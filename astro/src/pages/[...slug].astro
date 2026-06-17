@@ -1,0 +1,275 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Adv from '../components/blocks/Adv.astro';
+import CatalogCta from '../components/blocks/CatalogCta.astro';
+import WhyUs from '../components/blocks/WhyUs.astro';
+import BestOffer from '../components/blocks/BestOffer.astro';
+import Partner from '../components/blocks/Partner.astro';
+import Leadgen from '../components/blocks/Leadgen.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+
+// T-PERF-4: build-time extraction больших inline_styles блоков (>20 KB) в
+// external CSS-файлы под /public/css/inline-extracted/inline-<hash>.css.
+// Файлы дедуплицируются по содержимому (74 уникальных хэша на 513 страниц),
+// HTML каждой страницы уменьшается с 107 KB до ~1 KB. nginx отдаёт CSS с
+// max-age=86400 + immutable — на повторных визитах 0 загрузок.
+const EXTRACTED_CSS_DIR = path.resolve('./public/css/inline-extracted');
+fs.mkdirSync(EXTRACTED_CSS_DIR, { recursive: true });
+const cssSeen = new Set<string>();
+function extractInlineStyles(blocks: string[]): { external: string[]; inline: string[] } {
+  const external: string[] = [];
+  const inline: string[] = [];
+  for (const block of blocks) {
+    // Маленькие блоки (<20 KB) оставляем inline — экономия от внешнего link'а
+    // съедается round-trip'ом запроса.
+    if (block.length < 20000) {
+      inline.push(block);
+      continue;
+    }
+    // Убираем <style>...</style> обёртку — будет в обычный CSS-файл.
+    let css = block.replace(/^\s*<style[^>]*>/, '').replace(/<\/style>\s*$/, '');
+    // КРИТИЧЕСКИЙ ФИКС: relative urls (url('./img/...'), url("./img/...")) ломаются
+    // когда CSS перенесён в /css/inline-extracted/, потому что браузер резолвит их
+    // относительно расположения CSS-файла. Переписываем на абсолютные пути.
+    css = css.replace(/url\((['"]?)\.\/img\//g, 'url($1/img/');
+    css = css.replace(/url\((['"]?)\.\/brand\//g, 'url($1/brand/');
+    css = css.replace(/url\((['"]?)\.\.\/img\//g, 'url($1/img/');
+    css = css.replace(/url\((['"]?)\.\.\/brand\//g, 'url($1/brand/');
+    const hash = crypto.createHash('md5').update(css).digest('hex').slice(0, 12);
+    const filename = `inline-${hash}.css`;
+    if (!cssSeen.has(hash)) {
+      fs.writeFileSync(path.join(EXTRACTED_CSS_DIR, filename), css);
+      cssSeen.add(hash);
+    }
+    external.push(`/css/inline-extracted/${filename}`);
+  }
+  return { external, inline };
+}
+
+const COMPONENTS: Record<string, any> = {
+  'adv': Adv,
+  'catalog-cta': CatalogCta,
+  'why-us': WhyUs,
+  'best-offer': BestOffer,
+  'partner': Partner,
+  'leadgen': Leadgen,
+};
+
+export async function getStaticPaths() {
+  const rawRoot = path.resolve('./src/raw-pages');
+  const paths: any[] = [];
+  function walk(dir: string, relPath = '') {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      const rel = relPath ? `${relPath}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) {
+        walk(full, rel);
+      } else if (entry.name === 'body.html') {
+        const body = fs.readFileSync(full, 'utf-8');
+        let meta: {
+          title: string;
+          description: string;
+          inline_styles: string[];
+          css_templates?: string[];
+        } = {
+          title: '',
+          description: '',
+          inline_styles: [],
+        };
+        const mp = path.join(dir, 'meta.json');
+        if (fs.existsSync(mp)) {
+          try {
+            meta = JSON.parse(fs.readFileSync(mp, 'utf-8'));
+          } catch {
+            /* keep defaults */
+          }
+        }
+        paths.push({ params: { slug: relPath || undefined }, props: { body, meta } });
+      }
+    }
+  }
+  walk(rawRoot);
+  return paths;
+}
+
+const { body, meta } = Astro.props as {
+  body: string;
+  meta: {
+    title: string;
+    description: string;
+    inline_styles: string[];
+    /** B-3: общие шаблонные CSS-файлы (/css/tpl/<тип>.css), подключаются <link>'ом. */
+    css_templates?: string[];
+    /** LCP-картинка страницы — добавится в head как preload с fetchpriority=high. */
+    preload_image?: string;
+  };
+};
+// T-PERF-4: разделяем стили на external (>20 KB → /css/inline-extracted/) и
+// оставшийся inline (мелкие page-specific блоки).
+const { external: externalStyles, inline: inlineStylesArr } = extractInlineStyles(
+  meta.inline_styles || []
+);
+const inlineStyles = inlineStylesArr.join('\n');
+// B-3: общие шаблонные CSS-файлы (вынесены из дубль-блобов). Грузятся <link>'ом
+// на той же позиции каскада, что был inline-блоб (после site.css).
+const cssTemplates = meta.css_templates || [];
+const preloadImage = meta.preload_image;
+const slug = Astro.params.slug || '';
+
+let activeNav: string | undefined;
+if (slug === '') activeNav = 'home';
+else if (slug.startsWith('products')) activeNav = 'catalog';
+else if (slug.startsWith('uslugi')) activeNav = 'uslugi';
+else if (slug.startsWith('proizvodstvo')) activeNav = 'proizvodstvo';
+else if (slug.startsWith('proekty')) activeNav = 'proekty';
+else if (slug.startsWith('nalichie')) activeNav = 'nalichie';
+else if (slug.startsWith('o-kompanii') || slug.startsWith('o-company')) activeNav = 'o-kompanii';
+
+// Поиск (Pagefind):
+//  - проекты (/proekty/) НЕ индексируем;
+//  - разделы каталога (хаб/категории/подкатегории — у них .cat-hero) получают
+//    повышенный вес, чтобы стоять выше товарных карточек (.phero, вес 1).
+const isProject = slug.startsWith('proekty');
+const isSection = slug.startsWith('products') && body.includes('class="cat-hero"');
+// Служебная страница «Спасибо» — не в поисковой выдаче Pagefind (нет смысла
+// показывать экран благодарности в результатах поиска по сайту).
+const isUtility = slug === 'spasibo';
+const searchIndex = !isProject && !isUtility;
+const searchWeight = isSection ? 10 : 1;
+
+// SEO-T3b: парсер хлебных крошек → JSON-LD BreadcrumbList.
+// Ищем <nav class="breadcrumb"> ... </nav> и извлекаем пары (href, name).
+// Последний элемент — обычно <span class="breadcrumb__current"> без href.
+const SITE_SEO = 'https://new.uralinduktor.ru';
+function buildBreadcrumbSchema(html: string): string | null {
+  const navMatch = html.match(/<nav\s+class="breadcrumb[^"]*"[^>]*>([\s\S]*?)<\/nav>/);
+  if (!navMatch) return null;
+  const inner = navMatch[1];
+  const items: { name: string; url?: string }[] = [];
+  // <a href="...">name</a>
+  const linkRe = /<a\s+href="([^"]+)"[^>]*>([^<]+)<\/a>/g;
+  let m: RegExpExecArray | null;
+  while ((m = linkRe.exec(inner)) !== null) {
+    items.push({ url: m[1], name: m[2].replace(/&nbsp;/g, ' ').trim() });
+  }
+  // <span class="breadcrumb__current">...</span>
+  const currentMatch = inner.match(/<span\s+class="breadcrumb__current"[^>]*>([^<]+)<\/span>/);
+  if (currentMatch) {
+    items.push({ name: currentMatch[1].replace(/&nbsp;/g, ' ').trim() });
+  }
+  if (items.length < 2) return null;
+  const listItems = items.map((it, i) => {
+    const item: any = {
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": it.name,
+    };
+    if (it.url) {
+      // Абсолютный URL С trailing slash (синхронизировано с canonical и реальным
+      // 200-URL nginx: trailingSlash: 'always'). Иначе schema ссылается на 301.
+      let abs = it.url.startsWith('http') ? it.url : `${SITE_SEO}${it.url}`;
+      if (!abs.endsWith('/')) abs += '/';
+      item.item = abs;
+    }
+    return item;
+  });
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": listItems,
+  });
+}
+const breadcrumbSchema = buildBreadcrumbSchema(body);
+
+// SEO-T3c: JSON-LD Product — на товарных страницах (детектор: <section class="phero">).
+// Извлекаем name (h1.phero__title), image (главное фото), description (meta.description).
+// Цена «по запросу» → offers.price=0, availability=PreOrder — этого требуют Rich Results.
+function buildProductSchema(html: string, meta: any, canonicalAbs: string): string | null {
+  if (!/<section\s+class="phero"/.test(html)) return null;
+
+  // Имя товара — из h1.phero__title
+  const nameMatch = html.match(/<h1\s+class="phero__title"[^>]*>([\s\S]+?)<\/h1>/);
+  if (!nameMatch) return null;
+  const name = nameMatch[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+
+  // Главное фото — носитель .phero__main бывает <button> (с лайтбоксом) и <div>
+  // (запчасти, без лайтбокса); src у <img> не всегда первый атрибут.
+  const imgMatch = html.match(/class="phero__main"[\s\S]*?<img\b[^>]*?\bsrc="([^"]+)"/);
+  const imageURL = imgMatch
+    ? (imgMatch[1].startsWith('http') ? imgMatch[1] : `${SITE_SEO}${imgMatch[1].replace(/\?v=\d+/, '')}`)
+    : `${SITE_SEO}/og/default.jpg`;
+
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": name,
+    "description": meta.description ?? name,
+    "image": imageURL,
+    "brand": {
+      "@type": "Brand",
+      "name": "УралИндуктор"
+    },
+    "manufacturer": {
+      "@id": `${SITE_SEO}/#organization`
+    },
+    "url": canonicalAbs,
+    "offers": {
+      "@type": "Offer",
+      "url": canonicalAbs,
+      "priceCurrency": "RUB",
+      "price": "0",
+      "priceValidUntil": "2027-12-31",
+      "availability": "https://schema.org/PreOrder",
+      "itemCondition": "https://schema.org/NewCondition",
+      "seller": { "@id": `${SITE_SEO}/#organization` }
+    }
+  });
+}
+// canonicalAbs — с trailing slash, как реальный 200-URL (Astro trailingSlash: 'always').
+const canonicalAbs = slug ? `${SITE_SEO}/${slug.replace(/\/$/, '')}/` : `${SITE_SEO}/`;
+const productSchema = buildProductSchema(body, meta, canonicalAbs);
+
+// Split body into segments by block markers <!--C:NAME-->
+const parts = body.split(/<!--C:([a-z-]+)-->/);
+// parts = [html, name, html, name, html, ...]
+type Segment = { type: 'html'; content: string } | { type: 'component'; name: string };
+const segments: Segment[] = [];
+for (let i = 0; i < parts.length; i++) {
+  if (i % 2 === 0) {
+    if (parts[i]) segments.push({ type: 'html', content: parts[i] });
+  } else {
+    segments.push({ type: 'component', name: parts[i] });
+  }
+}
+---
+<BaseLayout title={meta.title} description={meta.description} activeNav={activeNav} index={searchIndex} searchWeight={searchWeight}>
+  {preloadImage && (
+    <link slot="head" rel="preload" as="image" href={preloadImage} fetchpriority="high" />
+  )}
+  {breadcrumbSchema && (
+    <script slot="head" type="application/ld+json" set:html={breadcrumbSchema} />
+  )}
+  {productSchema && (
+    <script slot="head" type="application/ld+json" set:html={productSchema} />
+  )}
+  {/* T-PERF-4 + fix FOUC: extracted CSS содержит критические стили layout/header/hero —
+      без него браузер рендерит «голый» HTML (SVG растягивается на весь экран).
+      Render-blocking обязательно. Файлы immutable + 1 год кэш, повторные визиты бесплатны. */}
+  {/* ?v= cache-bust для tpl-CSS: nginx кэширует css на 7d, без версии правки
+      шаблонных файлов (например tovar-b.css) не доезжают до вернувшихся юзеров.
+      Поднимай дату при правке любого /css/tpl/*.css. */}
+  {cssTemplates.map((href) => (
+    <link slot="head" rel="stylesheet" href={`${href}?v=20260609`} />
+  ))}
+  {externalStyles.map((href) => (
+    <link slot="head" rel="stylesheet" href={href} />
+  ))}
+  {inlineStyles && <Fragment slot="head" set:html={inlineStyles} />}
+  {segments.map((seg) => {
+    if (seg.type === 'html') return <Fragment set:html={seg.content} />;
+    const Comp = COMPONENTS[seg.name];
+    return Comp ? <Comp /> : null;
+  })}
+</BaseLayout>

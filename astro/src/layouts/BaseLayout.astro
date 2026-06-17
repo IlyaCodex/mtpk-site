@@ -1,0 +1,331 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Drawer from '../components/Drawer.astro';
+import Analytics from '../components/Analytics.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+  activeNav?: string;
+  /** Индексировать ли страницу поиском Pagefind (по умолчанию да). */
+  index?: boolean;
+  /** Вес страницы для ранжирования поиска (1 — обычная, >1 — приоритетная). */
+  searchWeight?: number;
+  /** OG image — абсолютный путь от корня (например '/og/foo.jpg'). По умолчанию '/og/default.jpg'. */
+  ogImage?: string;
+  /** OG type — обычно 'website' (default), для статей — 'article'. */
+  ogType?: string;
+}
+const {
+  title, description, canonical, activeNav, index = true, searchWeight = 1,
+  ogImage = '/og/default.jpg', ogType = 'website',
+} = Astro.props;
+
+// SEO-T1 (v2): canonical URL — С trailing slash, чтобы совпадать с реальным
+// 200-URL который отдаёт nginx (Astro trailingSlash: 'always'). Раньше был
+// без слеша — nginx делал 301 на версию со слешем, canonical указывал на
+// редирект (слабый сигнал для Я/Google). Теперь canonical = sitemap = ссылки.
+const SITE = 'https://new.uralinduktor.ru';
+const pathname = Astro.url.pathname;            // '/' | '/products/foo/' | '/nalichie/'
+// Гарантируем trailing slash; Astro обычно уже отдаёт с / в конце.
+const normalizedPath = pathname.endsWith('/') ? pathname : `${pathname}/`;
+const canonicalURL = canonical ?? `${SITE}${normalizedPath}`;
+
+// SEO-T2: Open Graph + Twitter Card — абсолютный URL для og:image и og:url.
+const ogImageURL = ogImage.startsWith('http') ? ogImage : `${SITE}${ogImage}`;
+const ogDescription = description ?? 'Производим, поставляем и запускаем оборудование для металлургии и литейных производств — индукционные печи, дробемётные установки, чиллеры, ковши.';
+
+// SEO-T3: JSON-LD Organization — единое описание компании для Яндекс.Вебмастера
+// и Google Knowledge Graph. Контакты — из site/contact/content.md, соц.сети — из Header/Footer.
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${SITE}/#organization`,
+  "name": "УралИндуктор",
+  "legalName": "ООО «МТПК»",
+  "alternateName": "МТПК-Уралиндуктор",
+  "url": SITE,
+  "logo": {
+    "@type": "ImageObject",
+    "url": `${SITE}/brand/logo-color.png`,
+    "width": "512",
+    "height": "512"
+  },
+  "image": `${SITE}/og/default.jpg`,
+  "description": "Производство индукционных плавильных печей, дробемётных установок, чиллеров и градирен, сталеразливочных ковшей и оборудования для литейных производств.",
+  "telephone": "+7-351-211-65-97",
+  "email": "info@uralinduktor.ru",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "ул. Уральских Добровольцев, 1в",
+    "addressLocality": "Миасс",
+    "addressRegion": "Челябинская область",
+    "postalCode": "456320",
+    "addressCountry": "RU"
+  },
+  "areaServed": [
+    { "@type": "Country", "name": "Россия" },
+    { "@type": "Country", "name": "Казахстан" },
+    { "@type": "Country", "name": "Беларусь" }
+  ],
+  "sameAs": [
+    "https://t.me/uralinduktor",
+    "https://max.ru/uralinduktor"
+  ]
+};
+
+// T-PERF-8/10/15: Критические CSS встраиваем inline в <head>:
+//   - tokens.css           (дизайн-токены)
+//   - fonts-critical.css   (4 @font-face — Inter 400/600 latin+cyrillic)
+//   - mobile-fixes.css     (правки мобильной вёрстки — критичны на mobile)
+//   - stock.css            (бейджи .pcard — мелкий файл)
+// Это убирает 2 render-blocking запроса из критического пути (Lighthouse
+// показывал stock.css на хвосте цепочки с задержкой 1.8 сек). Остальные
+// 14 шрифтов в fonts-extended.css — async (font-display:swap).
+const tokensCSS = fs.readFileSync(path.resolve('./public/tokens.css'), 'utf-8');
+const fontsCriticalCSS = fs.readFileSync(path.resolve('./public/fonts/fonts-critical.css'), 'utf-8');
+const mobileFixesCSS = fs.readFileSync(path.resolve('./public/css/mobile-fixes.css'), 'utf-8');
+const stockCSS = fs.readFileSync(path.resolve('./public/css/stock.css'), 'utf-8');
+// Атрибуты для <main>: data-pagefind-body включает страницу в индекс, weight — приоритет.
+const mainAttrs = index
+  ? { 'data-pagefind-body': true, 'data-pagefind-weight': String(searchWeight) }
+  : {};
+---
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--
+    ⛔ NOINDEX — сайт в финальной полировке, не индексируется поисковиками.
+    Перед публичным запуском (когда new.uralinduktor.ru становится основным
+    или сравнение конверсии завершено) — удалить эти 2 meta-тега и
+    `public/robots.txt`. См. также комментарии в robots.txt.
+  -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="yandex" content="noindex, nofollow">
+  <title>{title}</title>
+  {description && <meta name="description" content={description} />}
+  <link rel="canonical" href={canonicalURL} />
+
+  <!-- SEO-T2: Open Graph — превью при шеринге (Telegram, VK, WhatsApp, Slack). -->
+  <meta property="og:type" content={ogType} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:image" content={ogImageURL} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="УралИндуктор · МТПК" />
+  <meta property="og:locale" content="ru_RU" />
+
+  <!-- SEO-T2: Twitter Card — превью в X / LinkedIn. -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={ogDescription} />
+  <meta name="twitter:image" content={ogImageURL} />
+
+  <!-- SEO-T3: JSON-LD Organization — единое описание компании для Я.Вебмастера
+       (карточка организации) и Google Knowledge Graph. -->
+  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+
+  {pathname === '/' && (
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": `${SITE}/#website`,
+      "url": SITE,
+      "name": "УралИндуктор · МТПК",
+      "description": "Производство индукционных плавильных печей, дробемётных установок, чиллеров и градирен, сталеразливочных ковшей и оборудования для литейных производств.",
+      "publisher": { "@id": `${SITE}/#organization` },
+      "inLanguage": "ru-RU",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": { "@type": "EntryPoint", "urlTemplate": `${SITE}/?q={search_term_string}` },
+        "query-input": "required name=search_term_string"
+      }
+    })} />
+  )}
+  <!-- Self-hosted шрифты + preload основных весов 400/600 cyrillic (T-PERF-2).
+       Font-face declarations и design tokens — inline (T-PERF-8), убирают
+       2 render-blocking CSS-запроса и весь критический путь рендера сводят
+       к одному HTTP-обмену. -->
+  <!-- Лого в header — это реальный LCP-элемент по данным Lighthouse.
+       Preload + fetchpriority=high → браузер качает картинку параллельно
+       с парсингом HTML, к моменту первого пейнта она уже в кеше. -->
+  <link rel="preload" as="image" href="/brand/logo-header-clean.png" fetchpriority="high">
+  <!-- Preload основных весов Inter 400/600 в latin+cyrillic — параллельно с HTML,
+       без них в дереве критических запросов цепочка длиннее (Lighthouse). -->
+  <link rel="preload" href="/fonts/inter-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-600-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-600-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style is:global set:html={fontsCriticalCSS}></style>
+  <style is:global set:html={tokensCSS}></style>
+  <!-- Расширенные шрифты (T-PERF-10) — все остальные веса Inter + JetBrains
+       загружаются async после first paint. Lighthouse не флагует их как
+       критические зависимости — нет в critical request chain. -->
+  <link rel="preload" href="/fonts/fonts-extended.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="/fonts/fonts-extended.css"></noscript>
+  <link rel="icon" type="image/x-icon" href="/brand/favicon-original.ico">
+  <style is:global>
+    /* Honeypot — скрытое поле для ловли ботов (off-screen, не display:none).
+       is:global — иначе Astro заскоупит правило на cid слоя, а honeypot живёт
+       в компонентах форм (другой cid) и поле станет ВИДИМЫМ. */
+    .hp-field { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    /* Статус отправки формы */
+    .form-status { margin-top: var(--sp-3, 12px); padding: var(--sp-3, 12px) var(--sp-4, 16px); font-size: var(--fs-small, 14px); line-height: 1.4; }
+    .form-status--success { background: var(--status-success-bg, #e8f5e9); color: var(--status-success-fg, #1b5e20); }
+    .form-status--error { background: var(--status-error-bg, #fdecea); color: var(--status-error-fg, #b71c1c); }
+    .form-status--pending { color: var(--text-secondary, #555); }
+
+    /* Модалка поиска (Pagefind) */
+    .search-modal { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: flex-start; justify-content: center; }
+    .search-modal[hidden] { display: none; }
+    .search-modal__backdrop { position: absolute; inset: 0; background: rgba(16,31,38,.6); }
+    .search-modal__panel { position: relative; z-index: 1; margin-top: 8vh; width: min(680px, 92vw); max-height: 80vh; overflow: auto; background: #fff; box-shadow: 0 24px 60px rgba(0,0,0,.28); padding: 28px 24px 24px; }
+    .search-modal__close { position: absolute; top: 8px; right: 14px; border: 0; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--text-secondary, #555); }
+    .search-modal__close:hover { color: var(--text-primary, #101F26); }
+    #search-ui { --pagefind-ui-primary: var(--teal-600, #1F5E78); --pagefind-ui-text: var(--text-primary, #101F26); --pagefind-ui-font: var(--font-body, "Inter", sans-serif); --pagefind-ui-border-radius: 2px; --pagefind-ui-scale: .9; }
+  </style>
+  <!-- Pagefind CSS подключается lazy при первом открытии модалки (T-PERF-5).
+       Заголовок prefetch не блокирует, но сообщает браузеру: «скорее всего пригодится». -->
+  <link rel="prefetch" href="/_pagefind/pagefind-ui.css" as="style">
+  <link rel="prefetch" href="/_pagefind/pagefind-ui.js" as="script">
+  <!-- B-2: общее CSS-ядро (445 правил, ~69 KB) — вынесено из meta.json-блобов
+       в один файл. Подключается ДО slot=head, чтобы дельты страницы (external/
+       inline из [...slug].astro) шли после и могли переопределять ядро.
+       Render-blocking + immutable-кэш (nginx max-age) — повторные визиты бесплатны. -->
+  <link rel="stylesheet" href="/css/site.css?v=20260612">
+  <slot name="head" />
+  <!-- Mobile-fixes + stock-badges — inline в head (T-PERF-15).
+       Lighthouse показывал stock.css на хвосте критической цепочки с задержкой
+       1.8 сек. Inline убирает 2 HTTP-запроса, max chain delay падает с 1799 до ~300 мс.
+       Размер ~7 KB — приемлемо для inline. -->
+  <style is:global set:html={mobileFixesCSS}></style>
+  <style is:global set:html={stockCSS}></style>
+</head>
+<body>
+  <Header activeNav={activeNav} />
+  <main {...mainAttrs}>
+    <slot />
+  </main>
+  <Footer />
+  <Drawer />
+  <!-- Cache-bust версии: nginx отдаёт /js/*.js и /css/*.css с max-age=7д,
+       при правке файла поднимай ?v= — иначе пользователи получат старую версию. -->
+  <script src="/js/mobile-nav.js?v=20260601" defer></script>
+  <script src="/js/phone-mask.js?v=20260601" defer></script>
+  <script src="/js/forms.js?v=20260617" defer></script>
+  <!-- Единое правило скролла к форме заявки (#leadgen/#contacts → к самой форме). -->
+  <script src="/js/scroll-to-form.js?v=20260608" defer></script>
+  <!-- ТЗ-2 п.3: «Запросить цену» — дозапись позиции в форму + скролл. -->
+  <script src="/js/quote-form.js?v=20260607" defer></script>
+  <script src="/js/stock-badges.js?v=20260601" defer></script>
+  <!-- Spec-оглавление (scrollspy): активируется только если на странице есть блок .spec (карточка товара). -->
+  <script src="/js/spec-tabs.js?v=20260608-2" defer></script>
+  <!-- Catalog filter: активируется только если на странице есть [data-filter-form]. -->
+  <script src="/js/catalog-filter.js?v=20260601-3" defer></script>
+  <script>
+    /* T-PERF-9: scroll listener — обёрнут в requestAnimationFrame, чтобы
+       избежать forced reflow (классификация Lighthouse — «принудительная
+       компоновка»). window.scrollY читается в rAF-кадре, а не на каждом
+       scroll-event, и не дёргает layout посреди painting. */
+    (function(){
+      const h = document.querySelector('.header-shell');
+      if (!h) return;
+      let ticking = false;
+      const apply = () => {
+        h.classList.toggle('is-scrolled', window.scrollY > 8);
+        ticking = false;
+      };
+      window.addEventListener('scroll', () => {
+        if (!ticking) { requestAnimationFrame(apply); ticking = true; }
+      }, { passive: true });
+      apply();
+    })();
+  </script>
+
+  <!-- Поиск по сайту (Pagefind). Индекс /_pagefind/ создаётся командой
+       `npx pagefind --site dist` после сборки. Модалка открывается по «лупе». -->
+  <div class="search-modal" id="search-modal" hidden>
+    <div class="search-modal__backdrop" data-search-close></div>
+    <div class="search-modal__panel" role="dialog" aria-modal="true" aria-label="Поиск по сайту">
+      <button class="search-modal__close" type="button" aria-label="Закрыть поиск" data-search-close>&times;</button>
+      <div id="search-ui"></div>
+    </div>
+  </div>
+  <!-- Pagefind lazy loader (T-PERF-5): CSS + JS подгружаются динамически
+       при первом клике на кнопку поиска. До этого -35 KB JS и -7 KB CSS
+       из критического пути на каждой из 513 страниц. -->
+  <script is:inline>
+    (function () {
+      var modal = document.getElementById('search-modal');
+      if (!modal) return;
+      var ui = null;
+      var assetsLoaded = false;
+      var assetsLoading = null;
+
+      function loadPagefindAssets() {
+        if (assetsLoaded) return Promise.resolve();
+        if (assetsLoading) return assetsLoading;
+        assetsLoading = new Promise(function (resolve, reject) {
+          // CSS
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = '/_pagefind/pagefind-ui.css';
+          document.head.appendChild(link);
+          // JS
+          var script = document.createElement('script');
+          script.src = '/_pagefind/pagefind-ui.js';
+          script.onload = function () { assetsLoaded = true; resolve(); };
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+        return assetsLoading;
+      }
+
+      function initUI() {
+        if (!ui && window.PagefindUI) {
+          ui = new window.PagefindUI({
+            element: '#search-ui',
+            showSubResults: true,
+            showImages: false,
+            translations: {
+              placeholder: 'Поиск по сайту…',
+              clear_search: 'Очистить',
+              load_more: 'Показать ещё',
+              search_label: 'Поиск по сайту',
+              zero_results: 'Ничего не найдено по запросу «[SEARCH_TERM]»'
+            }
+          });
+        }
+      }
+
+      function open() {
+        modal.hidden = false;
+        document.documentElement.style.overflow = 'hidden';
+        loadPagefindAssets().then(function () {
+          initUI();
+          var inp = modal.querySelector('input[type="text"]');
+          if (inp) setTimeout(function () { inp.focus(); }, 60);
+        });
+      }
+      function close() {
+        modal.hidden = true;
+        document.documentElement.style.overflow = '';
+      }
+      document.querySelectorAll('[data-search-open]').forEach(function (b) { b.addEventListener('click', open); });
+      modal.querySelectorAll('[data-search-close]').forEach(function (b) { b.addEventListener('click', close); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) close(); });
+    })();
+  </script>
+
+  <!-- Сторонние аналитические скрипты (Roistat, Яндекс.Метрика) — в конце body -->
+  <Analytics />
+</body>
+</html>

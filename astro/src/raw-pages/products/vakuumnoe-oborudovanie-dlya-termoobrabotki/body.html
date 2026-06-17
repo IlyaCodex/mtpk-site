@@ -1,0 +1,280 @@
+<!-- ============================================================
+     HEADER — единый белый блок с двумя визуальными рядами
+     ============================================================ -->
+
+
+<!-- Локальный override для тизер-карточек: наши рендеры 1536×1024 (~3:2),
+     teaser-card__cover имеет 4:3. cover тут отлично работает, padding не нужен. -->
+
+
+<!-- ============================================================
+     CAT-HERO — Вакуумное оборудование для термообработки
+     ============================================================ -->
+<section class="cat-hero">
+  <div class="cat-hero__image" role="img" aria-label="Вакуумное оборудование УралИндуктор"
+       style="background-image: url('/img/vacuum-hero.jpg?v=3');"></div>
+  <div class="cat-hero__overlay"></div>
+
+  <div class="container cat-hero__content">
+    <nav class="breadcrumb" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="/products/">Каталог оборудования</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Вакуумное оборудование</span>
+    </nav>
+
+    <div class="cat-hero__body">
+      <div class="cat-hero__eyebrow">Вакуумное оборудование</div>
+      <h1 class="cat-hero__title">Вакуумное оборудование <em>для&nbsp;термообработки</em></h1>
+      <p class="cat-hero__subtitle">
+        Восемь серий вакуумных печей: плавильные индукционные и&nbsp;дуговые, графитовые и&nbsp;термические, печи для&nbsp;газовой и&nbsp;масляной закалки, лабораторные. Температуры до&nbsp;2&nbsp;200&nbsp;°C, предельный вакуум 10⁻³&nbsp;Па. Гарантия 18&nbsp;месяцев.
+      </p>
+      <div class="cat-hero__actions">
+        <a href="/products/" class="btn btn--primary">Перейти в каталог <span class="btn__arrow">→</span></a>
+        <a href="#leadgen" class="btn btn--on-dark">Подобрать модель <span class="btn__arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATS — 4 KPI
+     ============================================================ -->
+<section class="stats" aria-label="Ключевые показатели раздела">
+  <div class="container">
+    <div class="stats__grid">
+
+      <div class="stat">
+        <div class="stat__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="20" height="20"/><path d="M6 12h20M6 20h20"/></svg></div>
+        <div class="stat__body">
+          <div class="stat__label">направления</div>
+          <div class="stat__num">8<small>&nbsp;серий</small></div>
+          <div class="stat__text">от&nbsp;лабораторной до&nbsp;промышленной плавки</div>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v18a4 4 0 1 0 4 0V4a2 2 0 0 0-4 0z"/><circle cx="16" cy="24" r="2" fill="currentColor"/></svg></div>
+        <div class="stat__body">
+          <div class="stat__label">диапазон температур</div>
+          <div class="stat__num">до&nbsp;2&nbsp;200<small>&nbsp;°C</small></div>
+          <div class="stat__text">от&nbsp;термообработки до&nbsp;вакуумной плавки</div>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="10"/><path d="M16 6v10l6 4"/></svg></div>
+        <div class="stat__body">
+          <div class="stat__label">предельный вакуум</div>
+          <div class="stat__num">6,67<small>&nbsp;×&nbsp;10⁻³&nbsp;Па</small></div>
+          <div class="stat__text">двухступенчатая система откачки</div>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l11 4v8c0 6.6-4.5 12.6-11 14-6.5-1.4-11-7.4-11-14V8l11-4z"/><path d="M11 16l4 4 7-7" stroke-width="2.5"/></svg></div>
+        <div class="stat__body">
+          <div class="stat__label">гарантия</div>
+          <div class="stat__num">18<small>&nbsp;мес</small></div>
+          <div class="stat__text">на&nbsp;поставленное оборудование</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CATALOG-LIST — 8 категорий с teaser-карточками
+     ============================================================ -->
+<section class="catalog-list" aria-label="Каталог вакуумного оборудования">
+  <div class="container">
+    <div class="s-head">
+      <div class="s-eyebrow">Каталог</div>
+      <h2 class="s-title">Восемь <em>серий</em> вакуумного оборудования</h2>
+    </div>
+
+    <div class="catalog-intro">
+      <div class="intro-card">
+        <div class="intro-card__label"><span class="num">01</span> Сервис и&nbsp;ЗИП</div>
+        <h3 class="intro-card__title">Сервис вакуумной<br>аппаратуры и&nbsp;ЗИП</h3>
+        <p>Вакуумное оборудование УралИндуктор сопровождается сервисом: шефмонтаж, пусконаладка, диагностика и&nbsp;ремонт вакуумной аппаратуры — от&nbsp;инженерного центра в&nbsp;г.&nbsp;<strong>Миасс, Челябинская обл.</strong> Графитовые нагреватели, уплотнения и&nbsp;ЗИП — со&nbsp;склада, доставка по&nbsp;России и&nbsp;СНГ.</p>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card__label"><span class="num">02</span> Все&nbsp;типы процессов</div>
+        <h3 class="intro-card__title">Подбираем серию<br>под&nbsp;ваш техпроцесс</h3>
+        <p>Производим <strong>индукционные</strong> и&nbsp;<strong>дуговые</strong> плавильные печи, <strong>графитовые</strong> вертикальные и&nbsp;горизонтальные, <strong>термические</strong> и&nbsp;закалочные с&nbsp;газовой или&nbsp;масляной средой, <strong>лабораторные</strong> установки.</p>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card__label"><span class="num">03</span> Полный цикл</div>
+        <h3 class="intro-card__title">От&nbsp;расчёта<br>до&nbsp;сервиса</h3>
+        <p>Проектируем участок, изготавливаем за&nbsp;<strong>до&nbsp;95&nbsp;рабочих&nbsp;дней</strong> (или со&nbsp;склада, если позиция в&nbsp;наличии), доставляем по&nbsp;РФ и&nbsp;СНГ, шеф-монтируем нашей бригадой, обучаем операторов. Гарантия 18&nbsp;мес и&nbsp;сервисное сопровождение.</p>
+      </div>
+    </div>
+
+    <div class="teaser-grid">
+
+      <a href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/vakuumnaya-indukcionnaya-plavilnaya-pech/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-vacuum-indukcionnaya.jpg" alt="Вакуумная индукционная плавильная печь" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Вакуумная индукционная плавильная&nbsp;печь</h3>
+          <p class="teaser-card__caption">Серия BR-RLL — индукционная плавка в&nbsp;вакууме для&nbsp;спецсплавов. От&nbsp;10 до&nbsp;1&nbsp;000&nbsp;кг садки.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/vakuumnaya-dugovaya-plavilnaya-pech/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-vacuum-dugovaya.jpg" alt="Вакуумная дуговая плавильная печь" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Вакуумная дуговая плавильная&nbsp;печь</h3>
+          <p class="teaser-card__caption">Вакуумный дуговой переплав (VAR) для&nbsp;титана, жаропрочных сплавов и&nbsp;инструментальных сталей высокой чистоты.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/vakuumnaya-grafitovaya-pech/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-vacuum-grafitovaya.jpg" alt="Вакуумная графитовая печь" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Вакуумная графитовая&nbsp;печь</h3>
+          <p class="teaser-card__caption">Серия BR-TV — графитовые нагреватели до&nbsp;2&nbsp;200&nbsp;°C. Зона нагрева до&nbsp;200×300&nbsp;мм. Для&nbsp;спекания и&nbsp;отжига.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/vakuumnaya-grafitovaya-pech-gorizontalnaya/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-vacuum-grafitovaya-gorizontalnaya.jpg" alt="Вакуумная графитовая печь (горизонтальная)" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Вакуумная графитовая печь (горизонтальная)</h3>
+          <p class="teaser-card__caption">Горизонтальная компоновка для&nbsp;длинных и&nbsp;крупных заготовок. Камера с&nbsp;боковой загрузочной дверью.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/vakuumnaya-termicheskaya-pech/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-vacuum-termicheskaya.jpg" alt="Вакуумная термическая печь" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Вакуумная термическая&nbsp;печь</h3>
+          <p class="teaser-card__caption">Серия BR-VF — универсальные печи до&nbsp;1&nbsp;200&nbsp;/ 1&nbsp;500&nbsp;/ 1&nbsp;700&nbsp;°C. Камеры от&nbsp;100×100×100 до&nbsp;800×800×1&nbsp;200&nbsp;мм.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/vakuumnaya-pech-dlya-gazovoj-zakalki/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-vacuum-gazovaya-zakalka.jpg" alt="Вакуумная печь для газовой закалки" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Вакуумная печь для газовой закалки</h3>
+          <p class="teaser-card__caption">Закалка инструментальных и&nbsp;легированных сталей струёй инертного газа высокого давления. Без&nbsp;окалины и&nbsp;деформации.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/vakuumnaya-pech-dlya-zakalki-v-masle/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-vacuum-zakalka-maslo.jpg" alt="Вакуумная печь для закалки в масле" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Вакуумная печь для закалки в&nbsp;масле</h3>
+          <p class="teaser-card__caption">Двухкамерная установка: нагрев в&nbsp;вакууме, закалка погружением в&nbsp;масло. Для&nbsp;глубокой прокаливаемости и&nbsp;стабильной структуры.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/laboratornaya-vakuumnaya-indukcionnaya-plavilnaya-pech/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-vacuum-laboratornaya.jpg" alt="Лабораторная вакуумная индукционная плавильная печь" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Лабораторная вакуумная индукционная плавильная&nbsp;печь</h3>
+          <p class="teaser-card__caption">Компактная вакуумная плавильная печь для&nbsp;лабораторий, R&amp;D и&nbsp;малых партий. Точный контроль температуры, малая садка.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     APPLICATIONS — Под какие материалы и процессы
+     ============================================================ -->
+<section class="applications" aria-label="Применение вакуумного оборудования">
+  <div class="container">
+    <div class="s-head">
+      <div class="s-eyebrow">Применение</div>
+      <h2 class="s-title">Под&nbsp;ваш материал и&nbsp;<em>процесс</em></h2>
+      <p class="s-lead">Подбираем серию, режим вакуума и&nbsp;систему охлаждения под&nbsp;конкретный сплав, термоцикл и&nbsp;серийность. Считаем тепловой баланс и&nbsp;цикл оборота.</p>
+    </div>
+
+    <div class="applications__grid">
+      <article class="app-card">
+        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="20" height="20" rx="1"/><path d="M11 16h10"/></svg></div><div><h3 class="app-card__name">Инструментальные стали</h3><div class="app-card__temp">до&nbsp;<strong>1&nbsp;200&nbsp;°C</strong></div></div></div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Процесс</span><span class="app-card__spec-value">закалка газом или&nbsp;маслом, отпуск</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Эффект</span><span class="app-card__spec-value">без&nbsp;окалины, минимум деформации</span></li>
+        </ul>
+      </article>
+      <article class="app-card">
+        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="10"/><circle cx="16" cy="16" r="5" fill="currentColor" opacity="0.2"/></svg></div><div><h3 class="app-card__name">Жаропрочные сплавы</h3><div class="app-card__temp">до&nbsp;<strong>1&nbsp;700&nbsp;°C</strong></div></div></div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Процесс</span><span class="app-card__spec-value">отжиг, спекание, плавка в&nbsp;вакууме</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Сплавы</span><span class="app-card__spec-value">никель- и&nbsp;кобальт-базы</span></li>
+        </ul>
+      </article>
+      <article class="app-card">
+        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3l4 9h10l-8 6 3 11-9-7-9 7 3-11-8-6h10z"/></svg></div><div><h3 class="app-card__name">Титан и&nbsp;спецметаллы</h3><div class="app-card__temp">до&nbsp;<strong>2&nbsp;200&nbsp;°C</strong></div></div></div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Процесс</span><span class="app-card__spec-value">дуговой переплав (VAR), плавка</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Атмосфера</span><span class="app-card__spec-value">высокий вакуум 10⁻³&nbsp;Па</span></li>
+        </ul>
+      </article>
+      <article class="app-card">
+        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v8L6 24c-1 2 0 4 2 4h16c2 0 3-2 2-4L20 12V4"/><path d="M10 4h12"/></svg></div><div><h3 class="app-card__name">R&amp;D и&nbsp;лабораторные задачи</h3><div class="app-card__temp">±&nbsp;<strong>1&nbsp;°C</strong></div></div></div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Процесс</span><span class="app-card__spec-value">испытания, малая садка, R&amp;D</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Контроль</span><span class="app-card__spec-value">программируемые кривые, журнал</span></li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FULL-CYCLE
+     ============================================================ -->
+<section class="full-cycle" aria-label="Полный цикл — от подбора до сервиса">
+  <div class="container">
+    <div class="full-cycle__head">
+      <div>
+        <div class="s-eyebrow">Полный цикл</div>
+        <h2 class="s-title">Один поставщик — от&nbsp;проекта <em>до&nbsp;сервиса</em></h2>
+      </div>
+      <p class="s-lead">Проектируем под&nbsp;ваш техпроцесс, изготавливаем, шеф-монтируем на&nbsp;площадке, обучаем операторов и&nbsp;остаёмся на&nbsp;сервисе.</p>
+    </div>
+    <ol class="full-cycle__timeline">
+      <li class="cycle-step"><div class="cycle-step__num">01</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="8"/><path d="M20 20l6 6"/></svg></div><h3 class="cycle-step__title">Подбор и&nbsp;расчёт</h3><div class="cycle-step__meta">1&nbsp;рабочий день · бесплатно</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">02</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h14l6 6v18H6z"/><path d="M20 4v6h6"/></svg></div><h3 class="cycle-step__title">Проектирование участка</h3><div class="cycle-step__meta">от&nbsp;2&nbsp;недель</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">03</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 28V14l8 4V14l8 4V14l8 4v10z"/><path d="M4 28h24"/></svg></div><h3 class="cycle-step__title">Производство</h3><div class="cycle-step__meta">30–90 дней</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">04</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h4l3-10h14l3 10h4"/><circle cx="8" cy="26" r="2.5"/><circle cx="24" cy="26" r="2.5"/></svg></div><h3 class="cycle-step__title">Поставка</h3><div class="cycle-step__meta">РФ и&nbsp;СНГ · обеспечиваем доставку</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">05</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6l-8 8-4-4-6 6 4 4 6-6 4 4 8-8z"/></svg></div><h3 class="cycle-step__title">Шеф-монтаж и&nbsp;ПНР</h3><div class="cycle-step__meta">наша бригада</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">06</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l12 6-12 6L4 10z"/><path d="M10 14v8c0 2 3 4 6 4s6-2 6-4v-8"/></svg></div><h3 class="cycle-step__title">Обучение</h3><div class="cycle-step__meta">на&nbsp;вашей площадке</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">07</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 13a6 6 0 0 0-12 0c0 2 1 4 3 5l-2 8h10l-2-8c2-1 3-3 3-5z"/></svg></div><h3 class="cycle-step__title">Сервис</h3><div class="cycle-step__meta">гарантия&nbsp;18&nbsp;мес</div></li>
+    </ol>
+  </div>
+</section>
+
+<!--C:leadgen-->
+<!--C:why-us-->
+<!--C:best-offer-->

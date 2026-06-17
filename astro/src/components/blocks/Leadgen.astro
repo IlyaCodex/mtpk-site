@@ -1,0 +1,74 @@
+---
+// GENERATED block component (Astro Фаза 2). Reference hash 3a8fa373.
+// Edit here to update the leadgen block on all pages at once.
+---
+<section class="leadgen" id="leadgen">
+  <div class="container">
+    <div class="leadgen__grid">
+      <div class="leadgen__intro">
+        <div class="leadgen__eyebrow">Подбор и&nbsp;расчёт</div>
+        <h2 class="leadgen__title">
+          Получите подбор оборудования или&nbsp;<em>расчёт проекта</em> — заполните форму
+        </h2>
+        <p class="leadgen__lead">
+          Инженер свяжется с&nbsp;вами, уточнит задачу и&nbsp;предложит решение под&nbsp;ваше производство.
+        </p>
+
+        <ul class="leadgen__checklist">
+          <li class="leadgen__checklist-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Подбор оборудования под&nbsp;ваш металл, режим и&nbsp;объёмы</span>
+          </li>
+          <li class="leadgen__checklist-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Расчёт стоимости, сроков и&nbsp;схемы поставки</span>
+          </li>
+          <li class="leadgen__checklist-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Ответ в&nbsp;течение 1&nbsp;рабочего дня</span>
+          </li>
+        </ul>
+      </div>
+
+      <form class="form js-lead-form" data-form="Подбор и расчёт">
+        <h3 class="form__title">Запрос подбора и&nbsp;расчёта</h3>
+
+        <input type="text" name="hp_token" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="form_ts" class="js-form-ts">
+        <input type="hidden" name="source" class="js-form-source">
+        <input type="hidden" name="roistat_visit" class="js-roistat">
+
+        <div class="form__field">
+          <label class="form__label" for="cat-name">Имя <span aria-hidden="true">*</span></label>
+          <input class="form__input" type="text" name="name" id="cat-name" placeholder="Иван Петров" autocomplete="name" required>
+        </div>
+
+        <div class="form__row">
+          <div class="form__field">
+            <label class="form__label" for="cat-email">Эл. почта</label>
+            <input class="form__input" type="email" name="email" id="cat-email" placeholder="ivan@company.ru" autocomplete="email">
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="cat-phone">Телефон <span aria-hidden="true">*</span></label>
+            <input class="form__input" type="tel" name="phone" id="cat-phone" placeholder="+7 (___) ___-__-__" autocomplete="tel" required>
+          </div>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="cat-task">Описание задачи</label>
+          <textarea class="form__textarea" name="task" id="cat-task" rows="3" placeholder="Например: индукционная плавильная печь для чугуна, 1 т, 750 кВт; нужны пусконаладка и обучение персонала"></textarea>
+        </div>
+
+        <label class="form__check">
+          <input type="checkbox" checked>
+          <span>Отправляя форму, вы соглашаетесь с&nbsp;<a href="/policy/">политикой обработки персональных данных</a></span>
+        </label>
+
+        <button type="submit" class="form__submit">
+          Получить подбор или&nbsp;расчёт проекта <span class="btn__arrow">→</span>
+        </button>
+        <div class="js-form-status" style="display:none" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</section>

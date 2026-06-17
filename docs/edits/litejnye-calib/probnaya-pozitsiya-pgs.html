@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Пробная позиция ПГС — вариант B (раскрывающаяся карточка)</title>
+<style>
+  :root{
+    --green:#2e7d32; --green-d:#1b5e20; --ink:#1a1d1f; --muted:#5c6468;
+    --line:#e3e7ea; --bg:#f5f7f8; --card:#fff; --radius:14px;
+    --font:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px}
+  .note{background:#fffbe6;border:1px solid #f0d98a;border-radius:10px;padding:14px 18px;margin-bottom:32px;font-size:14px;color:#6b5a16}
+  .note b{color:#5a4a0c}
+  .s-eyebrow{color:var(--green);font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+  .s-title{font-size:30px;font-weight:800;margin:6px 0 8px}
+  .s-lead{color:var(--muted);max-width:680px;margin:0 0 28px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:820px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:540px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+  .card.open{grid-column:1/-1}
+  .cover{aspect-ratio:4/3;background:linear-gradient(135deg,#dfe6e9,#c8d2d6);display:flex;align-items:center;justify-content:center;color:#7b8a90;font-size:13px;text-align:center;padding:16px;position:relative}
+  .cover .ph{max-width:240px}
+  .cover .tag{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:3px 8px;border-radius:6px}
+  .card.open .cover{aspect-ratio:auto;min-height:240px}
+  .b{padding:16px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .cat{font-size:12px;color:var(--green);font-weight:600}
+  .ttl{font-size:17px;font-weight:700;margin:0}
+  .toggle{margin-top:auto;border:0;background:transparent;color:var(--green-d);font-weight:700;font-size:14px;text-align:left;cursor:pointer;padding:8px 0 0}
+  .toggle::after{content:" ▾"}
+
+  .detail{border-top:1px solid var(--line);padding:20px 22px;display:none}
+  .card.open .detail{display:block}
+  .detail h4{font-size:15px;font-weight:800;margin:18px 0 6px;color:var(--ink)}
+  .detail h4:first-child{margin-top:0}
+  .detail p,.detail li{color:#33393c;font-size:14.5px}
+  .detail ol,.detail ul{margin:6px 0;padding-left:20px}
+  table{border-collapse:collapse;width:100%;margin-top:8px;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+  thead th{background:#eef3ef;color:var(--green-d);font-weight:700}
+  tbody td:first-child{font-weight:600}
+  .specnote{font-size:13px;color:var(--muted);margin-top:8px}
+  .cta{display:inline-block;margin-top:18px;background:var(--green);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="note">
+    <b>Пробная позиция · Этап&nbsp;0б · вариант&nbsp;B (раскрывающаяся карточка).</b><br>
+    Демонстрация компоновки: сетка карточек раздела сохранена как на новом сайте,
+    но карточка раскрывает инлайн-панель с контентом старого сайта (Описание /
+    Основные элементы / Приготовление смеси / Таблица ТТХ). Контент перенесён
+    1:1 со старой страницы. Картинка — заглушка: в пилоте сюда встанет
+    перерисованная картинка по <b>ЭТАЛОНУ ПРИЁМКИ (Variant&nbsp;A)</b> из
+    <code>docs/edits/muf-calib/</code> через <code>/product-image</code>.
+    Раскрыта только пробная карточка — остальные 7 показаны свёрнутыми.
+  </div>
+
+  <div class="s-eyebrow">Линейка оборудования</div>
+  <h2 class="s-title">8 узлов <em>под линию ПГС</em></h2>
+  <p class="s-lead">Чашечный и вихревой смесители, формовочные машины УИФ-14 и УИФ-0806,
+    охладитель, полигональное сито, дробление комьев и магнитный сепаратор — полный
+    комплект для серийной формовки в сырые смеси.</p>
+
+  <div class="grid">
+
+    <!-- ПРОБНАЯ ПОЗИЦИЯ — раскрыта -->
+    <article class="card open">
+      <div class="cover">
+        <span class="tag">картинка → пилот (эталон Variant A)</span>
+        <span class="ph">[ перерисованная фотография: чашечный смеситель (бегуны),<br>
+          конструкция 1:1 с исходником, цех-канон v3 ]</span>
+      </div>
+      <div class="b">
+        <span class="cat">Смешивание · Бегуны</span>
+        <h3 class="ttl">Смеситель чашечный (бегуны)</h3>
+        <button class="toggle">Описание и характеристики</button>
+      </div>
+      <div class="detail">
+        <h4>Область применения</h4>
+        <p>Изготовление формовочной и стержневой смеси в литейном производстве.</p>
+
+        <h4>Основные элементы оборудования</h4>
+        <p>Вертикальные катки, скребки (отвалы), электропривод, выпускной люк
+          с пневмоприводом.</p>
+
+        <h4>Приготовление смеси</h4>
+        <ol>
+          <li>Включить привод вращения катков (скребков).</li>
+          <li>Загрузить сухие компоненты смеси (время перемешивания 1–2 минуты).</li>
+          <li>После образования однородной массы добавить жидкие компоненты
+            (процесс перемешивания 5–10 минут).</li>
+          <li>После достижения необходимых свойств выпустить готовую смесь через
+            выпускной люк.</li>
+        </ol>
+
+        <h4>Технические характеристики</h4>
+        <table>
+          <thead>
+            <tr><th>Модель</th><th>Ø чаши, мм</th><th>Замес max, кг</th>
+              <th>Производительность, т/ч</th><th>Скорость вращения, об/мин</th><th>Мощность, кВт</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>УИ-СБ 1110</td><td>1000</td><td>110</td><td>1.5–2</td><td>44</td><td>4</td></tr>
+            <tr><td>УИ-СБ 1110А</td><td>1220</td><td>130</td><td>2–4</td><td>27</td><td>4</td></tr>
+            <tr><td>УИ-СБ 1114</td><td>1820</td><td>500</td><td>5–6</td><td>25</td><td>15</td></tr>
+          </tbody>
+        </table>
+        <p class="specnote">В таблице — характеристики базовых моделей. Компания
+          спроектирует и изготовит оборудование согласно вашему ТЗ.</p>
+
+        <a class="cta" href="#">Запросить расчёт под мой проект</a>
+      </div>
+    </article>
+
+    <!-- Остальные 7 — свёрнуты (для общего вида сетки) -->
+    <article class="card"><div class="cover"><span class="ph">[ вихревой смеситель ]</span></div>
+      <div class="b"><span class="cat">Смешивание · Высокая скорость</span><h3 class="ttl">Смеситель вихревой</h3>
+      <button class="toggle">Описание и характеристики</button></div></article>
+
+    <article class="card"><div class="cover"><span class="ph">[ УИФ-14 ]</span></div>
+      <div class="b"><span class="cat">УИФ-14 · Формовка</span><h3 class="ttl">Формовочные машины серии УИФ-14</h3>
+      <button class="toggle">Описание и характеристики</button></div></article>
+
+    <article class="card"><div class="cover"><span class="ph">[ УИФ-0806 ]</span></div>
+      <div class="b"><span class="cat">УИФ-0806 · Мультиконтактная</span><h3 class="ttl">Мультиконтактная формовочная машина серии УИФ-0806</h3>
+      <button class="toggle">Описание и характеристики</button></div></article>
+
+    <article class="card"><div class="cover"><span class="ph">[ воздушный охладитель ]</span></div>
+      <div class="b"><span class="cat">Регенерация · Охлаждение</span><h3 class="ttl">Воздушный охладитель</h3>
+      <button class="toggle">Описание и характеристики</button></div></article>
+
+    <article class="card"><div class="cover"><span class="ph">[ полигональное сито ]</span></div>
+      <div class="b"><span class="cat">Регенерация · Сито</span><h3 class="ttl">Полигональное сито</h3>
+      <button class="toggle">Описание и характеристики</button></div></article>
+
+    <article class="card"><div class="cover"><span class="ph">[ дробление комьев ]</span></div>
+      <div class="b"><span class="cat">Регенерация · Дробление</span><h3 class="ttl">Установка дробления комьев</h3>
+      <button class="toggle">Описание и характеристики</button></div></article>
+
+    <article class="card"><div class="cover"><span class="ph">[ магнитный сепаратор ]</span></div>
+      <div class="b"><span class="cat">Регенерация · Магнит</span><h3 class="ttl">Ленточный магнитный сепаратор</h3>
+      <button class="toggle">Описание и характеристики</button></div></article>
+
+  </div>
+</div>
+
+<script>
+  // демо-раскрытие карточек
+  document.querySelectorAll('.toggle').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      btn.closest('.card').classList.toggle('open');
+    });
+  });
+</script>
+</body>
+</html>

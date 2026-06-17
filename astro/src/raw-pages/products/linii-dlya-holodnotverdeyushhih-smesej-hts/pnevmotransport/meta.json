@@ -1,0 +1,10 @@
+{
+  "title": "Пневмотранспорт ХТС УИПТ — 7,5–20 т/ч",
+  "description": "Пневмокамерный насос ХТС УИПТ для транспортировки регенерированного песка: 7,5–20 т/ч, 400 мм. Линии холоднотвердеющих смесей (ХТС).",
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}</style>"
+  ],
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ]
+}

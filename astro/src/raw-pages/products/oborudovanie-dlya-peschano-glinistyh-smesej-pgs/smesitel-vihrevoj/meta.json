@@ -1,0 +1,10 @@
+{
+  "title": "Смеситель вихревой УИ-СВ для ПГС — 12–25 т/ч",
+  "description": "Вихревой смеситель УИ-СВ для приготовления формовочной и стержневой смеси ПГС: 4 модели 12–25 т/ч, диск Ø1950 мм, замес до 1250 кг.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}</style>"
+  ]
+}

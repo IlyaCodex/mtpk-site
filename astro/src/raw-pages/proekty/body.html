@@ -1,0 +1,438 @@
+<!-- ============================================================
+     HEADER — единый белый блок с двумя визуальными рядами
+     ============================================================ -->
+
+
+
+
+<!-- ============================================================
+     CASE-FEATURE clamp — фиксируем высоту карточки текущего проекта,
+     чтобы при переключении проектов (JS-карусель) она не «прыгала»
+     от количества текста в заголовке и в блоке «Задача».
+     Стратегия: line-clamp до 2 строк + жёсткий min-height по высоте
+     2 строк, чтобы при коротком тексте оставалось то же место.
+     Result-список — clamp каждой строки до 2 строк (важно: длинные
+     одиночные пункты не пересчитывают карточку).
+     ============================================================ -->
+<style>
+  /* Заголовок проекта — 2 строки. line-height: 1.2 (см. основной стиль). */
+  .case-feature__title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    /* 2 строки × 1.2 line-height = 2.4em — высота под две строки h2 */
+    min-height: 2.4em;
+  }
+  /* Текст «Задача» — 2 строки. line-height: 1.55 (см. основной стиль). */
+  .case-block__text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    /* 2 строки × 1.55 line-height = 3.1em */
+    min-height: 3.1em;
+  }
+  /* Каждый пункт «Результат» — тоже 2 строки максимум.
+     Без этого один проект с длинной фразой ломает общую высоту. */
+  .case-result li {
+    /* flex-контейнер: clamp применяем к span/тексту внутри.
+       Здесь li содержит SVG-чек + текстовый узел, поэтому wrap'ить
+       его всё-таки можно — оборачивающим контейнером выступит сам li. */
+    overflow: hidden;
+  }
+  .case-result li > *:not(svg) {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
+
+
+<!-- ============================================================
+     PROJECTS HERO — Реализованные проекты
+     ============================================================ -->
+<section class="cat-hero proj-hero">
+  <div class="cat-hero__image proj-hero__image" role="img" aria-label="Индукционная плавильная печь УралИндуктор в литейном цеху"></div>
+  <div class="cat-hero__overlay"></div>
+
+  <div class="container cat-hero__content">
+    <nav class="breadcrumb" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Проекты&nbsp;/ Кейсы</span>
+    </nav>
+
+    <div class="cat-hero__body proj-hero__body">
+      <div class="cat-hero__eyebrow">Проекты и&nbsp;кейсы</div>
+      <h1 class="cat-hero__title">Реализованные проекты</h1>
+      <p class="cat-hero__subtitle">
+        От&nbsp;единичных поставок до&nbsp;комплексных литейных производств&nbsp;— решения, которые работают на&nbsp;площадках по&nbsp;всей России&nbsp;и СНГ.
+      </p>
+
+      <ul class="proj-hero__checklist">
+        <li>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+            <polyline points="17 5 8 14 3 9"/>
+          </svg>
+          <span>Поставки оборудования</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+            <polyline points="17 5 8 14 3 9"/>
+          </svg>
+          <span>Запуски производственных участков</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+            <polyline points="17 5 8 14 3 9"/>
+          </svg>
+          <span>Модернизация действующих линий</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+            <polyline points="17 5 8 14 3 9"/>
+          </svg>
+          <span>Литейные производства под&nbsp;ключ</span>
+        </li>
+      </ul>
+
+      <div class="cat-hero__actions">
+        <a href="#leadgen" class="btn btn--primary">Получить расчёт <span class="btn__arrow">→</span></a>
+        <a href="#leadgen" class="btn btn--on-dark">Запросить консультацию инженера <span class="btn__arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CASES INTRO — заголовок + табы + featured кейс
+     ============================================================ -->
+<section class="cases" aria-label="Реализованные проекты УралИндуктор">
+  <div class="container">
+
+    <div class="s-head cases__head">
+      <div class="s-eyebrow">Кейсы</div>
+      <h2 class="s-title">Здесь собраны <em>реализованные проекты</em> УралИндуктор</h2>
+      <p class="s-lead">От&nbsp;единичных поставок до&nbsp;комплексных объектов&nbsp;— подборка наиболее показательных работ по&nbsp;направлениям.</p>
+    </div>
+
+    <!-- Tabs filter -->
+    <div class="cases-tabs" role="tablist" aria-label="Фильтр проектов по направлению">
+      <button class="cases-tab is-active" type="button" data-tab="induction" role="tab" aria-selected="true">Индукционное оборудование</button>
+      <button class="cases-tab" type="button" data-tab="drobomet" role="tab" aria-selected="false">Дробемётное оборудование</button>
+      <button class="cases-tab" type="button" data-tab="cooling" role="tab" aria-selected="false">Градирни и&nbsp;системы охлаждения</button>
+      <button class="cases-tab" type="button" data-tab="turnkey" role="tab" aria-selected="false">Литейные производства под&nbsp;ключ</button>
+      <button class="cases-tab" type="button" data-tab="modern" role="tab" aria-selected="false">Модернизация и&nbsp;переоснащение</button>
+      <a class="cases-tab cases-tab--link" href="/proekty/allprojects/" role="link">Все проекты <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <!-- JS-driven case carousel — содержимое подгружается из cases-data.js -->
+    <article class="case-feature is-active" id="case-current" aria-live="polite">
+      <div class="case-feature__details">
+        <div class="case-feature__category" data-c="category">Индукционное оборудование</div>
+        <h3 class="case-feature__title" data-c="title">Загрузка проекта…</h3>
+
+        <ul class="case-meta">
+          <li data-c="meta-type"><span class="case-meta__label">Тип</span><span class="case-meta__value">—</span></li>
+          <li data-c="meta-city" hidden><span class="case-meta__label">Регион</span><span class="case-meta__value">—</span></li>
+          <li data-c="meta-date" hidden><span class="case-meta__label">Дата</span><span class="case-meta__value">—</span></li>
+        </ul>
+
+        <div class="case-block">
+          <div class="case-block__label">Задача</div>
+          <p class="case-block__text" data-c="task">—</p>
+        </div>
+
+        <div class="case-block">
+          <div class="case-block__label">Результат</div>
+          <ul class="case-result" data-c="result"></ul>
+        </div>
+
+        <div class="case-feature__cta">
+          <a href="#contacts" class="btn btn--primary">Обсудить задачу <span class="btn__arrow">→</span></a>
+          <div class="case-feature__nav">
+            <button type="button" class="case-feature__nav-btn" data-prev-case aria-label="Предыдущий проект в этой категории">
+              <span aria-hidden="true">&laquo;</span>&nbsp;Предыдущий
+            </button>
+            <span class="case-feature__counter" data-c="counter">1 / 1</span>
+            <button type="button" class="case-feature__nav-btn" data-next-case aria-label="Следующий проект в этой категории">
+              Следующий&nbsp;<span aria-hidden="true">&raquo;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="case-feature__gallery">
+        <div class="case-feature__main">
+          <img data-c="image" src="" alt="" loading="lazy">
+        </div>
+        <a class="case-feature__photo-note" data-c="link" href="#">Открыть страницу проекта &rarr;</a>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     PROJECTS MAP — Карта всех реализованных проектов
+     ============================================================ -->
+<section class="projects-map-section" aria-label="Карта реализованных проектов УралИндуктор">
+  <div class="container">
+
+    <div class="s-head projects-map-section__head">
+      <div class="s-eyebrow">География</div>
+      <h2 class="s-title">Карта <em>реализованных проектов</em></h2>
+    </div>
+
+    <div class="projects-map-wrap">
+      <div id="projects-map" role="img" aria-label="Карта реализованных проектов УралИндуктор по России и странам СНГ"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     VIDEO — Видеообзоры выполненных проектов
+     ============================================================ -->
+<section class="video-section" aria-label="Видеообзоры выполненных проектов и выездов на предприятия">
+  <div class="container">
+
+    <div class="s-head video-section__head">
+      <div class="s-eyebrow">Видео</div>
+      <h2 class="s-title">Видеообзоры <em>выполненных проектов</em></h2>
+      <p class="s-lead">Запуски, пусконаладки и&nbsp;выезды инженеров на&nbsp;площадки заказчиков&nbsp;— как&nbsp;всё работает в&nbsp;реальном цеху.</p>
+    </div>
+
+    <div class="video-grid">
+
+      <article class="video-tile">
+        <div class="video-tile__cover yt-lite" data-yt="9ADp0NsPluE" tabindex="0" role="button" aria-label="Воспроизвести: Запуск индукционной плавильной печи 350 кг, серии УИ-0.35Т-300кВт">
+          <span class="video-tile__play" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="30" fill="rgba(16,31,38,0.55)" stroke="white" stroke-width="2"/>
+              <path d="M26 22l16 10-16 10z" fill="white"/>
+            </svg>
+          </span>
+        </div>
+        <div class="video-tile__body">
+          <h3 class="video-tile__title">Запуск индукционной плавильной печи 350&nbsp;кг · УИ-0.35Т-300&nbsp;кВт</h3>
+          <div class="video-tile__meta">YouTube · УралИндуктор</div>
+        </div>
+      </article>
+
+      <article class="video-tile">
+        <div class="video-tile__cover yt-lite" data-yt="ruJezY2-sr0" tabindex="0" role="button" aria-label="Воспроизвести: Запуск индукционной плавильной печи 450 кг, серии УИ-0.45Т-400кВт">
+          <span class="video-tile__play" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="30" fill="rgba(16,31,38,0.55)" stroke="white" stroke-width="2"/>
+              <path d="M26 22l16 10-16 10z" fill="white"/>
+            </svg>
+          </span>
+        </div>
+        <div class="video-tile__body">
+          <h3 class="video-tile__title">Запуск индукционной плавильной печи 450&nbsp;кг · УИ-0.45Т-400&nbsp;кВт</h3>
+          <div class="video-tile__meta">YouTube · УралИндуктор</div>
+        </div>
+      </article>
+
+      <article class="video-tile">
+        <div class="video-tile__cover yt-lite" data-yt="KcAHZ4FnG80" tabindex="0" role="button" aria-label="Воспроизвести: Вертикальная линия непрерывного литья МНЛЗ">
+          <span class="video-tile__play" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="30" fill="rgba(16,31,38,0.55)" stroke="white" stroke-width="2"/>
+              <path d="M26 22l16 10-16 10z" fill="white"/>
+            </svg>
+          </span>
+        </div>
+        <div class="video-tile__body">
+          <h3 class="video-tile__title">Вертикальная линия непрерывного литья (МНЛЗ)</h3>
+          <div class="video-tile__meta">YouTube · УралИндуктор</div>
+        </div>
+      </article>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     WHY-US — Почему выбирают УралИндуктор (тёмная шапка + плитка)
+     ============================================================ -->
+<!--C:why-us-->
+
+<!-- ============================================================
+     BEST-OFFER — Подготовим лучшее предложение (формат с главной)
+     ============================================================ -->
+<!--C:best-offer-->
+
+
+
+
+
+
+
+<script src="/js/cases-data.js" defer></script>
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" defer></script>
+<script src="/js/projects-data.js" defer></script>
+<script src="/js/projects-map.js" defer></script>
+
+<script>
+  // — JS-driven cases: 5 категорий × N проектов внутри каждой —
+  // Источник: window.casesByCategory (из /js/cases-data.js)
+  // Оборачиваем в DOMContentLoaded — иначе inline-script бежит ДО defer-скриптов
+  document.addEventListener('DOMContentLoaded', function(){
+    if (!window.casesByCategory) {
+      console.warn('cases-data.js не загружен — список кейсов будет пустым');
+      return;
+    }
+    // Берём только табы-фильтры (button с data-tab), исключая ссылку «Все проекты»
+    const tabs = document.querySelectorAll('.cases-tab[data-tab]');
+    const card = document.getElementById('case-current');
+    if (!tabs.length || !card) return;
+
+    let currentCat = 'induction';
+    let currentIdx = 0;
+
+    function getList() { return window.casesByCategory[currentCat] || []; }
+
+    function render() {
+      const list = getList();
+      if (!list.length) {
+        card.querySelector('[data-c="title"]').textContent = 'В этой категории пока нет проектов';
+        card.querySelector('[data-c="counter"]').textContent = '0 / 0';
+        return;
+      }
+      const p = list[currentIdx];
+
+      card.querySelector('[data-c="category"]').innerHTML = p.category_label;
+      card.querySelector('[data-c="title"]').innerHTML = p.title;
+      card.querySelector('[data-c="meta-type"] .case-meta__value').innerHTML = p.type;
+
+      const cityLi = card.querySelector('[data-c="meta-city"]');
+      if (p.city) { cityLi.hidden = false; cityLi.querySelector('.case-meta__value').textContent = p.city; }
+      else cityLi.hidden = true;
+
+      const dateLi = card.querySelector('[data-c="meta-date"]');
+      if (p.date) { dateLi.hidden = false; dateLi.querySelector('.case-meta__value').textContent = p.date; }
+      else dateLi.hidden = true;
+
+      card.querySelector('[data-c="task"]').innerHTML = p.task || '';
+
+      const resUl = card.querySelector('[data-c="result"]');
+      resUl.innerHTML = (p.result || []).map(r =>
+        `<li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><polyline points="17 5 8 14 3 9"/></svg><span>${r}</span></li>`
+      ).join('');
+
+      const img = card.querySelector('[data-c="image"]');
+      img.src = p.image || '';
+      img.alt = p.title || '';
+      img.onerror = function() { this.style.opacity = '0.25'; };
+
+      const link = card.querySelector('[data-c="link"]');
+      link.href = '/proekty/' + p.slug + '/';
+
+      card.querySelector('[data-c="counter"]').textContent = `${currentIdx + 1} / ${list.length}`;
+    }
+
+    function switchTo(cat, idx = 0) {
+      currentCat = cat;
+      currentIdx = idx;
+      tabs.forEach(t => {
+        const on = t.dataset.tab === cat;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      render();
+    }
+
+    // Tab click → новая категория, индекс 0
+    tabs.forEach(t => t.addEventListener('click', () => {
+      switchTo(t.dataset.tab, 0);
+      document.querySelector('.cases')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
+
+    // Prev/Next — циклическое листание ВНУТРИ текущей категории
+    document.querySelectorAll('[data-next-case]').forEach(b => b.addEventListener('click', () => {
+      const list = getList();
+      if (!list.length) return;
+      currentIdx = (currentIdx + 1) % list.length;
+      render();
+    }));
+    document.querySelectorAll('[data-prev-case]').forEach(b => b.addEventListener('click', () => {
+      const list = getList();
+      if (!list.length) return;
+      currentIdx = (currentIdx - 1 + list.length) % list.length;
+      render();
+    }));
+
+    // первая загрузка
+    switchTo('induction', 0);
+  });
+
+  // — YouTube lite-iframe: превью → iframe с autoplay по клику —
+  (function(){
+    const tiles = document.querySelectorAll('.yt-lite[data-yt]');
+    if (!tiles.length) return;
+    tiles.forEach(el => {
+      const id = el.dataset.yt;
+
+      // Превью: если задан data-yt-poster — используем его, иначе пробуем
+      // YouTube CDN в порядке убывания качества: maxres → sd → hq.
+      // maxresdefault часто 404 (приходит 1KB-заглушка-плеер) — проверяем
+      // размер ответа, не только onload.
+      const poster = el.dataset.ytPoster;
+      if (poster) {
+        el.style.backgroundImage = `url('${poster}')`;
+      } else {
+        const variants = [
+          `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
+          `https://i.ytimg.com/vi/${id}/sddefault.jpg`,
+          `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+        ];
+        (function tryNext(idx){
+          if (idx >= variants.length) return;
+          const img = new Image();
+          img.onload = () => {
+            // YouTube возвращает заглушку 120×90 если нет maxresdefault.
+            // Если высота меньше 200px — пробуем следующий.
+            if (img.naturalWidth < 320 && idx < variants.length - 1) {
+              tryNext(idx + 1);
+            } else {
+              el.style.backgroundImage = `url('${variants[idx]}')`;
+            }
+          };
+          img.onerror = () => tryNext(idx + 1);
+          img.src = variants[idx];
+        })(0);
+      }
+
+      // активация: клик или Enter/Space
+      const activate = () => {
+        if (el.classList.contains('is-playing')) return;
+        el.classList.add('is-playing');
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.allowFullscreen = true;
+        iframe.title = el.getAttribute('aria-label') || 'YouTube video';
+        el.appendChild(iframe);
+      };
+      el.addEventListener('click', activate);
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+      });
+    });
+  })();
+
+  // — Channel pills: визуальное состояние при клике —
+  (function(){
+    const pills = document.querySelectorAll('.channel-pill');
+    if (!pills.length) return;
+    pills.forEach(p => p.addEventListener('click', () => {
+      pills.forEach(x => x.classList.remove('is-active'));
+      p.classList.add('is-active');
+    }));
+  })();
+</script>

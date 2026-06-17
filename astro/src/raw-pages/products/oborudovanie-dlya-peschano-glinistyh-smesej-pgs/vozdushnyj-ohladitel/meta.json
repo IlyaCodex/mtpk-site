@@ -1,0 +1,10 @@
+{
+  "title": "Воздушный охладитель УИВО для ПГС — 15–120 т",
+  "description": "Воздушный охладитель УИВО для подготовки отработанной песчано-глинистой смеси: охлаждение и обеспыливание в кипящем слое, 5 типоразмеров 15–120 т.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}</style>"
+  ]
+}

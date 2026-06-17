@@ -1,0 +1,10 @@
+{
+  "title": "Юбилей компании УралИндуктор!",
+  "description": "1 июня 2019 года отметила свой юбилей компания «Уралиндуктор», ведущий производитель и поставщик оборудования для металлургии.",
+  "inline_styles": [],
+  "css_templates": [
+    "/css/tpl/legal.css",
+    "/css/tpl/news.css"
+  ],
+  "preload_image": "/img/news/yubilej-kompanii-uralinduktor.jpg"
+}

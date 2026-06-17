@@ -1,0 +1,4 @@
+Contact: mailto:info@uralinduktor.ru
+Expires: 2027-05-29T00:00:00.000Z
+Preferred-Languages: ru, en
+Canonical: https://new.uralinduktor.ru/.well-known/security.txt

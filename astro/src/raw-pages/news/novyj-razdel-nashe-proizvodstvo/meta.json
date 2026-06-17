@@ -1,0 +1,10 @@
+{
+  "title": "На сайте появился новый раздел: «Наше производство»",
+  "description": "Рады сообщить о появлении на сайте раздела посвященного нашему собственному производству термических печей.",
+  "inline_styles": [],
+  "css_templates": [
+    "/css/tpl/legal.css",
+    "/css/tpl/news.css"
+  ],
+  "preload_image": "/img/news/novyj-razdel-nashe-proizvodstvo.jpg"
+}

@@ -1,0 +1,86 @@
+/* ============================================================
+   stock.css — стили подсистемы «В наличии на складе».
+   Глобальные стили (подключаются в BaseLayout.astro), нужны на:
+     - /nalichie/ — листинг карточек (.pcard через JS-рендер)
+     - /products/.../ — бейдж «В наличии» поверх обложек в каталоге
+   ============================================================ */
+
+/* Бейдж «В наличии» — зелёная плашка СНИЗУ-слева обложки.
+   Используется и в /nalichie/ (на инжектированных карточках каталога),
+   и в каталогах /products/ (через stock-badges.js).
+   Снизу, потому что сверху-слева на pcard уже есть .pcard__badge
+   (например «Сталь / чугун», «Для проката», «Градирня УИГ») — раньше
+   бейдж наличия перекрывал её. */
+.pcard__cover { position: relative; }
+.pcard__stock-badge {
+  position: absolute;
+  bottom: var(--sp-4, 16px);
+  left: 0;
+  z-index: 2;
+  display: inline-block;
+  background: var(--green-600, #3C8E33);
+  color: #fff;
+  font-family: var(--font-display, "Inter", sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  text-decoration: none;
+  line-height: 1.2;
+}
+.pcard__stock-badge:hover { background: var(--green-700, #2D7A2B); }
+
+/* Категория-каптион поверх карточки (используется в JS-рендере /nalichie/). */
+.pcard__cat {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary, #8a98a0);
+  margin-bottom: 6px;
+}
+
+/* Метаинформация «N шт · отгрузка от 1 дня» под названием */
+.pcard__stock-meta {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-secondary, #4a5862);
+  line-height: 1.4;
+}
+
+/* Полоска-обёртка фильтра: лейбл «Фильтр по категории:» слева + сами кнопки.
+   Скрывается JS если позиций меньше двух категорий. */
+.stock-filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3, 12px) var(--sp-4, 16px);
+  margin: var(--sp-5, 24px) 0 var(--sp-6, 32px);
+  padding: var(--sp-4, 16px) var(--sp-5, 20px);
+  background: var(--surface-subtle, #f6f8f9);
+  border: 1px solid var(--border-subtle, #e6eaee);
+  border-radius: 2px;
+}
+.stock-filterbar[hidden] { display: none; }
+.stock-filterbar__label {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary, #8a98a0);
+  white-space: nowrap;
+}
+/* Контейнер кнопок (внутри .stock-filterbar): использует .case-filter
+   из общего CSS блоба, здесь — только flex + gap. */
+[data-stock-filter] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2, 8px);
+}
+[data-stock-filter]:empty { display: none; }
+[data-stock-filter][hidden] { display: none; }
+@media (max-width: 767px) {
+  .stock-filterbar { padding: var(--sp-3, 12px); }
+  .stock-filterbar__label { font-size: 10px; }
+}

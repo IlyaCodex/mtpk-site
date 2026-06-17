@@ -1,0 +1,10 @@
+{
+  "title": "Индукционные транзисторные плавильные печи — 14 моделей · УралИндуктор",
+  "description": "Транзисторные плавильные печи на IGBT-модулях: загрузка от 1 до 100 кг по стали (до 250 кг по меди), мощность 7–150 кВт. 14 моделей собственного производства, гарантия 18 мес.",
+  "inline_styles": [
+    "<style>/* hero раздела — транзисторная печь с плавкой (override общего kategoriya-pechi.css) */\n.cat-hero__image { background-image: url('/img/hero-pech-tranzistor.png?v=1'); }</style>"
+  ],
+  "css_templates": [
+    "/css/tpl/kategoriya-pechi.css"
+  ]
+}

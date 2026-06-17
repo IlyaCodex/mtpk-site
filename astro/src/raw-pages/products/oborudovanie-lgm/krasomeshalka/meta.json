@@ -1,0 +1,10 @@
+{
+  "title": "Красомешалка RC-5 для ЛГМ — оборудование для литья",
+  "description": "Красомешалка RC-5 — универсальный комплекс для приготовления, перемешивания и диспергирования противопригарных покрытий в ЛГМ.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}.spec__body{min-width:0}</style>"
+  ]
+}

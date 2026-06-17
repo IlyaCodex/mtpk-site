@@ -1,0 +1,73 @@
+---
+/*
+ * Analytics.astro — единый контейнер сторонних аналитических скриптов.
+ * Подключается в конце <body> на ВСЕХ страницах через BaseLayout.astro.
+ *
+ * Счётчики (см. briefs/forms-spec.md, раздел «Аналитика»):
+ *   - Roistat        — projectId 55e30c285273fb0205de07d6cfbcb9ce
+ *   - Яндекс.Метрика — counter 25228307
+ *
+ * Все сторонние <script> помечены is:inline — иначе Astro попытается их
+ * собрать/обработать и сломает (особенно код с document.write).
+ * roistat_visit из cookie в скрытое поле формы кладёт /js/forms.js; cookie
+ * ставит сам счётчик Roistat ниже.
+ *
+ * T-PERF-12 (2026-06-01): инициализация отложена через requestIdleCallback
+ * до момента, когда браузер закончит первый рендер. Trade-off: первые
+ * 1-3 секунды посетитель не трекается, но FCP/LCP не пьют 75 KB сторонних
+ * скриптов и Lighthouse не помечает их как unused-on-critical-path.
+ * Все user-interaction (клик, скролл, тач, key-press) форсят немедленный
+ * запуск — никто не потеряется.
+ */
+---
+<!-- Аналитика откладывается до idle / first interaction (T-PERF-12) -->
+<script is:inline>
+(function(){
+  var started = false;
+  function startAnalytics(){
+    if (started) return;
+    started = true;
+
+    /* ===== Roistat ===== */
+    (function(w, d, s, h, id) {
+      w.roistatProjectId = id; w.roistatHost = h;
+      w.roistatPage = d.location.href; w.roistatReferrer = d.referrer;
+      var p = d.location.protocol == "https:" ? "https://" : "http://";
+      var u = /^.*roistat_visit=[^;]+(.*)?$/.test(d.cookie)
+        ? "/dist/module.js"
+        : "/api/site/1.0/"+id+"/init?referrer="+encodeURIComponent(d.location.href);
+      var js = d.createElement(s); js.charset="UTF-8"; js.async = 1; js.src = p+h+u;
+      var js2 = d.getElementsByTagName(s)[0]; js2.parentNode.insertBefore(js, js2);
+    })(window, document, 'script', 'cloud.roistat.com', '55e30c285273fb0205de07d6cfbcb9ce');
+
+    /* ===== Яндекс.Метрика ===== */
+    (function(m,e,t,r,i,k,a){
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,
+      a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js', 'ym');
+    ym(25228307, 'init', {
+      webvisor: true, clickmap: true,
+      referrer: document.referrer, url: location.href,
+      accurateTrackBounce: true, trackLinks: true
+    });
+  }
+
+  /* Отложенный старт: requestIdleCallback (Chrome/Firefox/Edge) или
+     setTimeout fallback на 2.5 сек для Safari/старых. */
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(startAnalytics, { timeout: 4000 });
+  } else {
+    setTimeout(startAnalytics, 2500);
+  }
+
+  /* Любое касание/клик/скролл/нажатие — немедленный запуск, чтобы не
+     терять hit от активного пользователя. once + passive — без overhead. */
+  ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){
+    window.addEventListener(ev, startAnalytics, { once: true, passive: true });
+  });
+})();
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/25228307" style="position:absolute; left:-9999px;" alt="" /></div></noscript>

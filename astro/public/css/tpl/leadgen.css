@@ -1,0 +1,44 @@
+/* tpl «leadgen» — стили блока заявки (компонент C:leadgen) + формы.
+   Базовые .leadgen__intro/__eyebrow/__title и .form__field/__row/__submit
+   лежат в site.css; здесь — остальное (фон секции, чек-лист, светлая карточка
+   формы). Вариант «как на главной/legal» (светлая форма). Грузится <link>'ом
+   после site.css. Подключать на hand-made raw-pages, где блок C:leadgen
+   используется без своего inline-блоба (например /spasibo/). */
+.leadgen { background: var(--surface-subtle, #F5F7F8); padding: var(--sp-32) 0; border-bottom: 1px solid var(--border-subtle); position: relative; overflow: hidden; }
+.leadgen::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 96px; background: var(--teal-600); z-index: 2; }
+.leadgen::after { content: ""; position: absolute; inset: 0; background-image:
+    linear-gradient(to right, rgba(31, 94, 120, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(31, 94, 120, 0.06) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; mask-image: radial-gradient(ellipse at 25% 50%, black 0%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse at 25% 50%, black 0%, transparent 70%); }
+.leadgen .container { position: relative; z-index: 1; }
+/* Чек-лист в левой колонке leadgen */
+.leadgen__checklist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+.leadgen__checklist-item { display: flex; align-items: flex-start; gap: var(--sp-3); font-size: var(--fs-body); color: var(--text-primary); line-height: 1.5; }
+.leadgen__checklist-item svg { flex-shrink: 0; color: var(--teal-600); margin-top: 3px; }
+.leadgen__grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-20); align-items: center; }
+.leadgen__lead { font-size: var(--fs-lead); color: var(--text-secondary); line-height: var(--lh-body); margin: 0 0 var(--sp-10); max-width: 48ch; }
+/* Form — светлая карточка (паттерн с главной) */
+.form { background: var(--neutral-0); color: var(--text-primary); padding: var(--sp-10); position: relative; border-top: 3px solid var(--teal-600); box-shadow: 0 24px 60px -20px rgba(16, 31, 38, 0.15), 0 2px 8px rgba(16, 31, 38, 0.04); }
+.form::before { content: ""; position: absolute; top: 0; right: 0; width: 64px; height: 3px; background: var(--green-500); }
+.form__title { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: var(--fw-semibold); margin: 0 0 var(--sp-8); color: var(--text-primary); letter-spacing: var(--ls-h3); }
+.form__label { display: block; font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); margin-bottom: var(--sp-2); }
+.form__input,
+.form__textarea { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--border-default); color: var(--text-primary); font-family: var(--font-body); font-size: var(--fs-body); padding: var(--sp-3) 0; outline: none; transition: border-color var(--duration-base) var(--ease-out); }
+.form__input::placeholder,
+.form__textarea::placeholder { color: var(--text-tertiary); opacity: 0.6; }
+.form__input:focus,
+.form__textarea:focus { border-bottom-color: var(--teal-600); box-shadow: none; }
+.form__textarea { resize: vertical; min-height: 88px; line-height: 1.5; }
+.form__check { display: flex; align-items: flex-start; gap: var(--sp-3); margin: var(--sp-8) 0; font-size: var(--fs-caption); color: var(--text-secondary); line-height: 1.5; cursor: pointer; }
+.form__check input { margin-top: 3px; accent-color: var(--teal-600); }
+.form__check a { color: var(--teal-600); text-decoration: underline; }
+.form__submit { width: 100%; background: var(--green-500); color: var(--neutral-0); border: 0; padding: var(--sp-5) var(--sp-6); font-family: var(--font-display); font-size: var(--fs-body); font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: var(--ls-caps); cursor: pointer; display: inline-flex; align-items: center; justify-content: space-between; gap: var(--sp-3); transition: background var(--duration-base) var(--ease-out); }
+.form__submit:hover { background: var(--green-600, #3C8E33); }
+@media (max-width: 1024px) {
+  .leadgen__grid { grid-template-columns: 1fr; gap: var(--sp-12); }
+  .leadgen__intro { padding-right: 0; }
+  .form__row { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .leadgen { padding: var(--sp-20) 0; }
+  .form { padding: var(--sp-8) var(--sp-6); }
+}

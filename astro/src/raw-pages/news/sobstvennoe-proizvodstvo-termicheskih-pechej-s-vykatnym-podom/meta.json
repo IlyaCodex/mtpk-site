@@ -1,0 +1,10 @@
+{
+  "title": "Новый раздел: «Термическая печь с выкатным подом»",
+  "description": "Камерные печи собственного производства компании «Уралиндуктор» являются самыми удобными и универсальными для процессов термической обработки.",
+  "inline_styles": [],
+  "css_templates": [
+    "/css/tpl/legal.css",
+    "/css/tpl/news.css"
+  ],
+  "preload_image": "/img/news/sobstvennoe-proizvodstvo-termicheskih-pechej-s-vykatnym-podom.jpg"
+}

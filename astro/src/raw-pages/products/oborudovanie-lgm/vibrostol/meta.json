@@ -1,0 +1,10 @@
+{
+  "title": "Трёхмерный вибростол УИ-ВБ-5 для ЛГМ — 5 т",
+  "description": "Трёхмерный вибростол УИ-ВБ-5 для уплотнения огнеупорного наполнителя в вакуумной опоке (ЛГМ): 5 т, 1500 мм. Литьё по газифицируемым моделям (ЛГМ).",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}.spec__body{min-width:0}</style>"
+  ]
+}
