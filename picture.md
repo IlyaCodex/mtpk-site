@@ -342,6 +342,11 @@ picture/
   (data-lightbox-index 1–4, hero — 0). (2026-06-09: страница «Расходники и
   комплектующие» переименована в «Расходные материалы», добавлены 4 материала
   с описаниями со старого сайта.)
+- **Новый товар «Машина для ручного литья воска под давлением» (УИ-В-140,** `mashina-ruchnogo-litya-voska`,
+  2026-06-19): отдельная картинка `mashina-dlya-ruchnogo-litya-voska-pod-davleniem.png`
+  (583×628, RGBA, ~360 КБ, без webp-соседа). Прод-файл — `astro/public/img/lvm-products/`.
+  Используется как hub-карточка на `/products/oborudovanie-lvm/` и главное фото
+  (phero + lightbox index 0) страницы товара.
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`
