@@ -351,6 +351,11 @@ picture/
   картинка `shpric-mashina.png` (~600 КБ, без webp-соседа). Прод-файл — `astro/public/img/lvm-products/`.
   Используется как hub-карточка на `/products/oborudovanie-lvm/` и главное фото
   (phero + lightbox index 0) страницы товара.
+- **Новый товар «Робот для изготовления оболочек (4 головы, 8 рук)» (УИ-К-4Г8Р,**
+  `robot-izgotovleniya-obolochek-4g8r`, 2026-06-19): картинка
+  `robot-dlya-izgotovleniya-obolochek-s-chetyrmya-golovami-i-vosmyu-rukami.png` (~330 КБ, без webp).
+  Прод-файл — `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Робот») +
+  главное фото (phero + lightbox index 0) страницы товара.
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`

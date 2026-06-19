@@ -191,9 +191,10 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │
 │   │   ─── Технологические разделы (T03b): хаб → дочерние узлы линии T05 (без уровня T04) ───
 │   ├── /products/oborudovanie-dlya-peschano-glinistyh-smesej-pgs/  ✅ T03b · Раздел «Линии ПГС» (8 узлов-позиций T05)
-│   ├── /products/oborudovanie-lvm/                     ✅ T03b · Раздел «Оборудование ЛВМ» (23 дочерних T05, реал. фото)
+│   ├── /products/oborudovanie-lvm/                     ✅ T03b · Раздел «Оборудование ЛВМ» (24 дочерних T05, реал. фото)
 │   │       └── …/mashina-ruchnogo-litya-voska/          ✅ T05 · Машина для ручного литья воска под давлением УИ-В-140 (2026-06-19)
 │   │       └── …/shpric-mashina/                        ✅ T05 · Шприц-машина (восконагнетательный пресс) УИ-В-120С (2026-06-19)
+│   │       └── …/robot-izgotovleniya-obolochek-4g8r/    ✅ T05 · Робот для изготовления оболочек (4 головы, 8 рук) УИ-К-4Г8Р (2026-06-19)
 │   ├── /products/oborudovanie-lgm/                     ✅ T03b · Раздел «Оборудование ЛГМ» (12 дочерних T05, реал. фото)
 │   └── /products/linii-dlya-holodnotverdeyushhih-smesej-hts/   ✅ T03b · Раздел «Линии ХТС» (7 дочерних T05)
 │       └── 7 дочерних T05 (вариант C)                  ✅ linya-regeneratsii · smesiteli · vibrostol · pnevmotransport · vibroottirochnaya-mashina · skaf-ohlazdenia · pyloylovitel
