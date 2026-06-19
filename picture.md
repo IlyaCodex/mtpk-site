@@ -347,6 +347,10 @@ picture/
   (583×628, RGBA, ~360 КБ, без webp-соседа). Прод-файл — `astro/public/img/lvm-products/`.
   Используется как hub-карточка на `/products/oborudovanie-lvm/` и главное фото
   (phero + lightbox index 0) страницы товара.
+- **Новый товар «Шприц-машина» (УИ-В-120С,** `shpric-mashina`, 2026-06-19): отдельная
+  картинка `shpric-mashina.png` (~600 КБ, без webp-соседа). Прод-файл — `astro/public/img/lvm-products/`.
+  Используется как hub-карточка на `/products/oborudovanie-lvm/` и главное фото
+  (phero + lightbox index 0) страницы товара.
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`
