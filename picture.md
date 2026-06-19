@@ -351,11 +351,13 @@ picture/
   картинка `shpric-mashina.png` (~600 КБ, без webp-соседа). Прод-файл — `astro/public/img/lvm-products/`.
   Используется как hub-карточка на `/products/oborudovanie-lvm/` и главное фото
   (phero + lightbox index 0) страницы товара.
-- **Новый товар «Робот для изготовления оболочек (4 головы, 8 рук)» (УИ-К-4Г8Р,**
-  `robot-izgotovleniya-obolochek-4g8r`, 2026-06-19): картинка
-  `robot-dlya-izgotovleniya-obolochek-s-chetyrmya-golovami-i-vosmyu-rukami.png` (~330 КБ, без webp).
-  Прод-файл — `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Робот») +
-  главное фото (phero + lightbox index 0) страницы товара.
+- **Товар «Робот для изготовления оболочек (3 головы, 6 рук)» (УИ-К-3Г6Р,**
+  `robot-izgotovleniya-obolochek-3g6r`, 2026-06-19): **переиспользует** картинку
+  `robot-dlya-izgotovleniya-obolochek-s-chetyrmya-golovami-i-vosmyu-rukami.png` (~330 КБ, без webp;
+  имя файла осталось от первоначального 4Г8Р — по решению Евгения фото общее). Прод-файл —
+  `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Робот») + главное фото
+  (phero + lightbox index 0). _История: 2026-06-19 страница сперва создана как 4Г8Р, в тот же день
+  заменена на 3Г6Р (название/спеки/описание), URL переименован `...-4g8r` → `...-3g6r`._
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`
