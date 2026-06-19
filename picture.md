@@ -358,6 +358,11 @@ picture/
   `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Робот») + главное фото
   (phero + lightbox index 0). _История: 2026-06-19 страница сперва создана как 4Г8Р, в тот же день
   заменена на 3Г6Р (название/спеки/описание), URL переименован `...-4g8r` → `...-3g6r`._
+- **Товар «Робот для изготовления оболочек (4 головы, 8 рук)» (УИ-К-4Г8Р,**
+  `robot-izgotovleniya-obolochek-4g8r`, 2026-06-19): картинка `robot-obolochek-4g8r.png` (~400 КБ,
+  без webp) — копия исходника `2026-06-19 162037.png`, переименованного в kebab-case. Прод-файл —
+  `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Робот») + главное фото
+  (phero + lightbox index 0). _Добавлен отдельным товаром рядом с 3Г6Р (оба робота сосуществуют)._
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`
