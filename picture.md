@@ -382,6 +382,10 @@ picture/
   2026-06-22): картинка `specialnaya-mashina-dlya-pogruzheniya.png` (~440 КБ, без webp). Прод-файл —
   `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Погружение») + главное фото
   (phero + lightbox index 0). Бак-пульпопровод с мешалкой для керамической суспензии (995 л, 28 об/мин).
+- **Товар «Барабанный пескоструйный аппарат (только для роботов)» (УИ-К-Б1,**
+  `barabannyj-peskostrujnyj-apparat`, 2026-06-22): картинка `barabannyj-peskostrujnyj-apparat.png`
+  (~560 КБ, без webp). Прод-файл — `astro/public/img/lvm-products/`. Hub-карточка (категория
+  «Керамика · Обсыпка») + главное фото (phero + lightbox index 0). Обсыпка/стомление в роботизированной линии.
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`
