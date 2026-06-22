@@ -1,0 +1,10 @@
+{
+  "title": "Шестиосный робот для изготовления оболочек УИ-К-6О (KUKA R-2000iC/210F) — ЛВМ",
+  "description": "Интеллектуальный шестиосный роботизированный комплекс УИ-К-6О на базе KUKA R-2000iC/210F: грузоподъёмность 210 кг, радиус 2,65 м, точность ±0,07 мм. Полный цикл формирования керамической оболочки в ЛВМ.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}.spec__body{min-width:0}</style>"
+  ]
+}
