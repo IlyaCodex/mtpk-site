@@ -378,6 +378,10 @@ picture/
   `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Линия») + главное фото
   (phero + lightbox index 0). _Добавлена отдельным товаром рядом с шестиосным роботом (оба
   сосуществуют). Старый файл линии `…obolochek.png` (353 КБ) и дубль `…obolochek (2).png` — orphan._
+- **Товар «Специальная машина для погружения» (УИ-К-П1,** `specialnaya-mashina-pogruzheniya`,
+  2026-06-22): картинка `specialnaya-mashina-dlya-pogruzheniya.png` (~440 КБ, без webp). Прод-файл —
+  `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Погружение») + главное фото
+  (phero + lightbox index 0). Бак-пульпопровод с мешалкой для керамической суспензии (995 л, 28 об/мин).
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`
