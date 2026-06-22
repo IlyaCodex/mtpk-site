@@ -1,0 +1,10 @@
+{
+  "title": "Полностью автоматический котёл для депарафинизации УИ-Д-А1 — вытопка воска ЛВМ",
+  "description": "Полностью автоматический электрический котёл депарафинизации УИ-Д-А1: генерация перегретого пара 333 кВт, давление до 8 МПа (рост 7 МПа за 10 с), ПЛК-управление. Удаление модельного воска в литье по выплавляемым моделям.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}.spec__body{min-width:0}</style>"
+  ]
+}
