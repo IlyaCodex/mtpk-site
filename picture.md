@@ -368,9 +368,10 @@ picture/
   `shestiosnyj-robot-izgotovleniya-obolochek.png` (~380 КБ, без webp) — копия исходника-скриншота
   `Снимок экрана 2026-06-22 105436.png`, переименован в kebab-case. Прод-файл —
   `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Робот») + главное фото
-  (phero + lightbox index 0). ⚠️ **Картинка робота — временно фото ЛИНИИ** (md5 == `…obolochek-01.png`):
-  отдельного фото шестиосного робота не было, авто-подобран скриншот, оказавшийся фото линии. Нужно
-  заменить на реальное фото робота KUKA.
+  (phero + lightbox index 0). Картинка `shestiosnyj-robot-dlya-izgotovleniya-obolochek.png` (~350 КБ,
+  без webp) — реальное фото зелёного шестиосного робота-манипулятора с лого «УралИндуктор» (прислано
+  Евгением 2026-06-22, заменило ошибочный кадр линии). Прежний файл `shestiosnyj-robot-izgotovleniya-obolochek.png`
+  (был копией фото линии) удалён.
 - **Товар «Специальная линия для изготовления оболочек» (УИ-К-Л1 / YN-GZX-600Z,**
   `specialnaya-liniya-izgotovleniya-obolochek`, 2026-06-22): картинка
   `specialnaya-liniya-dlya-izgotovleniya-obolochek-01.png` (~380 КБ, без webp). Прод-файл —
