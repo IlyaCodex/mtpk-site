@@ -363,6 +363,12 @@ picture/
   без webp) — копия исходника `2026-06-19 162037.png`, переименованного в kebab-case. Прод-файл —
   `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Робот») + главное фото
   (phero + lightbox index 0). _Добавлен отдельным товаром рядом с 3Г6Р (оба робота сосуществуют)._
+- **Товар «Специальная линия для изготовления оболочек» (УИ-К-Л1 / YN-GZX-600Z,**
+  `specialnaya-liniya-izgotovleniya-obolochek`, 2026-06-22): картинка
+  `specialnaya-liniya-dlya-izgotovleniya-obolochek.png` (~350 КБ, без webp). Прод-файл —
+  `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Линия») + главное фото
+  (phero + lightbox index 0). _В папке остался дубль-файл `…obolochek (2).png` — это копия фото
+  робота 4Г8Р, к этому товару не относится._
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`
