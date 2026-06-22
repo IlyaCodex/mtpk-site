@@ -368,10 +368,15 @@ picture/
   `shestiosnyj-robot-izgotovleniya-obolochek.png` (~380 КБ, без webp) — копия исходника-скриншота
   `Снимок экрана 2026-06-22 105436.png`, переименован в kebab-case. Прод-файл —
   `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Робот») + главное фото
-  (phero + lightbox index 0). _История: 2026-06-22 страница сперва создана как «Специальная линия»
-  (УИ-К-Л1), в тот же день заменена на шестиосного робота УИ-К-6О; URL переименован, старый удалён.
-  Картинка/файл линии `specialnaya-liniya-dlya-izgotovleniya-obolochek.png` остались в репо/проде
-  как orphan. В папке также дубль `…obolochek (2).png` — копия фото робота 4Г8Р, не используется._
+  (phero + lightbox index 0). ⚠️ **Картинка робота — временно фото ЛИНИИ** (md5 == `…obolochek-01.png`):
+  отдельного фото шестиосного робота не было, авто-подобран скриншот, оказавшийся фото линии. Нужно
+  заменить на реальное фото робота KUKA.
+- **Товар «Специальная линия для изготовления оболочек» (УИ-К-Л1 / YN-GZX-600Z,**
+  `specialnaya-liniya-izgotovleniya-obolochek`, 2026-06-22): картинка
+  `specialnaya-liniya-dlya-izgotovleniya-obolochek-01.png` (~380 КБ, без webp). Прод-файл —
+  `astro/public/img/lvm-products/`. Hub-карточка (категория «Керамика · Линия») + главное фото
+  (phero + lightbox index 0). _Добавлена отдельным товаром рядом с шестиосным роботом (оба
+  сосуществуют). Старый файл линии `…obolochek.png` (353 КБ) и дубль `…obolochek (2).png` — orphan._
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`
