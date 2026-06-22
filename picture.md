@@ -391,6 +391,11 @@ picture/
   `polnostyu-avtomaticheskij-kotel-dlya-deparafinizacii.png` (~470 КБ, без webp). Прод-файл —
   `astro/public/img/lvm-products/`. Hub-карточка (категория «Депарафинизация») + главное фото
   (phero + lightbox index 0). Электрический автоклав вытопки воска (333 кВт, 8 МПа).
+- **Товар «Система подачи парового воска» (УИ-Т-П1,** `sistema-podachi-parovogo-voska`, 2026-06-22):
+  картинка `sistema-podachi-parovogo-voska.png` (~200 КБ, без webp) — копия исходника-скриншота
+  `Снимок экрана 2026-06-22 125636.png`, переименован в kebab-case (зелёный пневмоцилиндр с лого,
+  визуально сверено). Прод-файл — `astro/public/img/lvm-products/`. Hub-карточка («Воск · Подача») +
+  главное фото (phero + lightbox index 0). Пневмодозатор расплавленного воска.
 - Manager + banner-service + общие блоки из shared.
 
 ### Каталог «Дробемёты с вращающимся столом» — `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/`
