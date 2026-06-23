@@ -40,6 +40,11 @@
       });
       grid.appendChild(fragCards);
 
+      // 1b) Карточки дорисованы динамически — досыпаем бейдж «Сделано в России»
+      //     на обложки трёх отечественных разделов (made-badges.js уже отработал
+      //     первый проход до нашего fetch). Идемпотентно.
+      if (typeof window.refreshMadeBadges === 'function') window.refreshMadeBadges();
+
       // 2) Собираем уникальные категории — порядок появления как в stock.json.
       var cats = [];
       var seenCats = Object.create(null);

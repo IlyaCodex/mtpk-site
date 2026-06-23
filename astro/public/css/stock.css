@@ -31,6 +31,45 @@
 }
 .pcard__stock-badge:hover { background: var(--green-700, #2D7A2B); }
 
+/* Бейдж «Сделано в России» — белая плашка с триколор-флажком, СНИЗУ-СПРАВА
+   обложки. Ставится JS (made-badges.js) на карточках каталога (.pcard__cover)
+   и товара (.phero__main) для разделов печей/дробемёта/охлаждения.
+   Снизу-справа — чтобы не пересекаться с «В наличии» (снизу-слева) и
+   «Сталь / чугун» / баннером (сверху-слева). */
+.made-badge {
+  position: absolute;
+  bottom: var(--sp-4, 16px);
+  right: 0;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: var(--text-primary, #14211f);
+  font-family: var(--font-display, "Inter", sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 12px 5px 10px;
+  line-height: 1.2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+/* Триколор: три горизонтальные полосы — белая / синяя / красная. */
+.made-badge__flag {
+  display: block;
+  width: 18px;
+  height: 12px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: linear-gradient(
+    to bottom,
+    #fff 0 33.33%,
+    #0039a6 33.33% 66.66%,
+    #d52b1e 66.66% 100%
+  );
+}
+
 /* Категория-каптион поверх карточки (используется в JS-рендере /nalichie/). */
 .pcard__cat {
   font-family: var(--font-mono, "JetBrains Mono", monospace);

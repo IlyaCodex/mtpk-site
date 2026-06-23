@@ -100,14 +100,10 @@ const mainAttrs = index
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!--
-    ⛔ NOINDEX — сайт в финальной полировке, не индексируется поисковиками.
-    Перед публичным запуском (когда new.uralinduktor.ru становится основным
-    или сравнение конверсии завершено) — удалить эти 2 meta-тега и
-    `public/robots.txt`. См. также комментарии в robots.txt.
-  -->
-  <meta name="robots" content="noindex, nofollow">
-  <meta name="yandex" content="noindex, nofollow">
+  <!-- Сайт запущен на uralinduktor.ru (18.06.2026), индексация разрешена.
+       noindex-теги сняты при синхронизации с правками другого специалиста (см. handoff-2026-06-23.md).
+       ⚠️ Это локальное приведение к состоянию прода; прочие правки BaseLayout из их ветки 1ee0f3f
+       могут отсутствовать — не деплоить этот файл до мерджа их исходников. -->
   <title>{title}</title>
   {description && <meta name="description" content={description} />}
   <link rel="canonical" href={canonicalURL} />
