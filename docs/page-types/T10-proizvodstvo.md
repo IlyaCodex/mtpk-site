@@ -37,4 +37,4 @@ Hero-картинка: `/img/proizvodstvo-hero-v2.png` (16:9, цех с инду
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/proizvodstvo/
+См. live: https://uralinduktor.ru/proizvodstvo/

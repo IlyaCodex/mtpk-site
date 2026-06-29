@@ -44,4 +44,4 @@ SEO-индексация (Я.Вебмастер) при этом сохраня�
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/proekty/postavka-uig-40t-3/
+См. live: https://uralinduktor.ru/proekty/postavka-uig-40t-3/

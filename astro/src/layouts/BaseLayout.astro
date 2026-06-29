@@ -29,7 +29,7 @@ const {
 // 200-URL который отдаёт nginx (Astro trailingSlash: 'always'). Раньше был
 // без слеша — nginx делал 301 на версию со слешем, canonical указывал на
 // редирект (слабый сигнал для Я/Google). Теперь canonical = sitemap = ссылки.
-const SITE = 'https://new.uralinduktor.ru';
+const SITE = 'https://uralinduktor.ru';
 const pathname = Astro.url.pathname;            // '/' | '/products/foo/' | '/nalichie/'
 // Гарантируем trailing slash; Astro обычно уже отдаёт с / в конце.
 const normalizedPath = pathname.endsWith('/') ? pathname : `${pathname}/`;
@@ -100,10 +100,6 @@ const mainAttrs = index
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Сайт запущен на uralinduktor.ru (18.06.2026), индексация разрешена.
-       noindex-теги сняты при синхронизации с правками другого специалиста (см. handoff-2026-06-23.md).
-       ⚠️ Это локальное приведение к состоянию прода; прочие правки BaseLayout из их ветки 1ee0f3f
-       могут отсутствовать — не деплоить этот файл до мерджа их исходников. -->
   <title>{title}</title>
   {description && <meta name="description" content={description} />}
   <link rel="canonical" href={canonicalURL} />
@@ -222,6 +218,11 @@ const mainAttrs = index
   <!-- ТЗ-2 п.3: «Запросить цену» — дозапись позиции в форму + скролл. -->
   <script src="/js/quote-form.js?v=20260607" defer></script>
   <script src="/js/stock-badges.js?v=20260601" defer></script>
+  <!-- Отметка «В наличии» внутри карточки товара (.phero): бейдж на обложке +
+       срок отгрузки от 1 дня. Активируется только на страницах товара. -->
+  <script src="/js/stock-product.js?v=20260623-1" defer></script>
+  <!-- Бейдж «Сделано в России» на обложках печей/дробемёта/охлаждения (кроме транзисторных и чиллеров). -->
+  <script src="/js/made-badges.js?v=20260623-1" defer></script>
   <!-- Spec-оглавление (scrollspy): активируется только если на странице есть блок .spec (карточка товара). -->
   <script src="/js/spec-tabs.js?v=20260608-2" defer></script>
   <!-- Catalog filter: активируется только если на странице есть [data-filter-form]. -->

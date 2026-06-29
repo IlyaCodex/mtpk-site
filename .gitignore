@@ -8,3 +8,4 @@ __pycache__/
 ФОТО/
 # Лог генератора картинок (полные промпты) — не коммитить, не публиковать (T-IMG-C)
 astro/public/img/history.jsonl
+_merge-backup/

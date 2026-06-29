@@ -142,7 +142,7 @@ const searchWeight = isSection ? 10 : 1;
 // SEO-T3b: парсер хлебных крошек → JSON-LD BreadcrumbList.
 // Ищем <nav class="breadcrumb"> ... </nav> и извлекаем пары (href, name).
 // Последний элемент — обычно <span class="breadcrumb__current"> без href.
-const SITE_SEO = 'https://new.uralinduktor.ru';
+const SITE_SEO = 'https://uralinduktor.ru';
 function buildBreadcrumbSchema(html: string): string | null {
   const navMatch = html.match(/<nav\s+class="breadcrumb[^"]*"[^>]*>([\s\S]*?)<\/nav>/);
   if (!navMatch) return null;

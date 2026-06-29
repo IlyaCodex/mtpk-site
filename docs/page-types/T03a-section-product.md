@@ -83,4 +83,4 @@
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/products/induktsionnye-plavilnye-pechi/
+См. live: https://uralinduktor.ru/products/induktsionnye-plavilnye-pechi/

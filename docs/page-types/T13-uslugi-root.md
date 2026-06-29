@@ -49,4 +49,4 @@ Override `inline_styles[1]` — тот же, что у `/products/` (`.cat-index
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/uslugi/
+См. live: https://uralinduktor.ru/uslugi/

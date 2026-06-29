@@ -4,9 +4,10 @@
 
 ## Что это
 
-Новый сайт https://new.uralinduktor.ru/ взамен https://uralinduktor.ru/ (WordPress).
-Статика на Astro, ~406 URL, A/B-тест на поддомене, потом смена домена.
-Подробнее: docs/project-info.md.
+Боевой сайт https://uralinduktor.ru/ — новая статика на Astro взамен старого
+WordPress. Домен уже переключён на Astro-сборку (2026-06, веха «Домен» закрыта);
+поддомен https://new.uralinduktor.ru/ остался как 301-редирект на основной домен.
+~406 URL. Подробнее: docs/project-info.md.
 
 ## Главное правило
 

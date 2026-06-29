@@ -54,4 +54,4 @@ URL `/o-kompanii/` (русский слаг) → `/o-company/` (301 redirect). �
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/o-company/
+См. live: https://uralinduktor.ru/o-company/

@@ -58,7 +58,7 @@
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/products/
+См. live: https://uralinduktor.ru/products/
 
 ## Связанные
 

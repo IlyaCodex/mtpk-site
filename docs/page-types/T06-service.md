@@ -76,4 +76,4 @@
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/uslugi/montazh-shefmontazh/
+См. live: https://uralinduktor.ru/uslugi/montazh-shefmontazh/

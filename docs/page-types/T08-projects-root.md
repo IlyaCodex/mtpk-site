@@ -32,4 +32,4 @@
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/proekty/
+См. live: https://uralinduktor.ru/proekty/

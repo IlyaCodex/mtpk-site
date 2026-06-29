@@ -83,4 +83,4 @@
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/products/linii-dlya-holodnotverdeyushhih-smesej-hts/
+См. live: https://uralinduktor.ru/products/linii-dlya-holodnotverdeyushhih-smesej-hts/

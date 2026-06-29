@@ -98,4 +98,4 @@
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-5t-400/
+См. live: https://uralinduktor.ru/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-5t-400/

@@ -45,6 +45,16 @@ JS: `astro/public/js/catalog-filter.js`. Подключается автомат
 
 ## Карточка товара (`.pcard`)
 
+**ПРАВИЛО (картинка карточки = главная товарной страницы).** `pcard__cover img`
+обязан указывать на ту же картинку, что и главная (`phero__main`) на странице
+этого товара. Меняешь главную в карточке товара (T05) — синхронно меняй и
+миниатюру в листинге категории. Источник правды для миниатюры — статический
+`body.html` категории (карточки `.pcard` захардкожены здесь); подсистема
+«Наличие» НЕ дублирует это поле, а **достаёт готовую `.pcard` из родительской
+категории** (`astro/scripts/build-stock.mjs` → `extractCatalogCard`) и пишет в
+`stock.json` (`image` + `cardHtml`) при сборке — поэтому после правки листинга
+обязателен `npm run build`, иначе `stock.json` и листинг разойдутся.
+
 ```html
 <article class="pcard">
   <a href="/products/<раздел>/<категория>/<товар>/" class="pcard__cover">
@@ -92,4 +102,4 @@ JS: `astro/public/js/catalog-filter.js`. Подключается автомат
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/products/induktsionnye-plavilnye-pechi/po-stali/
+См. live: https://uralinduktor.ru/products/induktsionnye-plavilnye-pechi/po-stali/

@@ -50,7 +50,7 @@ function lastmodForPath(pathname) {
 }
 
 export default defineConfig({
-  site: 'https://new.uralinduktor.ru',
+  site: 'https://uralinduktor.ru',
   output: 'static',
   trailingSlash: 'always',
   build: { format: 'directory' },

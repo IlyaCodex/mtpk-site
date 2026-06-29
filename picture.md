@@ -246,6 +246,23 @@ picture/
 - Тизер 4-й подкатегории (хаб): `card-pech-tranzistor.png?v=1` (+ `.webp`) — цех-канон,
   перерисовка фото УИ-160п через /product-image (nano-banana-pro-edit, 2026-06-16);
   архив `picture/products/induktsionnye-plavilnye-pechi/card-pech-tranzistor{,-src}.png`.
+- **Общая главная для `po-stali` с массой ≥150 кг** (2026-06-23, /product-image,
+  цех-канон v3). Файл `astro/public/img/catalog-pech-po-stali.png` (1200×900, 492 KB,
+  +`.webp` 80 KB; мастер `picture/products/induktsionnye-plavilnye-pechi/catalog-pech-po-stali.png`):
+  композит из двух рефов nano-banana-pro-edit — одна тиристольная печь + гидравлическая
+  печь глухим фасадом + зелёный шкаф управления (рефы: прежняя `catalog-furnace-bucket-s`
+  для тиристоли+шкафа и `pech-gidravlika-main` для фасада). Назначена главной (phero__main +
+  thumb-0) на **20 позициях** `po-stali` с массой плавки ≥150 кг; под порог не попала только
+  `ui-0-1t-100` (100 кг). Галерейные фото на страницах не тронуты. Прежние главные
+  (`catalog-furnace-bucket-{s,m,l,xl}`, `pech-gidravlika-main`) перезаписаны НЕ были — они
+  используются в других разделах; заменена только ссылка. Промежуточное имя
+  `ui-0-15t-160-main.png` (от 2026-06-23) удалено как дубль.
+  - **Синхронизация листинга категории (правило T04):** миниатюры `.pcard` в
+    `po-stali/body.html` приведены к главной товарной страницы (все 21 карточки:
+    20 ≥150 кг → `catalog-pech-po-stali.png`, `ui-0-1t-100` → свой `ui-0-1t-100-render-v1.png`).
+    Был давний дрейф (листинг не совпадал с героем). `stock.json` (`image`+`cardHtml`)
+    подтянулся из листинга через `build-stock.mjs`. Правило закреплено в
+    [docs/page-types/T04-category.md](docs/page-types/T04-category.md).
 
 ### Подкаталог «Транзисторные печи (IGBT)» — `/products/induktsionnye-plavilnye-pechi/tranzistornye/` (2026-06-16)
 - **Hero раздела:** `hero-pech-tranzistor.png?v=1` (+ `.webp`, 2048×1143) — чистый цех с плавкой

@@ -89,5 +89,5 @@ Override-блок (`<style>...</style>`) находится в `inline_styles[1]
 ## Пример
 
 См. live:
-- https://new.uralinduktor.ru/policy/
-- https://new.uralinduktor.ru/soglasie/
+- https://uralinduktor.ru/policy/
+- https://uralinduktor.ru/soglasie/

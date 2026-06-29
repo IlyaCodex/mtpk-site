@@ -46,4 +46,4 @@
 
 ## Пример
 
-См. live: https://new.uralinduktor.ru/
+См. live: https://uralinduktor.ru/

@@ -49,6 +49,13 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - 301-редиректов при миграции
 - SEO (один канонический URL на страницу)
 
+> 🔁 **Глобальная карта 301 старый WP → новый сайт (2026-06-18, на проде):** все 465
+> легаси-URL старого сайта редиректятся на новые (или на «/», где сопоставление
+> невозможно). Источник правды — [`server/redirects-legacy.map`](server/redirects-legacy.map)
+> + [`docs/redirects-migration.md`](docs/redirects-migration.md); на проде nginx
+> `map $uri $legacy_redirect`. При переименовании/удалении страниц проверять, не
+> ломает ли это цель редиректа (sweep — в migration-доке).
+
 ### Правила
 
 | ✅ Правильно | ❌ Неправильно |
@@ -202,6 +209,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │       └── …/barabannyj-peskostrujnyj-apparat/      ✅ T05 · Барабанный пескоструйный аппарат (для роботов) УИ-К-Б1 — обсыпка/стомление (2026-06-22)
 │   │       └── …/polnostyu-avtomaticheskij-kotel-deparafinizacii/  ✅ T05 · Полностью автоматический котёл для депарафинизации УИ-Д-А1 (электро, 333 кВт, 8 МПа) (2026-06-22)
 │   │       └── …/sistema-podachi-parovogo-voska/        ✅ T05 · Система подачи парового воска УИ-Т-П1 (пневмодозатор воска, 2,4 л) (2026-06-22)
+│   │       # 10 ЛВМ-товаров выше добавлены 19–22.06.2026 (другая копия), сведены в общий источник 29.06.2026
 │   ├── /products/oborudovanie-lgm/                     ✅ T03b · Раздел «Оборудование ЛГМ» (12 дочерних T05, реал. фото)
 │   └── /products/linii-dlya-holodnotverdeyushhih-smesej-hts/   ✅ T03b · Раздел «Линии ХТС» (7 дочерних T05)
 │       └── 7 дочерних T05 (вариант C)                  ✅ linya-regeneratsii · smesiteli · vibrostol · pnevmotransport · vibroottirochnaya-mashina · skaf-ohlazdenia · pyloylovitel
@@ -239,7 +247,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 ## Готовые страницы (✅)
 
 ### 1. Главная
-- **URL:** `/` — https://new.uralinduktor.ru/
+- **URL:** `/` — https://uralinduktor.ru/
 - **Прототип:** `design/prototypes/index-v7-dmgmori.html`
 - **Сервер:** `/var/www/uralinduktor/public/index.html`
 - **Назначение:** входная страница. Hero, показатели, форма подбора,
@@ -257,7 +265,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **В меню:** «Каталог → Плавильное оборудование → Индукционные плавильные печи».
 
 ### 3. Каталог «Индукционные плавильные печи»
-- **URL:** `/products/induktsionnye-plavilnye-pechi/` — https://new.uralinduktor.ru/products/induktsionnye-plavilnye-pechi/
+- **URL:** `/products/induktsionnye-plavilnye-pechi/` — https://uralinduktor.ru/products/induktsionnye-plavilnye-pechi/
 - **Прототип:** `design/prototypes/catalog-induktsionnye-plavilnye-pechi.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/induktsionnye-plavilnye-pechi/index.html`
 - **Назначение:** листинг 21 модели индукционных плавильных печей собственного
@@ -303,7 +311,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **14 моделей:** ui-1p, ui-2p, ui-3p, ui-5p, ui-8p, ui-10p (настольные, цветные/драгметаллы, 30–80 кГц, без наклона) · ui-15p, ui-25p, ui-35p, ui-45p, ui-70p, ui-90p, ui-110p, ui-160p (сталь+цветные, 1–20 кГц, редукторный наклон).
 
 ### 4b. Хаб «Индукционные нагреватели»
-- **URL:** `/products/induktsionnye-nagrevateli/` — https://new.uralinduktor.ru/products/induktsionnye-nagrevateli/
+- **URL:** `/products/induktsionnye-nagrevateli/` — https://uralinduktor.ru/products/induktsionnye-nagrevateli/
 - **Прототип:** `design/prototypes/catalog-induktsionnye-nagrevateli.html` (на основе `catalog-drobemetnoe-oborudovanie.html`)
 - **Сервер:** `/var/www/uralinduktor/public/products/induktsionnye-nagrevateli/index.html`
 - **Дата готовности:** 2026-05-26
@@ -332,7 +340,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **Картинки teaser:** переиспользованы существующие `card-<slug>.png` (те же, что были у карточек товаров; уже на проде).
 
 ### 4a. Эталонная карточка «УИ-0.1Т-100»
-- **URL:** `/products/induktsionnye-plavilnye-pechi/ui-0-1t-100/` — https://new.uralinduktor.ru/products/induktsionnye-plavilnye-pechi/ui-0-1t-100/
+- **URL:** `/products/induktsionnye-plavilnye-pechi/ui-0-1t-100/` — https://uralinduktor.ru/products/induktsionnye-plavilnye-pechi/ui-0-1t-100/
 - **Прототип:** `design/prototypes/product-ui-0-1t-100.html` (на базе эталона `product-uid-376e.html`)
 - **Сервер:** `/var/www/uralinduktor/public/products/induktsionnye-plavilnye-pechi/ui-0-1t-100/index.html`
 - **Старый URL (301):** `/products/induktsionnoe-oborudovanie/induktsionnye-tiristornye-pechi/induktsionnaya-tiristornaya-pech-ui-0-1t-100/` → новый
@@ -351,7 +359,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 > _Историческое:_ предыдущий прототип `design/prototypes/product.html` остался как архив старого формата (с JS-табами). Не использовать для новых страниц — эталон теперь `product-uid-376e.html` / `product-ui-0-1t-100.html`.
 
 ### 5. Хаб «Дробемётное оборудование»
-- **URL:** `/products/drobemetnoe-oborudovanie/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/
+- **URL:** `/products/drobemetnoe-oborudovanie/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/
 - **Прототип:** `design/prototypes/catalog-drobemetnoe-oborudovanie.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/index.html`
 - **Назначение:** хаб-каталог направлений дробемётного оборудования.
@@ -383,7 +391,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   с 9 категорийными тизерами и крупными картинками.
 
 ### 6. Каталог «Дробемёты кранового типа»
-- **URL:** `/products/drobemetnoe-oborudovanie/kranovogo-tipa/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/kranovogo-tipa/
+- **URL:** `/products/drobemetnoe-oborudovanie/kranovogo-tipa/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/kranovogo-tipa/
 - **Прототип:** `design/prototypes/catalog-drobemetnye-ystanovki-kran-tip.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/kranovogo-tipa/index.html`
 - **Старые URL (301):**
@@ -465,7 +473,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   все 9 моделей ведут на свои product-URL (раньше 8 моделей вели на `#leadgen`).
 
 ### 6c. Каталог «Дробемёты барабанного типа»
-- **URL:** `/products/drobemetnoe-oborudovanie/barabannogo-tipa/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/barabannogo-tipa/
+- **URL:** `/products/drobemetnoe-oborudovanie/barabannogo-tipa/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/barabannogo-tipa/
 - **Прототип:** `design/prototypes/catalog-barabannogo-tipa.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/barabannogo-tipa/index.html`
 - **Дата:** 2026-05-25
@@ -545,7 +553,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   визуальное дублирование фото на product-страницах и pcard-карточках каталога.
 
 ### 6e. Каталог «Дробемёты с вращающимся столом»
-- **URL:** `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/
+- **URL:** `/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/
 - **Прототип:** `design/prototypes/catalog-s-vrashchayushchimsya-stolom.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/index.html`
 - **Дата:** 2026-05-26
@@ -600,7 +608,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   и реальные фото со старого WP/из цеха для phero-галерей.
 
 ### 6g. Каталог «Дробемёты для швеллера, двутавра и сорта»
-- **URL:** `/products/drobemetnoe-oborudovanie/dlya-shvellera-i-sorta/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/dlya-shvellera-i-sorta/
+- **URL:** `/products/drobemetnoe-oborudovanie/dlya-shvellera-i-sorta/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/dlya-shvellera-i-sorta/
 - **Прототип:** `design/prototypes/catalog-dlya-shvellera-i-sorta.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/dlya-shvellera-i-sorta/index.html`
 - **Дата:** 2026-05-26 (первая версия) → 2026-05-26 (рефакторинг: 1 серия с таблицей → 12 отдельных product-страниц)
@@ -703,7 +711,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   фото на product-страницах и pcard-карточках каталога.
 
 ### 6i. Каталог «Дробемёты проходные подвесного типа»
-- **URL:** `/products/drobemetnoe-oborudovanie/prokhodnye-podvesnogo-tipa/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/prokhodnye-podvesnogo-tipa/
+- **URL:** `/products/drobemetnoe-oborudovanie/prokhodnye-podvesnogo-tipa/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/prokhodnye-podvesnogo-tipa/
 - **Прототип:** `design/prototypes/catalog-prokhodnye-podvesnogo-tipa.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/prokhodnye-podvesnogo-tipa/index.html`
 - **Дата:** 2026-05-26
@@ -770,7 +778,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   hero-картинки и обложек pcard-карточек каталога.
 
 ### 6k. Каталог «Дробемёты для очистки труб»
-- **URL:** `/products/drobemetnoe-oborudovanie/dlya-ochistki-trub/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/dlya-ochistki-trub/
+- **URL:** `/products/drobemetnoe-oborudovanie/dlya-ochistki-trub/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/dlya-ochistki-trub/
 - **Прототип:** `design/prototypes/catalog-dlya-ochistki-trub.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/dlya-ochistki-trub/index.html`
 - **Дата:** 2026-05-26
@@ -809,7 +817,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   всех сторон. Замкнутый цикл подачи абразива с автоматической рекуперацией.
 
 ### 6m. Каталог «Дробемёты с ленточным сетчатым конвейером»
-- **URL:** `/products/drobemetnoe-oborudovanie/s-lentochnym-konveyerom/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/s-lentochnym-konveyerom/
+- **URL:** `/products/drobemetnoe-oborudovanie/s-lentochnym-konveyerom/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/s-lentochnym-konveyerom/
 - **Прототип:** `design/prototypes/catalog-s-lentochnym-konveyerom.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/s-lentochnym-konveyerom/index.html`
 - **Дата:** 2026-05-26
@@ -835,7 +843,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   `uid-lenta-photo-1..5.png?v=1` (6-thumb grid override).
 
 ### 6o. Каталог «Дробемёты с выкатным столом»
-- **URL:** `/products/drobemetnoe-oborudovanie/s-vykatnym-stolom/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/s-vykatnym-stolom/
+- **URL:** `/products/drobemetnoe-oborudovanie/s-vykatnym-stolom/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/s-vykatnym-stolom/
 - **Прототип:** `design/prototypes/catalog-s-vykatnym-stolom.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/s-vykatnym-stolom/index.html`
 - **Дата:** 2026-05-26
@@ -863,7 +871,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   локальном архиве заказчика.
 
 ### 6q. Каталог «Передвижные дробемётные машины»
-- **URL:** `/products/drobemetnoe-oborudovanie/peredvizhnye/` — https://new.uralinduktor.ru/products/drobemetnoe-oborudovanie/peredvizhnye/
+- **URL:** `/products/drobemetnoe-oborudovanie/peredvizhnye/` — https://uralinduktor.ru/products/drobemetnoe-oborudovanie/peredvizhnye/
 - **Прототип:** `design/prototypes/catalog-peredvizhnye.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/drobemetnoe-oborudovanie/peredvizhnye/index.html`
 - **Дата:** 2026-05-26
@@ -924,7 +932,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **В меню:** «Каталог → Технологии → ЛВМ».
 
 ### 7. Хаб «Системы охлаждения»
-- **URL:** `/products/sistemy-ohlazhdeniya/` — https://new.uralinduktor.ru/products/sistemy-ohlazhdeniya/
+- **URL:** `/products/sistemy-ohlazhdeniya/` — https://uralinduktor.ru/products/sistemy-ohlazhdeniya/
 - **Прототип:** `design/prototypes/catalog-sistemy-ohlazhdeniya.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/sistemy-ohlazhdeniya/index.html`
 - **Дата:** 2026-05-26
@@ -937,7 +945,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **Картинки teaser:** 3 PNG в `picture/products/sistemy-ohlazhdeniya/` — `hero-cooling.png` (16:9 для хаба), `card-gradirni.png` (4:3 hub-карточка градирен), `card-chillery.png` (4:3 hub-карточка чиллеров). На сервере: `/img/hero-cooling.png?v=1`, `/img/card-gradirni.png?v=1`, `/img/card-chillery.png?v=1`.
 
 ### 7a. Каталог «Градирни УИГ»
-- **URL:** `/products/sistemy-ohlazhdeniya/gradirni/` — https://new.uralinduktor.ru/products/sistemy-ohlazhdeniya/gradirni/
+- **URL:** `/products/sistemy-ohlazhdeniya/gradirni/` — https://uralinduktor.ru/products/sistemy-ohlazhdeniya/gradirni/
 - **Прототип:** `design/prototypes/catalog-gradirni.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/sistemy-ohlazhdeniya/gradirni/index.html`
 - **Дата:** 2026-05-26
@@ -963,7 +971,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **Изображения galleries:** 4 общих фото `/img/gradirni-photo-1..4.png?v=1` — сконвертированы из реальных фото со старого WP/из цеха (`picture/products/sistemy-ohlazhdeniya/gradirni-gallery/`).
 
 ### 7c. Каталог «Чиллеры УИЧ»
-- **URL:** `/products/sistemy-ohlazhdeniya/chillery/` — https://new.uralinduktor.ru/products/sistemy-ohlazhdeniya/chillery/
+- **URL:** `/products/sistemy-ohlazhdeniya/chillery/` — https://uralinduktor.ru/products/sistemy-ohlazhdeniya/chillery/
 - **Прототип:** `design/prototypes/catalog-chillery.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/sistemy-ohlazhdeniya/chillery/index.html`
 - **Дата:** 2026-05-26
@@ -989,7 +997,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **TODO:** в будущем — отрисовать индивидуальные fal.ai-рендеры под каждую модель (особенно для крупных УИЧ-25 — УИЧ-30В), чтобы убрать визуальное дублирование на product-страницах.
 
 ### 7. Раздел «Производство» — литейные участки под ключ
-- **URL:** `/proizvodstvo/` — https://new.uralinduktor.ru/proizvodstvo/
+- **URL:** `/proizvodstvo/` — https://uralinduktor.ru/proizvodstvo/
 - **Прототип:** [`design/prototypes/proizvodstvo.html`](design/prototypes/proizvodstvo.html)
 - **Сервер:** `/var/www/uralinduktor/public/proizvodstvo/index.html`
 - **Дата:** 2026-05-25
@@ -1018,7 +1026,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **Открытые вопросы:** ещё нет подстраниц «Производство» (структура из футера: проектирование, подбор-комплектация, модернизация, переоснащение дробемётов, монтаж-шефмонтаж, пусконаладка, обучение, технический аудит, диагностика и ремонт) — `/proizvodstvo/` сейчас является финальной страницей раздела.
 
 ### 5.1. Категория «Оборудование ЛГМ»
-- **URL:** `/products/oborudovanie-lgm/` — https://new.uralinduktor.ru/products/oborudovanie-lgm/
+- **URL:** `/products/oborudovanie-lgm/` — https://uralinduktor.ru/products/oborudovanie-lgm/
 - **Прототип:** `design/prototypes/category-lgm.html`
 - **Сервер:** `/var/www/uralinduktor/public/products/oborudovanie-lgm/index.html`
 - **Дата:** 2026-05-24
@@ -1053,7 +1061,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
   (index, catalog, category, category-lvm, category-lgm, product).
 
 ### 8. Услуга «Пусконаладка»
-- **URL:** `/uslugi/puskonaladka/` — https://new.uralinduktor.ru/uslugi/puskonaladka/
+- **URL:** `/uslugi/puskonaladka/` — https://uralinduktor.ru/uslugi/puskonaladka/
 - **Прототип:** `design/prototypes/usluga-puskonaladka.html`
 - **Сервер:** `/var/www/uralinduktor/public/uslugi/puskonaladka/index.html`
 - **Источник макета:** `Прототипы/прототипы в pdf/Пусконаладка.pdf`
@@ -1085,7 +1093,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **В футере:** активирована ссылка в&nbsp;списке «Услуги»
 
 ### 9. Услуга «Технический аудит»
-- **URL:** `/uslugi/tehnicheskij-audit/` — https://new.uralinduktor.ru/uslugi/tehnicheskij-audit/
+- **URL:** `/uslugi/tehnicheskij-audit/` — https://uralinduktor.ru/uslugi/tehnicheskij-audit/
 - **Прототип:** `design/prototypes/usluga-tehnicheskij-audit.html`
 - **Сервер:** `/var/www/uralinduktor/public/uslugi/tehnicheskij-audit/index.html`
 - **Источник макета:** `Прототипы/прототипы в pdf/Технический_аудит.pdf`
@@ -1118,7 +1126,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **В футере:** активирована ссылка в&nbsp;списке «Услуги»
 
 ### 22. Политика обработки персональных данных
-- **URL:** `/policy/` — https://new.uralinduktor.ru/policy/
+- **URL:** `/policy/` — https://uralinduktor.ru/policy/
 - **Прототип:** `astro/src/raw-pages/policy/` (body.html + meta.json)
 - **Сервер:** `/var/www/uralinduktor-astro/policy/index.html`
 - **Назначение:** юридическая страница — Политика по&nbsp;152-ФЗ.
@@ -1136,7 +1144,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **Дата:** 2026-06-03.
 
 ### 23. Согласие на обработку персональных данных
-- **URL:** `/soglasie/` — https://new.uralinduktor.ru/soglasie/
+- **URL:** `/soglasie/` — https://uralinduktor.ru/soglasie/
 - **Тип:** T12 — юридическая страница (см. [`docs/page-types/T12-legal.md`](docs/page-types/T12-legal.md))
 - **Прототип:** `astro/src/raw-pages/soglasie/` (body.html + meta.json)
 - **Сервер:** `/var/www/uralinduktor-astro/soglasie/index.html`
@@ -1151,7 +1159,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 - **Дата:** 2026-06-03.
 
 ### 24. Корень каталога — общий индекс
-- **URL:** `/products/` — https://new.uralinduktor.ru/products/
+- **URL:** `/products/` — https://uralinduktor.ru/products/
 - **Тип:** T02 — корень каталога (см. [`docs/page-types/T02-catalog-root.md`](docs/page-types/T02-catalog-root.md))
 - **Прототип:** `astro/src/raw-pages/products/` (body.html + meta.json)
 - **Сервер:** `/var/www/uralinduktor-astro/products/index.html`
@@ -1210,7 +1218,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 ## В разработке (🟡)
 
 ### 6. Категория «Оборудование ХТС»
-- **URL:** `/products/linii-dlya-holodnotverdeyushhih-smesej-hts/` (планируется https://new.uralinduktor.ru/products/linii-dlya-holodnotverdeyushhih-smesej-hts/)
+- **URL:** `/products/linii-dlya-holodnotverdeyushhih-smesej-hts/` (планируется https://uralinduktor.ru/products/linii-dlya-holodnotverdeyushhih-smesej-hts/)
 - **Прототип:** `design/prototypes/category-hts.html`
 - **Дата:** 2026-05-24
 - **Hero-картинка:** `picture/products/linii-dlya-holodnotverdeyushhih-smesej-hts/hts-hero-realistic.png`

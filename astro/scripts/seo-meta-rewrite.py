@@ -355,7 +355,7 @@ for x in rows:
         x['nt'] = SINGLES.get(x['r'], x['title']); x['nd'] = generic_desc(x)
 
 ND_OVERRIDE = {
- 'soglasie': "Согласие на обработку персональных данных, передаваемых через формы сайта new.uralinduktor.ru (ООО «МТПК», Уралиндуктор).",
+ 'soglasie': "Согласие на обработку персональных данных, передаваемых через формы сайта uralinduktor.ru (ООО «МТПК», Уралиндуктор).",
 }
 for x in rows:
     if x['r'] in ND_OVERRIDE: x['nd'] = ND_OVERRIDE[x['r']]
