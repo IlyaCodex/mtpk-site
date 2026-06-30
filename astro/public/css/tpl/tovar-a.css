@@ -376,8 +376,8 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
 .phero {background: var(--surface-page); padding-bottom: var(--sp-16); }
 .phero__grid {display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-12); align-items: start; }
 .phero__media {display: flex; flex-direction: column; gap: var(--sp-3); }
-.phero__main {position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--surface-muted); border: 1px solid var(--border-subtle); padding: 0; font: inherit; color: inherit; text-align: left; cursor: zoom-in; display: block; width: 100%; }
-.phero__main img {width: 100%; height: 100%; object-fit: cover; transition: transform var(--duration-slow, 400ms) var(--ease-out, ease); }
+.phero__main {position: relative; aspect-ratio: 5 / 4; overflow: hidden; background: var(--surface-muted); border: 1px solid var(--border-subtle); padding: 0; font: inherit; color: inherit; text-align: left; cursor: zoom-in; display: block; width: 100%; }
+.phero__main img {width: 100%; height: 100%; object-fit: contain; transition: transform var(--duration-slow, 400ms) var(--ease-out, ease); }
 .phero__main:hover img {transform: scale(1.02); }
 .phero__banner {position: absolute; left: 0; top: var(--sp-5); background: var(--teal-600); color: var(--text-inverse); font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; padding: var(--sp-2) var(--sp-4); z-index: 2; }
 .phero__thumbs {display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--sp-3); }
