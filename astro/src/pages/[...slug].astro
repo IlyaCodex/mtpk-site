@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Adv from '../components/blocks/Adv.astro';
-import AdvChiller from '../components/blocks/AdvChiller.astro';
+import Adv12 from '../components/blocks/Adv12.astro';
 import CatalogCta from '../components/blocks/CatalogCta.astro';
 import WhyUs from '../components/blocks/WhyUs.astro';
 import BestOffer from '../components/blocks/BestOffer.astro';
@@ -51,7 +51,8 @@ function extractInlineStyles(blocks: string[]): { external: string[]; inline: st
 
 const COMPONENTS: Record<string, any> = {
   'adv': Adv,
-  'adv-chiller': AdvChiller,
+  'adv-chiller': Adv12,
+  'adv-12': Adv12,
   'catalog-cta': CatalogCta,
   'why-us': WhyUs,
   'best-offer': BestOffer,
@@ -234,7 +235,7 @@ const canonicalAbs = slug ? `${SITE_SEO}/${slug.replace(/\/$/, '')}/` : `${SITE_
 const productSchema = buildProductSchema(body, meta, canonicalAbs);
 
 // Split body into segments by block markers <!--C:NAME-->
-const parts = body.split(/<!--C:([a-z-]+)-->/);
+const parts = body.split(/<!--C:([a-z0-9-]+)-->/);
 // parts = [html, name, html, name, html, ...]
 type Segment = { type: 'html'; content: string } | { type: 'component'; name: string };
 const segments: Segment[] = [];
