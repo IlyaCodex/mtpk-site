@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Adv from '../components/blocks/Adv.astro';
+import AdvChiller from '../components/blocks/AdvChiller.astro';
 import CatalogCta from '../components/blocks/CatalogCta.astro';
 import WhyUs from '../components/blocks/WhyUs.astro';
 import BestOffer from '../components/blocks/BestOffer.astro';
@@ -50,6 +51,7 @@ function extractInlineStyles(blocks: string[]): { external: string[]; inline: st
 
 const COMPONENTS: Record<string, any> = {
   'adv': Adv,
+  'adv-chiller': AdvChiller,
   'catalog-cta': CatalogCta,
   'why-us': WhyUs,
   'best-offer': BestOffer,
@@ -261,7 +263,7 @@ for (let i = 0; i < parts.length; i++) {
       шаблонных файлов (например tovar-b.css) не доезжают до вернувшихся юзеров.
       Поднимай дату при правке любого /css/tpl/*.css. */}
   {cssTemplates.map((href) => (
-    <link slot="head" rel="stylesheet" href={`${href}?v=20260629`} />
+    <link slot="head" rel="stylesheet" href={`${href}?v=20260630`} />
   ))}
   {externalStyles.map((href) => (
     <link slot="head" rel="stylesheet" href={href} />

@@ -1,12 +1,14 @@
 ---
 // GENERATED block component (Astro Фаза 2). Reference hash 92e25730.
 // Edit here to update the adv block on all pages at once.
+// warranty — срок гарантии в заголовке (по умолчанию 18 мес; для чиллеров — 12, см. AdvChiller.astro).
+const { warranty = '18 месяцев' } = Astro.props;
 ---
 <section class="adv" aria-label="Преимущества собственного производства">
   <div class="container">
     <div class="adv__head">
       <div class="adv__eyebrow">Преимущества</div>
-      <h2 class="adv__title">Высочайший контроль качества и&nbsp;<em style="font-style:normal; color:var(--text-brand);">расширенная гарантия 18&nbsp;месяцев</em></h2>
+      <h2 class="adv__title">Высочайший контроль качества и&nbsp;<em style="font-style:normal; color:var(--text-brand);">расширенная гарантия {warranty}</em></h2>
       <p class="adv__lead">Собственное производство даёт независимость от&nbsp;внешних поставщиков, контроль на&nbsp;всех этапах и&nbsp;возможность адаптировать оборудование под&nbsp;задачу заказчика.</p>
     </div>
     <div class="adv__grid">
