@@ -59,7 +59,7 @@ body { margin: 0; }
   transition: color var(--duration-fast) var(--ease-out);
 }
 .contact-link:hover .contact-link__icon { color: var(--text-brand); }
-.contact-link--phone { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.contact-link--phone { font-family: var(--font-body); font-variant-numeric: tabular-nums; }
 .contact-sep {
   width: 1px;
   height: 16px;
