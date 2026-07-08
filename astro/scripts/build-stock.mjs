@@ -186,6 +186,7 @@ function main() {
     if (it.qty      != null) out.qty      = it.qty;
     if (it.shipping)         out.shipping = it.shipping;
     if (it.note)             out.note     = it.note;
+    if (Array.isArray(it.specs) && it.specs.length) out.specs = it.specs;
     resolved.push(out);
 
     log(`✓ ${slug} → ${title}${card ? ' [+catalog card]' : ''}`);

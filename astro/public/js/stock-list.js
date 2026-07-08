@@ -186,6 +186,19 @@
     var titleLink = el('a', { href: url, text: title });
     bodyChildren.push(el('h3', { class: 'pcard__title' }, [titleLink]));
 
+    // Характеристики из stock.config.json (specs: [["Label","Value"], …]) —
+    // для позиций без карточки в родительском каталоге (напр. категории,
+    // запчасти). Рендерим той же разметкой .pcard__specs, что и у товаров.
+    if (Array.isArray(it.specs) && it.specs.length) {
+      var rows = it.specs.filter(function (s) { return s && s.length >= 2; }).map(function (s) {
+        return el('div', { class: 'pcard__spec' }, [
+          el('dt', { text: String(s[0]) }),
+          el('dd', { text: String(s[1]) })
+        ]);
+      });
+      if (rows.length) bodyChildren.push(el('dl', { class: 'pcard__specs' }, rows));
+    }
+
     if (qty != null || ship) {
       var metaTxt = '';
       if (qty != null) metaTxt += qty + ' шт';

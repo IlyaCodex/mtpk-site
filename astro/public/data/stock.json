@@ -104,7 +104,29 @@
       "url": "/products/linii-dlya-holodnotverdeyushhih-smesej-hts/smesiteli/",
       "title": "Смесители ХТС УИШС",
       "category": "Оборудование ХТС",
-      "image": "/img/sm/sm-hero.jpg"
+      "image": "/img/sm/sm-hero.jpg",
+      "specs": [
+        [
+          "Модель",
+          "УИШС-245"
+        ],
+        [
+          "Производительность, т/ч",
+          "5"
+        ],
+        [
+          "Радиус зоны, м",
+          "2.5"
+        ],
+        [
+          "Угол поворота",
+          "120°"
+        ],
+        [
+          "Мощность, кВт",
+          "2.2"
+        ]
+      ]
     },
     {
       "slug": "stalerozlivochnye-kovshi/stalerazlivochnye-kovshi-chajnikovogo-tipa/uik-cht-0-5",
@@ -119,7 +141,25 @@
       "url": "/products/zapchasti/induktsionnoe/kondensatory-elektrotermicheskie/",
       "title": "Конденсаторы электротермические",
       "category": "Запчасти на оборудование",
-      "image": "/img/card-zap-kondensatory.jpg"
+      "image": "/img/card-zap-kondensatory.jpg",
+      "specs": [
+        [
+          "Модель",
+          "0.75-1000-1s"
+        ],
+        [
+          "Напряжение, В",
+          "380"
+        ],
+        [
+          "Мощность, кВАр",
+          "750"
+        ],
+        [
+          "Частота, кГц",
+          "1"
+        ]
+      ]
     },
     {
       "slug": "zapchasti/drobemetnoe",

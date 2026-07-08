@@ -14,9 +14,11 @@
     { "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-80t/" },
     { "url": "/products/induktsionnye-plavilnye-pechi/tranzistornye/ui-25p/" },
     { "url": "/products/induktsionnye-plavilnye-pechi/tranzistornye/ui-35p/" },
-    { "url": "/products/linii-dlya-holodnotverdeyushhih-smesej-hts/smesiteli/" },
+    { "url": "/products/linii-dlya-holodnotverdeyushhih-smesej-hts/smesiteli/",
+      "specs": [["Модель", "УИШС-245"], ["Производительность, т/ч", "5"], ["Радиус зоны, м", "2.5"], ["Угол поворота", "120°"], ["Мощность, кВт", "2.2"]] },
     { "url": "/products/stalerozlivochnye-kovshi/stalerazlivochnye-kovshi-chajnikovogo-tipa/uik-cht-0-5/" },
-    { "url": "/products/zapchasti/induktsionnoe/kondensatory-elektrotermicheskie/" },
+    { "url": "/products/zapchasti/induktsionnoe/kondensatory-elektrotermicheskie/",
+      "specs": [["Модель", "0.75-1000-1s"], ["Напряжение, В", "380"], ["Мощность, кВАр", "750"], ["Частота, кГц", "1"]] },
     { "url": "/products/zapchasti/drobemetnoe/" }
   ]
 }
