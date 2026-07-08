@@ -1,25 +1,22 @@
 {
   "_doc": "Источник правды по СКЛАДУ. Здесь ты управляешь, что показывается в разделе /nalichie/ и какие карточки каталога получают бейдж «В наличии». Правишь массив `items`. Минимум — URL товара (полный, как в адресной строке). Опционально — qty (штук в наличии), shipping (срок отгрузки), note (любая заметка). Остальное (название, фото, категория) подтягивается АВТОМАТИЧЕСКИ из соответствующей страницы товара скриптом scripts/build-stock.mjs при сборке. Удалил позицию — она исчезла со склада и с каталога. Подробно — см. docs/stock-system.md (или спроси меня).",
-  "_sync": "Синхронизировано со старым сайтом /equipment_in_stock/ (2026-06-08). Дополнено 8 позиций по списку Евгения (2026-06-16): УИГ-10Т/40Т/80Т, УИ-0.25Т-160, УИ-1Т-700, транзисторные УИ-25П/УИ-35П (страницы на новом есть по пути tranzistornye/), смесители ХТС УИШС.",
+  "_sync": "Обновлено по списку Евгения (2026-07-08): наличие приведено точно к присланному перечню (16 позиций). Убраны УИ-0.25Т-250, УИ-15АВЗ, УИД-3210, УИД-326, УИГ-10Т, ковш УИК-С-0.5. Добавлены УИ-0.15Т-160 (на гидравлике) и запчасти: конденсаторы электротермические, запчасти дробемётного оборудования.",
   "items": [
     { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-15t-160/" },
+    { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-15t-160-na-gidravlike/" },
     { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-25t-160/" },
-    { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-25t-250/" },
     { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-5t-400/" },
     { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-5t-400-na-gidravlike/" },
     { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-1t-800-0-7kgts/" },
-    { "url": "/products/induktsionnye-plavilnye-pechi/tranzistornye/ui-25p/" },
-    { "url": "/products/induktsionnye-plavilnye-pechi/tranzistornye/ui-35p/" },
-    { "url": "/products/induktsionnye-nagrevateli/vysokochastotnye/ui-15avz/" },
-    { "url": "/products/drobemetnoe-oborudovanie/barabannogo-tipa/uid-3210/" },
-    { "url": "/products/drobemetnoe-oborudovanie/barabannogo-tipa/uid-326/" },
-    { "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-10t/" },
     { "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-20t/" },
     { "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-30t/" },
     { "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-40t/" },
     { "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-80t/" },
+    { "url": "/products/induktsionnye-plavilnye-pechi/tranzistornye/ui-25p/" },
+    { "url": "/products/induktsionnye-plavilnye-pechi/tranzistornye/ui-35p/" },
     { "url": "/products/linii-dlya-holodnotverdeyushhih-smesej-hts/smesiteli/" },
     { "url": "/products/stalerozlivochnye-kovshi/stalerazlivochnye-kovshi-chajnikovogo-tipa/uik-cht-0-5/" },
-    { "url": "/products/stalerozlivochnye-kovshi/stalerazlivochnye-kovshi-dlya-rasplavlennoj-stali/uik-s-0-5/" }
+    { "url": "/products/zapchasti/induktsionnoe/kondensatory-elektrotermicheskie/" },
+    { "url": "/products/zapchasti/drobemetnoe/" }
   ]
 }
