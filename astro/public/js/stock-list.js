@@ -127,6 +127,25 @@
     return n;
   }
 
+  /* ── Кнопки действий карточки (единые для fallback и каталожных) ── */
+  function arrow() { return el('span', { class: 'btn__arrow', text: '→' }); }
+  function quoteBtn() {
+    return el('a', { href: '#leadgen', class: 'btn btn--primary btn--block js-quote-btn' },
+      [document.createTextNode('Запросить цену '), arrow()]);
+  }
+  function moreBtn(url) {
+    return el('a', { href: url, class: 'pcard__more' },
+      [document.createTextNode('Подробнее о позиции '), arrow()]);
+  }
+  // Гарантируем, что в карточке есть обе кнопки (Запросить цену + Подробнее).
+  function ensureActions(card, url) {
+    var body = card.querySelector('.pcard__body') || card;
+    var actions = card.querySelector('.pcard__actions');
+    if (!actions) { actions = el('div', { class: 'pcard__actions' }); body.appendChild(actions); }
+    if (!actions.querySelector('.js-quote-btn')) actions.insertBefore(quoteBtn(), actions.firstChild);
+    if (!actions.querySelector('.pcard__more')) actions.appendChild(moreBtn(url));
+  }
+
   function renderCard(it) {
     // Приоритет 1: готовый HTML из подкатегории каталога — рендерим как в
     // подразделе товара 1-в-1 (фото, бейдж категории, специ, кнопки) и сверху
@@ -163,6 +182,9 @@
         cover.appendChild(badge);
       }
     }
+    // Некоторые каталожные карточки (напр. ковши) не имеют кнопки «Подробнее» —
+    // на /nalichie/ добавляем недостающие кнопки, не трогая исходные листинги.
+    ensureActions(card, it.url);
     return card;
   }
 
@@ -206,6 +228,7 @@
       if (ship) metaTxt += 'отгрузка ' + ship;
       bodyChildren.push(el('div', { class: 'pcard__stock-meta', text: metaTxt }));
     }
+    bodyChildren.push(el('div', { class: 'pcard__actions' }, [quoteBtn(), moreBtn(url)]));
     var body = el('div', { class: 'pcard__body' }, bodyChildren);
 
     var card = el('article', { class: 'pcard', 'data-stock': 'true', 'data-stock-cat': cat }, [cover, body]);
