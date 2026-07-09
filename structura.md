@@ -27,7 +27,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 
 **Раздел каталога делится на 2 типа шаблона:**
 
-- **Продуктовые разделы (8 шт., шаблон T03a):** induktsionnye-plavilnye-pechi, induktsionnye-nagrevateli, drobemetnoe-oborudovanie, sistemy-ohlazhdeniya, mufelnye-termicheskie-pechi, zapchasti, vakuumnoe-oborudovanie-dlya-termoobrabotki, stalerozlivochnye-kovshi.
+- **Продуктовые разделы (9 шт., шаблон T03a):** induktsionnye-plavilnye-pechi, induktsionnye-nagrevateli, drobemetnoe-oborudovanie, sistemy-ohlazhdeniya, mufelnye-termicheskie-pechi, zapchasti, vakuumnoe-oborudovanie-dlya-termoobrabotki, stalerozlivochnye-kovshi, sterzhnevye-mashiny.
 - **Технологические разделы (4 шт., шаблон T03b):** oborudovanie-dlya-peschano-glinistyh-smesej-pgs, linii-dlya-holodnotverdeyushhih-smesej-hts, oborudovanie-lgm, oborudovanie-lvm.
 
 **Полный реестр типов страниц и их шаблонов** — см. [`docs/page-types/README.md`](docs/page-types/README.md). Под каждый тип — отдельный файл-шаблон `T01-...md` ... `T12-...md`.
@@ -175,6 +175,16 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │       301-редиректы в nginx ПРИМЕНЕНЫ (36 location-блоков, слеш+без; смоук: старый URL → 301 → 200):
 │   │       • /products/zapchasti/{tiristory-silovye,kondensatory-elektrotermicheskie,kabel-silovoj-vodoohlazhdaemyj,plata-impulsnyh-transformatorov}/ → …/zapchasti/induktsionnoe/<тот же slug>/
 │   │       • /products/zapchasti/{impeller-m,napravlyayushhaya,napravlyayushhaya-m,raspredelitel,raspredelitel-m,lopatki,lopatki-m,vkladysh-verhnij,vkladysh-verhnij-m,vkladysh-bokovoj,vkladysh-bokovoj-m,vkladysh-perednij-m,vkladysh-perednij-zadnij,vkladysh-zadnij-m}/ → …/zapchasti/drobemetnoe/<тот же slug>/
+│   ├── /products/sterzhnevye-mashiny/                 ✅ T03a · Хаб «Стержневые и формовочные машины» (8 моделей, 2026-07-09)
+│   │   │   # каждая модель = страница-описание (cat-hero + фото + описание + full-cycle), гарантия 12 мес, таблицы ТХ добавим позже
+│   │   ├── …/dvuhpozitsionnaya-vertikalnaya-goryachie-yashchiki/  ✅ Двухпозиционная вертикальная (горячий ящик)
+│   │   ├── …/gorizontalnaya-goryachie-yashchiki/                  ✅ Горизонтальная (горячий ящик)
+│   │   ├── …/mashina-obolochkovyh-sterzhney-goryachie-yashchiki/  ✅ Оболочковые стержни (Croning)
+│   │   ├── …/vertikalnaya-holodnyy-yashchik/                      ✅ Вертикальная (холодный ящик)
+│   │   ├── …/vertikalnaya-trehplitochnaya-holodnyy-yashchik/      ✅ Вертикальная трёхплиточная (холодный ящик)
+│   │   ├── …/gorizontalnaya-holodnyy-yashchik/                    ✅ Горизонтальная (холодный ящик)
+│   │   ├── …/formovochnaya-syrye-formy/                           ✅ Формовочная (сырые формы)
+│   │   └── …/formovochnaya-bezopochnaya/                          ✅ Формовочная (безопочная)
 │   ├── /products/mufelnye-termicheskie-pechi/          ✅ T03a · Хаб «Муфельные (термические) печи» (13 категорий 1-в-1 с боевого)
 │   │   │   # новый формат (Этап 3): каждая категория T04 = описание + таблица ТХ прямо на странице, БЕЗ дочерних товаров T05
 │   │   ├── …/mufelnaya-pech/                                              ✅ T04 · Муфельная печь (универсальная) — 6 модификаций в галерее + таблица УИ-МП (Этап 3, новый формат; T05-страницы убраны)
