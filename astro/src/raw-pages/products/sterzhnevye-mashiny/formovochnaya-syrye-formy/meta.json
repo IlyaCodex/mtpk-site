@@ -1,8 +1,10 @@
 {
   "title": "Формовочная машина (сырые формы) — УралИндуктор",
   "description": "Встряхивающе-прессовая формовка в опоках из сырой (песчано-глинистой) смеси — классический массовый процесс изготовления литейных форм. Собственное производство, гарантия 12 месяцев.",
-  "inline_styles": [],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}</style>"
+  ],
   "css_templates": [
-    "/css/tpl/tovar-c.css"
+    "/css/tpl/tovar-b.css"
   ]
 }
