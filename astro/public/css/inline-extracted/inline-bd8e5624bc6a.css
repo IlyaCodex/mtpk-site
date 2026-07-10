@@ -278,8 +278,8 @@
   .cat-hero__process { grid-template-columns: 1fr; }
 }
 /* === HERO KPI STRIP — 4 числовых тайла под hero === */
-.hero-kpi {background: var(--neutral-950); border-top: 1px solid rgba(255,255,255,0.08); position: relative; z-index: 3; }
-.hero-kpi__grid {display: grid; grid-template-columns: repeat(4, 1fr); }
+.hero-kpi {position: relative; z-index: 3; margin: var(--sp-8) 0; }
+.hero-kpi__grid {display: grid; grid-template-columns: repeat(4, 1fr); background: var(--neutral-950); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; overflow: hidden; }
 .hero-kpi__item {padding: var(--sp-8) var(--sp-6); border-right: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: var(--sp-2); }
 .hero-kpi__item:last-child {border-right: none; }
 .hero-kpi__num {font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(28px, 3vw, 40px); font-weight: var(--fw-bold); color: var(--green-400); line-height: 1; letter-spacing: -0.02em; }
