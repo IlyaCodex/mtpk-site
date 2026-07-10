@@ -235,7 +235,7 @@
 }
 /* --- Category hero (dark band) --- */
 .cat-hero {position: relative; background: var(--neutral-950); color: var(--text-inverse); min-height: 640px; display: flex; align-items: center; overflow: hidden; }
-.cat-hero__image {position: absolute; inset: 0; background: var(--neutral-950) url('/img/pgs/real/hero.jpg?v=2') center right/cover no-repeat; z-index: 0; }
+.cat-hero__image {position: absolute; inset: 0; background: var(--neutral-950) url('/img/hts-hero-realistic.png') center right/cover no-repeat; z-index: 0; }
 .cat-hero__overlay {position: absolute; inset: 0; z-index: 1; background:
     linear-gradient(90deg,
       rgba(10,28,37,0.92) 0%,
@@ -282,7 +282,7 @@
 .hero-kpi__grid {display: grid; grid-template-columns: repeat(4, 1fr); background: var(--neutral-950); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; overflow: hidden; }
 .hero-kpi__item {padding: var(--sp-8) var(--sp-6); border-right: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: var(--sp-2); }
 .hero-kpi__item:last-child {border-right: none; }
-.hero-kpi__num {font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(28px, 3vw, 40px); font-weight: var(--fw-bold); color: var(--green-400); line-height: 1; letter-spacing: -0.02em; }
+.hero-kpi__num {font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(20px, 2.2vw, 30px); font-weight: var(--fw-bold); color: var(--green-400); line-height: 1.1; letter-spacing: -0.02em; }
 .hero-kpi__label {font-size: var(--fs-small); color: rgba(255,255,255,0.7); line-height: 1.4; }
 @media (max-width: 1024px) {
   .hero-kpi__grid { grid-template-columns: repeat(2, 1fr); }
@@ -377,7 +377,7 @@
 @media (max-width: 640px) { .equip__grid { grid-template-columns: 1fr; } }
 /* === PRODUCTION RF — главный нарратив страницы, тёмная подложка === */
 .prod-rf {position: relative; background: var(--neutral-950); color: var(--text-inverse); padding: var(--section-py-loose, 128px) 0; overflow: hidden; isolation: isolate; }
-.prod-rf::before {content: ""; position: absolute; inset: 0; background-image: url('/img/pgs/real/hero.jpg?v=2'); background-size: cover; background-position: right center; opacity: 0.22; z-index: -2; }
+.prod-rf::before {content: ""; position: absolute; inset: 0; background-image: url('/img/hts-hero-realistic.png'); background-size: cover; background-position: right center; opacity: 0.22; z-index: -2; }
 .prod-rf::after {content: ""; position: absolute; inset: 0; background:
     linear-gradient(90deg,
       rgba(16,31,38,0.96) 0%, rgba(16,31,38,0.86) 28%,

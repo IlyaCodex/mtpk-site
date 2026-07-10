@@ -235,7 +235,7 @@
 }
 /* --- Category hero (dark band) --- */
 .cat-hero {position: relative; background: var(--neutral-950); color: var(--text-inverse); min-height: 640px; display: flex; align-items: center; overflow: hidden; }
-.cat-hero__image {position: absolute; inset: 0; background: var(--neutral-950) url('/img/hts-hero-realistic.png') center right/cover no-repeat; z-index: 0; }
+.cat-hero__image {position: absolute; inset: 0; background: var(--neutral-950) url('/img/lvm-hero-realistic.png') center right/cover no-repeat; z-index: 0; }
 .cat-hero__overlay {position: absolute; inset: 0; z-index: 1; background:
     linear-gradient(90deg,
       rgba(10,28,37,0.92) 0%,
@@ -282,7 +282,7 @@
 .hero-kpi__grid {display: grid; grid-template-columns: repeat(4, 1fr); background: var(--neutral-950); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; overflow: hidden; }
 .hero-kpi__item {padding: var(--sp-8) var(--sp-6); border-right: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: var(--sp-2); }
 .hero-kpi__item:last-child {border-right: none; }
-.hero-kpi__num {font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(28px, 3vw, 40px); font-weight: var(--fw-bold); color: var(--green-400); line-height: 1; letter-spacing: -0.02em; }
+.hero-kpi__num {font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(20px, 2.2vw, 30px); font-weight: var(--fw-bold); color: var(--green-400); line-height: 1.1; letter-spacing: -0.02em; }
 .hero-kpi__label {font-size: var(--fs-small); color: rgba(255,255,255,0.7); line-height: 1.4; }
 @media (max-width: 1024px) {
   .hero-kpi__grid { grid-template-columns: repeat(2, 1fr); }
@@ -294,27 +294,6 @@
 @media (max-width: 560px) {
   .hero-kpi__grid { grid-template-columns: 1fr; }
   .hero-kpi__item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
-}
-/* === HTS-INTRO — короткий смысловой блок о технологии ХТС === */
-.hts-intro {background: var(--neutral-0); padding: var(--section-py-base, 96px) 0; }
-.hts-intro__grid {display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: var(--sp-12); align-items: start; }
-.hts-intro__lead .s-title {margin-bottom: var(--sp-5); }
-.hts-intro__text {font-size: var(--fs-body-lg, 18px); line-height: 1.65; color: var(--text-secondary); margin: 0 0 var(--sp-4); }
-.hts-intro__text strong {color: var(--text-primary); font-weight: var(--fw-semibold); }
-.hts-intro__bullets {list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
-.hts-intro-bullet {display: flex; gap: var(--sp-4); padding: var(--sp-5); background: var(--surface-subtle); border: 1px solid var(--border-subtle); transition: border-color var(--duration-base) var(--ease-out),
-              transform var(--duration-base) var(--ease-out); }
-.hts-intro-bullet:hover {border-color: var(--teal-600); transform: translateY(-2px); }
-.hts-intro-bullet__icon {flex-shrink: 0; width: 36px; height: 36px; color: var(--teal-700, #1F5E78); display: flex; align-items: center; justify-content: center; }
-.hts-intro-bullet__icon svg {width: 28px; height: 28px; }
-.hts-intro-bullet__body {display: flex; flex-direction: column; gap: var(--sp-2); }
-.hts-intro-bullet__title {font-family: var(--font-display); font-size: var(--fs-body); font-weight: var(--fw-semibold); color: var(--text-primary); line-height: 1.3; }
-.hts-intro-bullet__text {font-size: var(--fs-small); color: var(--text-secondary); line-height: 1.55; }
-@media (max-width: 1024px) {
-  .hts-intro__grid { grid-template-columns: 1fr; gap: var(--sp-8); }
-}
-@media (max-width: 640px) {
-  .hts-intro__bullets { grid-template-columns: 1fr; }
 }
 /* === PROBLEMS — 4 benefit-forward карточки с ключевой метрикой === */
 .problems {background: var(--surface-subtle); padding: var(--section-py-base, 96px) 0; position: relative; overflow: hidden; }
@@ -377,7 +356,7 @@
 @media (max-width: 640px) { .equip__grid { grid-template-columns: 1fr; } }
 /* === PRODUCTION RF — главный нарратив страницы, тёмная подложка === */
 .prod-rf {position: relative; background: var(--neutral-950); color: var(--text-inverse); padding: var(--section-py-loose, 128px) 0; overflow: hidden; isolation: isolate; }
-.prod-rf::before {content: ""; position: absolute; inset: 0; background-image: url('/img/hts-hero-realistic.png'); background-size: cover; background-position: right center; opacity: 0.22; z-index: -2; }
+.prod-rf::before {content: ""; position: absolute; inset: 0; background-image: url('/img/production-rf-workshop.png'); background-size: cover; background-position: right center; opacity: 0.32; z-index: -2; }
 .prod-rf::after {content: ""; position: absolute; inset: 0; background:
     linear-gradient(90deg,
       rgba(16,31,38,0.96) 0%, rgba(16,31,38,0.86) 28%,
@@ -435,14 +414,6 @@
 .catalog-lvm-card__cover {background: var(--neutral-0); aspect-ratio: 4 / 3; overflow: hidden; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-subtle); }
 .catalog-lvm-card__cover img {width: 100%; height: 100%; object-fit: contain; padding: var(--sp-3); transition: transform var(--duration-slow, 400ms) var(--ease-out); }
 .catalog-lvm-card:hover .catalog-lvm-card__cover img {transform: scale(1.05); }
-/* Cover placeholder (SVG-illustration, без фото) */
-.catalog-lvm-card__cover--ph {background: linear-gradient(135deg, #f1f5f7 0%, #e3edf2 100%); position: relative; }
-.catalog-lvm-card__cover--ph::before {content: ""; position: absolute; inset: 0; background-image:
-    linear-gradient(135deg, rgba(31,94,120,0.04) 0%, rgba(31,94,120,0) 60%),
-    radial-gradient(circle at 50% 100%, rgba(31,94,120,0.06) 0%, rgba(31,94,120,0) 60%); pointer-events: none; }
-.catalog-lvm-card__cover--ph svg {width: 56%; height: 56%; color: var(--teal-700, #1F5E78); transition: transform var(--duration-slow, 400ms) var(--ease-out); z-index: 1; }
-.catalog-lvm-card:hover .catalog-lvm-card__cover--ph svg {transform: scale(1.06); }
-.catalog-lvm-card__cover--ph .ph-badge {position: absolute; top: var(--sp-3); right: var(--sp-3); font-family: var(--font-mono); font-size: 11px; font-weight: var(--fw-semibold); letter-spacing: 0.04em; background: var(--neutral-0); color: var(--teal-700, #1F5E78); border: 1px solid var(--border-subtle); padding: 4px 8px; border-radius: 2px; z-index: 2; }
 .catalog-lvm-card__body {padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-3); flex: 1; }
 .catalog-lvm-card__category {font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); }
 .catalog-lvm-card__title {font-family: var(--font-display); font-size: var(--fs-body); font-weight: var(--fw-semibold); color: var(--text-primary); line-height: 1.3; margin: 0; flex: 1; }
