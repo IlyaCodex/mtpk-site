@@ -1,0 +1,10 @@
+{
+  "title": "Электрические тигельные печи сопротивления для плавки алюминия — УралИндуктор",
+  "description": "Электрическая тигельная печь сопротивления: PID-регулирование ±5 °C, SiC-графитовые тигли, до 20% экономии энергии против газа. Собственное производство, гарантия 12 месяцев.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}</style>"
+  ]
+}

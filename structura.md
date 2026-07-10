@@ -27,7 +27,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 
 **Раздел каталога делится на 2 типа шаблона:**
 
-- **Продуктовые разделы (9 шт., шаблон T03a):** induktsionnye-plavilnye-pechi, induktsionnye-nagrevateli, drobemetnoe-oborudovanie, sistemy-ohlazhdeniya, mufelnye-termicheskie-pechi, zapchasti, vakuumnoe-oborudovanie-dlya-termoobrabotki, stalerozlivochnye-kovshi, sterzhnevye-mashiny.
+- **Продуктовые разделы (10 шт., шаблон T03a):** induktsionnye-plavilnye-pechi, induktsionnye-nagrevateli, drobemetnoe-oborudovanie, sistemy-ohlazhdeniya, mufelnye-termicheskie-pechi, zapchasti, vakuumnoe-oborudovanie-dlya-termoobrabotki, stalerozlivochnye-kovshi, sterzhnevye-mashiny, termoobrabotka-plavka-alyuminiya.
 - **Технологические разделы (4 шт., шаблон T03b):** oborudovanie-dlya-peschano-glinistyh-smesej-pgs, linii-dlya-holodnotverdeyushhih-smesej-hts, oborudovanie-lgm, oborudovanie-lvm.
 
 **Полный реестр типов страниц и их шаблонов** — см. [`docs/page-types/README.md`](docs/page-types/README.md). Под каждый тип — отдельный файл-шаблон `T01-...md` ... `T12-...md`.
@@ -185,6 +185,15 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │   ├── …/gorizontalnaya-holodnyy-yashchik/                    ✅ Горизонтальная (холодный ящик)
 │   │   ├── …/formovochnaya-syrye-formy/                           ✅ Формовочная (сырые формы)
 │   │   └── …/formovochnaya-bezopochnaya/                          ✅ Формовочная (безопочная)
+│   ├── /products/termoobrabotka-plavka-alyuminiya/    ✅ T03a · Хаб «Термообработка и плавка алюминия» (7 моделей, T05, 2026-07-10)
+│   │   │   # страницы моделей — T05 (phero + вкладки), описания и таблицы ТХ от Евгения, гарантия 12 мес
+│   │   ├── …/bassejnovye-elektropechi-dlya-vyderzhki-alyuminiya/  ✅ Бассейновые электропечи (выдержка), серия BK
+│   │   ├── …/gazovye-bassejnovye-pechi-dlya-vyderzhki-alyuminiya/ ✅ Газовые бассейновые (выдержка), серия BD
+│   │   ├── …/gazovye-tigelnye-pechi-s-rekuperaciej-tepla/         ✅ Газовые тигельные с рекуперацией, серия BA
+│   │   ├── …/naklonnye-gidravlicheskie-tigelnye-pechi/            ✅ Наклонные гидравлические тигельные, серия ВН
+│   │   ├── …/pechi-dlya-plavki-i-vyderzhki-alyuminiya/            ✅ Печи плавки и выдержки (башенные), серия BF
+│   │   ├── …/centralizovannye-bashennye-pechi/                   ✅ Централизованные башенные, серия BE
+│   │   └── …/elektricheskie-tigelnye-pechi-soprotivleniya/       ✅ Электрические тигельные сопротивления, серия BW
 │   ├── /products/mufelnye-termicheskie-pechi/          ✅ T03a · Хаб «Муфельные (термические) печи» (13 категорий 1-в-1 с боевого)
 │   │   │   # новый формат (Этап 3): каждая категория T04 = описание + таблица ТХ прямо на странице, БЕЗ дочерних товаров T05
 │   │   ├── …/mufelnaya-pech/                                              ✅ T04 · Муфельная печь (универсальная) — 6 модификаций в галерее + таблица УИ-МП (Этап 3, новый формат; T05-страницы убраны)
