@@ -420,6 +420,10 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
 .project__meta-value {font-size: var(--fs-small); font-weight: var(--fw-semibold); color: var(--text-primary); }
 .project__desc {font-size: var(--fs-lead); line-height: 1.55; color: var(--text-primary); margin-bottom: var(--sp-8); }
 .project__desc--muted {color: var(--text-secondary); font-size: var(--fs-body); }
+.project__result {list-style: none; padding: 0; margin: 0 0 var(--sp-8); display: grid; gap: var(--sp-3); }
+.project__result li {position: relative; padding-left: var(--sp-7); color: var(--text-secondary); line-height: 1.55; }
+.project__result li::before {content: ""; position: absolute; left: 0; top: 0.5em; width: 10px; height: 10px; border: 2px solid var(--teal-600); border-radius: 50%; }
+
 .project__cta {display: flex; gap: var(--sp-5); flex-wrap: wrap; align-items: center; margin-top: var(--sp-10); padding-top: var(--sp-8); border-top: 1px solid var(--border-subtle); }
 .project__back {color: var(--text-secondary); font-size: var(--fs-small); text-decoration: none; transition: color var(--duration-fast); }
 .project__back:hover {color: var(--teal-600); }
