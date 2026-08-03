@@ -51,9 +51,10 @@ const orgSchema = {
   "url": SITE,
   "logo": {
     "@type": "ImageObject",
+    "@id": `${SITE}/brand/logo-color.png`,
     "url": `${SITE}/brand/logo-color.png`,
-    "width": "512",
-    "height": "512"
+    "width": 512,
+    "height": 512
   },
   "image": `${SITE}/og/default.jpg`,
   "description": "Производство индукционных плавильных печей, дробемётных установок, чиллеров и градирен, сталеразливочных ковшей и оборудования для литейных производств.",
@@ -138,7 +139,11 @@ const mainAttrs = index
       "potentialAction": {
         "@type": "SearchAction",
         "target": { "@type": "EntryPoint", "urlTemplate": `${SITE}/?q={search_term_string}` },
-        "query-input": "required name=search_term_string"
+        "query-input": {
+          "@type": "PropertyValueSpecification",
+          "valueRequired": true,
+          "valueName": "search_term_string"
+        }
       }
     })} />
   )}
