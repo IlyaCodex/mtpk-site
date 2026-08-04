@@ -243,6 +243,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   ├── /uslugi/obuchenie-personala/                    ✅ T06 · Обучение персонала (страница услуги, photoreal hero)
 │   ├── /uslugi/modernizatsiya/                         ⬜ T06 · Модернизация (план)
 │   ├── /uslugi/remont-plavilnyh-pechey/                 ✅ T06 · Ремонт плавильных печей (4 узла, аудит, контент с источника)
+│   ├── /uslugi/remont-dugovyh-pechey/                   ✅ T06 · Ремонт дуговых печей (реновация ДСП, модернизация АСУ ТП, кейс+FAQ)
 │   ├── /uslugi/remont-drobemetov/                       ✅ T06 · Ремонт дробемётов (3 узла: камера/турбина/пылеуловитель)
 │   └── /uslugi/tehnicheskij-audit/                      ✅ T06 · Технический аудит (оценка состояния, blueprint-hero)
 │
