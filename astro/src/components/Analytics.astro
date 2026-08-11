@@ -66,12 +66,6 @@
       var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
       if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
     })(document, window, "tmr-code");
-
-    /* ===== Битрикс24 — сквозная аналитика (call tracker, портал b1785973) ===== */
-    (function(w,d,u){
-      var s=d.createElement('script');s.async=true;s.src=u+'?'+(Date.now()/60000|0);
-      var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
-    })(window,document,'https://cdn-ru.bitrix24.ru/b1785973/crm/tag/call.tracker.js');
   }
 
   /* Отложенный старт: requestIdleCallback (Chrome/Firefox/Edge) или
@@ -88,6 +82,16 @@
     window.addEventListener(ev, startAnalytics, { once: true, passive: true });
   });
 })();
+</script>
+<!-- Битрикс24 — сквозная аналитика / call tracker (портал b1785973).
+     Грузится СРАЗУ (не в отложенном блоке): коллтрекингу нужна подмена номера
+     до первого действия пользователя, а проверялка Битрикс24 ищет активный код
+     на старте страницы. -->
+<script is:inline>
+  (function(w,d,u){
+    var s=d.createElement('script');s.async=true;s.src=u+'?'+(Date.now()/60000|0);
+    var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
+  })(window,document,'https://cdn-ru.bitrix24.ru/b1785973/crm/tag/call.tracker.js');
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/25228307" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <noscript><div><img src="https://top-fwz1.mail.ru/counter?id=3784620;js=na" style="position:absolute;left:-9999px;" alt="Top.Mail.Ru" /></div></noscript>
