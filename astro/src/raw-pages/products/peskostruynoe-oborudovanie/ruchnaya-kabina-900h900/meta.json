@@ -1,0 +1,10 @@
+{
+  "title": "Ручная напорная пескоструйная кабина 900×900 — производство и поставка",
+  "description": "Оператор помещает деталь в рабочую камеру, закрывает дверь и управляет напорным соплом через встроенные рукава. Пуск подачи абразива осуществляется… Гарантия 12 месяцев.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}</style>"
+  ]
+}

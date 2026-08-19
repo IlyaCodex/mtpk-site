@@ -1,0 +1,10 @@
+{
+  "title": "Тележечная напорная пескоструйная установка с ручным соплом — производство и поставка",
+  "description": "Изделие размещается на поворотном столе тележки, тележка заезжает в камеру, после чего оператор выполняет обработку ручным напорным соплом через… Гарантия 12 месяцев.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}</style>"
+  ]
+}

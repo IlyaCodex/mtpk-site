@@ -29,6 +29,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 
 - **Продуктовые разделы (10 шт., шаблон T03a):** induktsionnye-plavilnye-pechi, induktsionnye-nagrevateli, drobemetnoe-oborudovanie, sistemy-ohlazhdeniya, mufelnye-termicheskie-pechi, zapchasti, vakuumnoe-oborudovanie-dlya-termoobrabotki, stalerozlivochnye-kovshi, sterzhnevye-mashiny, termoobrabotka-plavka-alyuminiya.
 - **Технологические разделы (4 шт., шаблон T03b):** oborudovanie-dlya-peschano-glinistyh-smesej-pgs, linii-dlya-holodnotverdeyushhih-smesej-hts, oborudovanie-lgm, oborudovanie-lvm.
+- **peskostruynoe-oborudovanie** (2026-08-19): новый раздел, хаб по образцу ПГС (богатый информативный) + 13 плоских товаров (шаблон tovar-b/phero), гарантия 12 мес. Товары: prohodnaya-s-gusenichnym-transporterom, prohodnaya-s-kombinirovannoy-gruppoy-sopel, prohodnaya-s-lentochnym-transporterom, prohodnaya-napornaya-dlya-dlinnomernyh-izdeliy, s-v-obraznymi-remnyami, napornaya-s-indeksnym-povorotnym-stolom, napornaya-s-kachayushchimisya-soplami-povorotnyj-stol, telezhechnaya-napornaya-s-povorotnym-stolom, telezhechnaya-napornaya-s-ruchnym-soplom, dlya-obrabotki-rezhushchego-instrumenta, dlya-ochistki-press-form-shin, ruchnaya-kabina-900h900, ruchnaya-telezhechnaya-kabina-1200h1200. Источник контента: PDF (в тексте «дробеструйн» заменено на «пескоструйн»).
 
 **Полный реестр типов страниц и их шаблонов** — см. [`docs/page-types/README.md`](docs/page-types/README.md). Под каждый тип — отдельный файл-шаблон `T01-...md` ... `T12-...md`.
 

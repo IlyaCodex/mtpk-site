@@ -1,0 +1,10 @@
+{
+  "title": "Проходная пескоструйная установка напорного типа для длинномерных изделий — производство и поставка",
+  "description": "Установка рассчитана на непрерывную циклическую обработку длинномерных или секционных изделий. Деталь подается роликовым транспортером через рабочую… Гарантия 12 месяцев.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}</style>"
+  ]
+}
