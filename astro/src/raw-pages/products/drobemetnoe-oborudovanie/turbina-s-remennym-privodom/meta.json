@@ -1,0 +1,10 @@
+{
+  "title": "Турбина дробемётная с ременным приводом — купить в Миассе | УралИндуктор",
+  "description": "Дробемётная турбина с ременным приводом для установок серии УИ: мощность 7,5–22 кВт, производительность по дроби до 360 кг/мин, скорость вылета 78–82 м/с. Вынос двигателя из зоны вибрации, ремонтопригодность, поставка со склада в Миассе.",
+  "css_templates": [
+    "/css/tpl/tovar-a.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}.spec-table--wide th,.spec-table--wide td{white-space:nowrap}</style>"
+  ]
+}
