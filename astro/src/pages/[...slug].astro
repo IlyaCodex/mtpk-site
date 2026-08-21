@@ -121,6 +121,10 @@ const inlineStyles = inlineStylesArr.join('\n');
 // на той же позиции каскада, что был inline-блоб (после site.css).
 const cssTemplates = meta.css_templates || [];
 const preloadImage = meta.preload_image;
+const _siMatch = body.match(/class="phero__main"[\s\S]*?<img[^>]*?src="([^"]+)"/)
+  || body.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/)
+  || body.match(/<img[^>]*?src="([^"]+)"/);
+const searchImage = ((preloadImage || (_siMatch && _siMatch[1]) || '') as string).replace(/\?v=\d+/, '') || undefined;
 const slug = Astro.params.slug || '';
 
 let activeNav: string | undefined;
@@ -249,7 +253,7 @@ for (let i = 0; i < parts.length; i++) {
   }
 }
 ---
-<BaseLayout title={meta.title} description={meta.description} activeNav={activeNav} index={searchIndex} searchWeight={searchWeight}>
+<BaseLayout title={meta.title} description={meta.description} activeNav={activeNav} index={searchIndex} searchWeight={searchWeight} searchImage={searchImage}>
   {preloadImage && (
     <link slot="head" rel="preload" as="image" href={preloadImage} fetchpriority="high" />
   )}

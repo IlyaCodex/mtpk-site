@@ -19,10 +19,12 @@ interface Props {
   ogImage?: string;
   /** OG type — обычно 'website' (default), для статей — 'article'. */
   ogType?: string;
+  /** Картинка-превью для результатов поиска (Pagefind meta image). */
+  searchImage?: string;
 }
 const {
   title, description, canonical, activeNav, index = true, searchWeight = 1,
-  ogImage = '/og/default.jpg', ogType = 'website',
+  ogImage = '/og/default.jpg', ogType = 'website', searchImage,
 } = Astro.props;
 
 // SEO-T1 (v2): canonical URL — С trailing slash, чтобы совпадать с реальным
@@ -183,16 +185,35 @@ const mainAttrs = index
     /* Модалка поиска (Pagefind) */
     .search-modal { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: flex-start; justify-content: center; }
     .search-modal[hidden] { display: none; }
-    .search-modal__backdrop { position: absolute; inset: 0; background: rgba(16,31,38,.6); }
-    .search-modal__panel { position: relative; z-index: 1; margin-top: 8vh; width: min(680px, 92vw); max-height: 80vh; overflow: auto; background: #fff; box-shadow: 0 24px 60px rgba(0,0,0,.28); padding: 28px 24px 24px; }
-    .search-modal__close { position: absolute; top: 8px; right: 14px; border: 0; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--text-secondary, #555); }
-    .search-modal__close:hover { color: var(--text-primary, #101F26); }
-    #search-ui { --pagefind-ui-primary: var(--teal-600, #1F5E78); --pagefind-ui-text: var(--text-primary, #101F26); --pagefind-ui-font: var(--font-body, "Inter", sans-serif); --pagefind-ui-border-radius: 2px; --pagefind-ui-scale: .9; }
+    .search-modal__backdrop { position: absolute; inset: 0; background: rgba(16,31,38,.55); backdrop-filter: blur(2px); }
+    .search-modal__panel { position: relative; z-index: 1; margin-top: 7vh; width: min(940px, 94vw); max-height: 86vh; display: flex; flex-direction: column; }
+    .ss-searchbar { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px; padding: 15px 20px; box-shadow: 0 14px 44px rgba(16,31,38,.20); }
+    .ss-searchbar__icon { width: 22px; height: 22px; color: var(--text-tertiary, #8A9298); flex-shrink: 0; }
+    .ss-searchbar__input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-family: var(--font-body, "Inter", sans-serif); font-size: 18px; color: var(--text-primary, #101F26); }
+    .ss-searchbar__input::placeholder { color: var(--text-tertiary, #8A9298); }
+    .ss-searchbar__clear { border: 0; background: none; cursor: pointer; color: var(--text-tertiary, #8A9298); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ss-searchbar__clear:hover { background: var(--neutral-100, #F0F2F3); color: var(--text-primary, #101F26); }
+    .ss-searchbar__clear svg { width: 18px; height: 18px; }
+    .ss-results { margin-top: 14px; background: #fff; border-radius: 16px; box-shadow: 0 14px 44px rgba(16,31,38,.16); overflow: auto; padding: 6px; }
+    .ss-count { padding: 12px 16px 8px; font-size: 14px; color: var(--text-tertiary, #8A9298); }
+    .ss-count b { color: var(--text-primary, #101F26); font-weight: 600; }
+    .ss-card { display: flex; gap: 16px; align-items: flex-start; padding: 16px; border-radius: 12px; text-decoration: none; }
+    .ss-card:hover { background: var(--surface-subtle, #F5F7F8); }
+    .ss-card + .ss-card { border-top: 1px solid var(--border-subtle, #E1E5E7); }
+    .ss-card:hover + .ss-card, .ss-card:hover { border-top-color: transparent; }
+    .ss-card__body { flex: 1; min-width: 0; }
+    .ss-card__title { font-family: var(--font-display, "Inter", sans-serif); font-weight: 600; font-size: 17px; line-height: 1.3; color: var(--text-primary, #101F26); margin: 0 0 5px; }
+    .ss-card__excerpt { font-size: 14px; line-height: 1.5; color: var(--text-secondary, #5A6166); margin: 0 0 9px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ss-card__excerpt mark { background: transparent; color: var(--text-primary, #101F26); font-weight: 600; }
+    .ss-card__more { font-family: var(--font-display, "Inter", sans-serif); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--green-600, #3C8E33); }
+    .ss-card__cover { width: 104px; height: 78px; flex-shrink: 0; border-radius: 10px; background: var(--neutral-100, #F0F2F3) center/cover no-repeat; border: 1px solid var(--border-subtle, #E1E5E7); }
+    .ss-empty { padding: 30px 16px; text-align: center; color: var(--text-tertiary, #8A9298); font-size: 15px; }
+    @media (max-width: 600px) { .ss-card__cover { width: 68px; height: 54px; } .ss-searchbar__input { font-size: 16px; } .ss-card__title { font-size: 16px; } }
   </style>
   <!-- Pagefind CSS подключается lazy при первом открытии модалки (T-PERF-5).
        Заголовок prefetch не блокирует, но сообщает браузеру: «скорее всего пригодится». -->
-  <link rel="prefetch" href="/_pagefind/pagefind-ui.css" as="style">
-  <link rel="prefetch" href="/_pagefind/pagefind-ui.js" as="script">
+  <link rel="prefetch" href="/_pagefind/pagefind.js" as="fetch" crossorigin>
+  
   <!-- B-2: общее CSS-ядро (445 правил, ~69 KB) — вынесено из meta.json-блобов
        в один файл. Подключается ДО slot=head, чтобы дельты страницы (external/
        inline из [...slug].astro) шли после и могли переопределять ядро.
@@ -209,6 +230,9 @@ const mainAttrs = index
 <body>
   <Header activeNav={activeNav} />
   <main {...mainAttrs}>
+    {index && searchImage && (
+      <span data-pagefind-meta="image[data-src], image_alt[data-alt]" data-src={searchImage} data-alt={title} style="display:none"></span>
+    )}
     <slot />
   </main>
   <Footer />
@@ -257,8 +281,16 @@ const mainAttrs = index
   <div class="search-modal" id="search-modal" hidden>
     <div class="search-modal__backdrop" data-search-close></div>
     <div class="search-modal__panel" role="dialog" aria-modal="true" aria-label="Поиск по сайту">
-      <button class="search-modal__close" type="button" aria-label="Закрыть поиск" data-search-close>&times;</button>
-      <div id="search-ui"></div>
+      <div class="ss-searchbar">
+        <svg class="ss-searchbar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="ss-input" class="ss-searchbar__input" placeholder="Поиск оборудования…" autocomplete="off" aria-label="Поиск по сайту">
+        <button class="ss-searchbar__clear" type="button" aria-label="Закрыть поиск" data-search-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6l-12 12"/></svg></button>
+      </div>
+      <div class="ss-results" id="ss-results" hidden>
+        <div class="ss-count" id="ss-count" hidden></div>
+        <div class="ss-list" id="ss-list"></div>
+        <div class="ss-empty" id="ss-empty" hidden></div>
+      </div>
     </div>
   </div>
   <!-- Pagefind lazy loader (T-PERF-5): CSS + JS подгружаются динамически
@@ -268,59 +300,55 @@ const mainAttrs = index
     (function () {
       var modal = document.getElementById('search-modal');
       if (!modal) return;
-      var ui = null;
-      var assetsLoaded = false;
-      var assetsLoading = null;
+      var input = document.getElementById('ss-input');
+      var results = document.getElementById('ss-results');
+      var list = document.getElementById('ss-list');
+      var countEl = document.getElementById('ss-count');
+      var emptyEl = document.getElementById('ss-empty');
+      var pf = null, loadingPromise = null, timer = null, lastQuery = '';
 
-      function loadPagefindAssets() {
-        if (assetsLoaded) return Promise.resolve();
-        if (assetsLoading) return assetsLoading;
-        assetsLoading = new Promise(function (resolve, reject) {
-          // CSS
-          var link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = '/_pagefind/pagefind-ui.css';
-          document.head.appendChild(link);
-          // JS
-          var script = document.createElement('script');
-          script.src = '/_pagefind/pagefind-ui.js';
-          script.onload = function () { assetsLoaded = true; resolve(); };
-          script.onerror = reject;
-          document.body.appendChild(script);
+      function loadPagefind() {
+        if (pf) return Promise.resolve(pf);
+        if (loadingPromise) return loadingPromise;
+        loadingPromise = import('/_pagefind/pagefind.js').then(function (mod) {
+          pf = mod; if (pf.init) { try { pf.init(); } catch (e) {} } return pf;
         });
-        return assetsLoading;
+        return loadingPromise;
+      }
+      function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+      function renderData(items, total, q) {
+        if (q !== lastQuery) return;
+        results.hidden = false; countEl.hidden = false;
+        countEl.innerHTML = 'Найдено: <b>' + total + '</b>';
+        if (!total) { list.innerHTML = ''; emptyEl.hidden = false; emptyEl.textContent = 'Ничего не найдено по запросу «' + q + '»'; return; }
+        emptyEl.hidden = true;
+        list.innerHTML = items.map(function (d) {
+          var img = d.meta && d.meta.image;
+          var cover = img ? '<div class="ss-card__cover" style="background-image:url(\'' + esc(img) + '\')"></div>' : '';
+          var title = esc((d.meta && d.meta.title) || d.url);
+          var ex = d.excerpt || '';
+          return '<a class="ss-card" href="' + esc(d.url) + '"><div class="ss-card__body">' +
+            '<div class="ss-card__title">' + title + '</div>' +
+            '<div class="ss-card__excerpt">' + ex + '</div>' +
+            '<span class="ss-card__more">Подробнее →</span></div>' + cover + '</a>';
+        }).join('');
       }
 
-      function initUI() {
-        if (!ui && window.PagefindUI) {
-          ui = new window.PagefindUI({
-            element: '#search-ui',
-            showSubResults: true,
-            showImages: false,
-            translations: {
-              placeholder: 'Поиск по сайту…',
-              clear_search: 'Очистить',
-              load_more: 'Показать ещё',
-              search_label: 'Поиск по сайту',
-              zero_results: 'Ничего не найдено по запросу «[SEARCH_TERM]»'
-            }
-          });
-        }
+      function doSearch(q) {
+        lastQuery = q;
+        if (!q || q.trim().length < 2) { results.hidden = true; countEl.hidden = true; emptyEl.hidden = true; list.innerHTML = ''; return; }
+        loadPagefind().then(function () { return pf.search(q); }).then(function (res) {
+          if (q !== lastQuery) return;
+          var total = res.results.length;
+          Promise.all(res.results.slice(0, 24).map(function (r) { return r.data(); })).then(function (items) { renderData(items, total, q); });
+        }).catch(function () {});
       }
 
-      function open() {
-        modal.hidden = false;
-        document.documentElement.style.overflow = 'hidden';
-        loadPagefindAssets().then(function () {
-          initUI();
-          var inp = modal.querySelector('input[type="text"]');
-          if (inp) setTimeout(function () { inp.focus(); }, 60);
-        });
-      }
-      function close() {
-        modal.hidden = true;
-        document.documentElement.style.overflow = '';
-      }
+      if (input) input.addEventListener('input', function () { var q = input.value; clearTimeout(timer); timer = setTimeout(function () { doSearch(q); }, 160); });
+
+      function open() { modal.hidden = false; document.documentElement.style.overflow = 'hidden'; loadPagefind(); setTimeout(function () { if (input) input.focus(); }, 60); }
+      function close() { modal.hidden = true; document.documentElement.style.overflow = ''; }
       document.querySelectorAll('[data-search-open]').forEach(function (b) { b.addEventListener('click', open); });
       modal.querySelectorAll('[data-search-close]').forEach(function (b) { b.addEventListener('click', close); });
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) close(); });
