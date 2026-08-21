@@ -103,6 +103,20 @@ const mainAttrs = index
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- B242YA — коллтрекинг B242YA (подмена телефона/email, портал uinduktor.bitrix24.ru).
+       В <head>, чтобы подмена срабатывала до показа контактов. CSP: *.b242ya.ru. -->
+  <script is:inline>
+    (function(w,d,u){
+      var s=d.createElement('script');s.defer=false;s.async=false;s.id='b242ya-script';s.src=u+'?'+(Date.now()/60000|0);
+      var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
+    })(window,document,'https://67p.b242ya.ru/static/js/b242ya.js');
+    var b242yaScript = document.querySelector('#b242ya-script');
+    b242yaScript.addEventListener('load', function () {
+      B242YAInit({ portal: 'https://uinduktor.bitrix24.ru/', pid: '6de41eb1d932b12cd4ec47ddc85ac1df' });
+    });
+  </script>
+
   <title>{title}</title>
   {description && <meta name="description" content={description} />}
   <link rel="canonical" href={canonicalURL} />
