@@ -335,13 +335,22 @@ const mainAttrs = index
         }).join('');
       }
 
+      function relevant(d, q) {
+        var words = q.toLowerCase().split(/\s+/).filter(function (w) { return w.length >= 2; });
+        if (!words.length) return true;
+        var hay = (((d.meta && d.meta.title) || '') + ' ' + (d.excerpt || '').replace(/<[^>]+>/g, '')).toLowerCase();
+        return words.every(function (w) { var stem = w.length >= 3 ? w.slice(0, 3) : w; return hay.indexOf(stem) !== -1; });
+      }
       function doSearch(q) {
         lastQuery = q;
         if (!q || q.trim().length < 2) { results.hidden = true; countEl.hidden = true; emptyEl.hidden = true; list.innerHTML = ''; return; }
         loadPagefind().then(function () { return pf.search(q); }).then(function (res) {
           if (q !== lastQuery) return;
-          var total = res.results.length;
-          Promise.all(res.results.slice(0, 24).map(function (r) { return r.data(); })).then(function (items) { renderData(items, total, q); });
+          Promise.all(res.results.slice(0, 40).map(function (r) { return r.data(); })).then(function (all) {
+            if (q !== lastQuery) return;
+            var items = all.filter(function (d) { return relevant(d, q); });
+            renderData(items, items.length, q);
+          });
         }).catch(function () {});
       }
 

@@ -59,6 +59,7 @@
 </section>
 <script>
   (function () {
+    function init() {
     var chips = [].slice.call(document.querySelectorAll('.cat-chip'));
     var secs = [].slice.call(document.querySelectorAll('section.cat-index[data-cat]'));
     var bar = document.querySelector('.cat-filter');
@@ -73,6 +74,9 @@
         if (bar) bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
   })();
 </script>
 
