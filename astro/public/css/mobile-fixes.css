@@ -367,6 +367,30 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
     min-height: 340px !important;
     aspect-ratio: 16 / 11 !important;
   }
+  /* Overlay-вариант (О компании): на мобильном не оверлей, а стопка —
+     текст обычным блоком, карта под ним. */
+  .geo--overlay { display: block !important; min-height: 0 !important; }
+  .geo--overlay .geo__map--full {
+    position: relative !important;
+    height: 320px !important;
+    min-height: 320px !important;
+    aspect-ratio: auto !important;
+  }
+  .geo--overlay .geo__overlay-wrap {
+    pointer-events: auto !important;
+    padding-top: var(--sp-10) !important;
+    padding-bottom: var(--sp-8) !important;
+  }
+  .geo--overlay .geo__panel {
+    max-width: none !important;
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
 }
 
 /* ------------------------------------------------------------
