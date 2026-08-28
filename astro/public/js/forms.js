@@ -21,6 +21,45 @@
     );
     return m ? decodeURIComponent(m[1]) : '';
   }
+
+  // ── UTM / маркетинговые метки ───────────────────────────────
+  // Первое касание сохраняем на 30 дней (localStorage + cookie); при отправке
+  // формы добавляем в заявку. Ключи: utm_*, yclid, gclid, fbclid + referrer/landing.
+  var UTM_KEY = 'ui_marketing_trace';
+  function setCookie(name, value, days) {
+    var d = new Date(); d.setTime(d.getTime() + days * 864e5);
+    document.cookie = name + '=' + encodeURIComponent(value) +
+      ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+  }
+  function getMarketing() {
+    var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'yclid', 'gclid', 'fbclid'];
+    var data = {};
+    try {
+      var raw = localStorage.getItem(UTM_KEY) || getCookie(UTM_KEY);
+      if (raw) data = JSON.parse(raw) || {};
+    } catch (e) {}
+    var params = null;
+    try { params = new URLSearchParams(location.search); } catch (e) {}
+    var changed = false;
+    if (params) keys.forEach(function (k) {
+      var v = params.get(k);
+      if (v) { data[k] = v; changed = true; }             // новая метка перезаписывает старую
+    });
+    if (!data.landing_url) { data.landing_url = location.href.slice(0, 500); changed = true; }
+    if (!data.referrer && document.referrer && document.referrer.indexOf(location.host) === -1) {
+      data.referrer = document.referrer.slice(0, 500); changed = true;
+    }
+    if (changed) {
+      try {
+        var s = JSON.stringify(data);
+        localStorage.setItem(UTM_KEY, s);
+        setCookie(UTM_KEY, s, 30);
+      } catch (e) {}
+    }
+    return data;
+  }
+  getMarketing(); // зафиксировать первое касание сразу при загрузке страницы
+
   function fillRoistat() {
     var v = getCookie('roistat_visit');
     if (!v) return false;
@@ -104,6 +143,9 @@
 
       fillRoistat(); // финальная попытка проставить roistat_visit перед отправкой
       var fd = new FormData(form); // файл «Прикрепить КП» уходит вместе с остальными полями
+      // маркетинговые метки (utm_*, yclid, gclid, fbclid, referrer, landing_url)
+      var mk = getMarketing();
+      Object.keys(mk).forEach(function (k) { if (mk[k]) fd.append(k, mk[k]); });
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.dataset.label = submitBtn.innerHTML;
