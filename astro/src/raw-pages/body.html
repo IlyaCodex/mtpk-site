@@ -8,7 +8,7 @@
 <!-- ============================================================
      SLIDE 1 — HERO
      ============================================================ -->
-<section class="hero">
+<section class="hero hero--home">
   <!-- Hero background — статичная картинка (композит дробемёт + индукционная печь
        с активной плавкой). Позже заменим на <video autoplay muted loop> с этим же src как poster. -->
   <div class="hero__image" role="img" aria-label="Производственный цех МТПК — дробемётная установка и индукционная плавильная печь в работе"></div>
@@ -26,8 +26,9 @@
     </p>
 
     <div class="hero__actions">
-      <a href="/products/" class="btn btn--primary">
-        Перейти в&nbsp;каталог <span class="btn__arrow">→</span>
+      <a href="/products/" class="btn btn--primary btn--cta">
+        Перейти в&nbsp;каталог
+        <svg class="btn__ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
       </a>
       <a href="#leadgen" class="btn btn--on-dark">
         Подобрать оборудование <span class="btn__arrow">→</span>
@@ -47,10 +48,8 @@
      ============================================================ -->
 <section class="catalog" id="catalog" aria-label="Каталог оборудования">
   <div class="container">
-    <div class="catalog__head">
-      <div class="catalog__eyebrow">Каталог оборудования</div>
-      <h2 class="catalog__title">Основные направления оборудования</h2>
-      <p class="catalog__lead">Комплектуем как&nbsp;отдельные производственные задачи, так&nbsp;и&nbsp;целые участки литейного и&nbsp;металлургического производства.</p>
+    <div class="catalog__head catalog__head--center">
+      <h2 class="catalog__title">Оборудование</h2>
     </div>
 
     <div class="catalog__grid">

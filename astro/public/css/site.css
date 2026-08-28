@@ -360,6 +360,21 @@ body { margin: 0; }
   transition: transform var(--duration-base) var(--ease-out);
 }
 .btn:hover .btn__arrow { transform: translateX(4px); }
+/* Hero CTA — усиленная primary-кнопка с inline-SVG стрелкой */
+.btn--cta {
+  padding: var(--btn-padding-y-lg, 16px) var(--btn-padding-x-lg, 32px);
+  box-shadow: 0 10px 24px -8px rgba(31, 94, 120, 0.55);
+}
+.btn--cta:hover {
+  box-shadow: 0 14px 30px -8px rgba(31, 94, 120, 0.72);
+  transform: translateY(-1px);
+}
+.btn__ico {
+  display: inline-block;
+  flex-shrink: 0;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+.btn--cta:hover .btn__ico { transform: translateX(4px); }
 /* ============================================================
    SLIDE 1 — HERO с видео-подложкой
    ============================================================ */
@@ -372,6 +387,9 @@ body { margin: 0; }
   background: var(--neutral-950); /* fallback пока нет видео */
   color: var(--neutral-0);
 }
+/* Главная: hero ниже, чтобы под ним проглядывал блок «Оборудование» (не трогает .hero О компании) */
+section.hero--home { min-height: 52vh; }
+@media (max-width: 768px) { section.hero--home { min-height: 58vh; } }
 /* Видео-подложка — placeholder пока пустой
    Когда будет реальное видео, заменить на:
    <video autoplay muted loop playsinline poster="/hero-poster.jpg">
@@ -740,6 +758,24 @@ body { margin: 0; }
   padding: var(--section-py-base, 96px) 0;
 }
 .catalog__head { max-width: 760px; margin: 0 0 var(--sp-12); }
+/* Центрированный минималистичный заголовок «Оборудование» с фланговыми линиями */
+.catalog__head--center {
+  max-width: none;
+  margin: 0 auto var(--sp-10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 3vw, 28px);
+}
+.catalog__head--center::before,
+.catalog__head--center::after {
+  content: "";
+  height: 2px;
+  width: clamp(28px, 8vw, 96px);
+  background: var(--teal-600);
+  flex-shrink: 0;
+}
+.catalog__head--center .catalog__title { margin: 0; }
 .catalog__eyebrow,
 .adv__eyebrow {
   font-family: var(--font-display);
