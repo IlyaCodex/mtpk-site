@@ -64,15 +64,49 @@
   /* ===== Отзывы (виджет Яндекса) ===== */
   .reviews { padding: var(--section-py-base, 96px) 0; background: var(--surface-page, #fff); }
   .reviews .s-head { margin-bottom: var(--sp-8, 36px); max-width: 720px; }
-  .reviews__widget {
-    position: relative;
+  /* Шапка отзывов: заголовок + агрегатный рейтинг */
+  .reviews__head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-6, 28px); flex-wrap: wrap; margin-bottom: var(--sp-8, 36px); }
+  .reviews__rating { display: flex; align-items: center; gap: var(--sp-4, 18px); }
+  .reviews__rating-num { font-family: var(--font-display); font-size: 44px; font-weight: 700; line-height: 1; color: var(--text-primary, #101F26); }
+  .reviews__stars { color: #FFB020; font-size: 18px; letter-spacing: 2px; line-height: 1; }
+  .reviews__rating-sub { font-size: var(--fs-small, 14px); color: var(--text-secondary, #5b6b73); margin-top: 4px; }
+  /* Слайдер */
+  .reviews__slider { position: relative; }
+  .reviews__track {
+    display: flex; gap: var(--sp-4, 20px);
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+    padding: var(--sp-2, 8px) 2px var(--sp-4, 20px);
+    scrollbar-width: none;
+  }
+  .reviews__track::-webkit-scrollbar { display: none; }
+  .review-card {
+    flex: 0 0 clamp(280px, 80vw, 380px);
+    scroll-snap-align: start;
+    display: flex; flex-direction: column;
+    background: var(--surface-subtle, #f5f7f8);
     border: 1px solid var(--border-subtle, #e6eaee);
     border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 24px 60px -32px rgba(16,31,38,.35);
-    background: var(--surface-subtle, #f5f7f8);
+    padding: var(--sp-6, 28px);
+    min-height: 260px;
   }
-  .reviews__widget iframe { width: 100%; height: 620px; border: 0; display: block; }
+  .review-card__top { display: flex; align-items: center; gap: var(--sp-3, 12px); margin-bottom: var(--sp-3, 12px); }
+  .review-card__avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--teal-600, #1F5E78); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 18px; flex-shrink: 0; }
+  .review-card__name { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--text-primary, #101F26); line-height: 1.2; }
+  .review-card__date { font-size: 12px; color: var(--text-tertiary, #8a98a0); margin-top: 2px; }
+  .review-card__stars { color: #FFB020; font-size: 15px; letter-spacing: 1px; margin-bottom: var(--sp-3, 12px); }
+  .review-card__text { font-size: var(--fs-small, 14px); color: var(--text-secondary, #4a555b); line-height: 1.55; margin: 0; }
+  .review-card__src { margin-top: auto; padding-top: var(--sp-4, 16px); font-size: 12px; color: var(--text-tertiary, #8a98a0); display: inline-flex; align-items: center; gap: 6px; }
+  .review-card__src a { color: var(--teal-700, #1F5E78); text-decoration: none; }
+  .review-card__src a:hover { text-decoration: underline; }
+  /* Стрелки */
+  .reviews__nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border-subtle, #e6eaee); background: #fff; color: var(--text-primary, #101F26); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 8px 22px -10px rgba(16,31,38,.4); transition: background .18s, color .18s, opacity .18s; }
+  .reviews__nav:hover { background: var(--teal-600, #1F5E78); color: #fff; }
+  .reviews__nav svg { width: 20px; height: 20px; }
+  .reviews__nav--prev { left: -10px; }
+  .reviews__nav--next { right: -10px; }
+  .reviews__nav[disabled] { opacity: 0; pointer-events: none; }
+  @media (max-width: 767px) { .reviews__nav { display: none; } }
   .reviews__more {
     display: inline-flex; align-items: center; gap: var(--sp-2, 8px);
     margin-top: var(--sp-5, 24px);
@@ -90,7 +124,7 @@
     .team-card__role { margin: var(--sp-3, 14px) var(--sp-3, 14px) var(--sp-2, 6px); }
     .team-card__name { margin: 0 var(--sp-3, 14px) var(--sp-2, 8px); }
     .team-card__email { margin: 0 var(--sp-3, 14px) var(--sp-4, 16px); }
-    .reviews__widget iframe { height: 560px; }
+    .reviews__head { align-items: flex-start; }
   }
   @media (max-width: 519px) {
     .contact-methods__grid { grid-template-columns: 1fr; }
@@ -281,17 +315,112 @@
      ============================================================ -->
 <section class="reviews" aria-label="Отзывы клиентов на Яндекс.Картах">
   <div class="container">
-    <div class="s-head">
-      <div class="s-eyebrow">Отзывы</div>
-      <h2 class="s-title">Что говорят <em>клиенты</em></h2>
-      <p class="s-lead">Реальные отзывы об&nbsp;УралИндуктор с&nbsp;Яндекс.Карт&nbsp;— обновляются автоматически.</p>
+    <div class="reviews__head">
+      <div>
+        <div class="s-eyebrow">Отзывы</div>
+        <h2 class="s-title">Что говорят <em>клиенты</em></h2>
+      </div>
+      <div class="reviews__rating">
+        <div class="reviews__rating-num">4,4</div>
+        <div>
+          <div class="reviews__stars">★★★★★</div>
+          <div class="reviews__rating-sub">16 отзывов · 47 оценок · Яндекс.Карты</div>
+        </div>
+      </div>
     </div>
-    <div class="reviews__widget">
-      <iframe src="https://yandex.ru/maps-reviews-widget/94364878698?comments" title="Отзывы об УралИндуктор на Яндекс.Картах" loading="lazy"></iframe>
+
+    <div class="reviews__slider">
+      <button type="button" class="reviews__nav reviews__nav--prev" aria-label="Предыдущий отзыв" data-rev-prev>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+
+      <div class="reviews__track" data-rev-track>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">Д</span>
+            <div>
+              <div class="review-card__name">Дмитрий Никитчук</div>
+              <div class="review-card__date">18 марта 2025</div>
+            </div>
+          </div>
+          <div class="review-card__stars" aria-label="5 из 5">★★★★★</div>
+          <p class="review-card__text">Приобрели комплекс оборудования: индукционная плавильная печь, система охлаждения, вибростол, смеситель литейный чашечный (бегуны). Поставка была осуществлена в&nbsp;назначенный срок, замечаний к&nbsp;качеству и&nbsp;к&nbsp;работе товаров не&nbsp;имеем. По&nbsp;системе охлаждения был нестандартный запрос…</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">И</span>
+            <div>
+              <div class="review-card__name">Илья С.</div>
+              <div class="review-card__date">10 сентября 2024</div>
+            </div>
+          </div>
+          <div class="review-card__stars" aria-label="5 из 5">★★★★★</div>
+          <p class="review-card__text">Надёжная компания, грамотные специалисты, обслуживание на&nbsp;самом высоком уровне.</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">К</span>
+            <div>
+              <div class="review-card__name">Клиент</div>
+              <div class="review-card__date">19 мая 2022</div>
+            </div>
+          </div>
+          <div class="review-card__stars" aria-label="5 из 5">★★★★★</div>
+          <p class="review-card__text">Заказали у&nbsp;данной организации дробемётную установку. Всё пришло в&nbsp;срок, согласно договорённостям, оборудование исправно работает. Менеджеры дали консультацию по&nbsp;лизинговым компаниям…</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">Д</span>
+            <div>
+              <div class="review-card__name">Дмитрий Багров</div>
+              <div class="review-card__date">31 октября 2023</div>
+            </div>
+          </div>
+          <div class="review-card__stars" aria-label="5 из 5">★★★★★</div>
+          <p class="review-card__text">Отзывчивый отдел продаж, грамотное инженерное сопровождение сделок на&nbsp;всех этапах — от&nbsp;подбора оборудования до&nbsp;запуска.</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+      </div>
+
+      <button type="button" class="reviews__nav reviews__nav--next" aria-label="Следующий отзыв" data-rev-next>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
     </div>
+
     <a class="reviews__more" href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Все отзывы на&nbsp;Яндекс.Картах →</a>
   </div>
 </section>
+
+<script>
+(function () {
+  var track = document.querySelector('[data-rev-track]');
+  if (!track) return;
+  var prev = document.querySelector('[data-rev-prev]');
+  var next = document.querySelector('[data-rev-next]');
+  function step() {
+    var card = track.querySelector('.review-card');
+    return card ? card.getBoundingClientRect().width + 20 : 320;
+  }
+  function update() {
+    var max = track.scrollWidth - track.clientWidth - 2;
+    if (prev) prev.disabled = track.scrollLeft <= 2;
+    if (next) next.disabled = track.scrollLeft >= max;
+  }
+  if (prev) prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+  if (next) next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+  track.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>
 
 <!-- ============================================================
      CTA — «Подготовим лучшее предложение»
