@@ -95,7 +95,7 @@
   .review-card__name { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--text-primary, #101F26); line-height: 1.2; }
   .review-card__date { font-size: 12px; color: var(--text-tertiary, #8a98a0); margin-top: 2px; }
   .review-card__stars { color: #FFB020; font-size: 15px; letter-spacing: 1px; margin-bottom: var(--sp-3, 12px); }
-  .review-card__text { font-size: var(--fs-small, 14px); color: var(--text-secondary, #4a555b); line-height: 1.55; margin: 0; }
+  .review-card__text { font-size: var(--fs-small, 14px); color: var(--text-secondary, #4a555b); line-height: 1.55; margin: 0; display: -webkit-box; -webkit-line-clamp: 8; line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; }
   .review-card__src { margin-top: auto; padding-top: var(--sp-4, 16px); font-size: 12px; color: var(--text-tertiary, #8a98a0); display: inline-flex; align-items: center; gap: 6px; }
   .review-card__src a { color: var(--teal-700, #1F5E78); text-decoration: none; }
   .review-card__src a:hover { text-decoration: underline; }
@@ -344,21 +344,7 @@
               <div class="review-card__date">18 марта 2025</div>
             </div>
           </div>
-          <div class="review-card__stars" aria-label="5 из 5">★★★★★</div>
-          <p class="review-card__text">Приобрели комплекс оборудования: индукционная плавильная печь, система охлаждения, вибростол, смеситель литейный чашечный (бегуны). Поставка была осуществлена в&nbsp;назначенный срок, замечаний к&nbsp;качеству и&nbsp;к&nbsp;работе товаров не&nbsp;имеем. По&nbsp;системе охлаждения был нестандартный запрос…</p>
-          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
-        </article>
-
-        <article class="review-card">
-          <div class="review-card__top">
-            <span class="review-card__avatar">И</span>
-            <div>
-              <div class="review-card__name">Илья С.</div>
-              <div class="review-card__date">10 сентября 2024</div>
-            </div>
-          </div>
-          <div class="review-card__stars" aria-label="5 из 5">★★★★★</div>
-          <p class="review-card__text">Надёжная компания, грамотные специалисты, обслуживание на&nbsp;самом высоком уровне.</p>
+          <p class="review-card__text">Приобрели комплекс оборудования: индукционная плавильная печь, система охлаждения, вибростол, смеситель литейный чашечный (бегуны), поставка была осуществлена в назначенный срок, замечаний к качеству и к работе товаров не имеем. По системе охлаждения был нестандартный запрос, и поскольку ООО «МТПК» (УралИндуктор) являются производителями станций охлаждения (градирен), подобрали необходимый вариант, произвели и поставили в кратчайший срок. Рекомендую к сотрудничеству.</p>
           <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
         </article>
 
@@ -370,21 +356,115 @@
               <div class="review-card__date">19 мая 2022</div>
             </div>
           </div>
-          <div class="review-card__stars" aria-label="5 из 5">★★★★★</div>
-          <p class="review-card__text">Заказали у&nbsp;данной организации дробемётную установку. Всё пришло в&nbsp;срок, согласно договорённостям, оборудование исправно работает. Менеджеры дали консультацию по&nbsp;лизинговым компаниям…</p>
+          <p class="review-card__text">Заказали у данной организации дробемётную установку. Всё пришло в срок, согласно договора. Оборудование установлено, всё исправно работает. Также получили от менеджеров консультацию по лизинговым компаниям, что помогло ускорить сделку.</p>
           <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
         </article>
 
         <article class="review-card">
           <div class="review-card__top">
-            <span class="review-card__avatar">Д</span>
+            <span class="review-card__avatar">А</span>
             <div>
-              <div class="review-card__name">Дмитрий Багров</div>
-              <div class="review-card__date">31 октября 2023</div>
+              <div class="review-card__name">Андрей Шаймарданов</div>
+              <div class="review-card__date">17 февраля 2021</div>
             </div>
           </div>
-          <div class="review-card__stars" aria-label="5 из 5">★★★★★</div>
-          <p class="review-card__text">Отзывчивый отдел продаж, грамотное инженерное сопровождение сделок на&nbsp;всех этапах — от&nbsp;подбора оборудования до&nbsp;запуска.</p>
+          <p class="review-card__text">Нам требовалась установка поверхностной закалки шестерён для автомобилей «Урал», порекомендовали АВЗ60. Установка была у нас раньше заявленного срока, специалисты компании помогли спроектировать и реализовать бюджетную систему охлаждения, научили работать, первые образцы прошли обработку под их контролем. На сегодняшний день всё работает без нареканий. Очень приветливый персонал — большое им спасибо!</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">К</span>
+            <div>
+              <div class="review-card__name">КРОНА</div>
+              <div class="review-card__date">3 мая 2023</div>
+            </div>
+          </div>
+          <p class="review-card__text">Приобрели у данной компании индукционную печь. Сотрудники оказали помощь с выбором оборудования, помогли с оформлением лизинга, сами организовали транспортировку. Все услуги были оказаны на высоком уровне и в оговорённые сроки.</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">Г</span>
+            <div>
+              <div class="review-card__name">Григорий</div>
+              <div class="review-card__date">27 мая 2022</div>
+            </div>
+          </div>
+          <p class="review-card__text">Компания оставила о себе очень хорошее впечатление, подход к клиенту максимально ответственный и внимательный! Учитывая, что мой случай был непростой, сотрудники приложили максимум усилий для положительного решения всех вопросов. МТПК УралИндуктор — надёжная компания!</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">И</span>
+            <div>
+              <div class="review-card__name">Илья С.</div>
+              <div class="review-card__date">10 сентября 2024</div>
+            </div>
+          </div>
+          <p class="review-card__text">Надёжная компания, грамотные специалисты, обслуживание на самом высоком уровне.</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">Ц</span>
+            <div>
+              <div class="review-card__name">АО ЦНИИМ</div>
+              <div class="review-card__date">22 июня 2022</div>
+            </div>
+          </div>
+          <p class="review-card__text">Наша компания приобрела дробемётную установку УИД-326. К важнейшим преимуществам ООО «МТПК» можно отнести наличие оборудования на складе и клиентоориентированный подход. Помогли определиться с выбором, сделав для нас пробную очистку. С полной уверенностью рекомендуем компанию как надёжного поставщика.</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">В</span>
+            <div>
+              <div class="review-card__name">Владимир</div>
+              <div class="review-card__date">25 февраля 2021</div>
+            </div>
+          </div>
+          <p class="review-card__text">Оплатили индукционную печь, получили её позже ожидаемого — не без ошибок. Но надо отдать должное: ошибку свою они исправили, без долгих споров и судов, всегда были на связи и информировали о происходящем. В целом хорошая компания, ошибки у всех бывают.</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">Р</span>
+            <div>
+              <div class="review-card__name">Родион Харчук</div>
+              <div class="review-card__date">26 февраля 2021</div>
+            </div>
+          </div>
+          <p class="review-card__text">Работаем с ними больше пяти лет и ни разу не подвели. Оценка 5.</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">А</span>
+            <div>
+              <div class="review-card__name">Александр Козин</div>
+              <div class="review-card__date">12 апреля 2024</div>
+            </div>
+          </div>
+          <p class="review-card__text">Отличная компания, классные сотрудники, рекомендую к сотрудничеству.</p>
+          <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
+        </article>
+
+        <article class="review-card">
+          <div class="review-card__top">
+            <span class="review-card__avatar">П</span>
+            <div>
+              <div class="review-card__name">produktoptom2015</div>
+              <div class="review-card__date">24 августа 2022</div>
+            </div>
+          </div>
+          <p class="review-card__text">Отличные ребята, серьёзная компания.</p>
           <div class="review-card__src">Отзыв с&nbsp;<a href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Яндекс.Карт</a></div>
         </article>
 
