@@ -548,8 +548,26 @@
 
   <div class="geo__map geo__map--full" aria-label="Главный офис на карте — Челябинская область, г. Миасс">
     <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3A946c119474b6b890a865d91e70184f05b5f74f242f5f488f2a99e5df6758e68d&amp;source=constructor" loading="lazy" title="Карта офиса УралИндуктор · ООО МТПК, г. Миасс, ул. Уральских Добровольцев, 1В" width="100%" height="100%" frameborder="0"></iframe>
+    <div class="geo__map-shield" role="button" tabindex="0" aria-label="Активировать карту для перемещения">
+      <span class="geo__map-hint">Нажмите, чтобы двигать карту</span>
+    </div>
   </div>
 </section>
+<script>
+(function () {
+  document.querySelectorAll('.geo__map-shield').forEach(function (sh) {
+    var wrap = sh.closest('.geo__map');
+    function activate() { sh.classList.add('is-hidden'); }
+    function relock() { sh.classList.remove('is-hidden'); }
+    sh.addEventListener('click', activate);
+    sh.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+    });
+    // Уводим курсор с карты — снова блокируем, чтобы следующий скролл не зумил карту.
+    if (wrap) wrap.addEventListener('mouseleave', relock);
+  });
+})();
+</script>
 <!-- ============================================================
      BEST-OFFER + CONTACTS — единый блок (паттерн с главной)
      ============================================================ -->

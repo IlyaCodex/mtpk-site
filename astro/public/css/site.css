@@ -1773,22 +1773,50 @@ section.hero--home { min-height: 52vh; }
 }
 .geo__overlay-wrap {
   position: relative;
-  z-index: 2;
+  z-index: 4;             /* выше щита карты, чтобы панель была кликабельна */
   width: 100%;
   pointer-events: none;   /* карту можно двигать/зумить вне панели */
 }
 .geo__panel {
   pointer-events: auto;
-  max-width: 480px;
+  max-width: 560px;
   background: rgba(255, 255, 255, 0.94);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
   box-shadow: 0 24px 60px -24px rgba(16, 31, 38, 0.4);
-  padding: var(--sp-8);
+  padding: var(--sp-8) var(--sp-10);
 }
 .geo--overlay .geo__regions { margin-bottom: 0; }
+/* Щит карты: карта активна только после клика — иначе перехватывает скролл страницы */
+.geo__map-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;             /* над картой (1), под панелью (4) */
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--sp-8);
+  background: transparent;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+.geo__map-shield.is-hidden { opacity: 0; pointer-events: none; }
+.geo__map-hint {
+  pointer-events: none;
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  background: rgba(16, 31, 38, 0.82);
+  color: var(--neutral-0);
+  font-family: var(--font-display);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
+  padding: var(--sp-2) var(--sp-5);
+  border-radius: 999px;
+  box-shadow: 0 6px 20px -6px rgba(16, 31, 38, 0.5);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
 /* ============================================================
    BLOCK 15 — «Подготовим лучшее предложение»
    ============================================================ */
