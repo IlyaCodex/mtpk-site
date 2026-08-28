@@ -388,8 +388,11 @@ body { margin: 0; }
   color: var(--neutral-0);
 }
 /* Главная: hero ниже, чтобы под ним проглядывал блок «Оборудование» (не трогает .hero О компании) */
-section.hero--home { min-height: 52vh; }
-@media (max-width: 768px) { section.hero--home { min-height: 58vh; } }
+section.hero--home { min-height: 44vh; }
+@media (max-width: 768px) { section.hero--home { min-height: 52vh; } }
+/* Заголовок hero на главной — компактнее (блок ниже за счёт меньшего h1) */
+.hero--home .hero__title { font-size: clamp(24px, 3.2vw, 42px); }
+@media (max-width: 768px) { .hero--home .hero__title { font-size: clamp(24px, 6.4vw, 34px); } }
 /* Видео-подложка — placeholder пока пустой
    Когда будет реальное видео, заменить на:
    <video autoplay muted loop playsinline poster="/hero-poster.jpg">
