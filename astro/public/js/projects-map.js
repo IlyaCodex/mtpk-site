@@ -129,10 +129,10 @@
       // hover — одиночная метка
       pm.events.add('mouseenter', function () { cancelClose(); pm.balloon.open(); });
       pm.events.add('mouseleave', function () { scheduleClose(pm); });
-      // клик — direct переход
-      pm.events.add('click', function () {
-        if (p.link) window.location.href = p.link;
-      });
+      // клик/тап — открываем попап с фото (на тач-устройствах hover нет,
+      // поэтому именно клик должен показывать карточку; переход на страницу —
+      // по ссылке «Открыть страницу проекта» внутри попапа).
+      pm.events.add('click', function () { cancelClose(); pm.balloon.open(); });
       placemarks.push(pm);
     });
 

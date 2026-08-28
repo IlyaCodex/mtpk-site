@@ -1705,35 +1705,51 @@ section.hero--home { min-height: 52vh; }
 }
 .geo__layout {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: var(--sp-12);
-  align-items: start;
+  grid-template-columns: 1fr 1.7fr;   /* карта шире — «растянута» */
+  gap: var(--sp-16);
+  align-items: center;
 }
 .geo__regions {
-  display: flex; flex-direction: column; gap: var(--sp-2);
+  display: flex; flex-direction: column; gap: var(--sp-3);
   margin: var(--sp-6) 0 var(--sp-8);
 }
 .region-tag {
   display: inline-flex; align-items: center; gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4);
   background: var(--surface-subtle);
-  border-left: 2px solid var(--teal-600);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--teal-600);
+  border-radius: 10px;
   font-family: var(--font-display);
   font-size: var(--fs-small);
   font-weight: var(--fw-medium);
   color: var(--text-primary);
+  transition: border-color var(--duration-base) var(--ease-out),
+              transform var(--duration-base) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out);
+}
+.region-tag:hover {
+  border-left-color: var(--green-500);
+  transform: translateX(3px);
+  box-shadow: var(--shadow-sm, 0 2px 10px -4px rgba(16,31,38,0.18));
 }
 .region-tag svg { width: 16px; height: 16px; color: var(--teal-600); flex-shrink: 0; }
-.region-tag.is-prime { border-left-color: var(--green-500); }
+.region-tag.is-prime { border-left-color: var(--green-500); background: var(--neutral-0); }
 .region-tag.is-prime svg { color: var(--green-600); }
+/* Карта: крупная скруглённая рамка с мягкой тенью */
 .geo__map {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 3 / 2;
+  min-height: 480px;
   background: var(--neutral-100);
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px -28px rgba(16, 31, 38, 0.4);
 }
-.geo__map iframe {
+.geo__map iframe,
+.geo__map #projects-map,
+.geo__map > * {
   width: 100%; height: 100%;
   border: 0; display: block;
 }
