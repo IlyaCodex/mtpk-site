@@ -1,0 +1,299 @@
+<style is:global>
+  /* ===== Hero ===== */
+  .contacts-hero { padding: var(--sp-16, 64px) 0 var(--sp-10, 40px); background: var(--surface-page, #fff); }
+  .contacts-hero .s-lead { max-width: 60ch; }
+
+  /* ===== Способы связи ===== */
+  .contact-methods { padding: 0 0 var(--section-py-base, 96px); background: var(--surface-page, #fff); }
+  .contact-methods__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-4, 20px);
+  }
+  .contact-card {
+    display: flex; flex-direction: column; gap: var(--sp-3, 12px);
+    padding: var(--sp-6, 28px);
+    background: var(--surface-subtle, #f5f7f8);
+    border: 1px solid var(--border-subtle, #e6eaee);
+    border-left: 3px solid var(--teal-600, #1F5E78);
+    border-radius: 12px;
+    text-decoration: none; color: inherit;
+    transition: border-color .18s, transform .18s, box-shadow .18s, background .18s;
+  }
+  a.contact-card:hover {
+    border-left-color: var(--green-500, #4CAF50);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px -14px rgba(16,31,38,.35);
+    background: var(--neutral-0, #fff);
+  }
+  .contact-card__ico {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(31,94,120,.10); color: var(--teal-700, #1F5E78);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .contact-card__ico svg { width: 22px; height: 22px; }
+  .contact-card__label {
+    font-family: var(--font-display); font-size: var(--fs-micro, 12px); font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--text-tertiary, #8a98a0);
+  }
+  .contact-card__value {
+    font-family: var(--font-display); font-size: 18px; font-weight: 600;
+    color: var(--text-primary, #101F26); line-height: 1.3; word-break: break-word; overflow-wrap: anywhere;
+  }
+  .contact-card__sub { font-size: var(--fs-small, 14px); color: var(--text-secondary, #5b6b73); }
+
+  /* ===== Команда (перенесено из «О компании») ===== */
+  .team { padding: var(--section-py-base, 96px) 0; background: var(--bg-secondary, #f6f8f9); }
+  .team .s-head { margin-bottom: var(--sp-6, 32px); }
+  .team-group { margin-top: var(--sp-7, 48px); }
+  .team-group:first-of-type { margin-top: var(--sp-5, 24px); }
+  .team-group__head { display: flex; align-items: baseline; gap: var(--sp-3, 12px); margin-bottom: var(--sp-4, 20px); padding-left: 14px; border-left: 4px solid var(--accent-green, #5BA85B); }
+  .team-group__title { font-size: var(--fs-h3, 24px); font-weight: 600; color: var(--text-primary, #101F26); margin: 0; line-height: 1.2; }
+  .team-group__count { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 12px; color: var(--text-secondary, #5b6b73); letter-spacing: .08em; text-transform: uppercase; }
+  .team-group__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-4, 20px); }
+  .team-card { background: #fff; border: 1px solid var(--border-subtle, #e6eaee); padding: 0; display: flex; flex-direction: column; align-items: stretch; text-align: left; overflow: hidden; transition: border-color .18s, box-shadow .18s, transform .18s; min-width: 0; }
+  .team-card:hover { border-color: var(--teal-300, #9ec3d3); box-shadow: 0 10px 24px rgba(16, 31, 38, .08); transform: translateY(-3px); }
+  .team-card__photo { width: 100%; aspect-ratio: 4 / 5; border-radius: 0; overflow: hidden; margin: 0; background: linear-gradient(135deg, #e8eef1, #d4dde2); display: flex; align-items: center; justify-content: center; }
+  .team-card__photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+  .team-card__photo--initial { color: var(--teal-700, #1F5E78); font-weight: 700; font-size: 56px; font-family: var(--font-body, "Inter", sans-serif); }
+  .team-card__role { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--text-secondary, #5b6b73); margin: var(--sp-4, 20px) var(--sp-4, 20px) var(--sp-2, 8px); }
+  .team-card__name { font-size: 18px; font-weight: 600; color: var(--text-primary, #101F26); margin: 0 var(--sp-4, 20px) var(--sp-3, 12px); line-height: 1.25; }
+  .team-card__email { display: inline-block; font-size: 13px; color: var(--teal-700, #1F5E78); text-decoration: none; word-break: break-word; overflow-wrap: anywhere; line-height: 1.4; margin: 0 var(--sp-4, 20px) var(--sp-5, 24px); }
+  .team-card__email:hover { text-decoration: underline; }
+
+  /* ===== Отзывы (виджет Яндекса) ===== */
+  .reviews { padding: var(--section-py-base, 96px) 0; background: var(--surface-page, #fff); }
+  .reviews .s-head { margin-bottom: var(--sp-8, 36px); max-width: 720px; }
+  .reviews__widget {
+    position: relative;
+    border: 1px solid var(--border-subtle, #e6eaee);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px -32px rgba(16,31,38,.35);
+    background: var(--surface-subtle, #f5f7f8);
+  }
+  .reviews__widget iframe { width: 100%; height: 620px; border: 0; display: block; }
+  .reviews__more {
+    display: inline-flex; align-items: center; gap: var(--sp-2, 8px);
+    margin-top: var(--sp-5, 24px);
+    font-family: var(--font-display); font-weight: 600; font-size: var(--fs-small, 14px);
+    color: var(--teal-700, #1F5E78); text-decoration: none;
+  }
+  .reviews__more:hover { text-decoration: underline; }
+
+  @media (max-width: 1023px) {
+    .contact-methods__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .team-group__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 767px) {
+    .team-group__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3, 12px); }
+    .team-card__role { margin: var(--sp-3, 14px) var(--sp-3, 14px) var(--sp-2, 6px); }
+    .team-card__name { margin: 0 var(--sp-3, 14px) var(--sp-2, 8px); }
+    .team-card__email { margin: 0 var(--sp-3, 14px) var(--sp-4, 16px); }
+    .reviews__widget iframe { height: 560px; }
+  }
+  @media (max-width: 519px) {
+    .contact-methods__grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 419px) {
+    .team-group__grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="contacts-hero" aria-label="Контакты УралИндуктор">
+  <div class="container">
+    <div class="s-eyebrow">Контакты</div>
+    <h1 class="s-title">Свяжитесь с&nbsp;<em>УралИндуктор</em></h1>
+    <p class="s-lead">Ответим по&nbsp;оборудованию, подберём модель под&nbsp;задачу и&nbsp;посчитаем коммерческое предложение. Пишите удобным способом&nbsp;— телефон, почта или&nbsp;мессенджеры; отклик до&nbsp;коммерческого предложения&nbsp;— в&nbsp;течение рабочего дня.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     СПОСОБЫ СВЯЗИ
+     ============================================================ -->
+<section class="contact-methods" aria-label="Способы связи">
+  <div class="container">
+    <div class="contact-methods__grid">
+
+      <a class="contact-card" href="tel:+73512116597">
+        <span class="contact-card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+        <span class="contact-card__label">Телефон</span>
+        <span class="contact-card__value">+7 (351) 211-65-97</span>
+        <span class="contact-card__sub">Пн–Пт, рабочее время</span>
+      </a>
+
+      <a class="contact-card" href="mailto:info@uralinduktor.ru">
+        <span class="contact-card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="m3 7 9 6 9-6"/></svg></span>
+        <span class="contact-card__label">Email</span>
+        <span class="contact-card__value">info@uralinduktor.ru</span>
+        <span class="contact-card__sub">Заявки и&nbsp;документы</span>
+      </a>
+
+      <a class="contact-card" href="https://t.me/uralinduktor" target="_blank" rel="noopener">
+        <span class="contact-card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 4.5 2.9 11.7c-.9.3-.9 1.6 0 1.9l4.6 1.5 1.8 5.4c.2.7 1.1.9 1.6.3l2.5-2.6 4.6 3.4c.6.4 1.5.1 1.7-.6L23 5.7c.2-.9-.7-1.6-1.5-1.2z"/><path d="m8 14 9-6-6.5 7.5"/></svg></span>
+        <span class="contact-card__label">Telegram</span>
+        <span class="contact-card__value">@uralinduktor</span>
+        <span class="contact-card__sub">Быстрый чат</span>
+      </a>
+
+      <a class="contact-card" href="https://max.ru/join/_jtaGUl05P2n89T6htH_ANJV1CDSfJXki7ftWcOb-80" target="_blank" rel="noopener">
+        <span class="contact-card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.6 8.6 0 0 1-3.9-.9L3 20.5l1.5-4.4a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 12 3.6a8.4 8.4 0 0 1 9 7.9z"/></svg></span>
+        <span class="contact-card__label">MAX</span>
+        <span class="contact-card__value">Мессенджер MAX</span>
+        <span class="contact-card__sub">Написать в&nbsp;MAX</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     КОМАНДА (перенесено со страницы «О компании»)
+     ============================================================ -->
+<section class="team" aria-label="Команда УралИндуктор">
+  <div class="container">
+    <div class="s-head">
+      <div class="s-eyebrow">Команда</div>
+      <h2 class="s-title">Кто работает <em>с&nbsp;вашим проектом</em></h2>
+      <p class="s-lead">Дирекция, отдел продаж, инженерный отдел и&nbsp;бухгалтерия. По&nbsp;любым вопросам можно писать напрямую профильному специалисту.</p>
+    </div>
+
+    <!-- ДИРЕКЦИЯ -->
+    <div class="team-group">
+      <div class="team-group__head">
+        <h3 class="team-group__title">Дирекция</h3>
+        <span class="team-group__count">2 человека</span>
+      </div>
+      <div class="team-group__grid">
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/nikolay-v2.jpg" alt="Николай — директор" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Директор</div>
+          <div class="team-card__name">Николай</div>
+          <a href="mailto:info@uralinduktor.ru" class="team-card__email">info@uralinduktor.ru</a>
+        </article>
+
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/anton-v2.jpg" alt="Антон — заместитель директора" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Заместитель директора</div>
+          <div class="team-card__name">Антон</div>
+          <a href="mailto:info@uralinduktor.ru" class="team-card__email">info@uralinduktor.ru</a>
+        </article>
+      </div>
+    </div>
+
+    <!-- ОТДЕЛ ПРОДАЖ -->
+    <div class="team-group">
+      <div class="team-group__head">
+        <h3 class="team-group__title">Отдел продаж</h3>
+        <span class="team-group__count">5 человек</span>
+      </div>
+      <div class="team-group__grid">
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/mikhail.jpg" alt="Михаил — начальник отдела продаж" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Начальник отдела продаж</div>
+          <div class="team-card__name">Михаил</div>
+          <a href="mailto:kmb@uralinduktor.ru" class="team-card__email">kmb@uralinduktor.ru</a>
+        </article>
+
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/polina-v2.jpg" alt="Полина — менеджер" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Менеджер</div>
+          <div class="team-card__name">Полина</div>
+          <a href="mailto:polina@uralinduktor.ru" class="team-card__email">polina@uralinduktor.ru</a>
+        </article>
+
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/olesya-v3.jpg" alt="Олеся — менеджер" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Менеджер</div>
+          <div class="team-card__name">Олеся</div>
+          <a href="mailto:olesya@uralinduktor.ru" class="team-card__email">olesya@uralinduktor.ru</a>
+        </article>
+
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/anna-v2.jpg" alt="Анна — менеджер" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Менеджер</div>
+          <div class="team-card__name">Анна</div>
+          <a href="mailto:mav@uralinduktor.ru" class="team-card__email">mav@uralinduktor.ru</a>
+        </article>
+
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/new-employee.jpg" alt="Леся — менеджер" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Менеджер</div>
+          <div class="team-card__name">Леся</div>
+          <a href="mailto:mod@uralinduktor.ru" class="team-card__email">mod@uralinduktor.ru</a>
+        </article>
+      </div>
+    </div>
+
+    <!-- ИНЖЕНЕРНЫЙ ОТДЕЛ -->
+    <div class="team-group">
+      <div class="team-group__head">
+        <h3 class="team-group__title">Инженерный отдел</h3>
+        <span class="team-group__count">3 человека</span>
+      </div>
+      <div class="team-group__grid">
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/vladimir-v2.jpg" alt="Владимир — инженер" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Инженер</div>
+          <div class="team-card__name">Владимир</div>
+          <a href="mailto:pvv@uralinduktor.ru" class="team-card__email">pvv@uralinduktor.ru</a>
+        </article>
+
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/dmitry-v2.jpg" alt="Дмитрий — инженер" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Инженер</div>
+          <div class="team-card__name">Дмитрий</div>
+          <a href="mailto:dmitry@uralinduktor.ru" class="team-card__email">dmitry@uralinduktor.ru</a>
+        </article>
+
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/dmitry2-v2.jpg" alt="Дмитрий — инженер" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Инженер</div>
+          <div class="team-card__name">Дмитрий</div>
+          <a href="mailto:pdv@uralinduktor.ru" class="team-card__email">pdv@uralinduktor.ru</a>
+        </article>
+      </div>
+    </div>
+
+    <!-- БУХГАЛТЕРИЯ -->
+    <div class="team-group">
+      <div class="team-group__head">
+        <h3 class="team-group__title">Бухгалтерия</h3>
+        <span class="team-group__count">1 человек</span>
+      </div>
+      <div class="team-group__grid">
+        <article class="team-card">
+          <div class="team-card__photo"><img src="/img/team/yuliya-v2.jpg" alt="Юлия — главный бухгалтер" loading="lazy" width="96" height="96"></div>
+          <div class="team-card__role">Главный бухгалтер</div>
+          <div class="team-card__name">Юлия</div>
+          <a href="mailto:buh@uralinduktor.ru" class="team-card__email">buh@uralinduktor.ru</a>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ОТЗЫВЫ — виджет Яндекс.Карт (организация 94364878698)
+     ============================================================ -->
+<section class="reviews" aria-label="Отзывы клиентов на Яндекс.Картах">
+  <div class="container">
+    <div class="s-head">
+      <div class="s-eyebrow">Отзывы</div>
+      <h2 class="s-title">Что говорят <em>клиенты</em></h2>
+      <p class="s-lead">Реальные отзывы об&nbsp;УралИндуктор с&nbsp;Яндекс.Карт&nbsp;— обновляются автоматически.</p>
+    </div>
+    <div class="reviews__widget">
+      <iframe src="https://yandex.ru/maps-reviews-widget/94364878698?comments" title="Отзывы об УралИндуктор на Яндекс.Картах" loading="lazy"></iframe>
+    </div>
+    <a class="reviews__more" href="https://yandex.ru/maps/org/mtpk_uralinduktor/94364878698/reviews/" target="_blank" rel="noopener">Все отзывы на&nbsp;Яндекс.Картах →</a>
+  </div>
+</section>
+
+<!-- ============================================================
+     CTA — «Подготовим лучшее предложение»
+     ============================================================ -->
+<!--C:best-offer-->
