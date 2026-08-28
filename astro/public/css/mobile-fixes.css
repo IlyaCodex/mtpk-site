@@ -364,8 +364,14 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
     gap: var(--sp-8) !important;
   }
   .geo__map {
-    min-height: 340px !important;
-    aspect-ratio: 16 / 11 !important;
+    /* aspect-ratio + min-height раздували ширину (h*16/11) и карта вылезала
+       за колонку → горизонтальный разъезд. Фикс: без aspect-ratio, фикс-высота,
+       ширина строго по колонке. */
+    aspect-ratio: auto !important;
+    height: 340px !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   /* Overlay-вариант (О компании): на мобильном не оверлей, а стопка —
      текст обычным блоком, карта под ним. */
@@ -375,6 +381,8 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
     height: 320px !important;
     min-height: 320px !important;
     aspect-ratio: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   .geo--overlay .geo__overlay-wrap {
     pointer-events: auto !important;
