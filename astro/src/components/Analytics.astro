@@ -68,19 +68,32 @@
     })(document, window, "tmr-code");
   }
 
+  /* Cookie-согласие: до нажатия «Принять» аналитику НЕ запускаем (152-ФЗ /
+     GDPR-подход). Флаг ставит CookieConsent.astro. */
+  function hasConsent(){
+    try { if (localStorage.getItem('ui_cookie_consent')) return true; } catch(e){}
+    return /(?:^|; )ui_cookie_consent=/.test(document.cookie);
+  }
   /* Отложенный старт: requestIdleCallback (Chrome/Firefox/Edge) или
-     setTimeout fallback на 2.5 сек для Safari/старых. */
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(startAnalytics, { timeout: 4000 });
-  } else {
-    setTimeout(startAnalytics, 2500);
+     setTimeout fallback на 2.5 сек для Safari/старых, + запуск по первому
+     взаимодействию, чтобы не терять hit от активного пользователя. */
+  function armStart(){
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(startAnalytics, { timeout: 4000 });
+    } else {
+      setTimeout(startAnalytics, 2500);
+    }
+    ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){
+      window.addEventListener(ev, startAnalytics, { once: true, passive: true });
+    });
   }
 
-  /* Любое касание/клик/скролл/нажатие — немедленный запуск, чтобы не
-     терять hit от активного пользователя. once + passive — без overhead. */
-  ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){
-    window.addEventListener(ev, startAnalytics, { once: true, passive: true });
-  });
+  if (hasConsent()) {
+    armStart();
+  } else {
+    /* Согласия ещё нет — ждём «Принять» в cookie-баннере. */
+    window.addEventListener('cookie-consent-accepted', startAnalytics);
+  }
 })();
 </script>
 <!-- Битрикс24 call tracker подключается в BaseLayout.astro строго перед </body>. -->
