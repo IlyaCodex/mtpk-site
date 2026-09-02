@@ -80,6 +80,9 @@ const CONSENT_VERSION = 'v2026.1';
   var KEY = 'ui_cookie_consent';
   var el = document.getElementById('cookie-consent');
   if (!el) return;
+  // Во фрейме (инструменты Яндекс.Метрики: карты/Вебвизор) плашку не показываем —
+  // она бы перекрывала страницу в предпросмотре, а согласие тут не требуется.
+  try { if (window.top !== window.self) return; } catch (e) {}
   var version = el.getAttribute('data-consent-version') || 'v1';
 
   function stored() {
