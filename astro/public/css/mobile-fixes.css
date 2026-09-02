@@ -358,6 +358,21 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
  * 10b. Блок «География работы»: на планшете/мобильном карта под текстом,
  *      высота компактнее (иначе 3:2 на узком экране слишком высокая).
  * ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+ * 10c. Каталог /products/ (.cat-index .scard-grid): на мобильном 2 карточки
+ *      в ряд (по умолчанию inline-стиль ставит 1). Ужимаем отступы/шрифт,
+ *      чтобы плитки читались. `.cat-index` + !important — бьёт инлайн ≤600px.
+ * ------------------------------------------------------------ */
+@media (max-width: 600px) {
+  .cat-index .scard-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .cat-index .scard__body { padding: 10px 12px 12px !important; }
+  .cat-index .scard__title { font-size: 14px !important; line-height: 1.25 !important; }
+  .cat-index .scard__meta { font-size: 12px !important; }
+}
+
 @media (max-width: 900px) {
   .geo__layout {
     grid-template-columns: 1fr !important;
