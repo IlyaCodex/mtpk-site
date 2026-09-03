@@ -27,52 +27,60 @@
 <style>
   .cat-filter { position: sticky; top: 0; z-index: 50; background: #fff; border-bottom: 1px solid var(--border-subtle, #E1E5E7); box-shadow: 0 2px 10px rgba(16,31,38,.05); }
   .cat-filter .container { padding-top: 14px; padding-bottom: 14px; }
-  .cat-filter__row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: thin; padding-bottom: 2px; }
-  .cat-filter__row::-webkit-scrollbar { height: 5px; }
-  .cat-filter__row::-webkit-scrollbar-thumb { background: var(--border-default, #CDD4D8); border-radius: 3px; }
-  .cat-chip { flex: 0 0 auto; border: 1px solid var(--border-subtle, #E1E5E7); background: #fff; color: var(--text-secondary, #5A6166); font-family: var(--font-display, 'Inter', sans-serif); font-size: 14px; font-weight: 600; padding: 9px 16px; border-radius: 999px; cursor: pointer; white-space: nowrap; transition: background .15s, border-color .15s, color .15s; }
-  .cat-chip:hover { border-color: var(--teal-600, #1F5E78); color: var(--teal-700, #164B60); }
-  .cat-chip.is-active { background: var(--teal-600, #1F5E78); border-color: var(--teal-600, #1F5E78); color: #fff; }
-  @media (max-width: 768px) { .cat-chip { font-size: 13px; padding: 8px 13px; } }
+  .cat-filter__row { display: flex; align-items: center; gap: 12px; }
+  .cat-select-label { font-family: var(--font-display, 'Inter', sans-serif); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-tertiary, #8a98a0); flex-shrink: 0; }
+  .cat-select {
+    appearance: none; -webkit-appearance: none;
+    font-family: var(--font-display, 'Inter', sans-serif); font-size: 15px; font-weight: 600;
+    color: var(--text-primary, #101F26); background-color: #fff;
+    border: 1px solid var(--border-default, #CDD4D8); border-radius: 10px;
+    padding: 11px 44px 11px 16px; min-width: 320px; max-width: 100%; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231F5E78' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .cat-select:hover { border-color: var(--teal-600, #1F5E78); }
+  .cat-select:focus { outline: none; border-color: var(--teal-600, #1F5E78); box-shadow: 0 0 0 3px rgba(31,94,120,.14); }
+  @media (max-width: 560px) { .cat-select { min-width: 0; flex: 1 1 auto; } .cat-filter__row { gap: 8px; } }
 </style>
 <section class="cat-filter" aria-label="Фильтр по категориям оборудования">
   <div class="container">
     <div class="cat-filter__row">
-        <button type="button" class="cat-chip is-active" data-cat="all">Все категории</button>
-        <button type="button" class="cat-chip" data-cat="induktsionnye-plavilnye-pechi">Индукционные плавильные печи</button>
-        <button type="button" class="cat-chip" data-cat="induktsionnye-nagrevateli">Индукционные нагреватели</button>
-        <button type="button" class="cat-chip" data-cat="drobemetnoe-oborudovanie">Дробемётное оборудование</button>
-        <button type="button" class="cat-chip" data-cat="peskostruynoe-oborudovanie">Пескоструйное оборудование</button>
-        <button type="button" class="cat-chip" data-cat="sistemy-ohlazhdeniya">Системы охлаждения</button>
-        <button type="button" class="cat-chip" data-cat="stalerozlivochnye-kovshi">Сталеразливочные ковши</button>
-        <button type="button" class="cat-chip" data-cat="oborudovanie-lvm">Оборудование ЛВМ</button>
-        <button type="button" class="cat-chip" data-cat="oborudovanie-lgm">Оборудование ЛГМ</button>
-        <button type="button" class="cat-chip" data-cat="linii-dlya-holodnotverdeyushhih-smesej-hts">Линии ХТС</button>
-        <button type="button" class="cat-chip" data-cat="oborudovanie-dlya-peschano-glinistyh-smesej-pgs">Оборудование ПГС</button>
-        <button type="button" class="cat-chip" data-cat="sterzhnevye-mashiny">Стержневые и формовочные машины</button>
-        <button type="button" class="cat-chip" data-cat="termoobrabotka-plavka-alyuminiya">Термообработка и плавка алюминия</button>
-        <button type="button" class="cat-chip" data-cat="mufelnye-termicheskie-pechi">Муфельные термические печи</button>
-        <button type="button" class="cat-chip" data-cat="vakuumnoe-oborudovanie-dlya-termoobrabotki">Вакуумное оборудование для термообработки</button>
-        <button type="button" class="cat-chip" data-cat="zapchasti">Запасные части на оборудование</button>
+      <span class="cat-select-label">Категория</span>
+      <select class="cat-select" data-cat-select aria-label="Категория оборудования">
+        <option value="all">Все категории</option>
+        <option value="induktsionnye-plavilnye-pechi">Индукционные плавильные печи</option>
+        <option value="induktsionnye-nagrevateli">Индукционные нагреватели</option>
+        <option value="drobemetnoe-oborudovanie">Дробемётное оборудование</option>
+        <option value="peskostruynoe-oborudovanie">Пескоструйное оборудование</option>
+        <option value="sistemy-ohlazhdeniya">Системы охлаждения</option>
+        <option value="stalerozlivochnye-kovshi">Сталеразливочные ковши</option>
+        <option value="oborudovanie-lvm">Оборудование ЛВМ</option>
+        <option value="oborudovanie-lgm">Оборудование ЛГМ</option>
+        <option value="linii-dlya-holodnotverdeyushhih-smesej-hts">Линии ХТС</option>
+        <option value="oborudovanie-dlya-peschano-glinistyh-smesej-pgs">Оборудование ПГС</option>
+        <option value="sterzhnevye-mashiny">Стержневые и формовочные машины</option>
+        <option value="termoobrabotka-plavka-alyuminiya">Термообработка и плавка алюминия</option>
+        <option value="mufelnye-termicheskie-pechi">Муфельные термические печи</option>
+        <option value="vakuumnoe-oborudovanie-dlya-termoobrabotki">Вакуумное оборудование для термообработки</option>
+        <option value="zapchasti">Запасные части на оборудование</option>
+      </select>
     </div>
   </div>
 </section>
 <script>
   (function () {
     function init() {
-    var chips = [].slice.call(document.querySelectorAll('.cat-chip'));
+    var sel = document.querySelector('[data-cat-select]');
     var secs = [].slice.call(document.querySelectorAll('section.cat-index[data-cat]'));
     var bar = document.querySelector('.cat-filter');
-    if (!chips.length || !secs.length) return;
+    if (!sel || !secs.length) return;
     function apply(cat) {
       secs.forEach(function (s) { s.style.display = (cat === 'all' || s.getAttribute('data-cat') === cat) ? '' : 'none'; });
-      chips.forEach(function (c) { c.classList.toggle('is-active', c.getAttribute('data-cat') === cat); });
     }
-    chips.forEach(function (c) {
-      c.addEventListener('click', function () {
-        apply(c.getAttribute('data-cat'));
-        if (bar) bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+    sel.addEventListener('change', function () {
+      apply(sel.value);
+      if (bar) bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
