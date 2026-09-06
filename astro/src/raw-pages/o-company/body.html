@@ -50,6 +50,12 @@
      Секции чередуют светлые / subtle / тёмные подложки.
      ============================================================ -->
 <style>
+/* Hero «О компании» — компактнее: без огромного пустого поля сверху
+   (дефолтный .hero почти во весь экран + контент прижат к низу) */
+.hero { min-height: 56vh; }
+@media (max-width: 768px) { .hero { min-height: 62vh; } }
+.hero .hero__content { padding-top: var(--sp-14); }
+
 .ab-section { padding: var(--section-py-base, 96px) 0; border-bottom: 1px solid var(--border-subtle); }
 .ab-section--page   { background: var(--surface-page, #fff); }
 .ab-section--subtle { background: var(--surface-subtle, #F5F7F8); }
