@@ -566,3 +566,19 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
   .cat-hero__title, .hero__title,
   .phero__title { overflow-wrap: anywhere; }
 }
+
+/* ============================================================
+ * 13. Мобильная навигация — гамбургер вместо десктопного меню.
+ *     Раньше правила «спрятать .nav / показать .nav-toggle» жили
+ *     ТОЛЬКО в per-page inline_styles каждой страницы. На страницах,
+ *     чей inline-блок их не содержал (напр. /kontakty/), на мобильном
+ *     показывалось десктопное .nav без гамбургера. Выносим сюда —
+ *     единый источник для всех страниц (Header/Drawer глобальны в BaseLayout).
+ * ============================================================ */
+@media (max-width: 1024px) {
+  .nav { display: none; }
+  .nav-toggle { display: inline-flex; }
+}
+@media (max-width: 640px) {
+  .header__actions .btn--primary { display: none; }
+}
