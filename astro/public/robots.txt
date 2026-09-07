@@ -7,5 +7,6 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://uralinduktor.ru/sitemap.xml
+# Актуальную карту генерирует сборка (@astrojs/sitemap): sitemap-index.xml → sitemap-0.xml.
+# Старый статический sitemap.xml удалён — он не обновлялся и содержал уже несуществующие URL.
 Sitemap: https://uralinduktor.ru/sitemap-index.xml
