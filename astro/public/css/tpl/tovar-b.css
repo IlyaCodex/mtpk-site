@@ -503,5 +503,12 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
    сжиматься и уводим саму таблицу в горизонтальный скролл. */
 .spec__layout { grid-template-columns: 240px minmax(0, 1fr); }
 .spec__body, .spec__panel { min-width: 0; }
-.spec-table { display: block; width: 100%; max-width: 100%; overflow-x: auto; }
+/* Ширину держим табличной раскладкой, а не display:block — тот ломает
+   колонку значений (её содержимое уезжает за видимую область). */
+.spec-table { width: 100%; max-width: 100%; table-layout: fixed; }
+/* Значения из ТЗ бывают развёрнутыми фразами («версия 15–20 кГц: генератор
+   1000 × 600 × 900 мм; выносной трансформатор…»). Прежний nowrap рассчитан на
+   короткие числа и не давал им переноситься — строка уезжала за таблицу. */
+.spec-table thead th, .spec-table td { white-space: normal; }
+.spec-table th, .spec-table td { overflow-wrap: anywhere; }
 @media (max-width: 1024px) { .spec__layout { grid-template-columns: minmax(0, 1fr); } }
