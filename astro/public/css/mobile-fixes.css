@@ -599,3 +599,17 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
 @media (max-width: 640px) {
   .footer__top { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+ * 15. Формы-компоненты на страницах без tpl-CSS.
+ *     Схлопывание двухколоночных рядов формы (.leadgen__grid,
+ *     .form__row) жило только в /css/tpl/*.css. Страницы, которые
+ *     эти шаблоны не подключают (новый раздел «Решения», сервисные
+ *     страницы), оставались с 2 колонками и распирали вьюпорт.
+ * ============================================================ */
+@media (max-width: 1024px) {
+  .leadgen__grid { grid-template-columns: minmax(0, 1fr); }
+  .form__row { grid-template-columns: minmax(0, 1fr); }
+}
+.form__row, .form__field { min-width: 0; }
+.form__input, .form__textarea { max-width: 100%; box-sizing: border-box; }

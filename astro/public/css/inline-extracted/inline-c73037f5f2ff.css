@@ -53,7 +53,7 @@
 .leadgen__checklist {list-style: none; padding: 0; margin: 0 0 var(--sp-10); display: flex; flex-direction: column; gap: var(--sp-3); }
 .leadgen__checklist-item {display: flex; align-items: flex-start; gap: var(--sp-3); font-size: var(--fs-body); color: var(--text-primary); line-height: 1.5; }
 .leadgen__checklist-item svg {flex-shrink: 0; color: var(--teal-600); margin-top: 3px; }
-/* Meta-блок: 12 лет / 340+ внедрений / 18 мес гарантия */
+/* Meta-блок: 13 лет / 340+ внедрений / 18 мес гарантия */
 .leadgen__meta {display: flex; align-items: center; gap: var(--sp-6); padding: var(--sp-6) 0 0; border-top: 1px solid var(--border-subtle); }
 .leadgen__meta-item {display: flex; flex-direction: column; gap: var(--sp-1); }
 .leadgen__meta-num {font-family: var(--font-mono); font-size: var(--fs-h3); font-weight: var(--fw-semibold); color: var(--text-primary); line-height: 1; letter-spacing: -0.01em; }

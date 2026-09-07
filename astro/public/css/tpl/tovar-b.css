@@ -496,3 +496,12 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
 @media (max-width: 640px) {
   .header__actions .btn--primary { display: none; }
 }
+
+/* --- Spec: широкие таблицы из ТЗ не должны распирать сетку --------------
+   1fr = minmax(auto,1fr) и не сжимается уже содержимого, поэтому таблица
+   с большим числом колонок растягивала всю страницу. Даём колонке право
+   сжиматься и уводим саму таблицу в горизонтальный скролл. */
+.spec__layout { grid-template-columns: 240px minmax(0, 1fr); }
+.spec__body, .spec__panel { min-width: 0; }
+.spec-table { display: block; width: 100%; max-width: 100%; overflow-x: auto; }
+@media (max-width: 1024px) { .spec__layout { grid-template-columns: minmax(0, 1fr); } }

@@ -132,6 +132,7 @@ if (slug === '') activeNav = 'home';
 else if (slug.startsWith('products')) activeNav = 'catalog';
 else if (slug.startsWith('uslugi')) activeNav = 'uslugi';
 else if (slug.startsWith('proizvodstvo')) activeNav = 'proizvodstvo';
+else if (slug.startsWith('resheniya')) activeNav = 'resheniya';
 else if (slug.startsWith('proekty')) activeNav = 'proekty';
 else if (slug.startsWith('nalichie')) activeNav = 'nalichie';
 else if (slug.startsWith('o-kompanii') || slug.startsWith('o-company')) activeNav = 'o-kompanii';
@@ -154,6 +155,15 @@ const searchWeight = isSection ? 10 : 1;
 // Ищем <nav class="breadcrumb"> ... </nav> и извлекаем пары (href, name).
 // Последний элемент — обычно <span class="breadcrumb__current"> без href.
 const SITE_SEO = 'https://uralinduktor.ru';
+// В подписях крошек встречаются типографские сущности (&ndash;, &nbsp; и т.п.) —
+// в JSON-LD должен попадать читаемый текст, а не разметка.
+function decodeEntities(s: string): string {
+  const map: Record<string, string> = {
+    '&nbsp;': ' ', '&ndash;': '–', '&mdash;': '—', '&laquo;': '«',
+    '&raquo;': '»', '&amp;': '&', '&quot;': '"', '&#8209;': '‑', '&deg;': '°',
+  };
+  return s.replace(/&[a-z]+;|&#\d+;/gi, (m) => map[m] ?? m).replace(/\s+/g, ' ').trim();
+}
 function buildBreadcrumbSchema(html: string): string | null {
   const navMatch = html.match(/<nav\s+class="breadcrumb[^"]*"[^>]*>([\s\S]*?)<\/nav>/);
   if (!navMatch) return null;
@@ -163,12 +173,12 @@ function buildBreadcrumbSchema(html: string): string | null {
   const linkRe = /<a\s+href="([^"]+)"[^>]*>([^<]+)<\/a>/g;
   let m: RegExpExecArray | null;
   while ((m = linkRe.exec(inner)) !== null) {
-    items.push({ url: m[1], name: m[2].replace(/&nbsp;/g, ' ').trim() });
+    items.push({ url: m[1], name: decodeEntities(m[2]) });
   }
   // <span class="breadcrumb__current">...</span>
   const currentMatch = inner.match(/<span\s+class="breadcrumb__current"[^>]*>([^<]+)<\/span>/);
   if (currentMatch) {
-    items.push({ name: currentMatch[1].replace(/&nbsp;/g, ' ').trim() });
+    items.push({ name: decodeEntities(currentMatch[1]) });
   }
   if (items.length < 2) return null;
   const listItems = items.map((it, i) => {
@@ -196,7 +206,8 @@ const breadcrumbSchema = buildBreadcrumbSchema(body);
 
 // SEO-T3c: JSON-LD Product — на товарных страницах (детектор: <section class="phero">).
 // Извлекаем name (h1.phero__title), image (главное фото), description (meta.description).
-// Цена «по запросу» → offers.price=0, availability=PreOrder — этого требуют Rich Results.
+// Цена не публикуется: проектная стоимость считается индивидуально (требование ТЗ —
+// без «0 руб.» и вымышленных цифр), поэтому блок offers не выводится.
 function buildProductSchema(html: string, meta: any, canonicalAbs: string): string | null {
   if (!/<section\s+class="phero"/.test(html)) return null;
 
@@ -226,16 +237,10 @@ function buildProductSchema(html: string, meta: any, canonicalAbs: string): stri
       "@id": `${SITE_SEO}/#organization`
     },
     "url": canonicalAbs,
-    "offers": {
-      "@type": "Offer",
-      "url": canonicalAbs,
-      "priceCurrency": "RUB",
-      "price": "0",
-      "priceValidUntil": "2027-12-31",
-      "availability": "https://schema.org/PreOrder",
-      "itemCondition": "https://schema.org/NewCondition",
-      "seller": { "@id": `${SITE_SEO}/#organization` }
-    }
+    // Блок offers намеренно не публикуется: стоимость проектная и считается
+    // индивидуально. Требование ТЗ — не выдавать «0 руб.» или вымышленную цену
+    // ради сниппета; на странице цена честно указана как «по запросу».
+    "itemCondition": "https://schema.org/NewCondition"
   });
 }
 // canonicalAbs — с trailing slash, как реальный 200-URL (Astro trailingSlash: 'always').
