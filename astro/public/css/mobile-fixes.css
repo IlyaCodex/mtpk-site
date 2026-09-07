@@ -582,3 +582,20 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
 @media (max-width: 640px) {
   .header__actions .btn--primary { display: none; }
 }
+
+/* ============================================================
+ * 14. Футер — схлопывание колонок на мобильном.
+ *     .footer__top по умолчанию 5 колонок (1.4fr 1fr×4) и НЕ
+ *     сворачивается — правила были только в per-page inline_styles.
+ *     На страницах без них (kontakty, nalichie, otzyvy, policy,
+ *     soglasie, spasibo, новости) футер оставался в 5 колонок и
+ *     распирал страницу до ~820px (горизонтальный overflow, из-за
+ *     которого «уезжала» и модалка поиска — position:fixed на mobile).
+ * ============================================================ */
+@media (max-width: 1024px) {
+  .footer__top { grid-template-columns: 1fr 1fr; gap: var(--sp-8); }
+  .footer__brand-block { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .footer__top { grid-template-columns: 1fr; }
+}
