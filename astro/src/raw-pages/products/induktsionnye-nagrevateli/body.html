@@ -222,6 +222,18 @@
 <!-- ============================================================
      APPLICATIONS — Под какой металл и режим работы (SUBTLE)
      ============================================================ -->
+<style>
+/* Перечень страниц-применений на хабе нагревателей */
+.app-links { margin-top: var(--sp-10); padding-top: var(--sp-8); border-top: 1px solid var(--border-subtle); }
+.app-links__label { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); margin-bottom: var(--sp-5); }
+.app-links__list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3) var(--sp-6); }
+.app-links__list li { position: relative; padding-left: var(--sp-5); }
+.app-links__list li::before { content: ""; position: absolute; left: 0; top: 0.65em; width: 8px; height: 1px; background: var(--teal-600); }
+.app-links__list a { color: var(--text-brand); text-decoration: none; font-size: var(--fs-small); line-height: 1.45; border-bottom: 1px solid transparent; }
+.app-links__list a:hover { border-bottom-color: currentColor; }
+@media (max-width: 1024px) { .app-links__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .app-links__list { grid-template-columns: minmax(0, 1fr); } }
+</style>
 <section class="applications" aria-label="Применение — задачи индукционного нагрева">
   <div class="container">
     <div class="s-head">
@@ -338,6 +350,20 @@
         <p class="app-card__desc">Снятие внутренних напряжений после&nbsp;закалки, обработка цветных сплавов, восстановление структуры сварных швов.</p>
       </article>
 
+    </div>
+    <div class="app-links">
+      <div class="app-links__label">Разбор по&nbsp;задачам</div>
+      <ul class="app-links__list">
+        <li><a href="/resheniya/induktsionnaya-zakalka-valov-i-osey/">Индукционная закалка валов и&nbsp;осей</a></li>
+        <li><a href="/resheniya/induktsionnaya-zakalka-shesteren-i-zvezdochek/">Индукционная закалка шестерён и&nbsp;звёздочек</a></li>
+        <li><a href="/resheniya/induktsionnyy-nagrev-pod-kovku-i-shtampovku/">Индукционный нагрев заготовок под ковку и&nbsp;штамповку</a></li>
+        <li><a href="/resheniya/induktsionnaya-payka/">Индукционные установки для&nbsp;пайки металлов</a></li>
+        <li><a href="/resheniya/induktsionnyy-nagrev-podshipnikov-i-muft/">Индукционный нагрев подшипников и&nbsp;муфт под посадку</a></li>
+        <li><a href="/resheniya/induktsionnyy-predvaritelnyy-nagrev-svarnyh-soedineniy/">Индукционный предварительный нагрев сварных соединений</a></li>
+        <li><a href="/resheniya/induktsionnyy-nagrev-trub-i-dlinnomernyh-zagotovok/">Индукционный нагрев труб и&nbsp;длинномерных заготовок</a></li>
+        <li><a href="/resheniya/skvoznoy-induktsionnyy-nagrev-zagotovok/">Сквозной индукционный нагрев металлических заготовок</a></li>
+        <li><a href="/resheniya/skaniruyushchaya-induktsionnaya-zakalka/">Сканирующая индукционная закалка</a></li>
+      </ul>
     </div>
   </div>
 </section>
