@@ -28,7 +28,11 @@
   // Исключения — бейдж НЕ ставим (категория + её товары).
   var DENY = [
     'induktsionnye-plavilnye-pechi/tranzistornye',
-    'sistemy-ohlazhdeniya/chillery'
+    'sistemy-ohlazhdeniya/chillery',
+    // Турбины: российское происхождение не подтверждено, бейдж не ставим
+    // ни на карточке товара, ни на плитках в каталоге.
+    'drobemetnoe-oborudovanie/turbina-s-pryamym-privodom',
+    'drobemetnoe-oborudovanie/turbina-s-remennym-privodom'
   ];
 
   function eligible(slug) {
