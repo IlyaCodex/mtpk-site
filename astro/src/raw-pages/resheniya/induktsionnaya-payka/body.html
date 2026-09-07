@@ -1,0 +1,125 @@
+<style>
+/* Контентный блок категории — текст из ТЗ заказчика */
+.cdoc { background: var(--surface-page, #fff); padding: var(--section-py-base, 96px) 0; border-top: 1px solid var(--border-subtle); }
+.cdoc__layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: var(--sp-12); align-items: start; }
+.cdoc__nav { position: sticky; top: 110px; display: flex; flex-direction: column; gap: var(--sp-1); }
+.cdoc__nav-eyebrow { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+.cdoc__nav-link { font-size: var(--fs-small); color: var(--text-secondary); text-decoration: none; padding: var(--sp-2) 0 var(--sp-2) var(--sp-4); border-left: 2px solid var(--border-subtle); line-height: 1.35; transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out); }
+.cdoc__nav-link:hover { color: var(--text-brand); border-left-color: var(--teal-600); }
+.cdoc__panel { padding: var(--sp-10) 0; scroll-margin-top: 120px; }
+.cdoc__panel:first-child { padding-top: 0; }
+.cdoc__panel + .cdoc__panel { border-top: 1px solid var(--border-subtle); }
+.cdoc__panel > * + * { margin-top: var(--sp-4); }
+.cdoc__title { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: var(--fw-bold); letter-spacing: var(--ls-h3); color: var(--text-primary); }
+.cdoc__panel p { color: var(--text-secondary); line-height: var(--lh-body); }
+.cdoc__panel ul { color: var(--text-secondary); line-height: var(--lh-body); padding-left: var(--sp-5); }
+.cdoc__panel ul li + li { margin-top: var(--sp-2); }
+.cdoc__panel h3 { font-family: var(--font-display); font-size: var(--fs-h4); font-weight: var(--fw-semibold); color: var(--text-primary); }
+.cdoc__lead { font-size: var(--fs-lead); color: var(--text-secondary); line-height: 1.7; }
+.cdoc__body { min-width: 0; }
+.cdoc__scroll { overflow-x: auto; max-width: 100%; }
+.cdoc table { width: 100%; border-collapse: collapse; min-width: 520px; }
+.cdoc th, .cdoc td { text-align: left; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); font-size: var(--fs-small); vertical-align: top; }
+.cdoc thead th { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); }
+.cdoc tbody th { color: var(--text-secondary); font-weight: var(--fw-regular); width: 40%; }
+.cdoc tbody td { color: var(--text-primary); }
+.cdoc__cta { margin-top: var(--sp-6); }
+@media (max-width: 1024px) { .cdoc__layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); } .cdoc__nav { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--sp-2); } .cdoc__nav-link { border-left: 0; border-bottom: 2px solid var(--border-subtle); padding: var(--sp-2) var(--sp-3); } .cdoc__nav-eyebrow { width: 100%; margin-bottom: 0; } }
+</style>
+<style>
+/* Светлый hero текстовой страницы */
+.thero { background: var(--surface-subtle, #F5F7F8); padding: var(--sp-10) 0 var(--sp-12); border-bottom: 1px solid var(--border-subtle); }
+.thero__eyebrow { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-brand); display: inline-flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.thero__eyebrow::before { content: ""; width: 32px; height: 2px; background: var(--teal-600); }
+.thero__title { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 44px); font-weight: var(--fw-bold); line-height: 1.12; letter-spacing: var(--ls-h1); color: var(--text-primary); margin: 0 0 var(--sp-5); max-width: 24ch; }
+.thero__lead { font-size: var(--fs-lead); color: var(--text-secondary); line-height: 1.7; max-width: 68ch; margin: 0 0 var(--sp-7); }
+.thero__actions { display: flex; flex-wrap: wrap; gap: var(--sp-4); }
+.thero .breadcrumb { padding-top: 0; }
+.thero .breadcrumb a { color: var(--text-secondary); }
+.thero .breadcrumb__current { color: var(--text-primary); }
+</style>
+<section class="thero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="/resheniya/">Решения</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Индукционные установки для&nbsp;пайки металлов</span>
+    </nav>
+
+    <div class="thero__eyebrow">Применение</div>
+    <h1 class="thero__title">Индукционные установки для&nbsp;пайки металлов</h1>
+    <p class="thero__lead">Индукционный нагрев позволяет подводить тепло непосредственно к&nbsp;зоне соединения, не&nbsp;прогревая без необходимости всю деталь. Такой способ применяют для&nbsp;пайки трубок, наконечников, штуцеров, токопроводящих шин, режущего инструмента, узлов из&nbsp;стали, меди, латуни и&nbsp;твёрдых сплавов. Установку, частоту и&nbsp;индуктор подбирают не&nbsp;только по&nbsp;габаритам изделия: решающее значение имеют материалы соединяемых деталей, масса нагреваемой зоны, вид припоя, требуемая температура и&nbsp;продолжительность цикла.</p>
+    <div class="thero__actions">
+      <a href="#leadgen" class="btn btn--primary">Получить расчёт <span class="btn__arrow">&rarr;</span></a>
+      <a href="/products/induktsionnye-nagrevateli/" class="btn btn--secondary">Все нагреватели <span class="btn__arrow">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="cdoc" aria-label="Содержание страницы">
+  <div class="container">
+    <div class="cdoc__layout">
+      <nav class="cdoc__nav" aria-label="Содержание">
+        <div class="cdoc__nav-eyebrow">Содержание</div>
+        <a class="cdoc__nav-link" href="#sec-1-chto-daet-indukcionnyy-nagrev">Что даёт индукционный нагрев при&nbsp;пайке</a>
+        <a class="cdoc__nav-link" href="#sec-2-kakie-dannye-nuzhny-dlya">Какие данные нужны для&nbsp;подбора</a>
+        <a class="cdoc__nav-link" href="#sec-3-kak-vybirayut-seriyu-i">Как выбирают серию и&nbsp;частоту</a>
+        <a class="cdoc__nav-link" href="#sec-4-primer-orientirovochnogo-rascheta">Пример ориентировочного расчёта</a>
+        <a class="cdoc__nav-link" href="#sec-5-postavka-i-proverka-oborudovaniya">Поставка и&nbsp;проверка оборудования</a>
+        <a class="cdoc__nav-link" href="#sec-6-chto-prislat-dlya-podbora">Что прислать для&nbsp;подбора</a>
+      </nav>
+
+      <div class="cdoc__body">
+        <div class="cdoc__panel" id="sec-1-chto-daet-indukcionnyy-nagrev">
+          <h2 class="cdoc__title">Что даёт индукционный нагрев при&nbsp;пайке</h2>
+          <p>Электромагнитное поле создаёт тепло в&nbsp;металлических элементах соединения. Припой плавится от&nbsp;нагретых поверхностей, поэтому при&nbsp;правильно построенном процессе можно получать повторяемый температурный цикл и&nbsp;уменьшать окисление окружающих участков. Форма индуктора определяет расположение и&nbsp;ширину зоны нагрева, а&nbsp;мощность и&nbsp;время задают скорость выхода на&nbsp;температуру пайки.</p>
+          <p>Для&nbsp;серийной операции установка может работать совместно с&nbsp;приспособлением, механизмом подачи деталей или дозирования припоя. Для&nbsp;единичных и&nbsp;разных по&nbsp;расположению соединений удобна ЛН с&nbsp;выносным индуктором. Результат зависит от&nbsp;зазора в&nbsp;соединении, подготовки поверхности, состава припоя и&nbsp;флюса, поэтому одна только мощность генератора не&nbsp;определяет качество шва.</p>
+          <p>локальный и&nbsp;управляемый нагрев зоны соединения;</p>
+          <p>возможность повторять заданные мощность и&nbsp;время цикла;</p>
+          <p>применение кольцевых, контурных, разъёмных и&nbsp;многоместных индукторов;</p>
+          <p>возможность встроить нагрев в&nbsp;ручной пост или автоматизированный комплекс.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-2-kakie-dannye-nuzhny-dlya">
+          <h2 class="cdoc__title">Какие данные нужны для&nbsp;подбора</h2>
+          <p>Для&nbsp;расчёта требуется чертёж или эскиз узла с&nbsp;размерами зоны пайки. Желательно передать образцы деталей и&nbsp;сообщить фактическую производительность: размер партии, число соединений в&nbsp;смену или допустимое время одного цикла. Если технология уже утверждена, исходными требованиями служат карта процесса и&nbsp;документация заказчика.</p>
+          <p>марки и&nbsp;магнитные свойства соединяемых металлов;</p>
+          <p>диаметр, толщина стенки, масса и&nbsp;взаимное положение деталей;</p>
+          <p>тип припоя, диапазон его плавления, флюс или защитная атмосфера;</p>
+          <p>требуемая температура, время нагрева и&nbsp;допустимый перегрев;</p>
+          <p>зазор, способ фиксации деталей и&nbsp;расположение припоя;</p>
+          <p>ручная загрузка или работа в&nbsp;составе линии;</p>
+          <p>доступное питание, место установки и&nbsp;система жидкостного охлаждения.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-3-kak-vybirayut-seriyu-i">
+          <h2 class="cdoc__title">Как выбирают серию и&nbsp;частоту</h2>
+          <p>АВВС применяют для&nbsp;небольших деталей и&nbsp;компактных зон, где полезна повышенная концентрация нагрева. АВВ и&nbsp;АВЗ подходят для&nbsp;значительной части операций пайки средних деталей. АВН рассматривают при&nbsp;большой массе, значительном сечении или необходимости более глубокого и&nbsp;равномерного прогрева. ЛН выбирают, когда оператору требуется подводить выносной индуктор к&nbsp;стационарному или крупногабаритному изделию. Окончательный выбор делают после расчёта связи «деталь — индуктор» и&nbsp;пробного цикла.</p>
+          <p>Слишком высокая частота может сосредоточить нагрев на&nbsp;поверхности, а&nbsp;недостаточная мощность увеличит цикл и&nbsp;тепловые потери. Избыточная мощность без корректного управления способна вызвать локальный перегрев. Поэтому частоту, индуктор, мощность и&nbsp;временную программу рассматривают как единую технологическую систему.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-4-primer-orientirovochnogo-rascheta">
+          <h2 class="cdoc__title">Пример ориентировочного расчёта</h2>
+          <p>Ориентировочный пример для&nbsp;первичной оценки. Предположим, в&nbsp;зоне пайки необходимо нагреть эквивалентно 0,5&nbsp;кг стальных деталей от&nbsp;20 до&nbsp;800&nbsp;°C. При&nbsp;средней теплоёмкости 0,65 кДж/(кг·°C) полезная энергия составит: 0,5 × 0,65 × 780 = 253,5 кДж. Если принять общий КПД процесса 50 %, установка должна получить из&nbsp;сети около 507 кДж. При&nbsp;средней потребляемой мощности от&nbsp;сети 20&nbsp;кВт расчётное время равно 507 / 20 = 25 секунд.</p>
+          <p>Фактический цикл может отличаться из-за&nbsp;геометрии индуктора, электромагнитной связи, теплопроводности деталей, нагрева оснастки, потерь в&nbsp;окружающую среду и&nbsp;выдержки для&nbsp;растекания припоя. Значения уточняют испытанием с&nbsp;реальной деталью, выбранным припоем и&nbsp;заказанным индуктором.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-5-postavka-i-proverka-oborudovaniya">
+          <h2 class="cdoc__title">Поставка и&nbsp;проверка оборудования</h2>
+          <p>УралИндуктор разрабатывает концепцию поста и&nbsp;формирует техническое решение. Китайский завод выполняет детальное конструирование и&nbsp;изготовление оборудования. Простой индуктор обычно входит в&nbsp;стоимость; сложные, многоместные или сменные индукторы рассчитываются отдельно по&nbsp;согласованию.</p>
+          <p>Перед отгрузкой завод проверяет установку с&nbsp;заказанным индуктором. В&nbsp;Миассе оборудование повторно проверяют без нагрузки при&nbsp;полном подключении. Управление и&nbsp;документация поставляются на&nbsp;русском языке. На&nbsp;территории заказчика специалисты проводят пусконаладочные работы и&nbsp;испытания на&nbsp;деталях с&nbsp;оформлением актов. Гарантия — 18&nbsp;месяцев, начало срока определяется договором: от&nbsp;даты отгрузки либо подписания акта ПНР. Цена — по&nbsp;запросу.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-6-chto-prislat-dlya-podbora">
+          <h2 class="cdoc__title">Что прислать для&nbsp;подбора</h2>
+          <p>Пришлите чертёж соединения, марки металлов, сведения о&nbsp;припое и&nbsp;требуемую производительность. Мы предложим серию установки, диапазон частоты, предварительную мощность и&nbsp;схему индуктора. Окончательные режимы и&nbsp;качество пайки подтверждаются пробными испытаниями на&nbsp;реальных деталях.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--C:leadgen-->
+<!--C:best-offer-->
