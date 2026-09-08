@@ -4,15 +4,12 @@
  * Подключается в конце <body> на ВСЕХ страницах через BaseLayout.astro.
  *
  * Счётчики (см. briefs/forms-spec.md, раздел «Аналитика»):
- *   - Roistat        — projectId 55e30c285273fb0205de07d6cfbcb9ce
  *   - Яндекс.Метрика — counter 25228307
  *   - Top.Mail.Ru    — counter 3784620
  *   - Битрикс24      — сквозная аналитика / call tracker (портал b1785973)
  *
  * Все сторонние <script> помечены is:inline — иначе Astro попытается их
  * собрать/обработать и сломает (особенно код с document.write).
- * roistat_visit из cookie в скрытое поле формы кладёт /js/forms.js; cookie
- * ставит сам счётчик Roistat ниже.
  *
  * T-PERF-12 (2026-06-01): инициализация отложена через requestIdleCallback
  * до момента, когда браузер закончит первый рендер. Trade-off: первые
@@ -29,18 +26,6 @@
   function startAnalytics(){
     if (started) return;
     started = true;
-
-    /* ===== Roistat ===== */
-    (function(w, d, s, h, id) {
-      w.roistatProjectId = id; w.roistatHost = h;
-      w.roistatPage = d.location.href; w.roistatReferrer = d.referrer;
-      var p = d.location.protocol == "https:" ? "https://" : "http://";
-      var u = /^.*roistat_visit=[^;]+(.*)?$/.test(d.cookie)
-        ? "/dist/module.js"
-        : "/api/site/1.0/"+id+"/init?referrer="+encodeURIComponent(d.location.href);
-      var js = d.createElement(s); js.charset="UTF-8"; js.async = 1; js.src = p+h+u;
-      var js2 = d.getElementsByTagName(s)[0]; js2.parentNode.insertBefore(js, js2);
-    })(window, document, 'script', 'cloud.roistat.com', '55e30c285273fb0205de07d6cfbcb9ce');
 
     /* ===== Яндекс.Метрика ===== */
     (function(m,e,t,r,i,k,a){

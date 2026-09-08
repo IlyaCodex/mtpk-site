@@ -9,12 +9,6 @@
   var forms = document.querySelectorAll('form.js-lead-form');
   if (!forms.length) return;
 
-  // ── roistat_visit ───────────────────────────────────────────
-  // Кладём значение cookie roistat_visit в скрытые поля .js-roistat.
-  // Roistat ставит cookie не мгновенно (≈1–2 с после загрузки),
-  // поэтому пробуем в 2 с, и если пусто — ретрай ещё через 1 с.
-  // (Бэкенд всё равно отбрасывает заявки быстрее 3 с как ботов,
-  //  так что к моменту реальной отправки значение уже проставлено.)
   function getCookie(name) {
     var m = document.cookie.match(
       new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)')
@@ -60,17 +54,18 @@
   }
   getMarketing(); // зафиксировать первое касание сразу при загрузке страницы
 
-  function fillRoistat() {
-    var v = getCookie('roistat_visit');
-    if (!v) return false;
-    document.querySelectorAll('input.js-roistat').forEach(function (el) {
-      if (!el.value) el.value = v;
-    });
-    return true;
+  // ── Сквозная аналитика Битрикс24 ──────────────────────────────────
+  // b24_trace — токен пути клиента (ставит счётчик Битрикса), _ym_uid —
+  // Client ID Яндекс.Метрики. Обе куки уходят в заявку, чтобы в CRM
+  // считалась окупаемость рекламы. Куки ставятся не мгновенно, поэтому
+  // читаем их в момент отправки формы, а не при загрузке страницы.
+  function appendAnalyticsCookies(fd) {
+    var b24Trace = getCookie('b24_trace');
+    if (b24Trace) fd.append('b24_trace', b24Trace);
+
+    var ymUid = getCookie('_ym_uid');
+    if (ymUid) fd.append('_ym_uid', ymUid);
   }
-  setTimeout(function () {
-    if (!fillRoistat()) setTimeout(fillRoistat, 1000);
-  }, 2000);
 
   forms.forEach(function (form) {
     // Проставляем timestamp загрузки формы (для time-check на бэке)
@@ -141,11 +136,11 @@
         return;
       }
 
-      fillRoistat(); // финальная попытка проставить roistat_visit перед отправкой
       var fd = new FormData(form); // файл «Прикрепить КП» уходит вместе с остальными полями
       // маркетинговые метки (utm_*, yclid, gclid, fbclid, referrer, landing_url)
       var mk = getMarketing();
       Object.keys(mk).forEach(function (k) { if (mk[k]) fd.append(k, mk[k]); });
+      appendAnalyticsCookies(fd); // b24_trace + _ym_uid для сквозной аналитики
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.dataset.label = submitBtn.innerHTML;
