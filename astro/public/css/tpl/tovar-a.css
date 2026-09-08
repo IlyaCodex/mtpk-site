@@ -510,4 +510,7 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
    им переноситься, и строка уезжала за таблицу. */
 .spec-table thead th, .spec-table td { white-space: normal; }
 .spec-table th, .spec-table td { overflow-wrap: anywhere; }
-@media (max-width: 1024px) { .spec__layout { grid-template-columns: minmax(0, 1fr); } }
+/* Одна колонка — на том же брейкпоинте, на котором шаблон скрывает
+   оглавление (900px). Иначе на 901-1024px сетка уже одноколоночная,
+   а sticky-оглавление ещё видимо и наезжает на текст при прокрутке. */
+@media (max-width: 900px) { .spec__layout { grid-template-columns: minmax(0, 1fr); } }
