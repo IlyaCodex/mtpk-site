@@ -2411,3 +2411,78 @@ body.nav-open { overflow: hidden; }
   font-style: normal;
   color: var(--green-400);
 }
+
+/* ============================================================
+   .sec-break — графический разделитель секций
+   Замена фото-полосы (.section-divider) там, где картинка
+   обрезалась в бессмысленную ленту: чистая графика вместо
+   кропа — диагональная штриховка, тонкие линии и фирменный
+   зелёный ромб по центру. Ничего не грузит, не обрезается.
+   ============================================================ */
+.sec-break {
+  position: relative;
+  padding: clamp(48px, 6vw, 84px) 0;
+  background: var(--surface-muted);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+/* диагональная штриховка — «промышленная» фактура, очень низкий контраст */
+.sec-break::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(135deg,
+    rgba(31, 94, 120, 0.07) 0 1px, transparent 1px 12px);
+  pointer-events: none;
+}
+/* штриховка выцветает к центру, чтобы знак стоял на чистом поле */
+.sec-break::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 55% 120% at 50% 50%,
+    var(--surface-muted) 0%, rgba(244, 245, 244, 0) 72%);
+  pointer-events: none;
+}
+.sec-break__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 3vw, 28px);
+}
+.sec-break__rule {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-default) 90%);
+}
+.sec-break__rule:last-child {
+  background: linear-gradient(270deg, transparent, var(--border-default) 90%);
+}
+.sec-break__mark {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.sec-break__dot {
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  background: var(--teal-600);
+  opacity: 0.32;
+}
+.sec-break__dot--accent {
+  width: 14px;
+  height: 14px;
+  background: var(--green-500);
+  opacity: 1;
+}
+@media (max-width: 640px) {
+  .sec-break { padding: var(--sp-10) 0; }
+}
