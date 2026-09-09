@@ -1,13 +1,12 @@
 {
   "_doc": "Источник правды по СКЛАДУ. Здесь ты управляешь, что показывается в разделе /nalichie/ и какие карточки каталога получают бейдж «В наличии». Правишь массив `items`. Минимум — URL товара (полный, как в адресной строке). Опционально — qty (штук в наличии), shipping (срок отгрузки), note (любая заметка). Остальное (название, фото, категория) подтягивается АВТОМАТИЧЕСКИ из соответствующей страницы товара скриптом scripts/build-stock.mjs при сборке. Удалил позицию — она исчезла со склада и с каталога. Подробно — см. docs/stock-system.md (или спроси меня).",
   "_sync": "Обновлено по списку Евгения (2026-07-08): наличие приведено точно к присланному перечню (16 позиций). Убраны УИ-0.25Т-250, УИ-15АВЗ, УИД-3210, УИД-326, УИГ-10Т, ковш УИК-С-0.5. Добавлены УИ-0.15Т-160 (на гидравлике) и запчасти: конденсаторы электротермические, запчасти дробемётного оборудования.",
+  "_sync2": "2026-09-09: URL приведены к каноническим после канонизации дублей. Варианты «на гидравлике» УИ-0.15Т-160 и УИ-0.5Т-400 слиты с базовыми моделями (на канонических страницах механизм наклона указан как редукторный или гидравлический), УИ-1Т-800 переведён с дубля 0.7 кГц на ui-1t-800. Позиций стало 14 — состав склада не изменился, ушли только дубли.",
   "items": [
     { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-15t-160/" },
-    { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-15t-160-na-gidravlike/" },
     { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-25t-160/" },
     { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-5t-400/" },
-    { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-5t-400-na-gidravlike/" },
-    { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-1t-800-0-7kgts/" },
+    { "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-1t-800/" },
     { "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-20t/" },
     { "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-30t/" },
     { "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-40t/" },
