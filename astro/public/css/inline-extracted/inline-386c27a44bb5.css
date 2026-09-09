@@ -534,7 +534,7 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
   .cycle-step:nth-child(2n) { border-right: 0; }
 }
 /* === Teaser-grid — 9 hub-карточек разделов (укрупнённый редизайн) === */
-.teaser-grid {display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-8); }
+.teaser-grid {display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-8); }
 .teaser-card {background: var(--surface-page); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: border-color var(--duration-base) var(--ease-out),
               transform var(--duration-base) var(--ease-out),
               box-shadow var(--duration-base) var(--ease-out); overflow: hidden; position: relative; }
