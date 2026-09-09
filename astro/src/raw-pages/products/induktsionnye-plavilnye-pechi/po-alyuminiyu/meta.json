@@ -3,6 +3,7 @@
   "description": "Печи серии А для алюминия: расчёт по объёму сухой шихты, перегреву и дегазации. Силовая часть собственной сборки, один узел в базе, ПНР и гарантия 18 месяцев.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/kategoriya-pechi.css"
+    "/css/tpl/kategoriya-pechi.css",
+    "/css/tpl/hub-compact.css"
   ]
 }

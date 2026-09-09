@@ -3,6 +3,7 @@
   "description": "Тиристорные печи для стали и чугуна от 100 кг до 15 т. Силовая часть собственной сборки, один узел в базе, УИГ отдельно, срок от 30 календарных дней, ПНР, гарантия 18 месяцев.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/kategoriya-pechi.css"
+    "/css/tpl/kategoriya-pechi.css",
+    "/css/tpl/hub-compact.css"
   ]
 }

@@ -3,6 +3,7 @@
   "description": "Индукционные нагреватели УралИндуктор: среднечастотные, высокочастотные, сверхвысокочастотные.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/hub-catalog.css"
+    "/css/tpl/hub-catalog.css",
+    "/css/tpl/hub-compact.css"
   ]
 }

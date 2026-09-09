@@ -3,6 +3,7 @@
   "description": "Печи серии М для меди, бронзы и латуни: подбор тигля, контроль перегрева и потерь цинка. Силовая часть собственной сборки, УИГ отдельно, ПНР, гарантия 18 месяцев.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/kategoriya-pechi.css"
+    "/css/tpl/kategoriya-pechi.css",
+    "/css/tpl/hub-compact.css"
   ]
 }

@@ -1,5 +1,8 @@
 {
   "title": "Охлаждение индукционных установок: чиллер или градирня",
   "description": "",
-  "inline_styles": []
+  "inline_styles": [],
+  "css_templates": [
+    "/css/tpl/hub-compact.css"
+  ]
 }

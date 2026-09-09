@@ -3,6 +3,7 @@
   "description": "Крановые дробемёты УИД: 9 серийных моделей, тельферы 1000–10 000 кг, индивидуальные исполнения, монтаж и ПНР. Гарантия 18 месяцев.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/hub-drobemet.css"
+    "/css/tpl/hub-drobemet.css",
+    "/css/tpl/hub-compact.css"
   ]
 }
