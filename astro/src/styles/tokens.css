@@ -231,8 +231,10 @@
   /* ---- Interactive (CTA / actions) ----
      CTA переведены с тёмно-бирюзового на фирменный зелёный: по Метрике
      кнопки первого экрана и шапки «слепли» на тёмном фото цеха.
-     Текст — глубокий графит, контраст к #4FAB3A ~6:1 (WCAG AAA);
-     белый на этом зелёном дал бы всего 2.4:1. */
+     Текст белый — по решению заказчика (2026-09-10). Контраст к #4FAB3A
+     2.91:1, ниже порога WCAG AA 4.5:1; графит #0A1C25 давал 5.99:1.
+     Если понадобится вернуть доступность, не теряя белый текст, —
+     затемнить --brand-green-bright до #35802C (белый даст 4.91:1). */
   --brand-green-bright: #4FAB3A;   /* = --green-500, основной акцент */
   --brand-green-hover:  #3C8E33;
   --brand-green-active: #2F702A;
@@ -240,7 +242,7 @@
   --action-primary-bg:        var(--brand-green-bright);
   --action-primary-bg-hover:  var(--brand-green-hover);
   --action-primary-bg-active: var(--brand-green-active);
-  --action-primary-fg:        #0A1C25;
+  --action-primary-fg:        #FFFFFF;
 
   --btn-green-glow:       0 8px 20px -4px rgba(79, 171, 58, 0.45);
   --btn-green-glow-hover: 0 12px 28px -4px rgba(79, 171, 58, 0.65);
