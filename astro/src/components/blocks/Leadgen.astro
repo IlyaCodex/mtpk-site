@@ -58,6 +58,16 @@
           <textarea class="form__textarea" name="task" id="cat-task" rows="3" placeholder="Например: индукционная плавильная печь для чугуна, 1 т, 750 кВт; нужны пусконаладка и обучение персонала"></textarea>
         </div>
 
+        <div class="form__field">
+          <span class="form__label">Техническое задание или паспорт</span>
+          <label class="form__file" for="cat-file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Прикрепить файл
+            <input type="file" name="file" id="cat-file" hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+          </label>
+          <span class="form__hint">PDF, DOC, XLS, JPG или PNG, до&nbsp;10&nbsp;МБ</span>
+        </div>
+
         <label class="form__check">
           <input type="checkbox" name="consent" value="v2026.1" required>
           <span>Я&nbsp;соглашаюсь с&nbsp;<a href="/policy/" target="_blank" rel="noopener">политикой обработки персональных данных</a> и&nbsp;<a href="/soglasie/" target="_blank" rel="noopener">даю согласие на&nbsp;их&nbsp;обработку</a></span>
