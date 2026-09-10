@@ -625,16 +625,9 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
  *     размер: меньше паддинги, кегль и межбуквенное расстояние.
  * ============================================================ */
 @media (min-width: 1025px) and (max-width: 1560px) {
-  /* Кнопка остаётся, но становится компактной. */
-  .header__actions .btn--primary {
-    padding: var(--sp-2) var(--sp-3);
-    font-size: var(--fs-micro);
-    letter-spacing: 0.02em;
-    gap: var(--sp-2);
-    white-space: nowrap;
-  }
-  /* Место под неё освобождает меню: строка не сжималась ниже 1157px,
-     из них 671px занимали 7 пунктов с паддингом 12px и кеглем 14px. */
+  /* Место под микроформу звонка освобождает меню: строка не сжималась
+     ниже 1157px, из них 671px занимали 7 пунктов с паддингом 12px и
+     кеглем 14px. Кнопки «Запросить КП / ТЗ» в шапке больше нет. */
   .nav { gap: 0; }
   .nav__link { padding-left: var(--sp-2); padding-right: var(--sp-2); font-size: 13px; }
   .header__inner { gap: var(--sp-4); }
