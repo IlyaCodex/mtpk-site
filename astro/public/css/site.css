@@ -339,8 +339,24 @@ body { margin: 0; }
   position: relative;
 }
 .btn--lg { padding: var(--btn-padding-y-lg) var(--btn-padding-x-lg); font-size: var(--fs-body); }
-.btn--primary { background: var(--action-primary-bg); color: var(--action-primary-fg); }
-.btn--primary:hover { background: var(--action-primary-bg-hover); }
+.btn--primary {
+  background: var(--action-primary-bg);
+  color: var(--action-primary-fg);
+  font-weight: var(--fw-bold);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: var(--btn-green-glow);
+}
+.btn--primary:hover {
+  background: var(--action-primary-bg-hover);
+  color: #fff;                       /* фон темнеет — текст уходит в белый */
+  box-shadow: var(--btn-green-glow-hover);
+  transform: translateY(-2px);
+}
+.btn--primary:active {
+  background: var(--action-primary-bg-active);
+  color: #fff;
+  transform: translateY(0);
+}
 .btn--secondary {
   background: transparent;
   color: var(--action-secondary-fg);
@@ -348,11 +364,19 @@ body { margin: 0; }
 }
 .btn--secondary:hover { background: var(--action-secondary-bg-hover); }
 .btn--on-dark {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   color: var(--neutral-0);
-  border-color: var(--neutral-0);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  font-weight: var(--fw-semibold);
 }
-.btn--on-dark:hover { background: rgba(255, 255, 255, 0.1); }
+.btn--on-dark:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: var(--neutral-0);
+  color: var(--neutral-0);
+  transform: translateY(-2px);
+}
 .btn--dark { background: var(--neutral-900); color: var(--neutral-0); }
 .btn--dark:hover { background: var(--neutral-800); }
 .btn__arrow {
@@ -363,11 +387,11 @@ body { margin: 0; }
 /* Hero CTA — усиленная primary-кнопка с inline-SVG стрелкой */
 .btn--cta {
   padding: var(--btn-padding-y-lg, 16px) var(--btn-padding-x-lg, 32px);
-  box-shadow: 0 10px 24px -8px rgba(31, 94, 120, 0.55);
+  box-shadow: var(--btn-green-glow);
 }
 .btn--cta:hover {
-  box-shadow: 0 14px 30px -8px rgba(31, 94, 120, 0.72);
-  transform: translateY(-1px);
+  box-shadow: var(--btn-green-glow-hover);
+  transform: translateY(-2px);
 }
 .btn__ico {
   display: inline-block;
@@ -543,6 +567,23 @@ section.hero--home { min-height: 44vh; }
   width: 1px; height: 32px;
   background: linear-gradient(to bottom, transparent, var(--neutral-0));
   animation: scroll-pulse 2s var(--ease-in-out-soft) infinite;
+}
+/* Скролл-подсказка стала рабочей ссылкой на секцию каталога: строка
+   с текстом и стрелкой вместо пассивной надписи «Scroll» с линией. */
+.hero__scroll {
+  flex-direction: row;
+  gap: var(--sp-2);
+  color: rgba(255, 255, 255, 0.7);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.hero__scroll:hover { color: var(--brand-green-bright); }
+.hero__scroll-arrow { animation: hero-scroll-bounce 1.8s var(--ease-in-out-soft) infinite; }
+@keyframes hero-scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__scroll-arrow { animation: none; }
 }
 /* ============================================================
    STATS — инфографика-разделитель между hero и lead-gen

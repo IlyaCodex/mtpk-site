@@ -228,11 +228,22 @@
   --border-brand:    var(--teal-600);
   --border-focus:    var(--teal-600);
 
-  /* ---- Interactive (CTA / actions) ---- */
-  --action-primary-bg:        var(--teal-600);
-  --action-primary-bg-hover:  var(--teal-700);
-  --action-primary-bg-active: var(--teal-800);
-  --action-primary-fg:        var(--neutral-0);
+  /* ---- Interactive (CTA / actions) ----
+     CTA переведены с тёмно-бирюзового на фирменный зелёный: по Метрике
+     кнопки первого экрана и шапки «слепли» на тёмном фото цеха.
+     Текст — глубокий графит, контраст к #4FAB3A ~6:1 (WCAG AAA);
+     белый на этом зелёном дал бы всего 2.4:1. */
+  --brand-green-bright: #4FAB3A;   /* = --green-500, основной акцент */
+  --brand-green-hover:  #3C8E33;
+  --brand-green-active: #2F702A;
+
+  --action-primary-bg:        var(--brand-green-bright);
+  --action-primary-bg-hover:  var(--brand-green-hover);
+  --action-primary-bg-active: var(--brand-green-active);
+  --action-primary-fg:        #0A1C25;
+
+  --btn-green-glow:       0 8px 20px -4px rgba(79, 171, 58, 0.45);
+  --btn-green-glow-hover: 0 12px 28px -4px rgba(79, 171, 58, 0.65);
 
   --action-secondary-bg:        transparent;
   --action-secondary-bg-hover:  var(--teal-50);
