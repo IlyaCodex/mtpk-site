@@ -2569,3 +2569,168 @@ body.nav-open { overflow: hidden; }
   font-size: var(--fs-micro);
   color: var(--text-tertiary);
 }
+
+/* ============================================================
+   БЫСТРЫЕ ЛИД-ФОРМЫ: карточка в hero и микроформа в шапке.
+   ТЗ 2026-09-10. Обе — обычные .js-lead-form, поэтому едут по той же
+   трубе, что и остальные заявки (honeypot, form_ts, source, send.php).
+   Обещание срока — «в течение рабочего дня»: так уже написано в
+   показателях главной и в основной форме, 10 минут им противоречили.
+   ============================================================ */
+
+/* ---- Двухколоночный hero: текст слева, карточка заявки справа ---- */
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr);
+  gap: var(--sp-10);
+  align-items: center;
+  width: 100%;
+}
+@media (max-width: 960px) {
+  .hero__grid { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); }
+}
+.hero__left, .hero__right { min-width: 0; }
+
+/* ---- Карточка быстрой заявки (тёмное стекло) ---- */
+.hero-quick-card {
+  background: rgba(16, 31, 38, 0.75);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: var(--sp-7) var(--sp-6);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 2;
+}
+.hero-quick-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(79, 171, 58, 0.15);
+  border: 1px solid rgba(79, 171, 58, 0.4);
+  color: #8FCC7B;
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: var(--sp-3);
+}
+.hero-quick-card__title {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: var(--fw-bold);
+  line-height: 1.2;
+  margin: 0 0 6px;
+}
+.hero-quick-card__subtitle {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0 0 var(--sp-5);
+}
+.hero-quick-card__form { display: flex; flex-direction: column; gap: var(--sp-3); }
+.hero-quick-card__input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  padding: 12px 14px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  transition: border-color 150ms var(--ease-out), background 150ms var(--ease-out);
+}
+.hero-quick-card__input::placeholder { color: rgba(255, 255, 255, 0.45); }
+.hero-quick-card__input:focus {
+  outline: none;
+  border-color: var(--brand-green-bright);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(79, 171, 58, 0.25);
+}
+.hero-quick-card__btn {
+  width: 100%;
+  justify-content: center;
+  padding: 13px 20px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.hero-quick-card__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-size: 11px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.6);
+}
+.hero-quick-card__consent input { margin-top: 2px; flex: 0 0 auto; accent-color: var(--brand-green-bright); }
+.hero-quick-card__consent a { color: rgba(255, 255, 255, 0.85); text-decoration: underline; }
+.hero-quick-card .js-form-status { font-size: 13px; }
+
+/* ---- Микроформа «перезвонить» в шапке ---- */
+.header-quick-form {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  padding: 2px;
+  position: relative;
+  transition: border-color 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+}
+.header-quick-form:focus-within {
+  border-color: var(--brand-green-bright);
+  box-shadow: 0 0 0 2px rgba(79, 171, 58, 0.25);
+}
+.header-quick-form__input {
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  width: 120px;
+}
+.header-quick-form__input::placeholder { color: var(--text-tertiary); }
+.header-quick-form__input:focus { outline: none; }
+.header-quick-form__btn {
+  background: var(--action-primary-bg);
+  color: var(--action-primary-fg);
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms var(--ease-out);
+}
+.header-quick-form__btn:hover { background: var(--action-primary-bg-hover); }
+.header-quick-form__hint {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--green-700);
+  white-space: nowrap;
+  opacity: 0.9;
+}
+/* Микроформа добавляет к строке шапки ~240px: с ней строка требует ~1500px,
+   без неё ~1260px. Ниже 1400px показываем только кнопку «Запросить КП / ТЗ» —
+   так на каждой ширине в шапке остаётся ровно один призыв, без переполнения. */
+@media (max-width: 1400px) {
+  .header-quick-form { display: none; }
+}

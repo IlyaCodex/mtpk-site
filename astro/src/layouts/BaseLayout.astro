@@ -236,7 +236,7 @@ const mainAttrs = index
        в один файл. Подключается ДО slot=head, чтобы дельты страницы (external/
        inline из [...slug].astro) шли после и могли переопределять ядро.
        Render-blocking + immutable-кэш (nginx max-age) — повторные визиты бесплатны. -->
-  <link rel="stylesheet" href="/css/site.css?v=20260910c">
+  <link rel="stylesheet" href="/css/site.css?v=20260910d">
   <slot name="head" />
   <!-- Mobile-fixes + stock-badges — inline в head (T-PERF-15).
        Lighthouse показывал stock.css на хвосте критической цепочки с задержкой
@@ -260,7 +260,7 @@ const mainAttrs = index
        при правке файла поднимай ?v= — иначе пользователи получат старую версию. -->
   <script src="/js/mobile-nav.js?v=20260601" defer></script>
   <script src="/js/phone-mask.js?v=20260601" defer></script>
-  <script src="/js/forms.js?v=20260908" defer></script>
+  <script src="/js/forms.js?v=20260910" defer></script>
   <!-- Единое правило скролла к форме заявки (#leadgen/#contacts → к самой форме). -->
   <script src="/js/scroll-to-form.js?v=20260608" defer></script>
   <!-- ТЗ-2 п.3: «Запросить цену» — дозапись позиции в форму + скролл. -->

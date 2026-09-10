@@ -624,7 +624,7 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
  *     Теперь она остаётся видимой, а место освобождает компактный
  *     размер: меньше паддинги, кегль и межбуквенное расстояние.
  * ============================================================ */
-@media (min-width: 1025px) and (max-width: 1280px) {
+@media (min-width: 1025px) and (max-width: 1560px) {
   /* Кнопка остаётся, но становится компактной. */
   .header__actions .btn--primary {
     padding: var(--sp-2) var(--sp-3);

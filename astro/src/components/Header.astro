@@ -295,6 +295,21 @@ const cls = (name: string) =>
       <button class="icon-btn" aria-label="Поиск" data-search-open>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       </button>
+      <!-- Экспресс-звонок. Обычная js-lead-form: honeypot, form_ts и source
+           обязательны — на них держатся антиспам и атрибуция заявки. -->
+      <form class="header-quick-form js-lead-form" data-form="Шапка: быстрый звонок">
+        <input type="text" name="hp_token" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="form_ts" class="js-form-ts">
+        <input type="hidden" name="source" class="js-form-source">
+        <input type="hidden" name="consent" value="v2026.1-implicit">
+        <input type="tel" name="phone" class="header-quick-form__input"
+               placeholder="+7 (___) ___-__-__" required autocomplete="tel"
+               aria-label="Контактный телефон для обратного звонка">
+        <button type="submit" class="header-quick-form__btn">Перезвонить</button>
+        <span class="header-quick-form__hint">Перезвоним в&nbsp;течение рабочего дня</span>
+        <span class="js-form-status" style="display:none" role="status" aria-live="polite"></span>
+      </form>
+
       <a href="#leadgen" class="btn btn--primary">
         Запросить&nbsp;КП&nbsp;/&nbsp;ТЗ <span class="btn__arrow">→</span>
       </a>

@@ -6,6 +6,8 @@
   'use strict';
 
   var ENDPOINT = '/api/send.php';
+  var YM_COUNTER = 25228307;   // Яндекс.Метрика
+  var TMR_COUNTER = 3784620;   // Top.Mail.Ru
   var forms = document.querySelectorAll('form.js-lead-form');
   if (!forms.length) return;
 
@@ -65,6 +67,25 @@
 
     var ymUid = getCookie('_ym_uid');
     if (ymUid) fd.append('_ym_uid', ymUid);
+  }
+
+  // ── Цели аналитики ───────────────────────────────────────────
+  // Целей не было вообще: конверсии форм в Метрике не считались.
+  // Шлём одну общую цель lead_form_submit и вторую — по имени формы
+  // (data-form), чтобы разделить экспресс-звонок и полную заявку.
+  function reachGoal(form) {
+    var label = (form.getAttribute('data-form') || 'lead').toLowerCase()
+      .replace(/[^a-zа-я0-9]+/gi, '_').replace(/^_+|_+$/g, '').slice(0, 40);
+    try {
+      if (typeof window.ym === 'function') {
+        window.ym(YM_COUNTER, 'reachGoal', 'lead_form_submit', { form: label });
+      }
+    } catch (e) {}
+    try {
+      if (window._tmr && typeof window._tmr.push === 'function') {
+        window._tmr.push({ type: 'reachGoal', id: TMR_COUNTER, goal: 'lead_form_submit' });
+      }
+    } catch (e) {}
   }
 
   forms.forEach(function (form) {
@@ -155,6 +176,7 @@
             // Успех → уводим на полноценную страницу «Спасибо» (/spasibo/).
             // Телефон передаём в query, чтобы там показать его для проверки
             // и предзаполнить форму, если клиент захочет исправить номер.
+            reachGoal(form);
             var phoneVal = phone ? phone.value.trim() : '';
             var url = '/spasibo/';
             if (phoneVal) url += '?phone=' + encodeURIComponent(phoneVal);
