@@ -3,6 +3,49 @@
   .contacts-hero { padding: var(--sp-16, 64px) 0 var(--sp-10, 40px); background: var(--surface-page, #fff); }
   .contacts-hero .s-lead { max-width: 60ch; }
 
+  /* ===== Форма обратной связи (перенесена снизу наверх) ===== */
+  .contact-form { padding: 0 0 var(--section-py-base, 96px); background: var(--surface-page, #fff); }
+  .contact-form__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: var(--sp-16, 64px);
+    align-items: center;
+  }
+  .contact-form__intro .s-eyebrow { margin-bottom: var(--sp-4); }
+  .contact-form__title {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 2.6vw, 36px);
+    font-weight: var(--fw-semibold);
+    line-height: 1.15;
+    letter-spacing: var(--ls-h2);
+    color: var(--text-primary);
+    margin: 0 0 var(--sp-5);
+  }
+  .contact-form__title em { font-style: normal; color: var(--text-brand); }
+  .contact-form__lead { font-size: var(--fs-lead); color: var(--text-secondary); line-height: var(--lh-body); max-width: 46ch; margin: 0 0 var(--sp-8); }
+  .contact-form__list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+  .contact-form__list li { display: flex; align-items: flex-start; gap: var(--sp-3); color: var(--text-primary); line-height: 1.5; }
+  .contact-form__list svg { flex-shrink: 0; color: var(--teal-600); margin-top: 3px; }
+  /* каноническая форма — копия правил из hub-catalog.css */
+  .form { background: var(--neutral-0); color: var(--text-primary); padding: var(--sp-10); position: relative; border-top: 3px solid var(--teal-600); box-shadow: 0 24px 60px -20px rgba(16,31,38,.15), 0 2px 8px rgba(16,31,38,.04); }
+  .form::before { content: ""; position: absolute; top: 0; right: 0; width: 64px; height: 3px; background: var(--green-500); }
+  .form__title { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: var(--fw-semibold); margin: 0 0 var(--sp-8); color: var(--text-primary); letter-spacing: var(--ls-h3); }
+  .form__label { display: block; font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); margin-bottom: var(--sp-2); }
+  .form__input, .form__textarea { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--border-default); color: var(--text-primary); font-family: var(--font-body); font-size: var(--fs-body); padding: var(--sp-3) 0; outline: none; transition: border-color var(--duration-base) var(--ease-out); }
+  .form__input::placeholder, .form__textarea::placeholder { color: var(--text-tertiary); opacity: .6; }
+  .form__input:focus, .form__textarea:focus { border-bottom-color: var(--teal-600); box-shadow: none; }
+  .form__textarea { resize: vertical; min-height: 56px; line-height: 1.5; }
+  .form__check { display: flex; align-items: flex-start; gap: var(--sp-3); margin: var(--sp-8) 0; font-size: var(--fs-caption); color: var(--text-secondary); line-height: 1.5; cursor: pointer; }
+  .form__check input { margin-top: 3px; accent-color: var(--teal-600); }
+  .form__check a { color: var(--teal-600); text-decoration: underline; }
+  .form__submit { width: 100%; background: var(--action-primary-bg); color: var(--action-primary-fg); border: 0; padding: var(--sp-5) var(--sp-6); font-family: var(--font-display); font-size: var(--fs-body); font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: var(--ls-caps); cursor: pointer; display: inline-flex; align-items: center; justify-content: space-between; gap: var(--sp-3); transition: background var(--duration-base) var(--ease-out); }
+  .form__submit:hover { background: var(--action-primary-bg-hover); }
+  @media (max-width: 1024px) {
+    .contact-form__grid { grid-template-columns: minmax(0, 1fr); gap: var(--sp-10); }
+    .form__row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) { .form { padding: var(--sp-8) var(--sp-6); } }
+
   /* ===== Способы связи ===== */
   .contact-methods { padding: 0 0 var(--section-py-base, 96px); background: var(--surface-page, #fff); }
   .contact-methods__grid {
@@ -179,6 +222,77 @@
         <span class="contact-card__value">Мессенджер MAX</span>
         <span class="contact-card__sub">Написать в&nbsp;MAX</span>
       </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ФОРМА ОБРАТНОЙ СВЯЗИ — слева призыв, справа каноническая форма
+     ============================================================ -->
+<section class="contact-form" aria-label="Форма обратной связи">
+  <div class="container">
+    <div class="contact-form__grid">
+
+      <div class="contact-form__intro">
+        <div class="s-eyebrow">Обратная связь</div>
+        <h2 class="contact-form__title">Или свяжитесь с&nbsp;нами через <em>форму обратной связи</em></h2>
+        <p class="contact-form__lead">Опишите задачу или приложите техническое задание&nbsp;— инженер разберёт запрос и&nbsp;ответит по&nbsp;существу.</p>
+        <ul class="contact-form__list">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Подбор оборудования под&nbsp;ваш металл, режим и&nbsp;объёмы</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Расчёт стоимости, сроков и&nbsp;схемы поставки</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Ответ в&nbsp;течение рабочего дня</span></li>
+        </ul>
+      </div>
+
+      <form class="form js-lead-form" data-form="Контакты: обратная связь">
+        <h3 class="form__title">Напишите нам</h3>
+
+        <input type="text" name="hp_token" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="form_ts" class="js-form-ts">
+        <input type="hidden" name="source" class="js-form-source">
+
+        <div class="form__field">
+          <label class="form__label" for="cf-name">Имя <span aria-hidden="true">*</span></label>
+          <input class="form__input" type="text" name="name" id="cf-name" placeholder="Иван Петров" autocomplete="name" required>
+        </div>
+
+        <div class="form__row">
+          <div class="form__field">
+            <label class="form__label" for="cf-email">Эл. почта</label>
+            <input class="form__input" type="email" name="email" id="cf-email" placeholder="ivan@company.ru" autocomplete="email">
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="cf-phone">Телефон <span aria-hidden="true">*</span></label>
+            <input class="form__input" type="tel" name="phone" id="cf-phone" placeholder="+7 (___) ___-__-__" autocomplete="tel" required>
+          </div>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="cf-task">Сообщение</label>
+          <textarea class="form__textarea" name="task" id="cf-task" rows="3" placeholder="Например: нужна индукционная печь для чугуна на 1 т; интересуют сроки и стоимость"></textarea>
+        </div>
+
+        <div class="form__field">
+          <span class="form__label">Техническое задание или паспорт</span>
+          <label class="form__file" for="cf-file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Прикрепить файл
+            <input type="file" name="file" id="cf-file" hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+          </label>
+          <span class="form__hint">PDF, DOC, XLS, JPG или PNG, до&nbsp;10&nbsp;МБ</span>
+        </div>
+
+        <label class="form__check">
+          <input type="checkbox" name="consent" value="v2026.1" required>
+          <span>Я&nbsp;соглашаюсь с&nbsp;<a href="/policy/" target="_blank" rel="noopener">политикой обработки персональных данных</a> и&nbsp;<a href="/soglasie/" target="_blank" rel="noopener">даю согласие на&nbsp;их&nbsp;обработку</a></span>
+        </label>
+
+        <button type="submit" class="form__submit">
+          Отправить сообщение <span class="btn__arrow">→</span>
+        </button>
+        <div class="js-form-status" style="display:none" role="status" aria-live="polite"></div>
+      </form>
 
     </div>
   </div>
@@ -506,4 +620,3 @@
 <!-- ============================================================
      CTA — «Подготовим лучшее предложение»
      ============================================================ -->
-<!--C:best-offer-->
