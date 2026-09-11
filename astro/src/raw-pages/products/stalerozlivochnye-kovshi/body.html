@@ -25,6 +25,7 @@
       <span class="breadcrumb__current">Сталеразливочные ковши</span>
     </nav>
 
+    <div class="cat-hero__grid">
     <div class="cat-hero__body">
       <div class="cat-hero__eyebrow">Литейная оснастка</div>
       <h1 class="cat-hero__title">Сталеразливочные <em>ковши</em></h1>
@@ -34,6 +35,35 @@
       <div class="cat-hero__actions">
         <a href="/products/" class="btn btn--primary">Перейти в каталог <span class="btn__arrow">→</span></a>
         <a href="#leadgen" class="btn btn--on-dark">Подобрать ковш <span class="btn__arrow">→</span></a>
+      </div>
+    </div>
+      <!-- Экспресс-заявка: телефон + звонок. Обычная js-lead-form. -->
+      <div class="cat-hero__aside">
+        <div class="hero-quick-card">
+          <div class="hero-quick-card__badge">Перезвоним в&nbsp;течение 10&nbsp;минут</div>
+          <h2 class="hero-quick-card__title">Экспресс-расчёт и&nbsp;консультация</h2>
+          <p class="hero-quick-card__subtitle">Инженер подберёт модель под&nbsp;ваш металл и&nbsp;пришлёт расчёт стоимости.</p>
+
+          <form class="hero-quick-card__form js-lead-form" data-form="Экспресс-заявка">
+            <input type="text" name="hp_token" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <input type="hidden" name="form_ts" class="js-form-ts">
+            <input type="hidden" name="source" class="js-form-source">
+
+            <input type="tel" name="phone" class="hero-quick-card__input"
+                   placeholder="+7 (___) ___-__-__" required autocomplete="tel"
+                   aria-label="Контактный телефон">
+
+            <button type="submit" class="btn btn--primary hero-quick-card__btn">
+              Жду звонка <span class="btn__arrow">→</span>
+            </button>
+
+            <label class="hero-quick-card__consent">
+              <input type="checkbox" name="consent" value="v2026.1" required>
+              <span>Согласен с&nbsp;<a href="/policy/" target="_blank" rel="noopener">политикой обработки персональных данных</a></span>
+            </label>
+            <div class="js-form-status" style="display:none" role="status" aria-live="polite"></div>
+          </form>
+        </div>
       </div>
     </div>
   </div>

@@ -2745,3 +2745,20 @@ body.nav-open { overflow: hidden; }
 @media (max-width: 1024px) {
   .header-quick-form { display: none; }
 }
+
+/* ---- Карточка экспресс-заявки в hero разделов и категорий (.cat-hero) ----
+   Та же .hero-quick-card, что на главной. Текст слева, карточка справа;
+   на планшете и телефоне складываются в одну колонку. */
+.cat-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr);
+  gap: var(--sp-10);
+  align-items: center;
+  width: 100%;
+}
+.cat-hero__grid .cat-hero__body { max-width: none; }
+.cat-hero__aside { min-width: 0; }
+@media (max-width: 960px) {
+  .cat-hero__grid { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); }
+  .cat-hero__aside { max-width: 560px; }
+}
