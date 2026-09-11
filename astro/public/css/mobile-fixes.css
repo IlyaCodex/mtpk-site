@@ -55,6 +55,7 @@
     gap: var(--sp-3);
   }
   .header-top__inner .contact-link:not(.contact-link--phone),
+  .header-top__inner .contact-hours,
   .header-top__inner .contact-sep {
     display: none;
   }

@@ -12,6 +12,15 @@ const cls = (name: string) =>
   <div class="header-top">
     <div class="container header-top__inner">
 
+      <span class="contact-hours" aria-label="Режим работы">
+        <svg class="contact-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+        </svg>
+        Режим работы 9:00–18:00 по&nbsp;времени ЕКБ
+      </span>
+
+      <span class="contact-sep"></span>
+
       <a href="tel:+73512116597" class="contact-link contact-link--phone" aria-label="Позвонить">
         <svg class="contact-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -306,7 +315,7 @@ const cls = (name: string) =>
                placeholder="+7 (___) ___-__-__" required autocomplete="tel"
                aria-label="Контактный телефон для обратного звонка">
         <button type="submit" class="header-quick-form__btn">Перезвонить</button>
-        <span class="header-quick-form__hint">Перезвоним в&nbsp;течение рабочего дня</span>
+        <span class="header-quick-form__hint">Перезвоним в&nbsp;течение 10&nbsp;минут</span>
         <span class="js-form-status" style="display:none" role="status" aria-live="polite"></span>
       </form>
 

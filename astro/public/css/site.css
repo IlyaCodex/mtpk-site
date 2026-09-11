@@ -60,6 +60,17 @@ body { margin: 0; }
 }
 .contact-link:hover .contact-link__icon { color: var(--text-brand); }
 .contact-link--phone { font-family: var(--font-body); font-variant-numeric: tabular-nums; }
+/* Режим работы в верхней строке: оформлен как контакт, но это не ссылка.
+   Он же поясняет, в какие часы действует обещание «перезвоним за 10 минут». */
+.contact-hours {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-small);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 .contact-sep {
   width: 1px;
   height: 16px;
