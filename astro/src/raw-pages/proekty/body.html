@@ -207,7 +207,7 @@
     <div class="video-grid">
 
       <article class="video-tile">
-        <div class="video-tile__cover yt-lite" data-yt="9ADp0NsPluE" tabindex="0" role="button" aria-label="Воспроизвести: Запуск индукционной плавильной печи 350 кг, серии УИ-0.35Т-300кВт">
+        <div class="video-tile__cover vk-lite" data-vk-oid="-134774817" data-vk-id="456239085" data-vk-hash="68afab658f047e1f" style="background-image:url('/img/video/vk-ui-0-35t-300-poster.webp')" tabindex="0" role="button" aria-label="Воспроизвести: Запуск индукционной плавильной печи 350 кг, серии УИ-0.35Т-300кВт">
           <span class="video-tile__play" aria-hidden="true">
             <svg viewBox="0 0 64 64" fill="none">
               <circle cx="32" cy="32" r="30" fill="rgba(16,31,38,0.55)" stroke="white" stroke-width="2"/>
@@ -217,12 +217,12 @@
         </div>
         <div class="video-tile__body">
           <h3 class="video-tile__title">Запуск индукционной плавильной печи 350&nbsp;кг · УИ-0.35Т-300&nbsp;кВт</h3>
-          <div class="video-tile__meta">YouTube · УралИндуктор</div>
+          <div class="video-tile__meta">VK Видео · УралИндуктор</div>
         </div>
       </article>
 
       <article class="video-tile">
-        <div class="video-tile__cover yt-lite" data-yt="ruJezY2-sr0" tabindex="0" role="button" aria-label="Воспроизвести: Запуск индукционной плавильной печи 450 кг, серии УИ-0.45Т-400кВт">
+        <div class="video-tile__cover vk-lite" data-vk-oid="-134774817" data-vk-id="456239084" data-vk-hash="08e402b16c9d0d38" style="background-image:url('/img/video/vk-ui-0-45t-400-poster.webp')" tabindex="0" role="button" aria-label="Воспроизвести: Запуск индукционной плавильной печи 450 кг, серии УИ-0.45Т-400кВт">
           <span class="video-tile__play" aria-hidden="true">
             <svg viewBox="0 0 64 64" fill="none">
               <circle cx="32" cy="32" r="30" fill="rgba(16,31,38,0.55)" stroke="white" stroke-width="2"/>
@@ -232,12 +232,12 @@
         </div>
         <div class="video-tile__body">
           <h3 class="video-tile__title">Запуск индукционной плавильной печи 450&nbsp;кг · УИ-0.45Т-400&nbsp;кВт</h3>
-          <div class="video-tile__meta">YouTube · УралИндуктор</div>
+          <div class="video-tile__meta">VK Видео · УралИндуктор</div>
         </div>
       </article>
 
       <article class="video-tile">
-        <div class="video-tile__cover yt-lite" data-yt="KcAHZ4FnG80" tabindex="0" role="button" aria-label="Воспроизвести: Вертикальная линия непрерывного литья МНЛЗ">
+        <div class="video-tile__cover vk-lite" data-vk-oid="-134774817" data-vk-id="456239083" data-vk-hash="da799de6c3e361fc" style="background-image:url('/img/video/vk-mnlz-poster.webp')" tabindex="0" role="button" aria-label="Воспроизвести: Вертикальная линия непрерывного литья МНЛЗ">
           <span class="video-tile__play" aria-hidden="true">
             <svg viewBox="0 0 64 64" fill="none">
               <circle cx="32" cy="32" r="30" fill="rgba(16,31,38,0.55)" stroke="white" stroke-width="2"/>
@@ -247,7 +247,7 @@
         </div>
         <div class="video-tile__body">
           <h3 class="video-tile__title">Вертикальная линия непрерывного литья (МНЛЗ)</h3>
-          <div class="video-tile__meta">YouTube · УралИндуктор</div>
+          <div class="video-tile__meta">VK Видео · УралИндуктор</div>
         </div>
       </article>
 
@@ -370,53 +370,21 @@
     switchTo('induction', 0);
   });
 
-  // — YouTube lite-iframe: превью → iframe с autoplay по клику —
+  // — VK Видео lite-iframe: постер → iframe с autoplay по клику —
   (function(){
-    const tiles = document.querySelectorAll('.yt-lite[data-yt]');
-    if (!tiles.length) return;
-    tiles.forEach(el => {
-      const id = el.dataset.yt;
-
-      // Превью: если задан data-yt-poster — используем его, иначе пробуем
-      // YouTube CDN в порядке убывания качества: maxres → sd → hq.
-      // maxresdefault часто 404 (приходит 1KB-заглушка-плеер) — проверяем
-      // размер ответа, не только onload.
-      const poster = el.dataset.ytPoster;
-      if (poster) {
-        el.style.backgroundImage = `url('${poster}')`;
-      } else {
-        const variants = [
-          `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
-          `https://i.ytimg.com/vi/${id}/sddefault.jpg`,
-          `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
-        ];
-        (function tryNext(idx){
-          if (idx >= variants.length) return;
-          const img = new Image();
-          img.onload = () => {
-            // YouTube возвращает заглушку 120×90 если нет maxresdefault.
-            // Если высота меньше 200px — пробуем следующий.
-            if (img.naturalWidth < 320 && idx < variants.length - 1) {
-              tryNext(idx + 1);
-            } else {
-              el.style.backgroundImage = `url('${variants[idx]}')`;
-            }
-          };
-          img.onerror = () => tryNext(idx + 1);
-          img.src = variants[idx];
-        })(0);
-      }
-
-      // активация: клик или Enter/Space
+    // VK Видео: постер лежит в background-image плитки, плеер создаётся по клику.
+    document.querySelectorAll('.vk-lite').forEach(el => {
+      const oid = el.getAttribute('data-vk-oid'), id = el.getAttribute('data-vk-id'), hash = el.getAttribute('data-vk-hash');
+      if (!oid || !id || !hash) return;
       const activate = () => {
         if (el.classList.contains('is-playing')) return;
         el.classList.add('is-playing');
         const iframe = document.createElement('iframe');
-        iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
-        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.src = `https://vkvideo.ru/video_ext.php?oid=${oid}&id=${id}&hash=${hash}&hd=3&autoplay=1`;
+        iframe.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock';
         iframe.referrerPolicy = 'strict-origin-when-cross-origin';
         iframe.allowFullscreen = true;
-        iframe.title = el.getAttribute('aria-label') || 'YouTube video';
+        iframe.title = el.getAttribute('aria-label') || 'VK Видео';
         el.appendChild(iframe);
       };
       el.addEventListener('click', activate);
