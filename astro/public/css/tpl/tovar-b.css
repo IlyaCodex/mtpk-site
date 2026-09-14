@@ -515,3 +515,59 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
    оглавление (900px). Иначе на 901-1024px сетка уже одноколоночная,
    а sticky-оглавление ещё видимо и наезжает на текст при прокрутке. */
 @media (max-width: 900px) { .spec__layout { grid-template-columns: minmax(0, 1fr); } }
+
+/* ============================================================
+   Карусель фото в карточке (.phero__stage / .phero__nav / .phero__counter)
+   Разметку создаёт /js/phero-gallery.js. Сцена со скруглением,
+   стрелки поверх, счётчик; лента превью без полосы прокрутки.
+   ============================================================ */
+.phero__stage { position: relative; border-radius: 14px; overflow: hidden; }
+.phero__stage .phero__main { border-radius: 14px; border-color: var(--border-subtle); }
+.phero__stage .phero__main img { transition: opacity 220ms var(--ease-out), transform var(--duration-slow, 400ms) var(--ease-out); }
+.phero__stage .phero__main img.is-switching { opacity: 0.35; }
+.phero__stage .phero__main:hover img { transform: none; }
+
+.phero__nav {
+  position: absolute; top: 50%; z-index: 3;
+  width: 44px; height: 44px; margin-top: -22px;
+  border-radius: 50%; border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.85);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  color: var(--text-primary);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+  box-shadow: 0 6px 18px -6px rgba(16,31,38,0.35);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+}
+.phero__nav svg { width: 22px; height: 22px; }
+.phero__nav--prev { left: var(--sp-4); }
+.phero__nav--next { right: var(--sp-4); }
+.phero__stage:hover .phero__nav,
+.phero__stage:focus-within .phero__nav { opacity: 1; transform: translateY(0); }
+.phero__nav:hover { background: var(--neutral-0); color: var(--teal-600); }
+.phero__nav:focus-visible { outline: 2px solid var(--teal-600); outline-offset: 2px; opacity: 1; }
+/* на тач-экранах наведения нет — стрелки видны всегда */
+@media (hover: none) { .phero__nav { opacity: 1; transform: none; } }
+
+.phero__counter {
+  position: absolute; right: var(--sp-4); top: var(--sp-4); z-index: 3; /* низ занят бейджами «В наличии» и «Сделано в России» */
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(16,31,38,0.72); color: #fff;
+  font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-semibold);
+  letter-spacing: 0.04em; font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/* лента превью: без полосы прокрутки, скруглённые плитки, активная — рамкой */
+.phero__thumbs.is-carousel { scrollbar-width: none; padding-bottom: 2px; }
+.phero__thumbs.is-carousel::-webkit-scrollbar { display: none; }
+.phero__thumbs.is-carousel .phero__thumb {
+  border-radius: 8px; cursor: pointer; border-width: 2px; border-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  transition: border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+.phero__thumbs.is-carousel .phero__thumb:hover { transform: translateY(-2px); }
+.phero__thumbs.is-carousel .phero__thumb.is-active { border-color: var(--teal-600); box-shadow: none; }
+.phero__thumbs.is-carousel .phero__thumb img { border-radius: 6px; }

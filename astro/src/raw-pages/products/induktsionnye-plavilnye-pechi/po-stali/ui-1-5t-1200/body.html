@@ -33,15 +33,12 @@
           <img src="/img/pech-main-standard.jpg?v=3" alt="Индукционная тиристорная печь УИ-1.5Т-1200" loading="eager">
         </button>
         <div class="phero__thumbs phero__thumbs--scroll">
-          <button type="button" class="phero__thumb is-active" data-lightbox-index="0" aria-label="Фото 1"><img src="/img/pech-main-standard.jpg?v=3" alt="УИ-1.5Т-1200 — фоторендер в цеху"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="1" aria-label="Фото 2"><img src="/img/pech-15t-1.jpg?v=1" alt="УИ-1.5Т-1200 — реальное фото 1 в цеху" loading="lazy"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="2" aria-label="Фото 3"><img src="/img/pech-15t-2.jpg?v=1" alt="УИ-1.5Т-1200 — реальное фото 2 в цеху" loading="lazy"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="3" aria-label="Фото 4"><img src="/img/pech-15t-3.jpg?v=1" alt="УИ-1.5Т-1200 — реальное фото 3 в цеху" loading="lazy"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="4" aria-label="Фото 5"><img src="/img/pech-15t-4.jpg?v=1" alt="УИ-1.5Т-1200 — реальное фото 4 в цеху" loading="lazy"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="5" aria-label="Фото 6"><img src="/img/pech-15t-5.jpg?v=1" alt="УИ-1.5Т-1200 — реальное фото 5 в цеху" loading="lazy"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="6" aria-label="Фото 7"><img src="/img/pech-15t-6.jpg?v=1" alt="УИ-1.5Т-1200 — реальное фото 6 в цеху" loading="lazy"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="7" aria-label="Фото 8"><img src="/img/pech-15t-7.jpg?v=1" alt="УИ-1.5Т-1200 — реальное фото 7 в цеху" loading="lazy"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="8" aria-label="Фото 9"><img src="/img/pech-15t-8.jpg?v=1" alt="УИ-1.5Т-1200 — реальное фото 8 в цеху" loading="lazy"></button>
+          <button type="button" class="phero__thumb is-active" data-lightbox-index="0" aria-label="Фото 1"><img src="/img/pech-main-standard.jpg?v=3" data-full="/img/pech-main-standard.jpg?v=3" alt="Индукционная тиристорная печь УИ-1.5Т-1200"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="1" aria-label="Фото 2"><img src="/img/pechi/ui-1-5t-1200/t01.webp" data-full="/img/pechi/ui-1-5t-1200/01.webp" alt="Индукционная печь УИ-1.5Т-1200 — фото 1" loading="lazy"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="2" aria-label="Фото 3"><img src="/img/pechi/ui-1-5t-1200/t02.webp" data-full="/img/pechi/ui-1-5t-1200/02.webp" alt="Индукционная печь УИ-1.5Т-1200 — фото 2" loading="lazy"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="3" aria-label="Фото 4"><img src="/img/pechi/ui-1-5t-1200/t03.webp" data-full="/img/pechi/ui-1-5t-1200/03.webp" alt="Индукционная печь УИ-1.5Т-1200 — фото 3" loading="lazy"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="4" aria-label="Фото 5"><img src="/img/pechi/ui-1-5t-1200/t04.webp" data-full="/img/pechi/ui-1-5t-1200/04.webp" alt="Индукционная печь УИ-1.5Т-1200 — фото 4" loading="lazy"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="5" aria-label="Фото 6"><img src="/img/pechi/ui-1-5t-1200/t05.webp" data-full="/img/pechi/ui-1-5t-1200/05.webp" alt="Индукционная печь УИ-1.5Т-1200 — фото 5" loading="lazy"></button>
         </div>
       </div>
 
@@ -293,7 +290,7 @@
       if (images[idx]) return; // уже есть (главная и thumb с index 0 указывают на одну картинку)
       const img = el.querySelector('img');
       if (!img) return;
-      images[idx] = { src: img.getAttribute('src'), alt: img.getAttribute('alt') || '' };
+      images[idx] = { src: img.getAttribute('data-full') || img.getAttribute('src'), alt: img.getAttribute('alt') || '' };
     });
 
     const lb = document.getElementById('lightbox');
