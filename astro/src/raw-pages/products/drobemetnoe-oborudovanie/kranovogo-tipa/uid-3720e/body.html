@@ -32,11 +32,13 @@
           <span class="phero__banner">Дробемёты кранового типа</span>
           <img src="/img/model-uid-3720e.png?v=8" alt="Дробемётная установка кранового типа УИД-3720Е" loading="eager">
         </button>
-        <div class="phero__thumbs">
-          <button type="button" class="phero__thumb is-active" data-lightbox-index="0" aria-label="Фото 1"><img src="/img/model-uid-3720e.png?v=8" alt="3D-визуализация УИД-3720Е"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="1" aria-label="Фото 2"><img src="/img/uid-3720e-photo-1.jpg?v=1" alt="УИД-3720Е — фото 1"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="2" aria-label="Фото 3"><img src="/img/uid-3720e-photo-2.jpg?v=1" alt="УИД-3720Е — фото 2"></button>
-          <button type="button" class="phero__thumb" data-lightbox-index="3" aria-label="Фото 4"><img src="/img/uid-3720e-photo-3.jpg?v=1" alt="УИД-3720Е — фото 3"></button>
+        <div class="phero__thumbs phero__thumbs--scroll">
+          <button type="button" class="phero__thumb is-active" data-lightbox-index="0" aria-label="Фото 1"><img src="/img/model-uid-3720e.png?v=8" data-full="/img/model-uid-3720e.png?v=8" alt="Дробемётная установка кранового типа УИД-3720Е"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="1" aria-label="Фото 2"><img src="/img/drobemet/uid-3720e/t01.webp" data-full="/img/drobemet/uid-3720e/01.webp" alt="Дробемётная установка УИД-3720Е — фото 1" loading="lazy"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="2" aria-label="Фото 3"><img src="/img/drobemet/uid-3720e/t02.webp" data-full="/img/drobemet/uid-3720e/02.webp" alt="Дробемётная установка УИД-3720Е — фото 2" loading="lazy"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="3" aria-label="Фото 4"><img src="/img/drobemet/uid-3720e/t03.webp" data-full="/img/drobemet/uid-3720e/03.webp" alt="Дробемётная установка УИД-3720Е — фото 3" loading="lazy"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="4" aria-label="Фото 5"><img src="/img/drobemet/uid-3720e/t04.webp" data-full="/img/drobemet/uid-3720e/04.webp" alt="Дробемётная установка УИД-3720Е — фото 4" loading="lazy"></button>
+          <button type="button" class="phero__thumb" data-lightbox-index="5" aria-label="Фото 6"><img src="/img/drobemet/uid-3720e/t05.webp" data-full="/img/drobemet/uid-3720e/05.webp" alt="Дробемётная установка УИД-3720Е — фото 5" loading="lazy"></button>
         </div>
       </div>
 
@@ -296,7 +298,7 @@
       if (images[idx]) return; // уже есть (главная и thumb с index 0 указывают на одну картинку)
       const img = el.querySelector('img');
       if (!img) return;
-      images[idx] = { src: img.getAttribute('src'), alt: img.getAttribute('alt') || '' };
+      images[idx] = { src: img.getAttribute('data-full') || img.getAttribute('src'), alt: img.getAttribute('alt') || '' };
     });
 
     const lb = document.getElementById('lightbox');
