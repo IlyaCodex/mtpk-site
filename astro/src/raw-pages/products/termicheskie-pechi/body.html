@@ -1,0 +1,624 @@
+<!-- ============================================================
+     HEADER — единый белый блок с двумя визуальными рядами
+     ============================================================ -->
+
+
+<!-- Локальный override для тизер-карточек хаба:
+     наши 13 рендеров — квадратные (1:1), а .teaser-card__cover имеет
+     aspect-ratio 4:3, поэтому стандартный object-fit:cover обрезал верх/низ.
+     Делаем contain + светлый фон, чтобы конструкция печи была видна целиком. -->
+<style>
+  .teaser-grid .teaser-card__cover {
+    background: linear-gradient(180deg, #f6f8f9 0%, #eef2f4 100%);
+  }
+  .teaser-grid .teaser-card__cover img {
+    object-fit: contain;
+    padding: 12px;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>
+
+
+<!-- ============================================================
+     CAT-HERO — Термические печи
+     Фон-картинка с цехом муфельных печей, breadcrumb, eyebrow + H1 + 2 CTA.
+     Паттерн 1-в-1 с /products/drobemetnoe-oborudovanie/.
+     ============================================================ -->
+<section class="cat-hero">
+  <div class="cat-hero__image" role="img" aria-label="Муфельные и термические печи УралИндуктор"
+       style="background-image: url('/img/mufelnye-hero.jpg?v=2');"></div>
+  <div class="cat-hero__overlay"></div>
+
+  <div class="container cat-hero__content">
+    <nav class="breadcrumb" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="/products/">Каталог оборудования</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Термические печи</span>
+    </nav>
+
+    <div class="cat-hero__grid">
+    <div class="cat-hero__body">
+      <div class="cat-hero__eyebrow">Термическое оборудование</div>
+      <h1 class="cat-hero__title">Промышленные термические печи и&nbsp;комплексы термообработки</h1>
+      <p class="cat-hero__subtitle">
+        Камерные, шахтные, лабораторные, отжиговые и&nbsp;сушильные печи для&nbsp;термообработки металлов, керамики, лабораторных исследований и&nbsp;промышленных процессов сушки. Поставка по&nbsp;РФ и&nbsp;СНГ, гарантия 12&nbsp;месяцев.
+      </p>
+      <div class="cat-hero__actions">
+        <a href="/products/" class="btn btn--primary">Перейти в каталог <span class="btn__arrow">→</span></a>
+        <a href="#leadgen" class="btn btn--on-dark">Подобрать печь <span class="btn__arrow">→</span></a>
+      </div>
+    </div>
+      <!-- Экспресс-заявка: телефон + звонок. Обычная js-lead-form. -->
+      <div class="cat-hero__aside">
+        <div class="hero-quick-card">
+          <div class="hero-quick-card__badge">Перезвоним в&nbsp;течение 10&nbsp;минут</div>
+          <h2 class="hero-quick-card__title">Экспресс-расчёт и&nbsp;консультация</h2>
+          <p class="hero-quick-card__subtitle">Инженер подберёт модель под&nbsp;ваш металл и&nbsp;пришлёт расчёт стоимости.</p>
+
+          <form class="hero-quick-card__form js-lead-form" data-form="Экспресс-заявка">
+            <input type="text" name="hp_token" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <input type="hidden" name="form_ts" class="js-form-ts">
+            <input type="hidden" name="source" class="js-form-source">
+
+            <input type="tel" name="phone" class="hero-quick-card__input"
+                   placeholder="+7 (___) ___-__-__" required autocomplete="tel"
+                   aria-label="Контактный телефон">
+
+            <button type="submit" class="btn btn--primary hero-quick-card__btn">
+              Жду звонка <span class="btn__arrow">→</span>
+            </button>
+
+            <label class="hero-quick-card__consent">
+              <input type="checkbox" name="consent" value="v2026.1" required>
+              <span>Согласен с&nbsp;<a href="/policy/" target="_blank" rel="noopener">политикой обработки персональных данных</a></span>
+            </label>
+            <div class="js-form-status" style="display:none" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATS — 4 KPI раздела (доверие)
+     ============================================================ -->
+<section class="stats" aria-label="Ключевые показатели раздела">
+  <div class="container">
+    <div class="stats__grid">
+
+      <!-- 1. Опыт -->
+      <div class="stat">
+        <div class="stat__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 4h16M8 28h16"/>
+            <path d="M8 4v4l8 8 8-8V4"/>
+            <path d="M8 28v-4l8-8 8 8v4"/>
+          </svg>
+        </div>
+        <div class="stat__body">
+          <div class="stat__label">с 2013</div>
+          <div class="stat__num">13<small>&nbsp;лет</small></div>
+          <div class="stat__text">в&nbsp;термообработке металлов и&nbsp;литейном производстве</div>
+        </div>
+      </div>
+
+      <!-- 2. Температурный диапазон -->
+      <div class="stat">
+        <div class="stat__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 4v18a4 4 0 1 0 4 0V4a2 2 0 0 0-4 0z"/>
+            <circle cx="16" cy="24" r="2" fill="currentColor"/>
+            <path d="M22 8h4M22 14h4M22 20h4"/>
+          </svg>
+        </div>
+        <div class="stat__body">
+          <div class="stat__label">диапазон температур</div>
+          <div class="stat__num">до&nbsp;1&nbsp;600<small>&nbsp;°C</small></div>
+          <div class="stat__text">от&nbsp;сушки до&nbsp;высокотемпературного отжига</div>
+        </div>
+      </div>
+
+      <!-- 3. Производство в РФ -->
+      <div class="stat">
+        <div class="stat__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="12" width="24" height="14"/>
+            <rect x="8" y="17" width="4" height="9"/>
+            <rect x="15" y="17" width="3" height="5"/>
+            <path d="M4 12l4-6h16l4 6"/>
+          </svg>
+        </div>
+        <div class="stat__body">
+          <div class="stat__label">г. Миасс</div>
+          <div class="stat__num">100<small>&nbsp;%</small></div>
+          <div class="stat__text">сервис и&nbsp;ЗИП — со&nbsp;склада в&nbsp;Миассе</div>
+        </div>
+      </div>
+
+      <!-- 4. Гарантия -->
+      <div class="stat">
+        <div class="stat__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4l11 4v8c0 6.6-4.5 12.6-11 14-6.5-1.4-11-7.4-11-14V8l11-4z"/>
+            <path d="M11 16l4 4 7-7" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div class="stat__body">
+          <div class="stat__label">гарантия</div>
+          <div class="stat__num">12<small>&nbsp;мес</small></div>
+          <div class="stat__text">на&nbsp;поставленное оборудование</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CATALOG-LIST — Модельный ряд: 3 intro-card + 6 teaser-карточек категорий
+     ============================================================ -->
+<section class="catalog-list" aria-label="Каталог муфельных и термических печей">
+  <div class="container">
+    <div class="s-head">
+      <div class="s-eyebrow">Каталог</div>
+      <h2 class="s-title">Модельный <em>ряд</em></h2>
+    </div>
+
+    <div class="catalog-intro">
+
+      <div class="intro-card">
+        <div class="intro-card__label"><span class="num">01</span> Сервис и&nbsp;ЗИП</div>
+        <h3 class="intro-card__title">Сервис, ЗИП и&nbsp;быстрая<br>доставка</h3>
+        <p>
+          Муфельные и&nbsp;термические печи УралИндуктор сопровождаются полным сервисом: шефмонтаж, пусконаладка, обучение операторов и&nbsp;ремонт — от&nbsp;инженерного центра в&nbsp;г.&nbsp;<strong>Миасс, Челябинская обл.</strong> Нагревательные элементы, термопары и&nbsp;ЗИП — со&nbsp;склада в&nbsp;Миассе, доставка по&nbsp;России и&nbsp;СНГ.
+        </p>
+      </div>
+
+      <div class="intro-card">
+        <div class="intro-card__label"><span class="num">02</span> Все&nbsp;типы печей</div>
+        <h3 class="intro-card__title">Подбираем тип<br>под&nbsp;ваш процесс</h3>
+        <p>
+          Производим <strong>камерные</strong> печи для&nbsp;термообработки и&nbsp;обжига, <strong>шахтные термические</strong> для&nbsp;длинных и&nbsp;цилиндрических деталей, <strong>отжиговые</strong> для&nbsp;закалки и&nbsp;нормализации стали, <strong>сушильные камеры</strong> для&nbsp;форм и&nbsp;покрытий, <strong>лабораторные</strong> для&nbsp;точных режимов и&nbsp;<strong>специальные печи для&nbsp;термошока</strong>.
+        </p>
+      </div>
+
+      <div class="intro-card">
+        <div class="intro-card__label"><span class="num">03</span> Полный цикл</div>
+        <h3 class="intro-card__title">Не&nbsp;просто поставка —<br>сопровождение до&nbsp;запуска</h3>
+        <p>
+          Проектируем участок под&nbsp;ваш техпроцесс, изготавливаем за&nbsp;<strong>до&nbsp;95&nbsp;рабочих&nbsp;дней</strong> (или со&nbsp;склада, если позиция в&nbsp;наличии), доставляем по&nbsp;РФ и&nbsp;СНГ, шеф-монтируем нашей бригадой, проводим пусконаладку и&nbsp;<strong>обучаем операторов</strong>. Гарантия 12&nbsp;мес и&nbsp;сервисное сопровождение далее. Один договор — одна ответственность.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- 13 teaser-карточек категорий — ПОЛНЫЙ список с боевого сайта.
+         Slug'и сохранены 1-в-1 с uralinduktor.ru (включая опечатки «vykatannym»
+         и «shahnaya») — для будущего 1:1-маппинга 301-редиректов.
+         Картинки: перерисованы через GPT Image 2 / fal-ai/gpt-image-1/edit-image
+         с сохранением конструкции каждого 3D-рендера боевого как референса. -->
+    <div class="teaser-grid">
+
+      <a href="/products/termicheskie-pechi/mufelnye-pechi/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-pech.jpg?v=5" alt="Муфельная печь" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Муфельная печь</h3>
+          <p class="teaser-card__caption">Универсальная камерная печь для&nbsp;термообработки, обжига и&nbsp;нагрева — основной модельный ряд под&nbsp;разные задачи.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/kamernye-pechi/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnye-kamernye-pechi.jpg?v=5" alt="Камерные печи УИ-МКП" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Камерные печи УИ-МКП</h3>
+          <p class="teaser-card__caption">Камерные печи большого объёма для&nbsp;термообработки металлов, обжига и&nbsp;закалки — горизонтальная загрузка через распашную дверь.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/pechi-s-vykatnym-podom/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-pech-s-vykatannym-podom.jpg?v=5" alt="Печи с выкатным подом УИ-МПВП" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Печи с&nbsp;выкатным подом УИ-МПВП</h3>
+          <p class="teaser-card__caption">Большегабаритные печи с&nbsp;подом на&nbsp;рельсах — для&nbsp;термообработки крупного литья, сварных конструкций и&nbsp;штамповок.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/vertikalnye-pechi/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-vertikalnaya-pech.jpg?v=5" alt="Вертикальные печи УИ-МВКП" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Вертикальные печи УИ-МВКП</h3>
+          <p class="teaser-card__caption">Вертикальная компоновка с&nbsp;откидной дверцей сверху — компактное размещение в&nbsp;цеху и&nbsp;удобная загрузка тиглей и&nbsp;колб.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/shahtnye-pechi/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-shahnaya-pech.jpg?v=5" alt="Шахтные печи УИ-МШП" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Шахтные печи УИ-МШП</h3>
+          <p class="teaser-card__caption">Высокая вертикальная шахта для&nbsp;глубокой термообработки длинных деталей — валов, штоков, трубных заготовок.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/pechi-s-zaschitnoy-atmosferoy/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-vysoko-temperaturnaya-vakuumnaya-pech.jpg?v=5" alt="Муфельная печь в защитной атмосфере" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Муфельная печь в&nbsp;защитной атмосфере</h3>
+          <p class="teaser-card__caption">Печи с&nbsp;герметичной камерой и&nbsp;подачей инертного газа — для&nbsp;термообработки без&nbsp;окисления и&nbsp;спекания спецсплавов.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/pechi-s-podyomnym-podom/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-pech-s-podyomnym-podom.jpg?v=5" alt="Высокотемпературная муфельная печь с подъёмным подом" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Высокотемпературные муфельные печи с&nbsp;подъёмным подом</h3>
+          <p class="teaser-card__caption">Высокотемпературная печь с&nbsp;подом на&nbsp;гидро- или&nbsp;винтовом подъёме — для&nbsp;удобной загрузки тяжёлых тиглей и&nbsp;шихты.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/vakuumnye-pechi/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-vakuumnaya-mufelnaya-pech.jpg?v=5" alt="Высокотемпературная вакуумная муфельная печь" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Муфельная высоко температурная вакуумная печь</h3>
+          <p class="teaser-card__caption">Цилиндрическая вакуумная печь с&nbsp;откатным шкафом управления — для&nbsp;термообработки в&nbsp;вакууме и&nbsp;высокочистых процессов.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/zubotehnicheskie-pechi/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-pech-dlya-dantistov.jpg?v=5" alt="Зуботехнические печи УИ-МПД" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Зуботехнические печи УИ-МПД</h3>
+          <p class="teaser-card__caption">Компактная настольная печь с&nbsp;поднимающимся диском — для&nbsp;выжигания, обжига керамики и&nbsp;литья в&nbsp;стоматологии.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/pechi-dlya-ispytaniy-na-termoudar/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-pech-dlya-ispytaniya-shokovoj-temperatury.jpg?v=5" alt="Муфельная печь для испытания шоковой температурой" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Муфельная печь для&nbsp;испытания шоковой температурой</h3>
+          <p class="teaser-card__caption">Специализированная двухкамерная печь — резкая смена температуры для&nbsp;испытания материалов на&nbsp;термический шок.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/pechi-s-podyomnym-podom/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-pech-s-2-podami.jpg?v=5" alt="Муфельная печь с двумя подами" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Муфельная печь с&nbsp;двумя подами</h3>
+          <p class="teaser-card__caption">Сдвоенная камера для&nbsp;параллельного режима двух партий — независимый контроль температуры и&nbsp;серийная обработка.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/fritovye-pechi/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-mufelnaya-fritovaya-pech.jpg?v=5" alt="Фритовые печи УИ-МФП" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Фритовые печи УИ-МФП</h3>
+          <p class="teaser-card__caption">Специализированная печь для&nbsp;варки и&nbsp;обжига фритт — стекольных и&nbsp;эмалевых масс с&nbsp;высокой точностью режима.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="/products/termicheskie-pechi/trubchatye-pechi/" class="teaser-card">
+        <div class="teaser-card__cover">
+          <img src="/img/card-muf-trubchataya-mufelnaya-pech.jpg?v=5" alt="Трубчатые печи УИ-ТП" loading="lazy">
+        </div>
+        <div class="teaser-card__body">
+          <h3 class="teaser-card__title">Трубчатые печи УИ-ТП</h3>
+          <p class="teaser-card__caption">Печь с&nbsp;трубчатой нагревательной камерой — для&nbsp;проходной термообработки длинных деталей и&nbsp;лабораторных процессов в&nbsp;газовой среде.</p>
+          <span class="teaser-card__more">Подробнее <span class="btn__arrow">→</span></span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     APPLICATIONS — Применение по отраслям и задачам
+     ============================================================ -->
+<section class="applications" aria-label="Применение муфельных и термических печей">
+  <div class="container">
+    <div class="s-head">
+      <div class="s-eyebrow">Применение</div>
+      <h2 class="s-title">Под ваш процесс и&nbsp;<em>отрасль</em></h2>
+      <p class="s-lead">Подбираем тип печи, мощность и&nbsp;объём камеры под&nbsp;конкретный материал, температурный режим и&nbsp;производительность участка. Считаем энергопотребление и&nbsp;цикл, проектируем оснастку.</p>
+    </div>
+
+    <div class="applications__grid">
+
+      <!-- Термообработка металлов -->
+      <article class="app-card">
+        <div class="app-card__head">
+          <div class="app-card__icon">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="6" y="6" width="20" height="20" rx="1"/>
+              <path d="M11 11h10v10H11z" fill="currentColor" opacity="0.15"/>
+              <path d="M11 16h10"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="app-card__name">Термообработка металлов</h3>
+            <div class="app-card__temp">до&nbsp;<strong>1&nbsp;600&nbsp;°C</strong></div>
+          </div>
+        </div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Процессы</span><span class="app-card__spec-value">отжиг, нормализация, закалка, отпуск</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Материалы</span><span class="app-card__spec-value">сталь, чугун, цветные сплавы</span></li>
+        </ul>
+      </article>
+
+      <!-- Литейное производство -->
+      <article class="app-card">
+        <div class="app-card__head">
+          <div class="app-card__icon">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 26h20l-2-12H8z"/>
+              <path d="M10 14V8a6 6 0 0 1 12 0v6"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="app-card__name">Литейное производство</h3>
+            <div class="app-card__temp">до&nbsp;<strong>500&nbsp;°C</strong></div>
+          </div>
+        </div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Процессы</span><span class="app-card__spec-value">сушка форм и&nbsp;стержней, прокалка</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Циклы</span><span class="app-card__spec-value">серийные / непрерывные</span></li>
+        </ul>
+      </article>
+
+      <!-- Керамика и стекло -->
+      <article class="app-card">
+        <div class="app-card__head">
+          <div class="app-card__icon">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 26h12v-4a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4z"/>
+              <path d="M14 18V10c0-2 1-4 2-4s2 2 2 4v8"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="app-card__name">Керамика и&nbsp;стекло</h3>
+            <div class="app-card__temp">до&nbsp;<strong>1&nbsp;300&nbsp;°C</strong></div>
+          </div>
+        </div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Процессы</span><span class="app-card__spec-value">обжиг, отжиг, спекание</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Режим</span><span class="app-card__spec-value">программируемые кривые нагрева/охлаждения</span></li>
+        </ul>
+      </article>
+
+      <!-- Лаборатории -->
+      <article class="app-card">
+        <div class="app-card__head">
+          <div class="app-card__icon">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4v8L6 24c-1 2 0 4 2 4h16c2 0 3-2 2-4L20 12V4"/>
+              <path d="M10 4h12"/>
+              <circle cx="14" cy="20" r="1.2" fill="currentColor"/>
+              <circle cx="18" cy="22" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="app-card__name">Лабораторные задачи</h3>
+            <div class="app-card__temp">до&nbsp;<strong>1&nbsp;200&nbsp;°C</strong></div>
+          </div>
+        </div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Процессы</span><span class="app-card__spec-value">контроль качества, испытания, исследования</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Точность</span><span class="app-card__spec-value">±&nbsp;1&nbsp;°C, программируемые циклы</span></li>
+        </ul>
+      </article>
+
+      <!-- Сушильные процессы -->
+      <article class="app-card">
+        <div class="app-card__head">
+          <div class="app-card__icon">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 22c2-2 2-4 0-6s-2-4 0-6"/>
+              <path d="M16 22c2-2 2-4 0-6s-2-4 0-6"/>
+              <path d="M24 22c2-2 2-4 0-6s-2-4 0-6"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="app-card__name">Сушка и&nbsp;прокалка</h3>
+            <div class="app-card__temp">до&nbsp;<strong>300&nbsp;°C</strong></div>
+          </div>
+        </div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Применение</span><span class="app-card__spec-value">лакокрасочные покрытия, сыпучие материалы</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Циклы</span><span class="app-card__spec-value">стабильный режим длительный</span></li>
+        </ul>
+      </article>
+
+      <!-- Испытания материалов -->
+      <article class="app-card">
+        <div class="app-card__head">
+          <div class="app-card__icon">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 16c0-7 5-12 12-12s12 5 12 12-5 12-12 12-12-5-12-12z"/>
+              <path d="M16 4v24M4 16h24" opacity="0.4"/>
+              <circle cx="16" cy="16" r="3" fill="currentColor" opacity="0.3"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="app-card__name">Испытания материалов</h3>
+            <div class="app-card__temp"><strong>термошок</strong></div>
+          </div>
+        </div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Процессы</span><span class="app-card__spec-value">испытания на&nbsp;термошок, циклические нагрузки</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Контроль</span><span class="app-card__spec-value">программируемые перепады температур</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FULL-CYCLE — Полный цикл от подбора до сервиса
+     ============================================================ -->
+<section class="full-cycle" aria-label="Полный цикл — от подбора до сервиса">
+  <div class="container">
+    <div class="full-cycle__head">
+      <div>
+        <div class="s-eyebrow">Полный цикл</div>
+        <h2 class="s-title">Один поставщик — от&nbsp;проекта <em>до&nbsp;сервиса</em></h2>
+      </div>
+      <p class="s-lead">Проектируем под&nbsp;ваш техпроцесс, изготавливаем, шеф-монтируем на&nbsp;площадке, обучаем операторов и&nbsp;остаёмся на&nbsp;сервисе. Один договор, одна ответственность, без&nbsp;цепочки субподрядчиков.</p>
+    </div>
+
+    <ol class="full-cycle__timeline">
+
+      <li class="cycle-step">
+        <div class="cycle-step__num">01</div>
+        <div class="cycle-step__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="14" cy="14" r="8"/>
+            <path d="M20 20l6 6"/>
+          </svg>
+        </div>
+        <h3 class="cycle-step__title">Подбор и&nbsp;расчёт</h3>
+        <div class="cycle-step__meta">1&nbsp;рабочий день · бесплатно</div>
+      </li>
+
+      <li class="cycle-step">
+        <div class="cycle-step__num">02</div>
+        <div class="cycle-step__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 4h14l6 6v18H6z"/>
+            <path d="M20 4v6h6"/>
+            <path d="M10 16h12M10 20h12M10 24h8"/>
+          </svg>
+        </div>
+        <h3 class="cycle-step__title">Проектирование участка</h3>
+        <div class="cycle-step__meta">от&nbsp;2&nbsp;недель</div>
+      </li>
+
+      <li class="cycle-step">
+        <div class="cycle-step__num">03</div>
+        <div class="cycle-step__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 28V14l8 4V14l8 4V14l8 4v10z"/>
+            <path d="M4 28h24"/>
+            <rect x="8" y="22" width="3" height="4"/>
+            <rect x="14.5" y="22" width="3" height="4"/>
+            <rect x="21" y="22" width="3" height="4"/>
+          </svg>
+        </div>
+        <h3 class="cycle-step__title">Производство</h3>
+        <div class="cycle-step__meta">30–60 дней</div>
+      </li>
+
+      <li class="cycle-step">
+        <div class="cycle-step__num">04</div>
+        <div class="cycle-step__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 22h4l3-10h14l3 10h4"/>
+            <circle cx="8" cy="26" r="2.5"/>
+            <circle cx="24" cy="26" r="2.5"/>
+          </svg>
+        </div>
+        <h3 class="cycle-step__title">Поставка на&nbsp;площадку</h3>
+        <div class="cycle-step__meta">РФ и&nbsp;СНГ · обеспечиваем доставку</div>
+      </li>
+
+      <li class="cycle-step">
+        <div class="cycle-step__num">05</div>
+        <div class="cycle-step__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 6l-8 8-4-4-6 6 4 4 6-6 4 4 8-8z"/>
+            <path d="M22 6l4 4"/>
+          </svg>
+        </div>
+        <h3 class="cycle-step__title">Шефмонтаж и&nbsp;ПНР</h3>
+        <div class="cycle-step__meta">наша бригада, фикс. срок</div>
+      </li>
+
+      <li class="cycle-step">
+        <div class="cycle-step__num">06</div>
+        <div class="cycle-step__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4l12 6-12 6L4 10z"/>
+            <path d="M10 14v8c0 2 3 4 6 4s6-2 6-4v-8"/>
+          </svg>
+        </div>
+        <h3 class="cycle-step__title">Обучение персонала</h3>
+        <div class="cycle-step__meta">на&nbsp;вашей площадке + акт об&nbsp;обучении</div>
+      </li>
+
+      <li class="cycle-step">
+        <div class="cycle-step__num">07</div>
+        <div class="cycle-step__icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 13a6 6 0 0 0-12 0c0 2 1 4 3 5l-2 8h10l-2-8c2-1 3-3 3-5z"/>
+            <path d="M14 13h4"/>
+          </svg>
+        </div>
+        <h3 class="cycle-step__title">Сервис и&nbsp;модернизация</h3>
+        <div class="cycle-step__meta">гарантия&nbsp;12&nbsp;мес + сопровождение</div>
+      </li>
+
+    </ol>
+
+    <div class="full-cycle__footnote">
+      <p class="full-cycle__footnote-text">
+        <strong>Один договор, одна ответственность.</strong> От&nbsp;первого расчёта до&nbsp;сервиса после ввода в&nbsp;эксплуатацию — все этапы ведут наши инженеры из&nbsp;Миасса.
+      </p>
+      <a href="#leadgen" class="btn btn--primary">Получить расчёт под&nbsp;ключ <span class="btn__arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LEAD-GEN — Подбор и расчёт
+     ============================================================ -->
+<!--C:leadgen-->
+
+<!-- ============================================================
+     WHY-US — Почему выбирают УралИндуктор
+     ============================================================ -->
+<!--C:why-us-12-->
+
+<!-- ============================================================
+     BEST-OFFER — Подготовим лучшее предложение (1-в-1 с главной)
+     ============================================================ -->
+<!--C:best-offer-->

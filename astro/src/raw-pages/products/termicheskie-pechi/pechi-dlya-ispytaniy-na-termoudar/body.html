@@ -1,0 +1,240 @@
+<!-- ============================================================
+     HEADER — единый белый блок с двумя визуальными рядами
+     ============================================================ -->
+
+<style>
+  .muf-desc { max-width: 72ch; }
+  .muf-desc p { color: var(--text-secondary); line-height: 1.75; margin: 0 0 var(--sp-4); }
+  .muf-about { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,0.9fr); gap: var(--sp-6); align-items: start; }
+  .muf-about__media { background: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg, 12px); overflow: hidden; aspect-ratio: 4 / 3; }
+  .muf-about__media img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .spec-table-wrap { overflow-x: auto; margin-top: var(--sp-5); }
+  .spec-table { width: 100%; border-collapse: collapse; }
+  .spec-table th, .spec-table td { text-align: left; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); font-size: var(--fs-small); }
+  .spec-table thead th { color: var(--text-secondary); font-weight: var(--fw-semibold); background: var(--surface-subtle); }
+  .spec-table tbody td:first-child { font-weight: var(--fw-semibold); color: var(--text-primary); }
+  .spec-table tbody td:last-child { font-family: var(--font-mono); color: var(--text-primary); }
+  @media (max-width: 720px) { .muf-about { grid-template-columns: 1fr; } }
+</style>
+
+<!-- ============================================================
+     CAT-HERO — Муфельная печь для испытания шоковой температурой
+     ============================================================ -->
+<section class="cat-hero">
+  <div class="cat-hero__image" role="img" aria-label="Муфельная печь для испытания шоковой температурой"
+       style="background-image: url('/img/mufelnye-hero.jpg');"></div>
+  <div class="cat-hero__overlay"></div>
+
+  <div class="container cat-hero__content">
+    <nav class="breadcrumb" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="/products/">Каталог оборудования</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="/products/termicheskie-pechi/">Термические печи</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Муфельная печь для испытания шоковой температурой</span>
+    </nav>
+
+    <div class="cat-hero__grid">
+    <div class="cat-hero__body">
+      <div class="cat-hero__eyebrow">Термическое оборудование</div>
+      <h1 class="cat-hero__title">Печь МП-ИТ-1 для&nbsp;испытаний на&nbsp;термический шок</h1>
+      <p class="cat-hero__subtitle">
+        Специализированные двухкамерные печи. Резкая смена температуры — испытание материалов на термический шок.
+      </p>
+      <div class="cat-hero__actions">
+        <a href="/products/" class="btn btn--primary">Перейти в каталог <span class="btn__arrow">→</span></a>
+        <a href="#leadgen" class="btn btn--on-dark">Подобрать модель <span class="btn__arrow">→</span></a>
+      </div>
+    </div>
+      <!-- Экспресс-заявка: телефон + звонок. Обычная js-lead-form. -->
+      <div class="cat-hero__aside">
+        <div class="hero-quick-card">
+          <div class="hero-quick-card__badge">Перезвоним в&nbsp;течение 10&nbsp;минут</div>
+          <h2 class="hero-quick-card__title">Экспресс-расчёт и&nbsp;консультация</h2>
+          <p class="hero-quick-card__subtitle">Инженер подберёт модель под&nbsp;ваш металл и&nbsp;пришлёт расчёт стоимости.</p>
+
+          <form class="hero-quick-card__form js-lead-form" data-form="Экспресс-заявка">
+            <input type="text" name="hp_token" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <input type="hidden" name="form_ts" class="js-form-ts">
+            <input type="hidden" name="source" class="js-form-source">
+
+            <input type="tel" name="phone" class="hero-quick-card__input"
+                   placeholder="+7 (___) ___-__-__" required autocomplete="tel"
+                   aria-label="Контактный телефон">
+
+            <button type="submit" class="btn btn--primary hero-quick-card__btn">
+              Жду звонка <span class="btn__arrow">→</span>
+            </button>
+
+            <label class="hero-quick-card__consent">
+              <input type="checkbox" name="consent" value="v2026.1" required>
+              <span>Согласен с&nbsp;<a href="/policy/" target="_blank" rel="noopener">политикой обработки персональных данных</a></span>
+            </label>
+            <div class="js-form-status" style="display:none" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATS — 4 показателя
+     ============================================================ -->
+<section class="stats" aria-label="Ключевые показатели раздела">
+  <div class="container">
+    <div class="stats__grid">
+
+      <div class="stat">
+        <div class="stat__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="20" height="20"/><path d="M6 12h20M6 20h20"/></svg></div>
+        <div class="stat__body">
+          <div class="stat__label">модель</div>
+          <div class="stat__num">МП-ИТ-1</div>
+          <div class="stat__text">изготовление под&nbsp;заказ</div>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v18a4 4 0 1 0 4 0V4a2 2 0 0 0-4 0z"/><circle cx="16" cy="24" r="2" fill="currentColor"/><path d="M22 8h4M22 14h4M22 20h4"/></svg></div>
+        <div class="stat__body">
+          <div class="stat__label">диапазон температур</div>
+          <div class="stat__num">до&nbsp;1&nbsp;700<small>&nbsp;°C</small></div>
+          <div class="stat__text">под&nbsp;индивидуальный заказ</div>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4a4 4 0 0 1 4 4v2M12 10V8a4 4 0 0 1 4-4"/><rect x="6" y="10" width="20" height="18"/><circle cx="16" cy="19" r="3"/></svg></div>
+        <div class="stat__body">
+          <div class="stat__label">точность контроля</div>
+          <div class="stat__num">±&nbsp;1<small>&nbsp;°C</small></div>
+          <div class="stat__text">программируемые режимы нагрева и&nbsp;выдержки</div>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l11 4v8c0 6.6-4.5 12.6-11 14-6.5-1.4-11-7.4-11-14V8l11-4z"/><path d="M11 16l4 4 7-7" stroke-width="2.5"/></svg></div>
+        <div class="stat__body">
+          <div class="stat__label">гарантия</div>
+          <div class="stat__num">12<small>&nbsp;мес</small></div>
+          <div class="stat__text">на&nbsp;поставленное оборудование</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ОПИСАНИЕ — печь МП-ИТ-1 (старый сайт: модель + базовые параметры)
+     ============================================================ -->
+<section class="applications" aria-label="Описание муфельной печи для испытания шоковой температурой">
+  <div class="container">
+    <div class="s-head">
+      <div class="s-eyebrow">Описание</div>
+      <h2 class="s-title">Печь <em>МП-ИТ-1</em></h2>
+    </div>
+    <div class="muf-about">
+      <div class="muf-about__media">
+        <img src="/img/muf-shoktemp-1.jpg" alt="Муфельная печь для испытания шоковой температурой МП-ИТ-1" loading="lazy">
+      </div>
+      <div class="muf-desc">
+        <p>Муфельная печь для&nbsp;испытания шоковой температурой <strong>МП-ИТ-1</strong>&nbsp;— специализированное оборудование для&nbsp;проверки материалов и&nbsp;изделий на&nbsp;термический шок: резкая смена температуры с&nbsp;последующей оценкой стойкости к&nbsp;растрескиванию и&nbsp;разрушению.</p>
+        <p>Печь оснащена выкатным лотком и&nbsp;интегрированным шкафом управления с&nbsp;цифровой панелью. Рабочая температура, термопара и&nbsp;футеровка подбираются под&nbsp;задачу; печь изготавливается под&nbsp;заказ.</p>
+        <div class="spec-table-wrap">
+          <table class="spec-table">
+            <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+            <tbody>
+              <tr><td>Модель</td><td>МП-ИТ-1</td></tr>
+              <tr><td>Напряжение, В</td><td>380</td></tr>
+              <tr><td>Точность контроля, °C</td><td>±&nbsp;1</td></tr>
+              <tr><td>Изготовление</td><td>под&nbsp;заказ</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     APPLICATIONS — Конфигурации по температурам, термопарам, футеровке
+     ============================================================ -->
+<section class="applications" aria-label="Конфигурации под задачу">
+  <div class="container">
+    <div class="s-head">
+      <div class="s-eyebrow">Конфигурация под&nbsp;задачу</div>
+      <h2 class="s-title">Термопара и&nbsp;футеровка — <em>под&nbsp;температуру</em></h2>
+      <p class="s-lead">Любая модель собирается под&nbsp;конкретный температурный диапазон с&nbsp;подбором термопары и&nbsp;футеровки. Шесть базовых вариантов рабочей температуры — от&nbsp;800 до&nbsp;1&nbsp;700&nbsp;°C.</p>
+    </div>
+
+    <div class="applications__grid">
+      <article class="app-card">
+        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="20" height="20" rx="1"/><path d="M11 16h10"/></svg></div><div><h3 class="app-card__name">800–1&nbsp;200&nbsp;°C</h3><div class="app-card__temp">базовый диапазон</div></div></div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Термопара</span><span class="app-card__spec-value">K-типа</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Футеровка</span><span class="app-card__spec-value">керамическое волокно</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Задачи</span><span class="app-card__spec-value">сушка, обжиг, отжиг лёгких сплавов</span></li>
+        </ul>
+      </article>
+      <article class="app-card">
+        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v18a4 4 0 1 0 4 0V4a2 2 0 0 0-4 0z"/><circle cx="16" cy="24" r="2" fill="currentColor"/></svg></div><div><h3 class="app-card__name">1&nbsp;200–1&nbsp;400&nbsp;°C</h3><div class="app-card__temp">средний диапазон</div></div></div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Термопара</span><span class="app-card__spec-value">S-типа</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Футеровка</span><span class="app-card__spec-value">алюмооксидное волокно</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Задачи</span><span class="app-card__spec-value">термообработка стали, обжиг керамики</span></li>
+        </ul>
+      </article>
+      <article class="app-card">
+        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3l4 9h10l-8 6 3 11-9-7-9 7 3-11-8-6h10z"/></svg></div><div><h3 class="app-card__name">1&nbsp;400–1&nbsp;700&nbsp;°C</h3><div class="app-card__temp">высокотемпературный</div></div></div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Термопара</span><span class="app-card__spec-value">B-типа</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Футеровка</span><span class="app-card__spec-value">композит из&nbsp;оксида алюминия</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Задачи</span><span class="app-card__spec-value">обжиг спецкерамики, спекание</span></li>
+        </ul>
+      </article>
+      <article class="app-card">
+        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="20" height="16"/><path d="M6 14h20"/><circle cx="11" cy="19" r="0.7" fill="currentColor"/><circle cx="16" cy="19" r="0.7" fill="currentColor"/><circle cx="21" cy="19" r="0.7" fill="currentColor"/></svg></div><div><h3 class="app-card__name">Доработки</h3><div class="app-card__temp">под&nbsp;индивидуальный заказ</div></div></div>
+        <ul class="app-card__specs">
+          <li class="app-card__spec"><span class="app-card__spec-label">Камера</span><span class="app-card__spec-value">размер и&nbsp;геометрия под&nbsp;деталь</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Управление</span><span class="app-card__spec-value">программируемые кривые, журнал</span></li>
+          <li class="app-card__spec"><span class="app-card__spec-label">Дополнения</span><span class="app-card__spec-value">атмосфера, выкатной под, оснастка</span></li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FULL-CYCLE — Полный цикл от подбора до сервиса
+     ============================================================ -->
+<section class="full-cycle" aria-label="Полный цикл — от подбора до сервиса">
+  <div class="container">
+    <div class="full-cycle__head">
+      <div>
+        <div class="s-eyebrow">Полный цикл</div>
+        <h2 class="s-title">Один поставщик — от&nbsp;проекта <em>до&nbsp;сервиса</em></h2>
+      </div>
+      <p class="s-lead">Проектируем под&nbsp;ваш техпроцесс, изготавливаем, шеф-монтируем на&nbsp;площадке, обучаем операторов и&nbsp;остаёмся на&nbsp;сервисе.</p>
+    </div>
+    <ol class="full-cycle__timeline">
+      <li class="cycle-step"><div class="cycle-step__num">01</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="8"/><path d="M20 20l6 6"/></svg></div><h3 class="cycle-step__title">Подбор и&nbsp;расчёт</h3><div class="cycle-step__meta">1&nbsp;рабочий день · бесплатно</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">02</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h14l6 6v18H6z"/><path d="M20 4v6h6"/><path d="M10 16h12M10 20h12M10 24h8"/></svg></div><h3 class="cycle-step__title">Проектирование участка</h3><div class="cycle-step__meta">от&nbsp;2&nbsp;недель</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">03</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 28V14l8 4V14l8 4V14l8 4v10z"/><path d="M4 28h24"/><rect x="8" y="22" width="3" height="4"/><rect x="14.5" y="22" width="3" height="4"/><rect x="21" y="22" width="3" height="4"/></svg></div><h3 class="cycle-step__title">Производство</h3><div class="cycle-step__meta">30–60 дней</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">04</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h4l3-10h14l3 10h4"/><circle cx="8" cy="26" r="2.5"/><circle cx="24" cy="26" r="2.5"/></svg></div><h3 class="cycle-step__title">Поставка на&nbsp;площадку</h3><div class="cycle-step__meta">РФ и&nbsp;СНГ · обеспечиваем доставку</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">05</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6l-8 8-4-4-6 6 4 4 6-6 4 4 8-8z"/><path d="M22 6l4 4"/></svg></div><h3 class="cycle-step__title">Шефмонтаж и&nbsp;ПНР</h3><div class="cycle-step__meta">наша бригада, фикс. срок</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">06</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l12 6-12 6L4 10z"/><path d="M10 14v8c0 2 3 4 6 4s6-2 6-4v-8"/></svg></div><h3 class="cycle-step__title">Обучение персонала</h3><div class="cycle-step__meta">на&nbsp;вашей площадке + акт об&nbsp;обучении</div></li>
+      <li class="cycle-step"><div class="cycle-step__num">07</div><div class="cycle-step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 13a6 6 0 0 0-12 0c0 2 1 4 3 5l-2 8h10l-2-8c2-1 3-3 3-5z"/><path d="M14 13h4"/></svg></div><h3 class="cycle-step__title">Сервис и&nbsp;модернизация</h3><div class="cycle-step__meta">гарантия&nbsp;12&nbsp;мес + сопровождение</div></li>
+    </ol>
+    <div class="full-cycle__footnote">
+      <p class="full-cycle__footnote-text"><strong>Один договор, одна ответственность.</strong> От&nbsp;первого расчёта до&nbsp;сервиса после ввода в&nbsp;эксплуатацию — все этапы ведут наши инженеры из&nbsp;Миасса.</p>
+      <a href="#leadgen" class="btn btn--primary">Получить расчёт под&nbsp;ключ <span class="btn__arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!--C:leadgen-->
+<!--C:why-us-12-->
+<!--C:best-offer-->
