@@ -665,5 +665,11 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
    развёрнутые значения («380 В, 3 фазы, N и PE; 50 Гц»). Из-за nowrap карточка
    не могла сузиться, и сетка из трёх колонок распирала страницу. */
 .pcard-grid > *, .scard-grid > *, .subcat-grid > *, .teaser-grid > * { min-width: 0; }
-.pcard__spec dd, .pcard__spec dt { white-space: normal; overflow-wrap: anywhere; }
+.pcard__spec dd { white-space: normal; overflow-wrap: anywhere; }
+/* Подписи переносим только по словам: anywhere обнуляет их min-content, и при
+   длинном значении рядом («сталь/чугун 1 кг; медь/бронза 2 кг; алюминий 0,5 кг;
+   золото 1 кг» у УИ-1П) колонка сжималась до 78px, а «Номинальная» рвалась
+   на «Номиналь/ная». break-word от переполнения защищает так же, но держит
+   min-content по самому длинному слову. */
+.pcard__spec dt { white-space: normal; overflow-wrap: break-word; }
 .pcard__title, .pcard__cover img { min-width: 0; max-width: 100%; }
