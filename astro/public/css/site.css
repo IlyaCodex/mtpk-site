@@ -2822,3 +2822,43 @@ body.nav-open { overflow: hidden; }
 .phero__thumbs.is-carousel .phero__thumb:hover { transform: translateY(-2px); }
 .phero__thumbs.is-carousel .phero__thumb.is-active { border-color: var(--teal-600); box-shadow: none; }
 .phero__thumbs.is-carousel .phero__thumb img { border-radius: 6px; }
+
+/* ============================================================
+   MODELNAV — переход к соседним моделям ряда (ТЗ градирен §4.3)
+   Две ссылки по краям строки: слева предыдущая, справа следующая.
+   На краях ряда вместо ссылки стоит распорка, чтобы одиночная
+   ссылка осталась у своего края, а не съехала в центр.
+   ============================================================ */
+/* Фон задаётся явно: блок стоит между маркетинговыми секциями, часть
+   которых тёмная, и без своего фона две белые карточки висят в тёмной
+   полосе. */
+.modelnav {
+  padding: var(--sp-10) 0;
+  background: var(--surface-subtle);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.modelnav__row { display: flex; justify-content: space-between; gap: var(--sp-6); }
+.modelnav__spacer { flex: 1 1 0; }
+.modelnav__link {
+  flex: 1 1 0; display: flex; flex-direction: column; gap: var(--sp-1);
+  padding: var(--sp-5) var(--sp-6); text-decoration: none;
+  border: 1px solid var(--border-subtle); background: var(--neutral-0);
+  transition: border-color var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+.modelnav__link:hover { border-color: var(--teal-600); transform: translateY(-2px); }
+.modelnav__link--next { text-align: right; }
+.modelnav__dir {
+  font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold);
+  text-transform: uppercase; letter-spacing: var(--ls-eyebrow); color: var(--text-tertiary);
+}
+.modelnav__name {
+  font-family: var(--font-display); font-size: var(--fs-h4);
+  font-weight: var(--fw-semibold); color: var(--text-primary);
+}
+@media (max-width: 640px) {
+  .modelnav__row { flex-direction: column; }
+  .modelnav__link--next { text-align: left; }
+  .modelnav__spacer { display: none; }
+}
