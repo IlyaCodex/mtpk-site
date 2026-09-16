@@ -2862,3 +2862,19 @@ body.nav-open { overflow: hidden; }
   .modelnav__link--next { text-align: left; }
   .modelnav__spacer { display: none; }
 }
+
+/* ============================================================
+   OPROSNIK — скачивание опросного листа рядом с формой заявки
+   (ТЗ термических печей §4: кнопка у формы на хабе и карточках
+   тяжёлых печей). Блок узкий и стоит перед leadgen, поэтому фон
+   задан явно — соседняя секция бывает тёмной.
+   ============================================================ */
+.oprosnik { padding: var(--sp-10) 0; background: var(--surface-subtle); border-top: 1px solid var(--border-subtle); }
+.oprosnik__row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); flex-wrap: wrap; }
+.oprosnik__text { max-width: 62ch; }
+.oprosnik__title { font-family: var(--font-display); font-size: var(--fs-h4); font-weight: var(--fw-semibold); margin: 0 0 var(--sp-2); }
+.oprosnik__note { font-size: var(--fs-small); color: var(--text-secondary); margin: 0; }
+.oprosnik__btn { display: inline-flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4) var(--sp-6); background: var(--neutral-0); border: 1px solid var(--border-default); text-decoration: none; color: var(--text-primary); font-family: var(--font-display); font-weight: var(--fw-semibold); transition: border-color var(--duration-fast) var(--ease-out); }
+.oprosnik__btn:hover { border-color: var(--teal-600); }
+.oprosnik__btn svg { flex-shrink: 0; }
+@media (max-width: 640px) { .oprosnik__btn { width: 100%; justify-content: center; } }
