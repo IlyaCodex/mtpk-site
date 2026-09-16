@@ -18,6 +18,17 @@
     height: 100%;
     display: block;
   }
+
+/* Ссылки на инженерные материалы и сервис раздела */
+.app-links { margin-top: var(--sp-10); padding-top: var(--sp-8); border-top: 1px solid var(--border-subtle); }
+.app-links__label { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); margin-bottom: var(--sp-5); }
+.app-links__list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3) var(--sp-6); }
+.app-links__list li { position: relative; padding-left: var(--sp-5); }
+.app-links__list li::before { content: ""; position: absolute; left: 0; top: 0.65em; width: 8px; height: 1px; background: var(--teal-600); }
+.app-links__list a { color: var(--text-brand); text-decoration: none; font-size: var(--fs-small); line-height: 1.45; border-bottom: 1px solid transparent; }
+.app-links__list a:hover { border-bottom-color: currentColor; }
+@media (max-width: 1024px) { .app-links__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .app-links__list { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
 
@@ -348,7 +359,16 @@
       </a>
 
     </div>
-  </div>
+  
+    <div class="app-links">
+      <div class="app-links__label">Инженерные материалы и&nbsp;сервис</div>
+      <ul class="app-links__list">
+        <li><a href="/products/termicheskie-pechi/pechi-nepreryvnogo-deystviya/">Печи непрерывного действия: роликовые, сетчато-ленточные и&nbsp;барабанные</a></li>
+        <li><a href="/products/termicheskie-pechi/futerovka-i-nagrevateli/">Футеровка термических печей и&nbsp;выбор нагревателей</a></li>
+        <li><a href="/uslugi/remont-termicheskih-pechey/">Ремонт и&nbsp;сервис термических печей</a></li>
+      </ul>
+    </div>
+</div>
 </section>
 
 <!-- ============================================================

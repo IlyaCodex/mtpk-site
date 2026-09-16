@@ -1,0 +1,181 @@
+<style>
+/* Контентный блок категории — текст из ТЗ заказчика */
+.cdoc { background: var(--surface-page, #fff); padding: var(--section-py-base, 96px) 0; border-top: 1px solid var(--border-subtle); }
+.cdoc__layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: var(--sp-12); align-items: start; }
+.cdoc__nav { position: sticky; top: 110px; display: flex; flex-direction: column; gap: var(--sp-1); }
+.cdoc__nav-eyebrow { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+.cdoc__nav-link { font-size: var(--fs-small); color: var(--text-secondary); text-decoration: none; padding: var(--sp-2) 0 var(--sp-2) var(--sp-4); border-left: 2px solid var(--border-subtle); line-height: 1.35; transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out); }
+.cdoc__nav-link:hover { color: var(--text-brand); border-left-color: var(--teal-600); }
+.cdoc__panel { padding: var(--sp-10) 0; scroll-margin-top: 120px; }
+.cdoc__panel:first-child { padding-top: 0; }
+.cdoc__panel + .cdoc__panel { border-top: 1px solid var(--border-subtle); }
+.cdoc__panel > * + * { margin-top: var(--sp-4); }
+.cdoc__title { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: var(--fw-bold); letter-spacing: var(--ls-h3); color: var(--text-primary); }
+.cdoc__panel p { color: var(--text-secondary); line-height: var(--lh-body); }
+.cdoc__panel ul { color: var(--text-secondary); line-height: var(--lh-body); padding-left: var(--sp-5); }
+.cdoc__panel ul li + li { margin-top: var(--sp-2); }
+.cdoc__panel h3 { font-family: var(--font-display); font-size: var(--fs-h4); font-weight: var(--fw-semibold); color: var(--text-primary); }
+.cdoc__lead { font-size: var(--fs-lead); color: var(--text-secondary); line-height: 1.7; }
+.cdoc__body { min-width: 0; }
+.cdoc__scroll { overflow-x: auto; max-width: 100%; }
+.cdoc table { width: 100%; border-collapse: collapse; min-width: 520px; }
+.cdoc th, .cdoc td { text-align: left; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); font-size: var(--fs-small); vertical-align: top; }
+.cdoc thead th { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); }
+.cdoc tbody th { color: var(--text-secondary); font-weight: var(--fw-regular); width: 40%; }
+.cdoc tbody td { color: var(--text-primary); }
+.cdoc__cta { margin-top: var(--sp-6); }
+@media (max-width: 1024px) { .cdoc__layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); } .cdoc__nav { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--sp-2); } .cdoc__nav-link { border-left: 0; border-bottom: 2px solid var(--border-subtle); padding: var(--sp-2) var(--sp-3); } .cdoc__nav-eyebrow { width: 100%; margin-bottom: 0; } }
+</style>
+<style>
+/* Светлый hero текстовой страницы */
+.thero { background: var(--surface-subtle, #F5F7F8); padding: var(--sp-10) 0 var(--sp-12); border-bottom: 1px solid var(--border-subtle); }
+.thero__eyebrow { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-brand); display: inline-flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.thero__eyebrow::before { content: ""; width: 32px; height: 2px; background: var(--teal-600); }
+.thero__title { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 44px); font-weight: var(--fw-bold); line-height: 1.12; letter-spacing: var(--ls-h1); color: var(--text-primary); margin: 0 0 var(--sp-5); max-width: 24ch; }
+.thero__lead { font-size: var(--fs-lead); color: var(--text-secondary); line-height: 1.7; max-width: 68ch; margin: 0 0 var(--sp-7); }
+.thero__actions { display: flex; flex-wrap: wrap; gap: var(--sp-4); }
+.thero .breadcrumb { padding-top: 0; }
+.thero .breadcrumb a { color: var(--text-secondary); }
+.thero .breadcrumb__current { color: var(--text-primary); }
+</style>
+
+<section class="thero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="/products/">Каталог оборудования</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="/products/termicheskie-pechi/">Термические печи</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Печи непрерывного действия: роликовые, сетчато-ленточные и&nbsp;барабанные</span>
+    </nav>
+    <div class="thero__eyebrow">Проходные печи</div>
+    <h1 class="thero__title">Печи непрерывного действия: роликовые, сетчато-ленточные и&nbsp;барабанные</h1>
+    <p class="thero__lead">Проходные и&nbsp;конвейерные электропечи для&nbsp;непрерывной подачи деталей, поддонов, порошков и&nbsp;гранул через одну или&nbsp;несколько температурных зон.</p>
+    <div class="thero__actions">
+      <a href="#leadgen" class="btn btn--primary">Получить подбор и&nbsp;техническое предложение <span class="btn__arrow">&rarr;</span></a>
+      <a href="/products/termicheskie-pechi/" class="btn btn--secondary">Все термические печи <span class="btn__arrow">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="cdoc" aria-label="Содержание страницы">
+  <div class="container">
+    <div class="cdoc__layout">
+      <nav class="cdoc__nav" aria-label="Содержание">
+        <div class="cdoc__nav-eyebrow">Содержание</div>
+        <a class="cdoc__nav-link" href="#sec-1-dlya-kakih-zadach-podhodit">Для&nbsp;каких задач подходит</a>
+        <a class="cdoc__nav-link" href="#sec-2-modelnyy-ryad-i-harakteristiki">Модельный ряд и&nbsp;характеристики</a>
+        <a class="cdoc__nav-link" href="#sec-3-kak-podbiraem-ispolnenie">Как подбираем исполнение</a>
+        <a class="cdoc__nav-link" href="#sec-4-temperatura-i-upravlenie">Температура и&nbsp;управление</a>
+        <a class="cdoc__nav-link" href="#sec-5-konstrukcii-i-dopolnitelnye-vozmozhnosti">Конструкции и&nbsp;дополнительные возможности</a>
+        <a class="cdoc__nav-link" href="#sec-6-voprosy-po-podboru">Вопросы по&nbsp;подбору</a>
+        <a class="cdoc__nav-link" href="#sec-7-chto-vybrat-dlya-melkih">Что выбрать для&nbsp;мелких деталей?</a>
+        <a class="cdoc__nav-link" href="#sec-8-kogda-nuzhen-vraschayuschiysya-baraban">Когда нужен вращающийся барабан?</a>
+        <a class="cdoc__nav-link" href="#sec-9-kak-rasschitat-proizvoditelnost">Как рассчитать производительность?</a>
+        <a class="cdoc__nav-link" href="#sec-10-chto-poluchite-v-tehnicheskom">Что получите в&nbsp;техническом предложении</a>
+        <a class="cdoc__nav-link" href="#sec-11-proverka-puskonaladka-i-garantiya">Проверка, пусконаладка и&nbsp;гарантия</a>
+        <a class="cdoc__nav-link" href="#sec-12-servis-v-rossii">Сервис в&nbsp;России</a>
+      </nav>
+      <div class="cdoc__body">
+        <div class="cdoc__panel" id="sec-1-dlya-kakih-zadach-podhodit">
+          <h2 class="cdoc__title">Для&nbsp;каких задач подходит</h2>
+          <p>Выбор определяется не&nbsp;названием печи, а&nbsp;поведением материала. Ролики подходят для&nbsp;поддонов и&nbsp;плоских изделий, сетчатая лента — для&nbsp;партий небольших деталей, вращающийся барабан — для&nbsp;сыпучих материалов, которым нужно перемешивание. Производительность рассчитывается по&nbsp;массе, времени выдержки и&nbsp;допустимой плотности загрузки.</p>
+          <ul>
+            <li>серийный отжиг и&nbsp;отпуск деталей</li>
+            <li>сушка и&nbsp;обжиг керамики</li>
+            <li>прокалка порошков и&nbsp;гранул</li>
+            <li>непрерывные линии с&nbsp;загрузкой и&nbsp;выгрузкой</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-2-modelnyy-ryad-i-harakteristiki">
+          <h2 class="cdoc__title">Модельный ряд и&nbsp;характеристики</h2>
+          <div class="cdoc__scroll"><table class="spec-table">
+            <thead><tr><th>Серия</th><th>Транспорт</th><th>Температура, °C</th><th>Скорость</th></tr></thead>
+            <tbody>
+              <tr><td>УИ-РП</td><td>Роликовый</td><td>до&nbsp;1350 длительно; класс 1600 — по&nbsp;ТЗ</td><td>0,12–4&nbsp;м/ч</td></tr>
+              <tr><td>УИ-СЛП</td><td>Сетчатая лента</td><td>до&nbsp;1050 длительно; класс 1200 — по&nbsp;ТЗ</td><td>0,5–10&nbsp;м/ч</td></tr>
+              <tr><td>УИ-ВБП</td><td>Вращающийся барабан</td><td>до&nbsp;1200; исполнение под&nbsp;задачу</td><td>0,5–5 об/мин</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="cdoc__panel" id="sec-3-kak-podbiraem-ispolnenie">
+          <h2 class="cdoc__title">Как подбираем исполнение</h2>
+          <ul>
+            <li>материал, форма и&nbsp;масса единицы продукции</li>
+            <li>кг/ч или&nbsp;шт./ч и&nbsp;время выдержки</li>
+            <li>допустимый тип транспортирующего органа</li>
+            <li>число зон нагрева/охлаждения и&nbsp;интеграция в&nbsp;линию</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-4-temperatura-i-upravlenie">
+          <h2 class="cdoc__title">Температура и&nbsp;управление</h2>
+          <p>Для&nbsp;проходных печей различаем длительную рабочую температуру и&nbsp;температурный класс. По&nbsp;данным производителя для&nbsp;роликовой печи указана длительная работа до&nbsp;1350&nbsp;°C при&nbsp;классах до&nbsp;1600&nbsp;°C; для&nbsp;сетчато-ленточной — до&nbsp;1050&nbsp;°C при&nbsp;классах до&nbsp;1200&nbsp;°C; для&nbsp;барабанной — до&nbsp;1200&nbsp;°C. Высокие классы роликовой и&nbsp;сетчато-ленточной печей предлагаем только после подтверждения материала транспортирующего органа, нагрузки и&nbsp;времени работы.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-5-konstrukcii-i-dopolnitelnye-vozmozhnosti">
+          <h2 class="cdoc__title">Конструкции и&nbsp;дополнительные возможности</h2>
+          <ul>
+            <li>загрузочный и&nbsp;разгрузочный транспортер</li>
+            <li>несколько независимых зон</li>
+            <li>управляемое охлаждение</li>
+            <li>рекуперация тепла</li>
+            <li>газовая среда как отдельный проект</li>
+            <li>регистратор и&nbsp;интеграция с&nbsp;линией</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-6-voprosy-po-podboru">
+          <h2 class="cdoc__title">Вопросы по&nbsp;подбору</h2>
+
+        </div>
+
+        <div class="cdoc__panel" id="sec-7-chto-vybrat-dlya-melkih">
+          <h2 class="cdoc__title">Что выбрать для&nbsp;мелких деталей?</h2>
+          <p>Сетчатую ленту, если размер и&nbsp;форма позволяют устойчивое размещение. Для&nbsp;изделий на&nbsp;жёстких поддонах рассмотрим роликовый транспорт.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-8-kogda-nuzhen-vraschayuschiysya-baraban">
+          <h2 class="cdoc__title">Когда нужен вращающийся барабан?</h2>
+          <p>Для&nbsp;порошков и&nbsp;гранул, которым во&nbsp;время нагрева необходимы перемешивание и&nbsp;перемещение.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-9-kak-rasschitat-proizvoditelnost">
+          <h2 class="cdoc__title">Как рассчитать производительность?</h2>
+          <p>Нужны масса и&nbsp;форма продукта, время пребывания, температура и&nbsp;условия охлаждения. По&nbsp;ним определяем скорость, размеры рабочей зоны и&nbsp;мощность.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-10-chto-poluchite-v-tehnicheskom">
+          <h2 class="cdoc__title">Что получите в&nbsp;техническом предложении</h2>
+          <ul>
+            <li>тип транспортирующей системы с&nbsp;учётом формы продукта, температуры и&nbsp;производительности</li>
+            <li>размеры зон, рабочая скорость, время пребывания, нагрев и&nbsp;охлаждение</li>
+            <li>мощность, интеграция в&nbsp;линию, состав поставки, стоимость, срок и&nbsp;ПНР</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-11-proverka-puskonaladka-i-garantiya">
+          <h2 class="cdoc__title">Проверка, пусконаладка и&nbsp;гарантия</h2>
+          <p>До&nbsp;отгрузки проверяем комплектность, электрическую и&nbsp;механическую части, а&nbsp;также работу блокировок при&nbsp;полном подключении оборудования. Первый полный прогрев проводим у&nbsp;заказчика с&nbsp;учётом состояния футеровки после перевозки. Выполняем пусконаладочные работы, обучаем персонал и&nbsp;оформляем акт. Гарантийный срок — 12 месяцев. Начало его отсчёта определяется договором: со&nbsp;дня отгрузки либо&nbsp;со&nbsp;дня подписания акта пусконаладочных работ.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-12-servis-v-rossii">
+          <h2 class="cdoc__title">Сервис в&nbsp;России</h2>
+          <p>Специалисты компании «УралИндуктор» выполняют в&nbsp;России диагностику, ремонт и&nbsp;модернизацию термических печей. Обслуживаем нагреватели, датчики, системы управления, футеровку, механические, газовые и&nbsp;вакуумные узлы.</p>
+          <ul>
+            <li>Ремонт и&nbsp;сервис термических печей</li>
+          </ul>
+          <p>Пришлите материал, размеры и&nbsp;массу садки, температуру и&nbsp;цикл — подберём комплектацию и&nbsp;рассчитаем стоимость.</p>
+          <p>Получить подбор и&nbsp;техническое предложение · Узнать цену</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--C:leadgen-->
+<!--C:best-offer-->

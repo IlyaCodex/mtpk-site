@@ -27,7 +27,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 
 **Раздел каталога делится на 2 типа шаблона:**
 
-- **Продуктовые разделы (10 шт., шаблон T03a):** induktsionnye-plavilnye-pechi, induktsionnye-nagrevateli, drobemetnoe-oborudovanie, sistemy-ohlazhdeniya, mufelnye-termicheskie-pechi, zapchasti, vakuumnoe-oborudovanie-dlya-termoobrabotki, stalerozlivochnye-kovshi, sterzhnevye-mashiny, termoobrabotka-plavka-alyuminiya.
+- **Продуктовые разделы (10 шт., шаблон T03a):** induktsionnye-plavilnye-pechi, induktsionnye-nagrevateli, drobemetnoe-oborudovanie, sistemy-ohlazhdeniya, termicheskie-pechi, zapchasti, vakuumnoe-oborudovanie-dlya-termoobrabotki, stalerozlivochnye-kovshi, sterzhnevye-mashiny, termoobrabotka-plavka-alyuminiya.
 - **Технологические разделы (4 шт., шаблон T03b):** oborudovanie-dlya-peschano-glinistyh-smesej-pgs, linii-dlya-holodnotverdeyushhih-smesej-hts, oborudovanie-lgm, oborudovanie-lvm.
 - **peskostruynoe-oborudovanie** (2026-08-19): новый раздел, хаб по образцу ПГС (богатый информативный) + 13 плоских товаров (шаблон tovar-b/phero), гарантия 12 мес. Товары: prohodnaya-s-gusenichnym-transporterom, prohodnaya-s-kombinirovannoy-gruppoy-sopel, prohodnaya-s-lentochnym-transporterom, prohodnaya-napornaya-dlya-dlinnomernyh-izdeliy, s-v-obraznymi-remnyami, napornaya-s-indeksnym-povorotnym-stolom, napornaya-s-kachayushchimisya-soplami-povorotnyj-stol, telezhechnaya-napornaya-s-povorotnym-stolom, telezhechnaya-napornaya-s-ruchnym-soplom, dlya-obrabotki-rezhushchego-instrumenta, dlya-ochistki-press-form-shin, ruchnaya-kabina-900h900, ruchnaya-telezhechnaya-kabina-1200h1200. Источник контента: PDF (в тексте «дробеструйн» заменено на «пескоструйн»).
 
@@ -195,21 +195,22 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │   ├── …/pechi-dlya-plavki-i-vyderzhki-alyuminiya/            ✅ Печи плавки и выдержки (башенные), серия BF
 │   │   ├── …/centralizovannye-bashennye-pechi/                   ✅ Централизованные башенные, серия BE
 │   │   └── …/elektricheskie-tigelnye-pechi-soprotivleniya/       ✅ Электрические тигельные сопротивления, серия BW
-│   ├── /products/mufelnye-termicheskie-pechi/          ✅ T03a · Хаб «Муфельные (термические) печи» (13 категорий 1-в-1 с боевого)
-│   │   │   # новый формат (Этап 3): каждая категория T04 = описание + таблица ТХ прямо на странице, БЕЗ дочерних товаров T05
-│   │   ├── …/mufelnaya-pech/                                              ✅ T04 · Муфельная печь (универсальная) — 6 модификаций в галерее + таблица УИ-МП (Этап 3, новый формат; T05-страницы убраны)
-│   │   ├── …/mufelnye-kamernye-pechi/                                     ✅ T04 · Муфельные камерные печи — 6 модификаций в галерее + таблица УИ-МКП (Этап 3, новый формат; T05-страницы убраны)
-│   │   ├── …/mufelnaya-pech-s-vykatannym-podom/                           ✅ T04 · С выкатным подом — 6 модификаций + таблица УИ-МПВП (Этап 3, новый формат)
-│   │   ├── …/mufelnaya-vertikalnaya-pech/                                 ✅ T04 · Вертикальная печь — 5 модификаций + таблица УИ-МВКП (Этап 3, новый формат, эталон)
-│   │   ├── …/mufelnaya-shahnaya-pech/                                     ✅ T04 · Шахтная печь — 6 модификаций + таблица УИ-МШП (Этап 3, новый формат)
-│   │   ├── …/mufelnaya-vysoko-temperaturnaya-vakuumnaya-pech/             ✅ T04 · В защитной атмосфере — 6 модификаций + таблица УИ-МПЗА (Этап 3)
-│   │   ├── …/mufelnaya-pech-s-podyomnym-podom/                            ✅ T04 · С подъёмным подом — 5 модификаций + таблица УИ-МПП (Этап 3)
-│   │   ├── …/vakuumnaya-mufelnaya-pech/                                   ✅ T04 · Высокотемп. вакуумная — 5 модификаций + таблица УИ-МВТВП (Этап 3)
-│   │   ├── …/mufelnaya-pech-dlya-dantistov/                               ✅ T04 · Для дантистов — 4 модификации + таблица УИ-МПД (Этап 3)
-│   │   ├── …/mufelnaya-pech-dlya-ispytaniya-shokovoj-temperatury/         ✅ T04 · Шоковая температура — стаб МП-ИТ-1 (без модификаций, реальное фото) (Этап 3)
-│   │   ├── …/mufelnaya-pech-s-2-podami/                                   ✅ T04 · С двумя подами — 7 модификаций + таблица УИ-МПДП (Этап 3)
-│   │   ├── …/mufelnaya-fritovaya-pech/                                    ✅ T04 · Фритовая печь — 7 модификаций + таблица УИ-МФП (Этап 3)
-│   │   └── …/trubchataya-mufelnaya-pech/                                  ✅ T04 · Трубчатая муфельная — 8 модификаций + параметрич. таблица (Этап 3)
+│   ├── /products/termicheskie-pechi/                  ✅ T03a · Хаб «Термические печи» (переезд с /mufelnye-termicheskie-pechi/ 16.09.2026, ТЗ Pixel Tools)
+│   │   │   # новый формат (Этап 3): каждая категория T04 = описание + таблица моделей
+│   │   ├── …/mufelnye-pechi/                                              ✅ T04 · Муфельные электропечи УИ-МП (лаборатории; слово «муфельная» сохранено — физический муфель)
+│   │   ├── …/kamernye-pechi/                                              ✅ T04 · Камерные электропечи УИ-МКП (СНО / СНЗ)
+│   │   ├── …/pechi-s-vykatnym-podom/                                      ✅ T04 · С выкатным подом УИ-МПВП + таблица подбора садки (V5)
+│   │   ├── …/vertikalnye-pechi/                                           ✅ T04 · Вертикальные печи УИ-МВКП
+│   │   ├── …/shahtnye-pechi/                                              ✅ T04 · Шахтные электропечи УИ-МШП (СШО / СШЗ)
+│   │   ├── …/pechi-s-zaschitnoy-atmosferoy/                               ✅ T04 · В защитной атмосфере УИ-МПЗА
+│   │   ├── …/pechi-s-podyomnym-podom/                                     ✅ T04 · Элеваторные УИ-МПП + двухподовое исполнение УИ-МПДП (склейка с /mufelnaya-pech-s-2-podami/)
+│   │   ├── …/vakuumnye-pechi/                                             ✅ T04 · Высокотемп. вакуумные УИ-МВТВП до 1800 °C
+│   │   ├── …/zubotehnicheskie-pechi/                                      ✅ T04 · Зуботехнические печи УИ-МПД
+│   │   ├── …/pechi-dlya-ispytaniy-na-termoudar/                           ✅ T04 · Печь МП-ИТ-1, испытания на термический шок
+│   │   ├── …/fritovye-pechi/                                              ✅ T04 · Фритовые печи УИ-МФП
+│   │   ├── …/trubchatye-pechi/                                            ✅ T04 · Трубчатые печи УИ-ТП (7 конструкций — разделами на этой же странице, ТЗ пакета V5)
+│   │   ├── …/pechi-nepreryvnogo-deystviya/                                ✅ T0x · Печи непрерывного действия УИ-РП / УИ-СЛП / УИ-ВБП (новая, 16.09.2026, текст 19 пакета V5)
+│   │   └── …/futerovka-i-nagrevateli/                                     ✅ T0x · Футеровка и выбор нагревателей — инженерный гид (новая, 16.09.2026, текст 24 пакета V5)
 │   │   📷 Картинки (Этап 3, новый формат): обложки `card-muf-{slug}.jpg` × 13 + галереи `muf-{key}-N.jpg` —
 │   │       ОРИГИНАЛЬНЫЕ рендеры со старого сайта, адаптированы (Pillow contain 600×450 на белом, объект не режется),
 │   │       БЕЗ AI. Каждая = jpg + WebP-сосед `.jpg.webp`. (AI-обложки Этапа 2 заменены оригиналами.)
@@ -245,6 +246,7 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   ├── /uslugi/modernizatsiya/                         ⬜ T06 · Модернизация (план)
 │   ├── /uslugi/remont-plavilnyh-pechey/                 ✅ T06 · Ремонт плавильных печей (4 узла, аудит, контент с источника)
 │   ├── /uslugi/remont-dugovyh-pechey/                   ✅ T06 · Ремонт дуговых печей (реновация ДСП, модернизация АСУ ТП, кейс+FAQ)
+│   ├── /uslugi/remont-termicheskih-pechey/             ✅ T0x · Ремонт и сервис термических печей (новая, 16.09.2026, текст 22 пакета V5; ТЗ Pixel Tools просило /services/, приведено к /uslugi/ по конвенции сайта)
 │   ├── /uslugi/remont-drobemetov/                       ✅ T06 · Ремонт дробемётов (3 узла: камера/турбина/пылеуловитель)
 │   └── /uslugi/tehnicheskij-audit/                      ✅ T06 · Технический аудит (оценка состояния, blueprint-hero)
 │
