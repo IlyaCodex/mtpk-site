@@ -1,5 +1,9 @@
 {
   "title": "Установки АВН 1–20 кГц для сквозного нагрева",
   "description": "",
-  "inline_styles": []
+  "inline_styles": [],
+  "css_templates": [
+    "/css/tpl/leadgen.css",
+    "/css/tpl/hub-compact.css"
+  ]
 }

@@ -1,5 +1,9 @@
 {
   "title": "Предварительный нагрев сварных соединений: оборудование",
   "description": "",
-  "inline_styles": []
+  "inline_styles": [],
+  "css_templates": [
+    "/css/tpl/leadgen.css",
+    "/css/tpl/hub-compact.css"
+  ]
 }
