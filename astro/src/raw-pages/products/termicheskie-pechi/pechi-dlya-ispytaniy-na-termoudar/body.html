@@ -127,82 +127,143 @@
   </div>
 </section>
 
-<!-- ============================================================
-     ОПИСАНИЕ — печь МП-ИТ-1 (старый сайт: модель + базовые параметры)
-     ============================================================ -->
-<section class="applications" aria-label="Описание муфельной печи для испытания шоковой температурой">
+
+
+<style>
+/* Контентный блок категории — текст из ТЗ заказчика */
+.cdoc { background: var(--surface-page, #fff); padding: var(--section-py-base, 96px) 0; border-top: 1px solid var(--border-subtle); }
+.cdoc__layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: var(--sp-12); align-items: start; }
+.cdoc__nav { position: sticky; top: 110px; display: flex; flex-direction: column; gap: var(--sp-1); }
+.cdoc__nav-eyebrow { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+.cdoc__nav-link { font-size: var(--fs-small); color: var(--text-secondary); text-decoration: none; padding: var(--sp-2) 0 var(--sp-2) var(--sp-4); border-left: 2px solid var(--border-subtle); line-height: 1.35; transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out); }
+.cdoc__nav-link:hover { color: var(--text-brand); border-left-color: var(--teal-600); }
+.cdoc__panel { padding: var(--sp-10) 0; scroll-margin-top: 120px; }
+.cdoc__panel:first-child { padding-top: 0; }
+.cdoc__panel + .cdoc__panel { border-top: 1px solid var(--border-subtle); }
+.cdoc__panel > * + * { margin-top: var(--sp-4); }
+.cdoc__title { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: var(--fw-bold); letter-spacing: var(--ls-h3); color: var(--text-primary); }
+.cdoc__panel p { color: var(--text-secondary); line-height: var(--lh-body); }
+.cdoc__panel ul { color: var(--text-secondary); line-height: var(--lh-body); padding-left: var(--sp-5); }
+.cdoc__panel ul li + li { margin-top: var(--sp-2); }
+.cdoc__panel h3 { font-family: var(--font-display); font-size: var(--fs-h4); font-weight: var(--fw-semibold); color: var(--text-primary); }
+.cdoc__lead { font-size: var(--fs-lead); color: var(--text-secondary); line-height: 1.7; }
+.cdoc__body { min-width: 0; }
+.cdoc__scroll { overflow-x: auto; max-width: 100%; }
+.cdoc table { width: 100%; border-collapse: collapse; min-width: 520px; }
+.cdoc th, .cdoc td { text-align: left; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); font-size: var(--fs-small); vertical-align: top; }
+.cdoc thead th { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); }
+.cdoc tbody th { color: var(--text-secondary); font-weight: var(--fw-regular); width: 40%; }
+.cdoc tbody td { color: var(--text-primary); }
+.cdoc__cta { margin-top: var(--sp-6); }
+@media (max-width: 1024px) { .cdoc__layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); } .cdoc__nav { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--sp-2); } .cdoc__nav-link { border-left: 0; border-bottom: 2px solid var(--border-subtle); padding: var(--sp-2) var(--sp-3); } .cdoc__nav-eyebrow { width: 100%; margin-bottom: 0; } }
+</style>
+<section class="cdoc" aria-label="Описание и характеристики">
   <div class="container">
-    <div class="s-head">
-      <div class="s-eyebrow">Описание</div>
-      <h2 class="s-title">Печь <em>МП-ИТ-1</em></h2>
-    </div>
-    <div class="muf-about">
-      <div class="muf-about__media">
-        <img src="/img/muf-shoktemp-1.jpg" alt="Печь МП-ИТ-1 для испытаний на термический шок МП-ИТ-1" loading="lazy">
-      </div>
-      <div class="muf-desc">
-        <p>Печь МП-ИТ-1 для&nbsp;испытаний на&nbsp;термический шок <strong>МП-ИТ-1</strong>&nbsp;— специализированное оборудование для&nbsp;проверки материалов и&nbsp;изделий на&nbsp;термический шок: резкая смена температуры с&nbsp;последующей оценкой стойкости к&nbsp;растрескиванию и&nbsp;разрушению.</p>
-        <p>Печь оснащена выкатным лотком и&nbsp;интегрированным шкафом управления с&nbsp;цифровой панелью. Рабочая температура, термопара и&nbsp;футеровка подбираются под&nbsp;задачу; печь изготавливается под&nbsp;заказ.</p>
-        <div class="spec-table-wrap">
-          <table class="spec-table">
-            <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+    <div class="cdoc__layout">
+      <nav class="cdoc__nav" aria-label="Содержание">
+        <div class="cdoc__nav-eyebrow">Содержание</div>
+        <a class="cdoc__nav-link" href="#sec-1-dlya-kakih-zadach-podhodit">Для&nbsp;каких задач подходит</a>
+        <a class="cdoc__nav-link" href="#sec-2-harakteristiki-pod-metodiku">Характеристики под&nbsp;методику</a>
+        <a class="cdoc__nav-link" href="#sec-3-kak-podbiraem-ispolnenie">Как подбираем исполнение</a>
+        <a class="cdoc__nav-link" href="#sec-4-temperatura-i-upravlenie">Температура и&nbsp;управление</a>
+        <a class="cdoc__nav-link" href="#sec-5-konstrukcii-i-dopolnitelnye-vozmozhnosti">Конструкции и&nbsp;дополнительные возможности</a>
+        <a class="cdoc__nav-link" href="#sec-6-voprosy-po-podboru">Вопросы по&nbsp;подбору</a>
+        <a class="cdoc__nav-link" href="#sec-7-kakie-materialy-ispytyvayut">Какие материалы испытывают?</a>
+        <a class="cdoc__nav-link" href="#sec-8-chto-avtomatiziruetsya">Что автоматизируется?</a>
+        <a class="cdoc__nav-link" href="#sec-9-chto-poluchite-v-tehnicheskom">Что получите в&nbsp;техническом предложении</a>
+        <a class="cdoc__nav-link" href="#sec-10-proverka-puskonaladka-i-garantiya">Проверка, пусконаладка и&nbsp;гарантия</a>
+        <a class="cdoc__nav-link" href="#sec-11-servis-v-rossii">Сервис в&nbsp;России</a>
+      </nav>
+      <div class="cdoc__body">
+        <div class="cdoc__panel" id="sec-1-dlya-kakih-zadach-podhodit">
+          <h2 class="cdoc__title">Для&nbsp;каких задач подходит</h2>
+          <p>Установка объединяет нагревательную камеру, механизм открытия двери, захват и&nbsp;охлаждающую ванну. Нагретый образец переносят в&nbsp;охлаждающую среду и&nbsp;повторяют цикл по&nbsp;методике испытаний. Это позволяет сравнивать термостойкость огнеупорных материалов и&nbsp;контролировать качество партий.</p>
+          <ul>
+            <li>испытания огнеупорного кирпича</li>
+            <li>оценка стойкости к&nbsp;термоциклированию</li>
+            <li>контроль качества партий огнеупоров</li>
+            <li>исследовательские методики с&nbsp;резким охлаждением</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-2-harakteristiki-pod-metodiku">
+          <h2 class="cdoc__title">Характеристики под&nbsp;методику</h2>
+          <div class="cdoc__scroll"><table class="spec-table">
+            <thead><tr><th>Параметр</th><th>Как выбирается</th></tr></thead>
             <tbody>
-              <tr><td>Модель</td><td>МП-ИТ-1</td></tr>
-              <tr><td>Напряжение, В</td><td>380</td></tr>
-              <tr><td>Точность контроля, °C</td><td>±&nbsp;1</td></tr>
-              <tr><td>Изготовление</td><td>под&nbsp;заказ</td></tr>
+              <tr><td>Камера и&nbsp;захват</td><td>По&nbsp;размерам и&nbsp;массе образца</td></tr>
+              <tr><td>Температура и&nbsp;мощность</td><td>По&nbsp;методике и&nbsp;времени нагрева</td></tr>
+              <tr><td>Охлаждение</td><td>Среда, время и&nbsp;температура по&nbsp;методике</td></tr>
+              <tr><td>Регистрация</td><td>Температурная кривая и&nbsp;число циклов по&nbsp;комплектации</td></tr>
             </tbody>
-          </table>
+          </table></div>
+        </div>
+
+        <div class="cdoc__panel" id="sec-3-kak-podbiraem-ispolnenie">
+          <h2 class="cdoc__title">Как подбираем исполнение</h2>
+          <ul>
+            <li>применяемый стандарт и&nbsp;геометрия образца</li>
+            <li>температура нагрева и&nbsp;время выдержки</li>
+            <li>среда и&nbsp;длительность охлаждения</li>
+            <li>автоматизация переноса и&nbsp;способ регистрации результата</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-4-temperatura-i-upravlenie">
+          <h2 class="cdoc__title">Температура и&nbsp;управление</h2>
+          <p>Рабочую температуру, выдержку, время переноса и&nbsp;параметры охлаждения согласуем по&nbsp;методике испытаний. Вместе с&nbsp;программой задаём геометрию образца и&nbsp;критерий окончания испытания.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-5-konstrukcii-i-dopolnitelnye-vozmozhnosti">
+          <h2 class="cdoc__title">Конструкции и&nbsp;дополнительные возможности</h2>
+          <ul>
+            <li>автоматический перенос</li>
+            <li>полуавтоматическая фиксация числа циклов</li>
+            <li>сенсорная панель</li>
+            <li>печать или&nbsp;электронная регистрация параметров</li>
+            <li>нестандартный захват образца</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-6-voprosy-po-podboru">
+          <h2 class="cdoc__title">Вопросы по&nbsp;подбору</h2>
+
+        </div>
+
+        <div class="cdoc__panel" id="sec-7-kakie-materialy-ispytyvayut">
+          <h2 class="cdoc__title">Какие материалы испытывают?</h2>
+          <p>В&nbsp;первую очередь огнеупорные изделия. Размеры образца и&nbsp;метод испытания согласуются до&nbsp;выбора камеры и&nbsp;захвата.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-8-chto-avtomatiziruetsya">
+          <h2 class="cdoc__title">Что автоматизируется?</h2>
+          <p>Открытие двери, перенос и&nbsp;последовательность циклов — в&nbsp;согласованной комплектации. Формат регистрации результата выбираем под&nbsp;отчётность заказчика.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-9-chto-poluchite-v-tehnicheskom">
+          <h2 class="cdoc__title">Что получите в&nbsp;техническом предложении</h2>
+          <ul>
+            <li>конфигурация камеры, захвата и&nbsp;охлаждения по&nbsp;указанной методике</li>
+            <li>температура, выдержка, время переноса и&nbsp;алгоритм повторения циклов</li>
+            <li>автоматизация, регистрация результатов, стоимость, срок и&nbsp;ПНР</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-10-proverka-puskonaladka-i-garantiya">
+          <h2 class="cdoc__title">Проверка, пусконаладка и&nbsp;гарантия</h2>
+          <p>До&nbsp;отгрузки проверяем комплектность, электрическую и&nbsp;механическую части, а&nbsp;также работу блокировок при&nbsp;полном подключении оборудования. Первый полный прогрев проводим у&nbsp;заказчика с&nbsp;учётом состояния футеровки после перевозки. Выполняем пусконаладочные работы, обучаем персонал и&nbsp;оформляем акт. Гарантийный срок — 12 месяцев. Начало его отсчёта определяется договором: со&nbsp;дня отгрузки либо&nbsp;со&nbsp;дня подписания акта пусконаладочных работ.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-11-servis-v-rossii">
+          <h2 class="cdoc__title">Сервис в&nbsp;России</h2>
+          <p>Специалисты компании «УралИндуктор» выполняют в&nbsp;России диагностику, ремонт и&nbsp;модернизацию термических печей. Обслуживаем нагреватели, датчики, системы управления, футеровку, механические, газовые и&nbsp;вакуумные узлы.</p>
+          <ul>
+            <li>Ремонт и&nbsp;сервис термических печей</li>
+          </ul>
+          <p>Пришлите материал, размеры и&nbsp;массу садки, температуру и&nbsp;цикл — подберём комплектацию и&nbsp;рассчитаем стоимость.</p>
+          <p>Получить подбор и&nbsp;техническое предложение · Узнать цену</p>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================
-     APPLICATIONS — Конфигурации по температурам, термопарам, футеровке
-     ============================================================ -->
-<section class="applications" aria-label="Конфигурации под задачу">
-  <div class="container">
-    <div class="s-head">
-      <div class="s-eyebrow">Конфигурация под&nbsp;задачу</div>
-      <h2 class="s-title">Термопара и&nbsp;футеровка — <em>под&nbsp;температуру</em></h2>
-      <p class="s-lead">Любая модель собирается под&nbsp;конкретный температурный диапазон с&nbsp;подбором термопары и&nbsp;футеровки. Шесть базовых вариантов рабочей температуры — от&nbsp;800 до&nbsp;1&nbsp;700&nbsp;°C.</p>
-    </div>
-
-    <div class="applications__grid">
-      <article class="app-card">
-        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="20" height="20" rx="1"/><path d="M11 16h10"/></svg></div><div><h3 class="app-card__name">800–1&nbsp;200&nbsp;°C</h3><div class="app-card__temp">базовый диапазон</div></div></div>
-        <ul class="app-card__specs">
-          <li class="app-card__spec"><span class="app-card__spec-label">Термопара</span><span class="app-card__spec-value">K-типа</span></li>
-          <li class="app-card__spec"><span class="app-card__spec-label">Футеровка</span><span class="app-card__spec-value">керамическое волокно</span></li>
-          <li class="app-card__spec"><span class="app-card__spec-label">Задачи</span><span class="app-card__spec-value">сушка, обжиг, отжиг лёгких сплавов</span></li>
-        </ul>
-      </article>
-      <article class="app-card">
-        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v18a4 4 0 1 0 4 0V4a2 2 0 0 0-4 0z"/><circle cx="16" cy="24" r="2" fill="currentColor"/></svg></div><div><h3 class="app-card__name">1&nbsp;200–1&nbsp;400&nbsp;°C</h3><div class="app-card__temp">средний диапазон</div></div></div>
-        <ul class="app-card__specs">
-          <li class="app-card__spec"><span class="app-card__spec-label">Термопара</span><span class="app-card__spec-value">S-типа</span></li>
-          <li class="app-card__spec"><span class="app-card__spec-label">Футеровка</span><span class="app-card__spec-value">алюмооксидное волокно</span></li>
-          <li class="app-card__spec"><span class="app-card__spec-label">Задачи</span><span class="app-card__spec-value">термообработка стали, обжиг керамики</span></li>
-        </ul>
-      </article>
-      <article class="app-card">
-        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3l4 9h10l-8 6 3 11-9-7-9 7 3-11-8-6h10z"/></svg></div><div><h3 class="app-card__name">1&nbsp;400–1&nbsp;700&nbsp;°C</h3><div class="app-card__temp">высокотемпературный</div></div></div>
-        <ul class="app-card__specs">
-          <li class="app-card__spec"><span class="app-card__spec-label">Термопара</span><span class="app-card__spec-value">B-типа</span></li>
-          <li class="app-card__spec"><span class="app-card__spec-label">Футеровка</span><span class="app-card__spec-value">композит из&nbsp;оксида алюминия</span></li>
-          <li class="app-card__spec"><span class="app-card__spec-label">Задачи</span><span class="app-card__spec-value">обжиг спецкерамики, спекание</span></li>
-        </ul>
-      </article>
-      <article class="app-card">
-        <div class="app-card__head"><div class="app-card__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="20" height="16"/><path d="M6 14h20"/><circle cx="11" cy="19" r="0.7" fill="currentColor"/><circle cx="16" cy="19" r="0.7" fill="currentColor"/><circle cx="21" cy="19" r="0.7" fill="currentColor"/></svg></div><div><h3 class="app-card__name">Доработки</h3><div class="app-card__temp">под&nbsp;индивидуальный заказ</div></div></div>
-        <ul class="app-card__specs">
-          <li class="app-card__spec"><span class="app-card__spec-label">Камера</span><span class="app-card__spec-value">размер и&nbsp;геометрия под&nbsp;деталь</span></li>
-          <li class="app-card__spec"><span class="app-card__spec-label">Управление</span><span class="app-card__spec-value">программируемые кривые, журнал</span></li>
-          <li class="app-card__spec"><span class="app-card__spec-label">Дополнения</span><span class="app-card__spec-value">атмосфера, выкатной под, оснастка</span></li>
-        </ul>
-      </article>
     </div>
   </div>
 </section>
