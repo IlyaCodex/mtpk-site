@@ -166,9 +166,24 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │       — так на боевом, сохраняем для прямых 301-редиректов).
 │   ├── /products/vakuumnoe-oborudovanie-dlya-termoobrabotki/  ✅ T03a · Хаб «Вакуумное оборудование для термообработки»
 │   │       └── 8 карточек T05 (vacuum-* — печи/установки, обложки card-vacuum-* в цех-каноне)
-│   ├── /products/zapchasti/                            ✅ T03a · Хаб-раздел «Запчасти на оборудование» (3 тизера подкатегорий)
-│   │   ├── …/induktsionnoe/                                 ✅ T03a · Подкатегория «Для индукционного оборудования» (4 тизера T05)
-│   │   │       └── tiristory-silovye · kondensatory-elektrotermicheskie · kabel-silovoj-vodoohlazhdaemyj · plata-impulsnyh-transformatorov
+│   ├── /products/zapchasti/                            ✅ T03a · Хаб-раздел «Запчасти на оборудование» (4 тизера подкатегорий)
+│   │   ├── …/induktsionnoe/                                 ✅ Раздел «Для индукционного оборудования» (пакет V10, 18.09.2026, 48 страниц)
+│   │   │       └── 25 подразделов, 120 позиций. Силовая часть: tiristory-silovye (+15 исполнений
+│   │   │          TECHSEM Y38…Y70 KPE/KKE) · tiristornye-sborki · kondensatory-elektrotermicheskie ·
+│   │   │          kondensatory-dc · reaktory-drosseli · katushki-reaktorov · rezistory-rc-cepi ·
+│   │   │          ohladiteli-tiristorov · mednye-shiny. Управление: platy-upravleniya ·
+│   │   │          plata-impulsnyh-transformatorov · transformatory-toka-tpch · transformatory-pitaniya ·
+│   │   │          avtomaty-kontaktory-tpch · izmeritelnye-pribory · pulty-upravleniya-naklonom.
+│   │   │          Соединения: kabel-silovoj-vodoohlazhdaemyj (+nakonechniki-…) · izolyatory-tpch ·
+│   │   │          shlangi-kollektory-ohlazhdeniya · ventilyatory-ohlazhdeniya. Плавильный узел:
+│   │   │          korpusa-pechey · izoliruyushchie-kolca · shablony-futerovki · elektricheskie-trambovki ·
+│   │   │          reduktory-naklona (11 моделей RZS). Плюс nomenklatura (все позиции) и 4 страницы
+│   │   │          подбора: podbor-zapchastey · kak-podobrat-tiristor · kak-podobrat-kondensator ·
+│   │   │          komplekt-zip · ustroystvo-tpch.
+│   │   │          Поиск по маркировке, фильтр по группам, заявка со списком — скрипт пакета
+│   │   │          /js/ui-spares.js, данные каталога в блоке <!--C:spares-runtime-->. Стили в .ui-spares.
+│   │   │          5 прежних страниц (хаб, тиристоры, конденсаторы, кабели, платы) перекрыты
+│   │   │          пакетом по тем же адресам — редиректы не потребовались.
 │   │   └── …/drobemetnoe/                                   ✅ T03a · Подкатегория «Для дробемётного оборудования» (14 тизеров T05)
 │   │           └── impeller-m · napravlyayushhaya(-m) · raspredelitel(-m) · lopatki(-m) · vkladysh-{verhnij,bokovoj,perednij,zadnij}(-m) · vkladysh-perednij-zadnij
 │   │   └── …/tranzistornye/                                 ✅ Раздел «Для транзисторных установок» (пакет 18.09.2026, 18 страниц)

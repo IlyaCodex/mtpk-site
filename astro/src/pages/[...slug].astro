@@ -8,6 +8,7 @@ import WhyUs12 from '../components/blocks/WhyUs12.astro';
 import BestOffer from '../components/blocks/BestOffer.astro';
 import Partner from '../components/blocks/Partner.astro';
 import Leadgen from '../components/blocks/Leadgen.astro';
+import SparesRuntime from '../components/blocks/SparesRuntime.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -60,6 +61,7 @@ const COMPONENTS: Record<string, any> = {
   'best-offer': BestOffer,
   'partner': Partner,
   'leadgen': Leadgen,
+  'spares-runtime': SparesRuntime,
 };
 
 export async function getStaticPaths() {
