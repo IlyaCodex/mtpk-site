@@ -1,0 +1,33 @@
+.ui-futerovka{--ui-green:#3c8e33;--ui-dark:#21491d;--ui-pale:#f1f9ee;--ui-text:#18181b;max-width:1180px;margin:0 auto;padding:40px 28px 80px;font:17px/1.7 Arial,Helvetica,sans-serif;color:var(--ui-text);background:#fff;box-sizing:border-box}.ui-futerovka *{box-sizing:border-box}.ui-futerovka h1,.ui-futerovka h2,.ui-futerovka h3{font-weight:700;line-height:1.2;letter-spacing:-.025em;color:#18181b}.ui-futerovka h1{font-size:clamp(32px,4vw,49px);margin:15px 0 22px}.ui-futerovka h2{font-size:clamp(27px,3vw,35px);margin:0 0 24px}.ui-futerovka h3{font-size:22px;margin:30px 0 12px}.ui-futerovka p{margin:0 0 20px}.ui-futerovka a{color:#2f702a;text-underline-offset:3px;overflow-wrap:anywhere}.ui-futerovka a:hover{color:#21491d}.ui-futerovka a:focus-visible,.ui-futerovka .ui-table-wrap:focus-visible{outline:3px solid #3c8e33;outline-offset:5px}.ui-futerovka .ui-eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#2f702a}.ui-futerovka .ui-subtitle{font-size:18px;color:#52525b;line-height:1.6}.ui-futerovka .ui-hero{display:grid;grid-template-columns:1.03fr 1fr;gap:35px;align-items:center;margin-bottom:34px}.ui-futerovka .ui-hero figure{margin:0}.ui-futerovka .ui-actions{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin:26px 0 0;font-size:15px}.ui-futerovka .ui-button{display:inline-block;padding:13px 22px;border-radius:6px;color:white;background:#3c8e33;font-weight:700;text-decoration:none}.ui-futerovka .ui-button:hover{background:#2f702a;color:white}.ui-futerovka figure{margin:32px auto;max-width:860px}.ui-futerovka img{display:block;width:100%;height:auto}.ui-futerovka figcaption{font-size:13px;line-height:1.5;color:#71717a;margin-top:10px}.ui-futerovka .ui-toc{background:var(--ui-pale);padding:26px 30px;margin:35px 0 48px;border-radius:8px}.ui-futerovka .ui-toc-title{font-weight:700;margin-bottom:10px}.ui-futerovka .ui-toc ol{columns:2;column-gap:42px;margin:0;padding-left:22px;font-size:15px}.ui-futerovka .ui-toc li{break-inside:avoid;padding:5px 0}.ui-futerovka section{margin-top:54px;scroll-margin-top:35px}.ui-futerovka ul{padding-left:23px}.ui-futerovka li{padding-bottom:8px}.ui-futerovka .ui-table-wrap{max-width:100%;overflow-x:auto;margin:25px 0 28px}.ui-futerovka table{border-collapse:collapse;width:100%;font-size:15px;line-height:1.55;text-align:left;min-width:610px}.ui-futerovka caption{text-align:left;font-weight:700;font-size:18px;color:#21491d;padding:0 0 14px;caption-side:top}.ui-futerovka th,.ui-futerovka td{border:1px solid #d9ded7;padding:15px 16px;vertical-align:top}.ui-futerovka thead th{background:#285923;color:#fff;font-weight:700}.ui-futerovka tbody th{font-weight:600;min-width:160px}.ui-futerovka tbody tr:nth-child(even){background:#f4f8f2}.ui-futerovka .ui-formula{font-weight:700;font-size:18px;padding:15px 0;overflow-wrap:anywhere}.ui-futerovka .ui-links{list-style:none;padding:0}.ui-futerovka .ui-links li{padding:6px 0} @media(max-width:760px){.ui-futerovka{padding:25px 18px 50px;font-size:16px}.ui-futerovka .ui-hero{grid-template-columns:1fr;gap:18px}.ui-futerovka .ui-hero figure{max-width:550px}.ui-futerovka .ui-toc{padding:20px}.ui-futerovka .ui-toc ol{columns:1}.ui-futerovka section{margin-top:38px}.ui-futerovka th,.ui-futerovka td{padding:12px}.ui-futerovka .ui-actions{gap:14px}.ui-futerovka .ui-formula{font-size:16px}} @media print{.ui-futerovka{padding:0;font-size:11pt;max-width:none}.ui-futerovka .ui-toc,.ui-futerovka .ui-actions{display:none}.ui-futerovka .ui-hero{display:block}.ui-futerovka .ui-hero figure{max-width:420px}.ui-futerovka table{font-size:9pt;min-width:0}.ui-futerovka .ui-table-wrap{overflow:visible}.ui-futerovka th,.ui-futerovka td{padding:7px}.ui-futerovka thead{display:table-header-group}.ui-futerovka tr{break-inside:avoid}.ui-futerovka h2,.ui-futerovka h3,.ui-futerovka caption{break-after:avoid}.ui-futerovka figure{max-width:470px;break-inside:avoid}}
+
+/* ============================================================
+   Обвязка под сайт. Стили пакета ограничены классом .ui-futerovka
+   и соседние страницы не трогают; здесь — только то, что нужно,
+   чтобы статья встала в нашу страницу: тело сайта тёмное, поэтому
+   обёртка красит себя сама, а ширину задаём как в разделе запчастей.
+   ============================================================ */
+.ui-futerovka-page { background: var(--neutral-0); padding: 24px 0 56px; }
+.ui-futerovka-page .container { width: min(1280px, calc(100% - 64px)); margin: auto; }
+.ui-futerovka-page .breadcrumb { margin-bottom: 20px; }
+/* широкие таблицы на телефоне прокручиваются по горизонтали */
+.ui-futerovka table { min-width: 520px; }
+.ui-futerovka .table-scroll, .ui-futerovka figure.table { overflow-x: auto; }
+
+/* Первый экран без фотографии: в пакете это сетка из двух колонок,
+   а иллюстрация снята до подтверждения прав — иначе половина пустует. */
+.ui-futerovka .ui-hero--solo { grid-template-columns: 1fr; max-width: 820px; }
+
+/* Крошки: на сайте их правила лежат в постраничных инлайновых стилях,
+   а не в общем site.css, поэтому здесь нужны свои. */
+.ui-futerovka-page .breadcrumb { font-size: 13px; color: var(--text-tertiary); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ui-futerovka-page .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+.ui-futerovka-page .breadcrumb a:hover { color: var(--teal-600); }
+.ui-futerovka-page .breadcrumb__sep { color: var(--border-default); }
+.ui-futerovka-page .breadcrumb__current { color: var(--text-tertiary); }
+
+/* На телефоне поля складывались дважды: 32px у контейнера и 18px у статьи,
+   из 390px на текст оставалось 262. padding у статьи свои, поэтому внешние
+   на узких экранах снимаем. */
+@media (max-width: 640px) {
+  .ui-futerovka-page .container { width: 100%; }
+}
