@@ -14,13 +14,16 @@
 .catalog-section img, .category-grid img, .shared-turbines img, .section-hero img, .model-strip img, .selection-banner img, .seo-faq img, .product-page img, .request-dialog img, .image-dialog img, .pagination img, .zap-hero img, .section img { display: block; max-width: 100%; }
 .catalog-section button, .category-grid button, .shared-turbines button, .section-hero button, .model-strip button, .selection-banner button, .seo-faq button, .product-page button, .request-dialog button, .image-dialog button, .pagination button, .zap-hero button, .section button { cursor: pointer; }
 .catalog-section button, .catalog-section input, .catalog-section select, .catalog-section textarea, .category-grid button, .category-grid input, .category-grid select, .category-grid textarea, .shared-turbines button, .shared-turbines input, .shared-turbines select, .shared-turbines textarea, .section-hero button, .section-hero input, .section-hero select, .section-hero textarea, .model-strip button, .model-strip input, .model-strip select, .model-strip textarea, .selection-banner button, .selection-banner input, .selection-banner select, .selection-banner textarea, .seo-faq button, .seo-faq input, .seo-faq select, .seo-faq textarea, .product-page button, .product-page input, .product-page select, .product-page textarea, .request-dialog button, .request-dialog input, .request-dialog select, .request-dialog textarea, .image-dialog button, .image-dialog input, .image-dialog select, .image-dialog textarea, .pagination button, .pagination input, .pagination select, .pagination textarea, .zap-hero button, .zap-hero input, .zap-hero select, .zap-hero textarea, .section button, .section input, .section select, .section textarea { font: inherit; }
-/* Фон: тело страницы у сайта тёмное, каждая секция красит себя сама.
-   В прототипе это делал body{background:#fff}, который мы отбросили.
-   Перечислены только блоки БЕЗ собственного фона: у .section-hero,
-   .selection-banner и .catalog-section он свой (тёмный/серый), и белая
-   заливка делала белый текст на белом. */
-.product-page, .seo-faq, .shared-turbines, .pagination, .category-grid,
-.zapchasti-page .section { background: var(--neutral-0); }
+/* Фон: тело страницы у сайта тёмное, в прототипе его красил
+   body{background:#fff}, который мы не берём. Красим одну обёртку
+   во всю ширину, а не отдельные блоки: .shared-turbines сам является
+   контейнером, и заливка по нему оставляла тёмные поля по краям.
+   Блоки со своим фоном (.zap-hero, .section-hero, .catalog-section,
+   .selection-banner) закрашивают её сверху. */
+.zapchasti-page { background: var(--neutral-0); }
+/* Ширина контейнера — как в прототипе и на эталонном сайте; за пределами
+   раздела запчастей контейнер сайта не трогаем. */
+.zapchasti-page .container { width: min(1280px, calc(100% - 64px)); margin: auto; }
 
 .button{display:inline-flex;align-items:center;justify-content:center;gap:15px;border:1px solid transparent;border-radius:6px;padding:14px 21px;font-weight:650;font-size:14px;line-height:1.4;background:var(--green-500);color:white;transition:background .15s,transform .15s}
 .button:hover{background:var(--green-600, #348c26)}
@@ -29,6 +32,9 @@
 .button-light{border-color:#6d8286;color:white;background:transparent}
 .button-light:hover{background:#243b41}
 .button-small{padding:10px 15px;font-size:13px}
+.breadcrumbs{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:12px;color:#819397;margin-bottom:26px}
+.breadcrumbs a:hover{text-decoration:underline}
+.breadcrumbs .sep{color:#9dafb2}
 .zap-hero{background:var(--neutral-900, #102329);color:#fff;overflow:hidden}
 .zap-hero .container{padding-top:28px;padding-bottom:45px}
 .zap-hero .breadcrumbs{color:#aabbbc;margin-bottom:31px}
@@ -262,6 +268,7 @@ details[open] summary:after{content:'−'}
 }
 @media(max-width:600px){
 .zap-hero .container{padding-top:20px;padding-bottom:30px}
+.breadcrumbs{font-size:10px;gap:6px}
 .zap-hero .breadcrumbs{margin-bottom:22px}
 .zap-hero .breadcrumbs .hide-mobile{display:none}
 .zap-hero-main{display:flex;flex-direction:column;gap:26px;align-items:stretch}
