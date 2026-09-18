@@ -27,11 +27,14 @@ if(listing){
  $('toggle-filters').onclick=()=>{const on=$('filters').classList.toggle('mobile-open');$('toggle-filters').setAttribute('aria-expanded',String(on))};
  filterCatalog();
 }
+// Увеличение фото: у транзисторных запчастей триггер — ссылка
+// на файл картинки, поэтому переход отменяем; без скрипта
+// ссылка продолжает работать как запасной путь.
 document.addEventListener('click',event=>{
  const request=event.target.closest('[data-request]');
  if(request){const form=$('request-form');form.elements.part.value=request.dataset.part||'';form.elements.model.value=request.dataset.model||($('model-select')?.value||'');form.elements.quantity.value=$('quantity')?.value||'1';$('request-result').hidden=true;$('request-dialog').showModal();return}
  const close=event.target.closest('[data-close]');if(close){close.closest('dialog').close();return}
- const zoom=event.target.closest('[data-zoom]');if(zoom){$('zoom-image').src=zoom.dataset.zoom;$('zoom-image').alt=zoom.dataset.alt;$('zoom-caption').textContent=zoom.dataset.caption;$('image-dialog').showModal();return}
+ const zoom=event.target.closest('[data-zoom]');if(zoom){event.preventDefault();$('zoom-image').src=zoom.dataset.zoom;$('zoom-image').alt=zoom.dataset.alt;$('zoom-caption').textContent=zoom.dataset.caption;$('image-dialog').showModal();return}
  const qty=event.target.closest('[data-qty]');if(qty)$('quantity').value=Math.max(1,Math.min(9999,(Number($('quantity').value)||1)+Number(qty.dataset.qty)));
 });
 // Preserve the existing site's public form contract. Capture precedes forms-current.js.
