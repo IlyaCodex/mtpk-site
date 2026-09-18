@@ -5,6 +5,7 @@ import Adv12 from '../components/blocks/Adv12.astro';
 import CatalogCta from '../components/blocks/CatalogCta.astro';
 import WhyUs from '../components/blocks/WhyUs.astro';
 import WhyUs12 from '../components/blocks/WhyUs12.astro';
+import WhyUs6 from '../components/blocks/WhyUs6.astro';
 import BestOffer from '../components/blocks/BestOffer.astro';
 import Partner from '../components/blocks/Partner.astro';
 import Leadgen from '../components/blocks/Leadgen.astro';
@@ -55,6 +56,7 @@ const COMPONENTS: Record<string, any> = {
   'adv-chiller': Adv12,
   'adv-12': Adv12,
   'why-us-12': WhyUs12,
+  'why-us-6': WhyUs6,
   'catalog-cta': CatalogCta,
   'why-us': WhyUs,
   'best-offer': BestOffer,
@@ -276,7 +278,7 @@ for (let i = 0; i < parts.length; i++) {
       шаблонных файлов (например tovar-b.css) не доезжают до вернувшихся юзеров.
       Поднимай дату при правке любого /css/tpl/*.css. */}
   {cssTemplates.map((href) => (
-    <link slot="head" rel="stylesheet" href={`${href}?v=20260918h`} />
+    <link slot="head" rel="stylesheet" href={`${href}?v=20260918i`} />
   ))}
   {externalStyles.map((href) => (
     <link slot="head" rel="stylesheet" href={href} />
