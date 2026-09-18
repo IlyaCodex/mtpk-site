@@ -38,8 +38,11 @@
         words.every(w => norm([r.id, r.name, r.params, r.purpose].join(' ')).includes(w)));
       const show = active || full;
       document.getElementById('search-results').hidden = !show;
+      // Статический список прячем ровно тогда, когда показываем выдачу.
+      // На «Всей номенклатуре» выдача есть и без запроса (full), и при
+      // прежнем условии обе половины показывались разом — 240 позиций.
       const groups = document.getElementById('catalog-groups');
-      if (groups) groups.hidden = !!active;
+      if (groups) groups.hidden = show;
       if (show) {
         document.getElementById('results-list').innerHTML =
           filtered.map(r => templates[r.id]).join('');

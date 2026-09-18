@@ -302,3 +302,165 @@
   .request-form label { font-size: 10px; }
   .request-form input, .request-form textarea { font-size: 12px; padding: 10px 8px; }
 }
+
+
+/* ============================================================
+   Товарная страница и карточки каталога: правила перенесены
+   из tpl/zapchasti.css как есть (72), чтобы раздел выглядел
+   ровно как запчасти дробемётов.
+   ============================================================ */
+и т.п.). Суффикс
+   дописан КАЖДОМУ селектору списка — запись «.a, .b a» применилась бы
+   только к .b. */
+.catalog-section, .category-grid, .shared-turbines, .section-hero, .model-strip, .selection-banner, .seo-faq, .product-page, .request-dialog, .image-dialog, .pagination, .zap-hero, .section { box-sizing: border-box; }
+.catalog-section *, .category-grid *, .shared-turbines *, .section-hero *, .model-strip *, .selection-banner *, .seo-faq *, .product-page *, .request-dialog *, .image-dialog *, .pagination *, .zap-hero *, .section * { box-sizing: border-box; }
+.catalog-section a, .category-grid a, .shared-turbines a, .section-hero a, .model-strip a, .selection-banner a, .seo-faq a, .product-page a, .request-dialog a, .image-dialog a, .pagination a, .zap-hero a, .section a { color: inherit; text-decoration: none; }
+.catalog-section img, .category-grid img, .shared-turbines img, .section-hero img, .model-strip img, .selection-banner img, .seo-faq img, .product-page img, .request-dialog img, .image-dialog img, .pagination img, .zap-hero img, .section img { display: block; max-width: 100%; }
+.catalog-section button, .category-grid button, .shared-turbines button, .section-hero button, .model-strip button, .selection-banner button, .seo-faq button, .product-page button, .request-dialog button, .image-dialog button, .pagination button, .zap-hero button, .section button { cursor: pointer; }
+.catalog-section button, .catalog-section input, .catalog-section select, .catalog-section textarea, .category-grid button, .category-grid input, .category-grid select, .category-grid textarea, .shared-turbines button, .shared-turbines input, .shared-turbines select, .shared-turbines textarea, .section-hero button, .section-hero input, .section-hero select, .section-hero textarea, .model-strip button, .model-strip input, .model-strip select, .model-strip textarea, .selection-banner button, .selection-banner input, .selection-banner select, .selection-banner textarea, .seo-faq button, .seo-faq input, .seo-faq select, .seo-faq textarea, .product-page button, .product-page input, .product-page select, .product-page textarea, .request-dialog button, .request-dialog input, .request-dialog select, .request-dialog textarea, .image-dialog button, .image-dialog input, .image-dialog select, .image-dialog textarea, .pagination button, .pagination input, .pagination select, .pagination textarea, .zap-hero button, .zap-hero input, .zap-hero select, .zap-hero textarea, .section button, .section input, .section select, .section textarea { font: inherit; }
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.product-card{border:1px solid var(--border-subtle);background:white;border-radius:8px;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .2s,transform .2s}
+.product-card:hover{box-shadow:0 9px 24px #17321c10;transform:translateY(-2px);border-color:#c5d4bd}
+.card-image{padding:20px 25px 12px;display:block;height:194px;background:white}
+.card-image img{width:100%;height:100%;object-fit:contain}
+.card-content{padding:10px 19px 18px;display:flex;flex-direction:column;flex:1}
+.card-category{font-size:10px;color:#7c8c8e;margin-bottom:8px}
+.product-card h3{font-size:14px;font-weight:650;line-height:1.5;margin:0 0 10px}
+.product-card h3 a:hover{color:var(--green-600, #348c26)}
+.card-bottom{margin-top:auto;padding-top:13px;border-top:1px solid #edf0ec;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-price{font-weight:650;font-size:12px}
+.card-detail{color:var(--green-600, #348c26);font-size:11px;font-weight:650;white-space:nowrap}
+.product-page{padding:25px 0 45px}
+.product-page .breadcrumbs{margin-bottom:28px}
+.product-overview{display:grid;grid-template-columns:1fr 1fr;gap:55px;align-items:start}
+.product-visual{position:relative}
+.product-photo{width:100%;border:1px solid var(--border-subtle);border-radius:12px;background:white;padding:35px;height:454px;display:flex;align-items:center;justify-content:center;position:relative}
+.product-photo img{height:100%;width:100%;object-fit:contain}
+.photo-caption{font-size:11px;color:#7a8a8d;line-height:1.7;margin:14px 4px}
+.product-info .zap-eyebrow{color:var(--green-600, #348c26);font-size:10px}
+.product-info h1{font-size:31px;letter-spacing:-.035em;line-height:1.22;margin:16px 0 15px}
+.product-lead{color:#627377;font-size:14px;line-height:1.8;margin:0 0 20px}
+.quick-specs{margin:0 0 24px}
+.quick-specs div{display:flex;justify-content:space-between;gap:20px;padding:8px 0;border-bottom:1px solid #edf1ed;font-size:12px}
+.quick-specs dt{color:#7a8b8b}
+.quick-specs dd{margin:0;text-align:right;font-weight:550}
+.request-box{background:#f3f7f0;border:1px solid #e0eadb;border-radius:8px;padding:21px 23px}
+.request-price{font-size:24px;font-weight:700;letter-spacing:-.025em;margin:0}
+.request-sub{font-size:11px;color:#788b72;margin:4px 0 19px}
+.request-actions{display:flex;gap:12px}
+.qty{display:flex;align-items:center;border:1px solid #d3dfcb;background:white;border-radius:5px;overflow:hidden;height:47px;flex-shrink:0}
+.qty button{width:32px;height:100%;background:transparent;border:0;font-size:18px;color:#647959}
+.qty input{width:37px;border:0;appearance:textfield;-moz-appearance:textfield;text-align:center;font-size:13px;color:var(--text-primary)}
+.qty input::-webkit-inner-spin-button{appearance:none}
+.request-actions>.button{flex:1}
+.product-tabs{display:flex;gap:30px;border-bottom:1px solid var(--border-subtle);margin:45px 0 32px;font-size:13px;font-weight:600}
+.product-tabs a{padding:0 0 14px}
+.product-tabs a:first-child{border-bottom:2px solid var(--green-500);color:var(--green-600, #348c26)}
+.product-detail-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:65px}
+.product-description h2,.product-description h3{font-size:24px;line-height:1.3;margin:0 0 20px;letter-spacing:-.02em}
+.product-description h3{font-size:21px;margin-top:30px}
+.product-description p{font-size:14px;color:#637479;line-height:1.85;margin:0 0 17px}
+.spec-table{width:100%;border-collapse:collapse;font-size:13px}
+.spec-table th,.spec-table td{padding:12px 15px;text-align:left;border-bottom:1px solid #e7ece8;vertical-align:top}
+.spec-table th{font-weight:400;color:#6e8180;width:48%}
+.spec-table tr:nth-child(odd){background:#f6f8f5}
+.selection-panel{padding:25px;background:#f5f8f3;border:1px solid #e3eadf;border-radius:8px;align-self:start}
+.selection-panel h2{font-size:19px;line-height:1.3;margin:0 0 17px}
+.selection-panel ul{padding:0;margin:0 0 20px;list-style:none}
+.selection-panel li{font-size:13px;color:#63785d;margin-bottom:14px;padding-left:22px;position:relative}
+.selection-panel li:before{content:'✓';position:absolute;left:0;color:#5a9d46}
+.selection-panel p{font-size:12px;color:#73846c}
+.related-section{margin-top:49px}
+.related-section h2{font-size:25px;margin:0 0 21px}
+.related-section .product-grid{grid-template-columns:repeat(3,1fr);max-width:980px}
+.related-section .card-image{height:180px}
+.back-catalog{font-size:12px;color:var(--green-600, #348c26);display:inline-flex;align-items:center;gap:7px}
+.request-dialog::backdrop,.image-dialog::backdrop{background:#071b24b3;backdrop-filter:blur(4px)}
+.image-dialog{border:0;border-radius:10px;padding:34px;width:min(850px,calc(100% - 30px));max-height:92vh}
+.image-dialog img{width:100%;height:70vh;object-fit:contain}
+.image-dialog p{font-size:12px;color:var(--text-secondary);text-align:center}
+@media(max-width:1100px){
+.product-grid{gap:10px}
+.card-image{height:164px;padding:15px}
+.card-content{padding:10px 13px 15px}
+.product-card h3{font-size:12px}
+.card-price{font-size:11px}
+.card-bottom{flex-wrap:wrap}
+.product-overview{gap:32px}
+.product-info h1{font-size:27px}
+.product-photo{height:416px}
+.product-detail-grid{gap:35px}
+}
+@media(max-width:820px){
+.product-grid{gap:14px}
+.product-card h3{font-size:13px}
+.card-image{height:180px}
+.product-overview{grid-template-columns:.85fr 1.15fr;gap:25px}
+.product-photo{height:343px;padding:22px}
+.product-info h1{font-size:24px}
+.request-actions{flex-wrap:wrap}
+.request-actions .button{flex-basis:100%}
+.product-detail-grid{grid-template-columns:1fr}
+.selection-panel{max-width:none}
+.quick-specs div{font-size:11px}
+.request-box{padding:18px}
+.product-tabs{gap:25px}
+.related-section .product-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:600px){
+.product-grid{grid-template-columns:repeat(2,1fr);gap:9px}
+.card-image{height:141px;padding:15px 12px 8px}
+.card-content{padding:6px 11px 12px}
+.card-category{font-size:8px;margin-bottom:6px}
+.product-card h3{font-size:11px;line-height:1.5;margin-bottom:8px}
+.card-bottom{padding-top:10px;gap:8px;align-items:flex-start;flex-direction:column}
+.card-price{font-size:10px}
+.card-detail{font-size:10px}
+.product-page{padding-top:19px}
+.product-page .breadcrumbs{margin-bottom:19px}
+.product-overview{display:flex;flex-direction:column;gap:19px}
+.product-visual{width:100%}
+.product-photo{height:310px;padding:25px}
+.photo-caption{font-size:10px;margin:10px 2px}
+.product-info h1{font-size:27px;letter-spacing:-.03em}
+.product-info .zap-eyebrow{font-size:9px}
+.product-lead{font-size:13px}
+.quick-specs div{font-size:12px}
+.request-price{font-size:24px}
+.request-actions{flex-wrap:nowrap;gap:10px}
+.request-actions .button{font-size:12px;padding:12px;flex-basis:auto}
+.qty button{width:28px}
+.qty input{width:27px}
+.request-box{padding:19px}
+.product-tabs{gap:20px;font-size:11px;margin:30px 0 24px;overflow:auto;white-space:nowrap}
+.product-description h2{font-size:23px}
+.product-description p{font-size:13px}
+.spec-table{font-size:11px}
+.spec-table th,.spec-table td{padding:11px 10px;overflow-wrap:anywhere}
+.selection-panel{padding:22px}
+.related-section{margin-top:35px}
+.related-section .product-grid{grid-template-columns:repeat(2,1fr)}
+.related-section .card-image{height:145px}
+.related-section h2{font-size:23px}
+.image-dialog{padding:25px 15px}
+.image-dialog img{height:60vh}
+.image-dialog p{font-size:10px}
+}
+.product-photo img{height:100%;width:100%;object-fit:contain}
+.scope-badge{font-size:10px;color:#496543;margin:0 0 12px;background:#eef5ea;border-radius:4px;padding:5px 7px}
+
+/* .product-page у дробемётов обнуляет боковые поля (padding: 25px 0 45px),
+   а гутер там задан шириной контейнера. У нас контейнер сайтовый и держит
+   поля именно padding'ом — поэтому для товарной страницы задаём ширину
+   так же, иначе содержимое прилипает к краю экрана. */
+.ui-spares-page .container.product-page {
+  width: min(var(--container-wide), calc(100% - 64px)); margin-inline: auto;
+}
+@media (max-width: 640px) {
+  .ui-spares-page .container.product-page { width: calc(100% - 32px); }
+}
+.ui-spares-page .product-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px) { .ui-spares-page .product-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .ui-spares-page .product-grid { grid-template-columns: 1fr; } }
+/* Фото у позиции — снимок раздела: своего в пакете нет. Не растягиваем. */
+.ui-spares-page .card-image img { object-fit: contain; background: #fff; }
