@@ -42,6 +42,8 @@ document.addEventListener('submit',event=>{
  const form=event.target;if(form.id!=='request-form')return;
  const text='Деталь: '+form.elements.part.value+'\nМодель: '+form.elements.model.value+'\nКоличество: '+form.elements.quantity.value;
  form.elements.message.value=text;
- form.elements.source.value='Запчасти дробемёта · '+location.pathname+' · '+text.replace(/\n/g,'; ');
+ // Метку берём из самой формы: обработчик обслуживает и запчасти
+ // индукционных печей, у них должен быть свой источник заявки.
+ form.elements.source.value=(form.dataset.form||'Запчасти')+' · '+location.pathname+' · '+text.replace(/\n/g,'; ');
 },true);
 for(const dialog of document.querySelectorAll('dialog'))dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close()}});
