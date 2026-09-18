@@ -3,7 +3,7 @@
   "description": "Как составить комплект ЗИП по установленным тиристорам, конденсаторам, кабелям и платам. Ведомость, критерии резерва и данные для предложения.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

@@ -3,7 +3,7 @@
   "description": "Элементы водяного охлаждения ТПЧ: шланги, коллекторы, штуцеры и крепления. Подбор по схеме протока, присоединениям и свойствам теплоносителя.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

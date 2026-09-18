@@ -3,7 +3,7 @@
   "description": "Асбестовые изолирующие кольца для индукционных печей. Подбор по месту установки, диаметрам, толщине, отверстиям и чертежу детали.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

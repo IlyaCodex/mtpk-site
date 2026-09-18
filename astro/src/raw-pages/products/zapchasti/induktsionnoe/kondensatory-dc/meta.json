@@ -3,7 +3,7 @@
   "description": "Фильтровые конденсаторы для звена постоянного тока. 6 вариантов по U DC, ёмкости и секциям; проверка пульсаций, подключения и исполнения.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

@@ -3,7 +3,7 @@
   "description": "Изготовление катушек для ремонта реакторов ТПЧ по чертежу или образцу. Подбор обмоток, изоляции, выводов и охлаждения для печей серии УИ.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

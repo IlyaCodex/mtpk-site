@@ -3,7 +3,7 @@
   "description": "Электрические трамбовки для уплотнения набивной футеровки индукционных печей. Подбор рабочего органа, привода и режима по технологии набивки.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

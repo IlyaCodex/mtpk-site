@@ -3,7 +3,7 @@
   "description": "Щитовые амперметры, вольтметры, частотомеры и манометры для печей и ТПЧ. Подбор по шкале, входному сигналу, частоте и монтажным размерам.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

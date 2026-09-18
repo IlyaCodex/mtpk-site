@@ -1,9 +1,9 @@
 {
-  "title": "Тиристор Y50KPE TECHSEM — характеристики, подбор | УралИндуктор",
-  "description": "Y50KPE: средний ток 1540 А при Tc = 70 °C, корпус KT50cT. Характеристики, чертёж и паспорт PDF. Подбор исполнения и запрос цены.",
+  "title": "Тиристор TECHSEM Y50KPE | УралИндуктор",
+  "description": "Тиристор TECHSEM Y50KPE. Фазовое управление в выпрямителе ТПЧ. Подбор по маркировке и режиму работы. Цена по запросу.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

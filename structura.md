@@ -167,31 +167,19 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   ├── /products/vakuumnoe-oborudovanie-dlya-termoobrabotki/  ✅ T03a · Хаб «Вакуумное оборудование для термообработки»
 │   │       └── 8 карточек T05 (vacuum-* — печи/установки, обложки card-vacuum-* в цех-каноне)
 │   ├── /products/zapchasti/                            ✅ T03a · Хаб-раздел «Запчасти на оборудование» (4 тизера подкатегорий)
-│   │   ├── …/induktsionnoe/                                 ✅ Раздел «Для индукционного оборудования» (пакет V10, 18.09.2026, 48 страниц)
-│   │   │       └── 25 подразделов, 120 позиций. Силовая часть: tiristory-silovye (+15 исполнений
-│   │   │          TECHSEM Y38…Y70 KPE/KKE) · tiristornye-sborki · kondensatory-elektrotermicheskie ·
-│   │   │          kondensatory-dc · reaktory-drosseli · katushki-reaktorov · rezistory-rc-cepi ·
-│   │   │          ohladiteli-tiristorov · mednye-shiny. Управление: platy-upravleniya ·
-│   │   │          plata-impulsnyh-transformatorov · transformatory-toka-tpch · transformatory-pitaniya ·
-│   │   │          avtomaty-kontaktory-tpch · izmeritelnye-pribory · pulty-upravleniya-naklonom.
-│   │   │          Соединения: kabel-silovoj-vodoohlazhdaemyj (+nakonechniki-…) · izolyatory-tpch ·
-│   │   │          shlangi-kollektory-ohlazhdeniya · ventilyatory-ohlazhdeniya. Плавильный узел:
-│   │   │          korpusa-pechey · izoliruyushchie-kolca · shablony-futerovki · elektricheskie-trambovki ·
-│   │   │          reduktory-naklona (11 моделей RZS). Плюс nomenklatura (все позиции) и 4 страницы
-│   │   │          подбора: podbor-zapchastey · kak-podobrat-tiristor · kak-podobrat-kondensator ·
-│   │   │          komplekt-zip · ustroystvo-tpch.
-│   │   │          Структура как у дробемётов и на казахстанском сайте: раздел -> карточки
-│   │   │          позиций -> подробная страница -> вопросы внизу. У каждой из 120 позиций
-│   │   │          своя страница; пакет адреса дал только 16, остальные 104 собраны
-│   │   │          из названия и отличающих параметров (…/<раздел>/<позиция>/).
-│   │   │          Поиск по маркировке и фильтр по группам — /js/ui-spares.js, данные каталога
-│   │   │          в блоке <!--C:spares-runtime-->. Форма запроса цены — как у дробемётов;
-│   │   │          корзина пакета с письмом в почтовой программе не используется.
-│   │   │          Китайские подписи пакета из раздела убраны.
-│   │   │          ⚠ Своей фотографии у позиции в пакете нет — карточка и страница берут
-│   │   │             снимок раздела, подпись это оговаривает.
-│   │   │          5 прежних страниц (хаб, тиристоры, конденсаторы, кабели, платы) перекрыты
-│   │   │          пакетом по тем же адресам — редиректы не потребовались.
+│   │   ├── …/induktsionnoe/                                 ✅ Раздел «Для индукционного оборудования» (пакет V10 + перенос из KZ, 18.09.2026)
+│   │   │       └── 152 страницы: хаб, 25 узлов, 120 позиций, «Вся номенклатура» и гайды.
+│   │   │          Механика та же, что у дробемётов: тёмный hero, полоса цифр, сетка узлов,
+│   │   │          каталог с фильтрами по узлу и группе, поиском, сортировкой и пагинацией;
+│   │   │          у позиции — фото с увеличением, быстрые характеристики, «Цена по запросу»
+│   │   │          со счётчиком, вкладки, таблица исполнения, панель подбора, связанные позиции.
+│   │   │          Страницы позиций лежат плоско в разделе (…/induktsionnoe/<позиция>/) —
+│   │   │          как на казахстанском сайте, откуда раздел и перенесён (коммиты 3615b7c,
+│   │   │          4450c71, dcc8f6d репозитория MTPK-SITE-KAZAHSTAN).
+│   │   │          Стили: /css/zapchasti-catalog.css (прототип, заскоуплен в .zp) + /css/ui-spares.css
+│   │   │          (справочные блоки пакета, мост .zp → .ui-spares-scope). Работает на
+│   │   │          zapchasti-catalog.js, подпись источника заявки берётся из data-form.
+│   │   │          Китайских подписей пакета и корзины «в заявку» в разделе нет.
 │   │   └── …/drobemetnoe/                                   ✅ T03a · Подкатегория «Для дробемётного оборудования» (14 тизеров T05)
 │   │           └── impeller-m · napravlyayushhaya(-m) · raspredelitel(-m) · lopatki(-m) · vkladysh-{verhnij,bokovoj,perednij,zadnij}(-m) · vkladysh-perednij-zadnij
 │   │   └── …/tranzistornye/                                 ✅ Раздел «Для транзисторных установок» (пакет 18.09.2026, 18 страниц)

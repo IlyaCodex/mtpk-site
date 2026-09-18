@@ -3,7 +3,7 @@
   "description": "Платы управления MPU-2FK, MPU-6FK и MPU-7 для тиристорных преобразователей индукционных печей. Подбор по ревизии, питанию, разъёмам и схеме.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

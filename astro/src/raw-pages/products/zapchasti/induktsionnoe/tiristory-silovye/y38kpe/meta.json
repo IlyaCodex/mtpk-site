@@ -1,9 +1,9 @@
 {
-  "title": "Тиристор Y38KPE TECHSEM — характеристики, подбор | УралИндуктор",
-  "description": "Y38KPE: средний ток 890 А при Tc = 70 °C, корпус KT33aT/KT33cT. Характеристики, чертёж и паспорт PDF. Подбор исполнения и запрос цены.",
+  "title": "Тиристор TECHSEM Y38KPE | УралИндуктор",
+  "description": "Тиристор TECHSEM Y38KPE. Фазовое управление в выпрямителе ТПЧ. Подбор по маркировке и режиму работы. Цена по запросу.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

@@ -3,7 +3,7 @@
   "description": "Охладители дисковых тиристоров и блоки водяного охлаждения без тиристоров. Подбор по корпусу прибора, тепловому режиму, размерам и штуцерам.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

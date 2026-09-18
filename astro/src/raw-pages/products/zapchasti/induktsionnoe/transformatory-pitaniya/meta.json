@@ -3,7 +3,7 @@
   "description": "Трансформаторы 660/220 В, 220/17/17 В и среднечастотного напряжения 1000/100/20 В. Подбор по схеме обмоток, мощности, частоте и подключению.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

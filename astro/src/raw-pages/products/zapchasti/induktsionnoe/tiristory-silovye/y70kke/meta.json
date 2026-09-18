@@ -1,9 +1,9 @@
 {
-  "title": "Тиристор Y70KKE TECHSEM — характеристики, подбор | УралИндуктор",
-  "description": "Y70KKE: средний ток 2240 А при Tc = 55 °C, корпус KT60cT, tq 30–60 мкс. Характеристики, чертёж и паспорт PDF. Подбор исполнения и запрос цены.",
+  "title": "Тиристор TECHSEM Y70KKE | УралИндуктор",
+  "description": "Тиристор TECHSEM Y70KKE. Коммутация тока в инверторе ТПЧ. Подбор по маркировке и режиму работы. Цена по запросу.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

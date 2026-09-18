@@ -3,7 +3,7 @@
   "description": "Шаблоны для набивки футеровки индукционных печей 250, 500, 750 и 1000 кг. Подбор по профилю тигля, диаметру, высоте, конусности и конструкции дна.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

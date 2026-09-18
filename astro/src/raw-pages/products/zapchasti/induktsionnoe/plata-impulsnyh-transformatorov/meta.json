@@ -3,7 +3,7 @@
   "description": "Импульсные платы тиристорного преобразователя. Подбор по каналам, схеме, разъёмам, параметрам управления и исполнению установленного узла.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

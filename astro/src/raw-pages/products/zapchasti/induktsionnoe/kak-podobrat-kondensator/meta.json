@@ -3,7 +3,7 @@
   "description": "Как читать параметры конденсатора, отличить AC от DC и проверить U, квар, частоту и ёмкость. Пример расчёта и данные для согласования замены.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

@@ -3,7 +3,7 @@
   "description": "Изоляционные опоры, планки, втулки и стойки силовых узлов ТПЧ. Подбор по чертежу, электрической прочности, температуре и механической нагрузке.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

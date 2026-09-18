@@ -3,7 +3,7 @@
   "description": "Радиопульты управления наклоном плавильной печи: передатчик и приёмный блок. Подбор по питанию, выходам, командам и схеме привода наклона.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

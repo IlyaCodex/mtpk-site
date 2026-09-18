@@ -1,9 +1,9 @@
 {
-  "title": "Тиристор Y40KKE TECHSEM — характеристики, подбор | УралИндуктор",
-  "description": "Y40KKE: средний ток 1080 А при Tc = 55 °C, корпус KT39cT, tq 18–50 мкс. Характеристики, чертёж и паспорт PDF. Подбор исполнения и запрос цены.",
+  "title": "Тиристор TECHSEM Y40KKE | УралИндуктор",
+  "description": "Тиристор TECHSEM Y40KKE. Коммутация тока в инверторе ТПЧ. Подбор по маркировке и режиму работы. Цена по запросу.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

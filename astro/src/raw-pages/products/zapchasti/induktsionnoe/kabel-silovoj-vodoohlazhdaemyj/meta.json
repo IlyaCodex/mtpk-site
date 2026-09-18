@@ -3,7 +3,7 @@
   "description": "Силовые водоохлаждаемые кабели и связки: варианты 150–400 мм², длины и состав комплектов. Подбор наконечников, трассы, нагрузки и охлаждения.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

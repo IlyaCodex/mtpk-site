@@ -1,9 +1,9 @@
 {
-  "title": "Тиристор Y55KKE TECHSEM — характеристики, подбор | УралИндуктор",
-  "description": "Y55KKE: средний ток 1460 А при Tc = 55 °C, корпус KT54cT, tq 18–50 мкс. Характеристики, чертёж и паспорт PDF. Подбор исполнения и запрос цены.",
+  "title": "Тиристор TECHSEM Y55KKE | УралИндуктор",
+  "description": "Тиристор TECHSEM Y55KKE. Коммутация тока в инверторе ТПЧ. Подбор по маркировке и режиму работы. Цена по запросу.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

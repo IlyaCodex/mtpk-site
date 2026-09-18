@@ -3,7 +3,7 @@
   "description": "Измерение тока в тиристорном преобразователе. Плата DLXH-9.1 на фото, читаемые обозначения, назначение обратной связи и параметры подбора.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

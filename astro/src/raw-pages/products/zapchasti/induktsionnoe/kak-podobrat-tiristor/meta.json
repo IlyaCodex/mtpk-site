@@ -3,7 +3,7 @@
   "description": "Порядок подбора тиристора TECHSEM: назначение, ток с условиями охлаждения, напряжение, tq, управление и прижим. Пример сравнения Y65KKE и Y70KKE.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

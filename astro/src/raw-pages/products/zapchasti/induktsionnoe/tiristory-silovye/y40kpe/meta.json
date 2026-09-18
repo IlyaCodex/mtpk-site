@@ -1,9 +1,9 @@
 {
-  "title": "Тиристор Y40KPE TECHSEM — характеристики, подбор | УралИндуктор",
-  "description": "Y40KPE: средний ток 1070 А при Tc = 70 °C, корпус KT39cT. Характеристики, чертёж и паспорт PDF. Подбор исполнения и запрос цены.",
+  "title": "Тиристор TECHSEM Y40KPE | УралИндуктор",
+  "description": "Тиристор TECHSEM Y40KPE. Фазовое управление в выпрямителе ТПЧ. Подбор по маркировке и режиму работы. Цена по запросу.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

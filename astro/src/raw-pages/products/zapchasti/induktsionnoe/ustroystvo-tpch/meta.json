@@ -3,7 +3,7 @@
   "description": "Как работают выпрямитель, инвертор и вспомогательные системы ТПЧ. Назначение тиристоров, реакторов, конденсаторов, плат и элементов охлаждения.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

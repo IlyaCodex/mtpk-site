@@ -3,7 +3,7 @@
   "description": "120 позиций и исполнений запчастей для индукционных печей и ТПЧ. Поиск по названию, маркировке и параметрам, выбор деталей для заявки.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

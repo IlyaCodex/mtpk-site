@@ -1,9 +1,9 @@
 {
-  "title": "Тиристор Y65KPE TECHSEM — характеристики, подбор | УралИндуктор",
-  "description": "Y65KPE: средний ток 2460 А при Tc = 70 °C, корпус KT60cT. Характеристики, чертёж и паспорт PDF. Подбор исполнения и запрос цены.",
+  "title": "Тиристор TECHSEM Y65KPE | УралИндуктор",
+  "description": "Тиристор TECHSEM Y65KPE. Фазовое управление в выпрямителе ТПЧ. Подбор по маркировке и режиму работы. Цена по запросу.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

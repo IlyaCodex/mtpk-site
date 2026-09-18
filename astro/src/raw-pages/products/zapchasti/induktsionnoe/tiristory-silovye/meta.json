@@ -3,7 +3,7 @@
   "description": "Каталог TECHSEM: 7 семейств KPE и 8 KKE. Паспортные токи, напряжения, tq и корпуса. Карточки с заводскими данными и подбор исполнения по заявке.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

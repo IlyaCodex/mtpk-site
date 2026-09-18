@@ -3,7 +3,7 @@
   "description": "Токоведущие шины силовых узлов индукционных печей. Подбор по току, частоте, сечению, контактным площадкам, отверстиям и монтажному чертежу.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

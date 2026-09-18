@@ -3,7 +3,7 @@
   "description": "Коммутационные аппараты тиристорных преобразователей: автоматы, контакторы и вспомогательные контакты. Подбор по цепи, нагрузке и маркировке.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

@@ -3,7 +3,7 @@
   "description": "Вентиляторы шкафов преобразователей и узлов охлаждения индукционных печей. Подбор по расходу воздуха, давлению, питанию и монтажным размерам.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

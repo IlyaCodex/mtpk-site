@@ -3,7 +3,7 @@
   "description": "Запчасти для индукционных печей и ТПЧ: 120 позиций, тиристоры TECHSEM, конденсаторы, платы, реакторы, кабели и редукторы. Подбор по маркировке и чертежу.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }

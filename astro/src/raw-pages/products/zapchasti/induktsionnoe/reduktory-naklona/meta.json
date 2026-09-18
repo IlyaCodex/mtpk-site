@@ -3,7 +3,7 @@
   "description": "Редукторы наклона индукционных печей RZS: 11 моделей под заказ. Выходной момент, передаточное число, двигатель; размеры и чертежи шести моделей.",
   "inline_styles": [],
   "css_templates": [
-    "/css/tpl/ui-spares.css",
-    "/css/tpl/leadgen.css"
+    "/css/zapchasti-catalog.css",
+    "/css/ui-spares.css"
   ]
 }
