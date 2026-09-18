@@ -1,0 +1,9 @@
+{
+  "title": "BSM200GA120DN2 — IGBT-модуль 1200 В, 200 А | УралИндуктор",
+  "description": "BSM200GA120DN2: одиночный IGBT, 1200 В. Ток 200 А при Tc = 80 °C и 300 А при Tc = 25 °C. Схема, характеристики и условия замены.",
+  "inline_styles": [],
+  "css_templates": [
+    "/css/tpl/zapchasti-tranzistornye.css",
+    "/css/tpl/hub-compact.css"
+  ]
+}

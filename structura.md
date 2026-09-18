@@ -166,11 +166,18 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │       — так на боевом, сохраняем для прямых 301-редиректов).
 │   ├── /products/vakuumnoe-oborudovanie-dlya-termoobrabotki/  ✅ T03a · Хаб «Вакуумное оборудование для термообработки»
 │   │       └── 8 карточек T05 (vacuum-* — печи/установки, обложки card-vacuum-* в цех-каноне)
-│   ├── /products/zapchasti/                            ✅ T03a · Хаб-раздел «Запчасти на оборудование» (2 тизера подкатегорий)
+│   ├── /products/zapchasti/                            ✅ T03a · Хаб-раздел «Запчасти на оборудование» (3 тизера подкатегорий)
 │   │   ├── …/induktsionnoe/                                 ✅ T03a · Подкатегория «Для индукционного оборудования» (4 тизера T05)
 │   │   │       └── tiristory-silovye · kondensatory-elektrotermicheskie · kabel-silovoj-vodoohlazhdaemyj · plata-impulsnyh-transformatorov
 │   │   └── …/drobemetnoe/                                   ✅ T03a · Подкатегория «Для дробемётного оборудования» (14 тизеров T05)
 │   │           └── impeller-m · napravlyayushhaya(-m) · raspredelitel(-m) · lopatki(-m) · vkladysh-{verhnij,bokovoj,perednij,zadnij}(-m) · vkladysh-perednij-zadnij
+│   │   └── …/tranzistornye/                                 ✅ Раздел «Для транзисторных установок» (пакет 18.09.2026, 18 страниц)
+│   │           └── 7 подразделов: igbt-moduli (8 моделей) · platy-upravleniya · platy-drayvera ·
+│   │              platy-zashchity · paneli-upravleniya · spiralnye-induktory · kondensatory (0-12-mkf) ·
+│   │              плюс podbor-po-foto. Стили и скрипт пакета ограничены классом .ui-transistor-site.
+│   │   📌 Раздел дробемётов перестроен пакетом (18.09.2026): 242 карточки + 31 подраздел,
+│   │       каталог с фильтрами по узлу и модели, поиск, сортировка, пагинация.
+│   │       Прежние 14 страниц перекрыты пакетом один в один — редиректы не потребовались.
 │   │   📌 Этап доработок (2026-06-10): плоский хаб (18 товаров напрямую) → раздел с 2 подкатегориями по типу оборудования.
 │   │       Карточки/контент — как было; URL углубился на уровень. ✅ Задеплоено на прод 2026-06-10 (/ship).
 │   │       301-редиректы в nginx ПРИМЕНЕНЫ (36 location-блоков, слеш+без; смоук: старый URL → 301 → 200):

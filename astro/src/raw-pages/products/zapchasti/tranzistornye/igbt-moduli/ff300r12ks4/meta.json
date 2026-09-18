@@ -1,0 +1,9 @@
+{
+  "title": "FF300R12KS4 — IGBT-модуль 1200 В, 300 А | УралИндуктор",
+  "description": "FF300R12KS4: полумост IGBT2, VCES 1200 В, 300 А при Tc = 60 °C. Заряд затвора, потери переключения, тепловые параметры и размеры.",
+  "inline_styles": [],
+  "css_templates": [
+    "/css/tpl/zapchasti-tranzistornye.css",
+    "/css/tpl/hub-compact.css"
+  ]
+}

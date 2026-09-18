@@ -1,0 +1,9 @@
+{
+  "title": "FZ400R12KS4 — IGBT-модуль 1200 В, 400 А | УралИндуктор",
+  "description": "FZ400R12KS4: одиночный IGBT с обратным диодом, 1200 В, 400 А при Tc = 70 °C. Характеристики затвора, тепловое сопротивление и корпус.",
+  "inline_styles": [],
+  "css_templates": [
+    "/css/tpl/zapchasti-tranzistornye.css",
+    "/css/tpl/hub-compact.css"
+  ]
+}
