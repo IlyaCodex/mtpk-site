@@ -18,18 +18,38 @@
    натуральной ширины. */
 .ui-case .ui-hero > * { min-width: 0; }
 .ui-case .ui-main-photo { cursor: zoom-in; }
+/* Кадр под снимок — всегда 4:3: высота шла от самой картинки
+   (height:100% при родителе auto не работает), и при листании
+   вертикальные фото раздували первый экран, а горизонтальные сжимали.
+   Снимок лежит в кадре абсолютом, так что на размер не влияет. */
+.ui-case .ui-main-photo { aspect-ratio: 4 / 3; height: auto; min-height: 0; }
+.ui-case .ui-main-photo > img { position: absolute; inset: 0; }
+/* Кадр не растягиваем по высоте строки: при заданной высоте aspect-ratio
+   считает от неё ширину, и снимок вылезал из своей колонки. */
+.ui-case .ui-hero > .ui-main-photo, .ui-case .ui-main-col { align-self: start; }
+/* --- Ритм блоков --------------------------------------------- */
+/* Пакет разделял блоки верхним отступом заголовка; заголовок переехал
+   наверх, и разделы слиплись. Ставим один шаг между всеми блоками. */
+.ui-case .ui-title { margin: 0 0 32px; }
+.ui-case .ui-hero { margin-bottom: 48px; }
+.ui-case .ui-overview { margin-bottom: 48px; }
+.ui-case .ui-details { margin-bottom: 48px; }
 /* Длинные слова в паспорте проекта (например «нефтегазового») распирали
    узкую колонку сайдбара на планшете. */
 .ui-case .ui-fact > div { min-width: 0; }
 .ui-case .ui-fact strong, .ui-case .ui-fact small { overflow-wrap: anywhere; }
 .ui-case .ui-main-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.ui-case .ui-letter-hero img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
-.ui-case .ui-letter-hero { height: 490px; background: #fff; }
-.ui-case .ui-letter-hero span { margin-top: 10px; }
+/* flex-basis:0 — чтобы натуральная высота скана не задавала высоту
+   строки: плитка тянется по соседям, а скан заполняет, что осталось.
+   Так письмо кончается там же, где лента миниатюр и паспорт проекта. */
+.ui-case .ui-letter-hero img { width: 100%; height: 100%; object-fit: cover; object-position: top center; flex: 1 1 0; min-height: 0; }
+.ui-case .ui-letter-hero { height: auto; min-height: 0; background: #fff; }
+.ui-case .ui-letter-hero span { margin-top: 10px; font-size: 13px; }
 
 /* --- Лента миниатюр под главным снимком ---------------------- */
 .ui-case .ui-main-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.ui-case .ui-main-col .ui-main-photo { flex: 1; height: auto; min-height: 0; }
+/* Кадр держит свои пропорции, лента миниатюр идёт под ним. */
+.ui-case .ui-main-col .ui-main-photo { flex: none; }
 .ui-case .ui-thumbs { display: flex; align-items: center; gap: 10px; }
 .ui-case .ui-thumbs-track {
   display: flex; gap: 10px; overflow-x: auto; scroll-behavior: smooth;
@@ -81,6 +101,13 @@
   .ui-case .ui-details > .ui-letter-card { max-width: 340px; }
 }
 
+/* Первый экран на планшете: в три колонки снимку оставалось 288px.
+   Снимок во всю ширину, письмо и паспорт проекта — под ним в ряд. */
+@media (max-width: 900px) {
+  .ui-case .ui-hero { grid-template-columns: 1fr 1fr; }
+  .ui-case .ui-main-col, .ui-case .ui-hero > .ui-main-photo { grid-column: 1 / -1; }
+}
+
 /* --- Полноэкранный просмотр ---------------------------------- */
 /* Окно — по размеру снимка: сплошная тёмная плита шириной 1200px
    оставляла по бокам глухие поля. Фон остаётся только у подложки. */
@@ -126,7 +153,9 @@
   .ui-case .ui-main-photo > img { position: static; height: 100%; }
   .ui-case .ui-letter-hero { height: auto; aspect-ratio: 3 / 4; min-height: 0; padding: 10px; }
   .ui-case .ui-letter-hero img { height: 100%; }
-  .ui-case .ui-letter-hero span { font-size: 11px; }
+  .ui-case .ui-letter-hero span { font-size: 12px; }
+  .ui-case .ui-title { margin-bottom: 24px; }
+  .ui-case .ui-hero, .ui-case .ui-overview, .ui-case .ui-details { margin-bottom: 32px; }
   .ui-case .ui-thumb { flex-basis: 78px; height: 58px; }
   .ui-case .ui-thumbs-nav { display: none; }
   .ui-case .ui-crumb { flex-wrap: wrap; gap: 6px; }
