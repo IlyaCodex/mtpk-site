@@ -89,10 +89,15 @@
     });
   }
 
+  // Письмо открывают два элемента: плитка первого экрана с картинкой
+  // внутри и кнопка в карточке «Благодарственное письмо», где картинки
+  // нет — там адрес скана лежит в data-src.
   root.querySelectorAll('[data-letter]').forEach(btn => {
     const img = btn.querySelector('img');
+    const src = btn.dataset.src || (img && img.getAttribute('src'));
+    if (!src) return;
     btn.addEventListener('click', () =>
-      openViewer(0, { src: img.src, alt: 'Благодарственное письмо' }));
+      openViewer(0, { src, alt: 'Благодарственное письмо' }));
   });
 
   root.querySelectorAll('[data-view-step]').forEach(btn =>
