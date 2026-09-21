@@ -8,8 +8,21 @@
    у шапки сайта тоже 32px и на 1440, и на 390.
    ============================================================ */
 .pr-container { max-width: var(--container-wide); padding-left: var(--sp-8); padding-right: var(--sp-8); }
-/* Кнопка «Все проекты» под сеткой — отдельной строкой и по центру. */
-.pr-jump--center { justify-content: center; margin: 0; }
 /* Сетка проектов, встроенная в чужую страницу (блок на главной):
    контейнер и поля там уже свои, от .pr-root берём только типографику. */
-.pr-root--embed .pr-cards { margin-bottom: 30px; }
+.pr-root--embed .pr-cards { margin-bottom: 0; }
+/* Заголовок блока на главной: слева текст, справа кнопка.
+   Штатный .cases__head центрирует содержимое и сужает до 800px —
+   для строки с кнопкой это снимаем. */
+/* Селектор с двумя классами: штатный .cases__head живёт в инлайновых
+   стилях страницы, а они подключаются после файлов css_templates —
+   с одним классом правило проигрывало бы по порядку. */
+.cases .cases__head--split {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 40px; max-width: none; text-align: left;
+}
+.cases .cases__head--split .cases__head-text { max-width: 760px; }
+.cases__head-btn { flex: 0 0 auto; white-space: nowrap; }
+@media (max-width: 900px) {
+  .cases .cases__head--split { flex-direction: column; align-items: flex-start; gap: 24px; }
+}
