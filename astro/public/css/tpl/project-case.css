@@ -2,9 +2,106 @@
 
 
 /* ============================================================
-   Обвязка под сайт: контейнер кейса по сайтовой геометрии
-   (у пакета 1440px с полями 44px, у сайта — 32px). Селектор
-   такой же, как у пакета (.ui-case .ui-wrap): с одним классом
-   правило проиграло бы по специфичности.
+   Обвязка под сайт. Селекторы с .ui-case — как у пакета:
+   с одним классом правила проигрывали бы по специфичности.
    ============================================================ */
+/* Контейнер по сайтовой геометрии: у пакета 1440px с полями 44px. */
 .ui-case .ui-wrap { max-width: var(--container-wide); padding-left: var(--sp-8); padding-right: var(--sp-8); }
+
+/* --- Первый экран ------------------------------------------- */
+/* Снимок и письмо заполняют свои плитки: было object-fit:contain,
+   и по бокам оставались пустые поля. Письмо прижимаем к верху —
+   так видно шапку бланка и начало текста; целиком оно открывается
+   по клику и лежит рядом в PDF. */
+/* Элементы первого экрана должны уметь сжиматься: у grid-элементов
+   min-width:auto, и на телефоне снимок растягивал колонку до своей
+   натуральной ширины. */
+.ui-case .ui-hero > * { min-width: 0; }
+.ui-case .ui-main-photo { cursor: zoom-in; }
+/* Длинные слова в паспорте проекта (например «нефтегазового») распирали
+   узкую колонку сайдбара на планшете. */
+.ui-case .ui-fact > div { min-width: 0; }
+.ui-case .ui-fact strong, .ui-case .ui-fact small { overflow-wrap: anywhere; }
+.ui-case .ui-main-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ui-case .ui-letter-hero img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.ui-case .ui-letter-hero { height: 490px; background: #fff; }
+.ui-case .ui-letter-hero span { margin-top: 10px; }
+
+/* --- Лента миниатюр под главным снимком ---------------------- */
+.ui-case .ui-main-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.ui-case .ui-main-col .ui-main-photo { flex: 1; height: auto; min-height: 0; }
+.ui-case .ui-thumbs { display: flex; align-items: center; gap: 10px; }
+.ui-case .ui-thumbs-track {
+  display: flex; gap: 10px; overflow-x: auto; scroll-behavior: smooth;
+  scrollbar-width: none; flex: 1; min-width: 0;
+}
+.ui-case .ui-thumbs-track::-webkit-scrollbar { display: none; }
+.ui-case .ui-thumb {
+  flex: 0 0 96px; height: 72px; padding: 0; border: 2px solid transparent;
+  border-radius: 5px; overflow: hidden; background: #f4f5f4; cursor: pointer;
+}
+.ui-case .ui-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ui-case .ui-thumb.is-active { border-color: var(--green-500); }
+.ui-case .ui-thumb:hover { border-color: #a8c79c; }
+.ui-case .ui-thumbs-nav {
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--border-default); background: #fff; color: var(--text-secondary);
+  font-size: 20px; line-height: 1; cursor: pointer;
+}
+.ui-case .ui-thumbs-nav:hover { border-color: var(--green-500); color: var(--green-600, #348c26); }
+
+/* --- Кнопки: штатные .btn сайта ------------------------------ */
+/* Пакетный .ui-button перебивал бы их, поэтому оформление снимаем
+   и оставляем только ширину в колонке сайдбара. */
+.ui-case .ui-button {
+  border: 0; background: none; color: inherit; border-radius: 0;
+  padding: 0; font-weight: inherit; font-size: inherit; min-height: 0;
+}
+.ui-case .ui-sidebar > .btn { width: 100%; margin-top: 10px; justify-content: center; }
+.ui-case a.btn--primary, .ui-case a.btn--primary:hover { color: var(--action-primary-fg); }
+.ui-case a.btn--secondary, .ui-case a.btn--secondary:hover { color: var(--action-secondary-fg); }
+
+/* --- Крошки: текущая страница -------------------------------- */
+.ui-case .ui-crumb-current { color: var(--text-primary); }
+
+/* --- Полноэкранный просмотр ---------------------------------- */
+.ui-case #viewer, .ui-case dialog.ui-viewer {
+  width: min(1200px, 100vw - 32px); max-width: none; background: #101f26;
+  border: 0; border-radius: 8px; padding: 18px; color: #fff;
+}
+.ui-case .ui-viewer::backdrop { background: #071b24e6; }
+.ui-case .ui-viewer img { max-height: 76vh; width: auto; max-width: 100%; border-radius: 4px; }
+.ui-case .ui-viewer .ui-close {
+  position: absolute; top: 10px; right: 12px; background: transparent; border: 0;
+  color: #fff; font-size: 28px; line-height: 1; cursor: pointer;
+}
+.ui-case .ui-controls {
+  justify-content: center; gap: 18px; margin-top: 14px; color: #c3ced2; font-size: 13px;
+}
+.ui-case .ui-controls button {
+  width: 40px; height: 40px; border-radius: 50%; border: 1px solid #40565e;
+  background: transparent; color: #fff; font-size: 22px; line-height: 1; cursor: pointer;
+}
+.ui-case .ui-controls button:hover { background: #1c333d; }
+
+/* --- Телефон -------------------------------------------------- */
+@media (max-width: 760px) {
+  .ui-case .ui-wrap { padding-left: var(--sp-5); padding-right: var(--sp-5); }
+  .ui-case .ui-hero { grid-template-columns: 1fr; gap: 14px; }
+  /* min-height пакета вместе с aspect-ratio считал ширину от высоты:
+     350px × 4/3 = 466px, и снимок вылезал за экран. */
+  .ui-case .ui-main-col .ui-main-photo,
+  .ui-case .ui-main-photo {
+    height: auto; aspect-ratio: 4 / 3; max-height: none; min-height: 0; flex: none;
+  }
+  .ui-case .ui-main-photo > img { position: static; height: 100%; }
+  .ui-case .ui-letter-hero { height: auto; aspect-ratio: 3 / 4; min-height: 0; padding: 10px; }
+  .ui-case .ui-letter-hero img { height: 100%; }
+  .ui-case .ui-letter-hero span { font-size: 11px; }
+  .ui-case .ui-thumb { flex-basis: 78px; height: 58px; }
+  .ui-case .ui-thumbs-nav { display: none; }
+  .ui-case .ui-crumb { flex-wrap: wrap; gap: 6px; }
+  .ui-case .ui-crumb > span:last-child { display: inline; }
+  .ui-case #viewer, .ui-case dialog.ui-viewer { width: calc(100vw - 16px); padding: 12px; }
+  .ui-case .ui-viewer img { max-height: 64vh; }
+}
