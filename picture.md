@@ -45,6 +45,10 @@ picture/
 │       ├── sber.svg
 │       └── vtb.svg
 │
+├── otzyvy/                                      # благодарственные письма для /otzyvy/
+│   └── *.pdf                                    # 9 оригиналов писем (Desktop/Письма);
+│                                                # страницы отрисованы в /img/reviews/*.webp, 1000px
+│
 ├── o-company/                                   # уникальное для /o-company/
 │   ├── office-hero.jpg                          # фасад/интерьер офиса УралИндуктор (IMG_1714.HEIC → JPEG, max 2400px)
 │   ├── company-main.jpg                         # основное фото компании (уи3.jpg) — в блоке «Производственная база»

@@ -5,7 +5,7 @@
   .rev-section { padding: 0 0 var(--section-py-base, 96px); background: var(--surface-page, #fff); }
   .rev-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--sp-5, 24px);
   }
   .review-doc {
@@ -98,7 +98,7 @@
   <div class="container">
     <div class="s-eyebrow">Отзывы</div>
     <h1 class="s-title">Благодарственные <em>письма</em></h1>
-    <p class="s-lead">Отзывы предприятий металлургии и&nbsp;машиностроения о&nbsp;поставке индукционных печей и&nbsp;дробемётного оборудования. Нажмите на&nbsp;письмо, чтобы открыть его на&nbsp;весь экран.</p>
+    <p class="s-lead">Отзывы предприятий металлургии и&nbsp;машиностроения о&nbsp;поставке индукционных и&nbsp;термических печей, дробемётного оборудования и&nbsp;модернизации дуговых печей. Нажмите на&nbsp;письмо, чтобы открыть его на&nbsp;весь экран.</p>
   </div>
 </section>
 
@@ -109,47 +109,102 @@
   <div class="container">
     <div class="rev-grid" data-rev-gallery>
 
-      <button type="button" class="review-doc" data-full="/img/reviews/valok-chugun.webp" data-caption="ООО НПП «Валок-Чугун», г. Липецк">
+      <button type="button" class="review-doc" data-full="/img/reviews/unimetals.webp" data-caption="ТОО «Unimetals», г. Павлодар, Казахстан">
         <span class="review-doc__thumb">
-          <img src="/img/reviews/valok-chugun.webp" alt="Благодарственное письмо ООО НПП «Валок-Чугун», г. Липецк — дробемётная установка УИД-3710Е" loading="lazy" width="629" height="856">
+          <img src="/img/reviews/unimetals.webp" alt="Благодарственное письмо ТОО «Unimetals», г. Павлодар, Казахстан — индукционная печь УИ-1Т-800 и градирня УИГ-80Т" loading="lazy" width="1000" height="1414">
           <span class="review-doc__zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
         </span>
         <span class="review-doc__caption">
-          <span class="review-doc__from">ООО НПП «Валок-Чугун»</span>
-          <span class="review-doc__meta">г.&nbsp;Липецк · дробемётная установка УИД-3710Е</span>
+          <span class="review-doc__from">ТОО «Unimetals»</span>
+          <span class="review-doc__meta">г. Павлодар, Казахстан&nbsp;· индукционная печь УИ-1Т-800 и градирня УИГ-80Т</span>
+        </span>
+      </button>
+
+      <button type="button" class="review-doc" data-full="/img/reviews/mk-uralprokat.webp" data-caption="ООО «МК Уралпрокат», г. Челябинск">
+        <span class="review-doc__thumb">
+          <img src="/img/reviews/mk-uralprokat.webp" alt="Благодарственное письмо ООО «МК Уралпрокат», г. Челябинск — индукционное плавильное оборудование" loading="lazy" width="1000" height="1414">
+          <span class="review-doc__zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
+        </span>
+        <span class="review-doc__caption">
+          <span class="review-doc__from">ООО «МК Уралпрокат»</span>
+          <span class="review-doc__meta">г. Челябинск&nbsp;· индукционное плавильное оборудование</span>
         </span>
       </button>
 
       <button type="button" class="review-doc" data-full="/img/reviews/vtormetkom.webp" data-caption="ООО «ВторМетКом», г. Магнитогорск">
         <span class="review-doc__thumb">
-          <img src="/img/reviews/vtormetkom.webp" alt="Благодарственное письмо ООО «ВторМетКом», г. Магнитогорск — индукционные плавильные печи УИ-2Т и УИ-0.25Т" loading="lazy" width="631" height="871">
+          <img src="/img/reviews/vtormetkom.webp" alt="Благодарственное письмо ООО «ВторМетКом», г. Магнитогорск — индукционные печи УИ-2Т-1200 и УИ-0.25Т-250" loading="lazy" width="1000" height="1414">
           <span class="review-doc__zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
         </span>
         <span class="review-doc__caption">
           <span class="review-doc__from">ООО «ВторМетКом»</span>
-          <span class="review-doc__meta">г.&nbsp;Магнитогорск · индукционные плавильные печи</span>
+          <span class="review-doc__meta">г. Магнитогорск&nbsp;· индукционные печи УИ-2Т-1200 и УИ-0.25Т-250</span>
         </span>
       </button>
 
-      <button type="button" class="review-doc" data-full="/img/reviews/zavod-sinergiya.webp" data-caption="ООО «Завод Синергия», г. Чусовой">
+      <button type="button" class="review-doc" data-full="/img/reviews/rybinskiy-zavod.webp" data-caption="ООО «Рыбинский сталелитейный завод», г. Рыбинск">
         <span class="review-doc__thumb">
-          <img src="/img/reviews/zavod-sinergiya.webp" alt="Благодарственное письмо ООО «Завод Синергия», г. Чусовой — дробемётные установки" loading="lazy" width="633" height="815">
+          <img src="/img/reviews/rybinskiy-zavod.webp" alt="Благодарственное письмо ООО «Рыбинский сталелитейный завод», г. Рыбинск — индукционная печь УИ-0.35Т-300, дробемёт УИД-3210, формовочная машина УИФ-145" loading="lazy" width="1000" height="1378">
+          <span class="review-doc__zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
+        </span>
+        <span class="review-doc__caption">
+          <span class="review-doc__from">ООО «Рыбинский сталелитейный завод»</span>
+          <span class="review-doc__meta">г. Рыбинск&nbsp;· индукционная печь УИ-0.35Т-300, дробемёт УИД-3210, формовочная машина УИФ-145</span>
+        </span>
+      </button>
+
+      <button type="button" class="review-doc" data-full="/img/reviews/npo-tehnohim.webp" data-caption="ООО НПО «ТехноХим», г. Екатеринбург">
+        <span class="review-doc__thumb">
+          <img src="/img/reviews/npo-tehnohim.webp" alt="Благодарственное письмо ООО НПО «ТехноХим», г. Екатеринбург — индукционное плавильное и дробемётное оборудование" loading="lazy" width="1000" height="1414">
+          <span class="review-doc__zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
+        </span>
+        <span class="review-doc__caption">
+          <span class="review-doc__from">ООО НПО «ТехноХим»</span>
+          <span class="review-doc__meta">г. Екатеринбург&nbsp;· индукционное плавильное и дробемётное оборудование</span>
+        </span>
+      </button>
+
+      <button type="button" class="review-doc" data-full="/img/reviews/valok-chugun.webp" data-caption="ООО НПП «Валок-Чугун», г. Липецк">
+        <span class="review-doc__thumb">
+          <img src="/img/reviews/valok-chugun.webp" alt="Благодарственное письмо ООО НПП «Валок-Чугун», г. Липецк — дробемётная установка УИД-3710Е" loading="lazy" width="1000" height="1413">
+          <span class="review-doc__zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
+        </span>
+        <span class="review-doc__caption">
+          <span class="review-doc__from">ООО НПП «Валок-Чугун»</span>
+          <span class="review-doc__meta">г. Липецк&nbsp;· дробемётная установка УИД-3710Е</span>
+        </span>
+      </button>
+
+      <button type="button" class="review-doc" data-full="/img/reviews/zavod-sinergiya.webp" data-caption="ООО «Завод Синергия», г. Чермоз, Пермский край">
+        <span class="review-doc__thumb">
+          <img src="/img/reviews/zavod-sinergiya.webp" alt="Благодарственное письмо ООО «Завод Синергия», г. Чермоз, Пермский край — дробемётные установки" loading="lazy" width="1000" height="1414">
           <span class="review-doc__zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
         </span>
         <span class="review-doc__caption">
           <span class="review-doc__from">ООО «Завод Синергия»</span>
-          <span class="review-doc__meta">г.&nbsp;Чусовой · дробемётные установки</span>
+          <span class="review-doc__meta">г. Чермоз, Пермский край&nbsp;· дробемётные установки</span>
         </span>
       </button>
 
-      <button type="button" class="review-doc" data-full="/img/reviews/chelyabpromdetal.webp" data-caption="ООО «Челябпромдеталь», г. Челябинск">
+      <button type="button" class="review-doc" data-full="/img/reviews/armaturnyj-zavod.webp" data-caption="ООО «Арматурный завод», г. Уфа">
         <span class="review-doc__thumb">
-          <img src="/img/reviews/chelyabpromdetal.webp" alt="Благодарственное письмо ООО «Челябпромдеталь», г. Челябинск — индукционное оборудование" loading="lazy" width="788" height="898">
+          <img src="/img/reviews/armaturnyj-zavod.webp" alt="Благодарственное письмо ООО «Арматурный завод», г. Уфа — термические печи" loading="lazy" width="1000" height="1414">
           <span class="review-doc__zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
         </span>
         <span class="review-doc__caption">
-          <span class="review-doc__from">ООО «Челябпромдеталь»</span>
-          <span class="review-doc__meta">г.&nbsp;Челябинск · индукционное оборудование</span>
+          <span class="review-doc__from">ООО «Арматурный завод»</span>
+          <span class="review-doc__meta">г. Уфа&nbsp;· термические печи</span>
+        </span>
+      </button>
+
+      <button type="button" class="review-doc" data-full="/img/reviews/uralskie-ferrosplavy.webp" data-caption="ООО «Уральские ферросплавы», г. Миасс">
+        <span class="review-doc__thumb">
+          <img src="/img/reviews/uralskie-ferrosplavy.webp" alt="Благодарственное письмо ООО «Уральские ферросплавы», г. Миасс — модернизация электрооборудования ДСП-3" loading="lazy" width="1000" height="1414">
+          <span class="review-doc__zoom" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
+        </span>
+        <span class="review-doc__caption">
+          <span class="review-doc__from">ООО «Уральские ферросплавы»</span>
+          <span class="review-doc__meta">г. Миасс&nbsp;· модернизация электрооборудования ДСП-3</span>
         </span>
       </button>
 
