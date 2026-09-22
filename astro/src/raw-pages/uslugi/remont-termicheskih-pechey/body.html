@@ -24,6 +24,13 @@
 .cdoc tbody th { color: var(--text-secondary); font-weight: var(--fw-regular); width: 40%; }
 .cdoc tbody td { color: var(--text-primary); }
 .cdoc__cta { margin-top: var(--sp-6); }
+/* Две кнопки заявки в конце описания: основной CTA пакета
+   и «Узнать цену». Раньше это была строка текста. */
+.cdoc__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+/* Ссылки внутри описания: у сайта нет глобального стиля ссылки,
+   браузер красил их синим по умолчанию. */
+.cdoc a:not(.btn) { color: var(--teal-600); text-decoration: underline; text-underline-offset: 2px; }
+.cdoc a:not(.btn):hover { color: var(--text-brand); }
 @media (max-width: 1024px) { .cdoc__layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); } .cdoc__nav { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--sp-2); } .cdoc__nav-link { border-left: 0; border-bottom: 2px solid var(--border-subtle); padding: var(--sp-2) var(--sp-3); } .cdoc__nav-eyebrow { width: 100%; margin-bottom: 0; } }
 </style>
 <style>
@@ -84,6 +91,7 @@
             <li>Обслуживание насосов, клапанов, уплотнений и&nbsp;газовых систем.</li>
             <li>Модернизация системы управления, установка регистратора, пусконаладочные работы и&nbsp;обучение персонала.</li>
           </ul>
+          <p>Как выбирают материалы футеровки, нагреватели, термопары и&nbsp;управление — в&nbsp;отдельном разборе: <a href="/products/termicheskie-pechi/futerovka-i-nagrevateli/">футеровка термических печей и&nbsp;выбор нагревателей</a>.</p>
         </div>
 
         <div class="cdoc__panel" id="sec-2-pechi-raznyh-konstrukciy-i">

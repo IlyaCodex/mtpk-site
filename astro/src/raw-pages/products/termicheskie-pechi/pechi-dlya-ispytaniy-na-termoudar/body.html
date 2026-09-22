@@ -155,6 +155,13 @@
 .cdoc tbody th { color: var(--text-secondary); font-weight: var(--fw-regular); width: 40%; }
 .cdoc tbody td { color: var(--text-primary); }
 .cdoc__cta { margin-top: var(--sp-6); }
+/* Две кнопки заявки в конце описания: основной CTA пакета
+   и «Узнать цену». Раньше это была строка текста. */
+.cdoc__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+/* Ссылки внутри описания: у сайта нет глобального стиля ссылки,
+   браузер красил их синим по умолчанию. */
+.cdoc a:not(.btn) { color: var(--teal-600); text-decoration: underline; text-underline-offset: 2px; }
+.cdoc a:not(.btn):hover { color: var(--text-brand); }
 @media (max-width: 1024px) { .cdoc__layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); } .cdoc__nav { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--sp-2); } .cdoc__nav-link { border-left: 0; border-bottom: 2px solid var(--border-subtle); padding: var(--sp-2) var(--sp-3); } .cdoc__nav-eyebrow { width: 100%; margin-bottom: 0; } }
 </style>
 <section class="cdoc" aria-label="Описание и характеристики">
@@ -258,10 +265,10 @@
           <h2 class="cdoc__title">Сервис в&nbsp;России</h2>
           <p>Специалисты компании «УралИндуктор» выполняют в&nbsp;России диагностику, ремонт и&nbsp;модернизацию термических печей. Обслуживаем нагреватели, датчики, системы управления, футеровку, механические, газовые и&nbsp;вакуумные узлы.</p>
           <ul>
-            <li>Ремонт и&nbsp;сервис термических печей</li>
+            <li><a href="/uslugi/remont-termicheskih-pechey/">Ремонт и&nbsp;сервис термических печей</a></li>
           </ul>
           <p>Пришлите материал, размеры и&nbsp;массу садки, температуру и&nbsp;цикл — подберём комплектацию и&nbsp;рассчитаем стоимость.</p>
-          <p>Получить подбор и&nbsp;техническое предложение · Узнать цену</p>
+          <p class="cdoc__actions"><a class="btn btn--primary" href="#leadgen">Получить подбор и&nbsp;техническое предложение <span class="btn__arrow">→</span></a> <a class="btn btn--secondary" href="#leadgen">Узнать цену</a></p>
         </div>
       </div>
     </div>

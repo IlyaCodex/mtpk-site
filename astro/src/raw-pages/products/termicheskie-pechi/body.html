@@ -504,6 +504,163 @@
 <!-- ============================================================
      FULL-CYCLE — Полный цикл от подбора до сервиса
      ============================================================ -->
+<style>
+/* Контентный блок категории — текст из ТЗ заказчика */
+.cdoc { background: var(--surface-page, #fff); padding: var(--section-py-base, 96px) 0; border-top: 1px solid var(--border-subtle); }
+.cdoc__layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: var(--sp-12); align-items: start; }
+.cdoc__nav { position: sticky; top: 110px; display: flex; flex-direction: column; gap: var(--sp-1); }
+.cdoc__nav-eyebrow { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+.cdoc__nav-link { font-size: var(--fs-small); color: var(--text-secondary); text-decoration: none; padding: var(--sp-2) 0 var(--sp-2) var(--sp-4); border-left: 2px solid var(--border-subtle); line-height: 1.35; transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out); }
+.cdoc__nav-link:hover { color: var(--text-brand); border-left-color: var(--teal-600); }
+.cdoc__panel { padding: var(--sp-10) 0; scroll-margin-top: 120px; }
+.cdoc__panel:first-child { padding-top: 0; }
+.cdoc__panel + .cdoc__panel { border-top: 1px solid var(--border-subtle); }
+.cdoc__panel > * + * { margin-top: var(--sp-4); }
+.cdoc__title { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: var(--fw-bold); letter-spacing: var(--ls-h3); color: var(--text-primary); }
+.cdoc__panel p { color: var(--text-secondary); line-height: var(--lh-body); }
+.cdoc__panel ul { color: var(--text-secondary); line-height: var(--lh-body); padding-left: var(--sp-5); }
+.cdoc__panel ul li + li { margin-top: var(--sp-2); }
+.cdoc__panel h3 { font-family: var(--font-display); font-size: var(--fs-h4); font-weight: var(--fw-semibold); color: var(--text-primary); }
+.cdoc__lead { font-size: var(--fs-lead); color: var(--text-secondary); line-height: 1.7; }
+.cdoc__body { min-width: 0; }
+.cdoc__scroll { overflow-x: auto; max-width: 100%; }
+.cdoc table { width: 100%; border-collapse: collapse; min-width: 520px; }
+.cdoc th, .cdoc td { text-align: left; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); font-size: var(--fs-small); vertical-align: top; }
+.cdoc thead th { font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); }
+.cdoc tbody th { color: var(--text-secondary); font-weight: var(--fw-regular); width: 40%; }
+.cdoc tbody td { color: var(--text-primary); }
+.cdoc__cta { margin-top: var(--sp-6); }
+/* Две кнопки заявки в конце описания: основной CTA пакета
+   и «Узнать цену». Раньше это была строка текста. */
+.cdoc__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+/* Ссылки внутри описания: у сайта нет глобального стиля ссылки,
+   браузер красил их синим по умолчанию. */
+.cdoc a:not(.btn) { color: var(--teal-600); text-decoration: underline; text-underline-offset: 2px; }
+.cdoc a:not(.btn):hover { color: var(--text-brand); }
+@media (max-width: 1024px) { .cdoc__layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); } .cdoc__nav { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--sp-2); } .cdoc__nav-link { border-left: 0; border-bottom: 2px solid var(--border-subtle); padding: var(--sp-2) var(--sp-3); } .cdoc__nav-eyebrow { width: 100%; margin-bottom: 0; } }
+</style>
+<section class="cdoc" aria-label="Описание и характеристики">
+  <div class="container">
+    <div class="cdoc__layout">
+      <nav class="cdoc__nav" aria-label="Содержание">
+        <div class="cdoc__nav-eyebrow">Содержание</div>
+        <a class="cdoc__nav-link" href="#sec-1-vybrat-pech-po-processu">Выберите печь по&nbsp;процессу</a>
+        <a class="cdoc__nav-link" href="#sec-2-pechi-s-vykatnym-podom-dlya-krupnoy-sadki">Печи с&nbsp;выкатным подом для&nbsp;крупной садки</a>
+        <a class="cdoc__nav-link" href="#sec-3-ot-tehnologicheskoy-zadachi-do-zapuska">От&nbsp;технологической задачи до&nbsp;запуска</a>
+        <a class="cdoc__nav-link" href="#sec-4-temperatura-i-kachestvo-nagreva">Температура и&nbsp;качество нагрева</a>
+        <a class="cdoc__nav-link" href="#sec-5-futerovka-i-nagrevateli-pod-vash-process">Футеровка и&nbsp;нагреватели под&nbsp;ваш процесс</a>
+        <a class="cdoc__nav-link" href="#sec-6-upravlenie-na-russkom-yazyke">Управление на&nbsp;русском языке</a>
+        <a class="cdoc__nav-link" href="#sec-7-postavka-i-komplektaciya">Поставка и&nbsp;комплектация</a>
+        <a class="cdoc__nav-link" href="#sec-8-chto-vliyaet-na-cenu">Что влияет на&nbsp;цену</a>
+        <a class="cdoc__nav-link" href="#sec-9-voprosy-pered-zakazom">Вопросы перед&nbsp;заказом термической печи</a>
+        <a class="cdoc__nav-link" href="#sec-10-chto-poluchite-v-tehnicheskom-predlozhenii">Что получите в&nbsp;техническом предложении</a>
+        <a class="cdoc__nav-link" href="#sec-11-proverka-puskonaladka-i-garantiya">Проверка, пусконаладка и&nbsp;гарантия</a>
+        <a class="cdoc__nav-link" href="#sec-12-servis-v-rossii">Сервис в&nbsp;России</a>
+      </nav>
+      <div class="cdoc__body">
+        <div class="cdoc__panel" id="sec-1-vybrat-pech-po-processu">
+          <h2 class="cdoc__title">Выберите печь по&nbsp;процессу</h2>
+          <p>Серию выбирают по&nbsp;тому, как изделие попадает в&nbsp;камеру и&nbsp;какая нужна среда. Ниже&nbsp;— короткая таблица соответствия; подробности и&nbsp;модельные ряды&nbsp;— на&nbsp;страницах серий.</p>
+          <div class="cdoc__scroll"><table class="spec-table">
+            <thead><tr><th>Задача</th><th>Серия</th><th>Особенность</th></tr></thead>
+            <tbody>
+              <tr><td>Крупные и&nbsp;тяжёлые садки</td><td><a href="/products/termicheskie-pechi/pechi-s-vykatnym-podom/">УИ-МПВП</a></td><td>Выкатной под и&nbsp;крановая загрузка</td></tr>
+              <tr><td>Периодическая загрузка деталей</td><td><a href="/products/termicheskie-pechi/mufelnye-pechi/">УИ-МП</a></td><td>Камерная компоновка под&nbsp;процесс</td></tr>
+              <tr><td>Периодическая загрузка деталей</td><td><a href="/products/termicheskie-pechi/kamernye-pechi/">УИ-МКП</a></td><td>Фронтальная загрузка через&nbsp;распашную дверь</td></tr>
+              <tr><td>Верхняя загрузка, тигли</td><td><a href="/products/termicheskie-pechi/vertikalnye-pechi/">УИ-МВКП</a></td><td>Доступ сверху</td></tr>
+              <tr><td>Цилиндрические детали и&nbsp;подвесы</td><td><a href="/products/termicheskie-pechi/shahtnye-pechi/">УИ-МШП</a></td><td>Шахта под&nbsp;длину и&nbsp;массу</td></tr>
+              <tr><td>Защита поверхности при&nbsp;нагреве</td><td><a href="/products/termicheskie-pechi/pechi-s-zaschitnoy-atmosferoy/">УИ-МПЗА</a></td><td>Контролируемая газовая среда</td></tr>
+              <tr><td>Вакуумный отжиг, пайка, спекание</td><td><a href="/products/termicheskie-pechi/vakuumnye-pechi/">УИ-МВТВП</a></td><td>Горячая зона и&nbsp;откачка под&nbsp;задачу</td></tr>
+              <tr><td>Тигли и&nbsp;сменные платформы</td><td><a href="/products/termicheskie-pechi/pechi-s-podyomnym-podom/">УИ-МПП</a></td><td>Подъёмный под; один или&nbsp;два стола</td></tr>
+              <tr><td>Образцы, порошки, поток газа</td><td><a href="/products/termicheskie-pechi/trubchatye-pechi/">УИ-ТП</a></td><td>Труба и&nbsp;зоны нагрева</td></tr>
+              <tr><td>Непрерывный поток продукции</td><td><a href="/products/termicheskie-pechi/pechi-nepreryvnogo-deystviya/">УИ-РП / УИ-СЛП / УИ-ВБП</a></td><td>Ролики, лента или&nbsp;барабан</td></tr>
+              <tr><td>Плавление фритты</td><td><a href="/products/termicheskie-pechi/fritovye-pechi/">УИ-МФП</a></td><td>Тигель и&nbsp;выгрузка</td></tr>
+              <tr><td>Зуботехнические материалы</td><td><a href="/products/termicheskie-pechi/zubotehnicheskie-pechi/">УИ-МПД</a></td><td>Небольшая рабочая зона</td></tr>
+              <tr><td>Испытания огнеупоров</td><td><a href="/products/termicheskie-pechi/pechi-dlya-ispytaniy-na-termoudar/">МП-ИТ-1</a></td><td>Нагрев, перенос и&nbsp;охлаждение</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="cdoc__panel" id="sec-2-pechi-s-vykatnym-podom-dlya-krupnoy-sadki">
+          <h2 class="cdoc__title">Печи с&nbsp;выкатным подом для&nbsp;крупной садки</h2>
+          <p><a href="/products/termicheskie-pechi/pechi-s-vykatnym-podom/">УИ-МПВП</a>&nbsp;— наиболее востребованная серия у&nbsp;наших заказчиков. Под выкатывается из&nbsp;камеры: крупные детали и&nbsp;оснастку удобно размещать краном и&nbsp;осматривать перед&nbsp;загрузкой. Подбираем размеры, нагрузку на&nbsp;под, дверь и&nbsp;зоны нагрева.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-3-ot-tehnologicheskoy-zadachi-do-zapuska">
+          <h2 class="cdoc__title">От&nbsp;технологической задачи до&nbsp;запуска</h2>
+          <p>УралИндуктор разрабатывает концепцию комплекса и&nbsp;формирует техническое решение. Подбор, проверку, пусконаладку, обучение персонала и&nbsp;сервис в&nbsp;России выполняют наши специалисты.</p>
+          <ul>
+            <li>Подбираем камеру по&nbsp;изделию, оснастке, массе садки и&nbsp;рабочим зазорам.</li>
+            <li>Согласуем температуру, среду, выдержку, нагрев и&nbsp;охлаждение.</li>
+            <li>Предлагаем механику загрузки, число зон, управление и&nbsp;регистрацию.</li>
+            <li>Проверяем мощность и&nbsp;требования площадки, состав поставки и&nbsp;пусконаладки.</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-4-temperatura-i-kachestvo-nagreva">
+          <h2 class="cdoc__title">Температура и&nbsp;качество нагрева</h2>
+          <p>Точность регулирования в&nbsp;контрольной точке&nbsp;— до&nbsp;±1&nbsp;°C в&nbsp;соответствующем исполнении. Равномерность по&nbsp;рабочему объёму согласуем отдельно&nbsp;— по&nbsp;зонам, садке и&nbsp;контрольным точкам. Скорость нагрева может достигать 40&nbsp;°C/мин в&nbsp;подходящей конфигурации; программу выбираем с&nbsp;учётом материала и&nbsp;футеровки.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-5-futerovka-i-nagrevateli-pod-vash-process">
+          <h2 class="cdoc__title">Футеровка и&nbsp;нагреватели под&nbsp;ваш процесс</h2>
+          <p>Для&nbsp;муфельных, камерных печей, установок с&nbsp;выкатным подом, защитной атмосферой и&nbsp;вакуумом предусмотрены разные материалы волокнистой теплоизоляции: керамическое волокно, материалы на&nbsp;основе оксида алюминия и&nbsp;оксида циркония. В&nbsp;зависимости от&nbsp;температурного исполнения применяются металлические нагреватели FeCrAl или&nbsp;NiCr, стержни из&nbsp;карбида кремния SiC либо&nbsp;дисилицида молибдена MoSi₂.</p>
+          <p>Конкретный материал выбираем вместе с&nbsp;рабочей температурой, газовой средой и&nbsp;требованиями к&nbsp;чистоте изделий. Состав футеровки, конструкцию пода, нагреватели и&nbsp;термопары включаем в&nbsp;спецификацию выбранной печи. Подробный разбор&nbsp;— <a href="/products/termicheskie-pechi/futerovka-i-nagrevateli/">футеровка термических печей и&nbsp;выбор нагревателей</a>.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-6-upravlenie-na-russkom-yazyke">
+          <h2 class="cdoc__title">Управление на&nbsp;русском языке</h2>
+          <p>Оборудование поставляется с&nbsp;русскоязычным управлением и&nbsp;эксплуатационной документацией. По&nbsp;задаче устанавливаем программный контроллер, сенсорную панель или&nbsp;регистратор. Шкаф управления можем полностью собрать и&nbsp;испытать в&nbsp;России.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-7-postavka-i-komplektaciya">
+          <h2 class="cdoc__title">Поставка и&nbsp;комплектация</h2>
+          <p>Отдельные модели могут быть в&nbsp;наличии&nbsp;— комплектацию и&nbsp;дату отгрузки подтвердит менеджер. Печь поставляем в&nbsp;сборе, если транспортные габариты позволяют, либо&nbsp;крупными узлами с&nbsp;согласованной сборкой на&nbsp;площадке. Для&nbsp;контейнерной перевозки учитываем габариты 40HQ и&nbsp;дальнейшую доставку по&nbsp;России.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-8-chto-vliyaet-na-cenu">
+          <h2 class="cdoc__title">Что влияет на&nbsp;цену</h2>
+          <p>Размер камеры, температура, мощность, привод, число зон, управление, газовая и&nbsp;вакуумная системы определяют состав предложения. Работаем с&nbsp;НДС. Возможность и&nbsp;условия лизинга согласуем индивидуально.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-9-voprosy-pered-zakazom">
+          <h2 class="cdoc__title">Вопросы перед&nbsp;заказом термической печи</h2>
+          <h3>Что нужно для&nbsp;расчёта цены?</h3>
+          <p>Материал, размеры и&nbsp;масса садки с&nbsp;оснасткой, температурный цикл, рабочая среда и&nbsp;способ загрузки. Дополнительно укажите требования к&nbsp;равномерности температуры, автоматизации и&nbsp;доступную электрическую мощность.</p>
+          <h3>Почему печи одинакового объёма могут иметь разную мощность?</h3>
+          <p>Мощность зависит от&nbsp;температурного исполнения, массы и&nbsp;состава садки, времени нагрева, числа зон и&nbsp;комплектации. В&nbsp;предложении согласуем параметры именно для&nbsp;вашего процесса.</p>
+          <h3>Можно ли заказать замену футеровки и&nbsp;нагревателей?</h3>
+          <p>Специалисты УралИндуктор выполняют диагностику и&nbsp;ремонт. Для&nbsp;подбора решения нужны модель печи, фото, описание неисправности и&nbsp;рабочие режимы. Оборудование других производителей принимаем после&nbsp;оценки его состояния и&nbsp;ремонтопригодности.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-10-chto-poluchite-v-tehnicheskom-predlozhenii">
+          <h2 class="cdoc__title">Что получите в&nbsp;техническом предложении</h2>
+          <ul>
+            <li>рекомендуемая конструкция и&nbsp;серия под&nbsp;изделие, садку и&nbsp;технологический цикл;</li>
+            <li>предварительная комплектация с&nbsp;рабочей камерой, температурой, мощностью, зонами и&nbsp;управлением;</li>
+            <li>состав поставки, требования к&nbsp;площадке, стоимость, срок и&nbsp;объём пусконаладки.</li>
+          </ul>
+        </div>
+
+        <div class="cdoc__panel" id="sec-11-proverka-puskonaladka-i-garantiya">
+          <h2 class="cdoc__title">Проверка, пусконаладка и&nbsp;гарантия</h2>
+          <p>До&nbsp;отгрузки проверяем комплектность, электрическую и&nbsp;механическую части, а&nbsp;также работу блокировок при&nbsp;полном подключении оборудования. Первый полный прогрев проводим у&nbsp;заказчика с&nbsp;учётом состояния футеровки после&nbsp;перевозки. Выполняем пусконаладочные работы, обучаем персонал и&nbsp;оформляем акт. Гарантийный срок&nbsp;— 12&nbsp;месяцев; начало отсчёта определяется договором: со&nbsp;дня отгрузки либо&nbsp;со&nbsp;дня подписания акта пусконаладочных работ.</p>
+        </div>
+
+        <div class="cdoc__panel" id="sec-12-servis-v-rossii">
+          <h2 class="cdoc__title">Сервис в&nbsp;России</h2>
+          <p>Специалисты «УралИндуктор» выполняют в&nbsp;России диагностику, ремонт и&nbsp;модернизацию термических печей. Обслуживаем нагреватели, датчики, системы управления, футеровку, механические, газовые и&nbsp;вакуумные узлы.</p>
+          <ul>
+            <li><a href="/uslugi/remont-termicheskih-pechey/">Ремонт и&nbsp;сервис термических печей</a></li>
+          </ul>
+          <p>Пришлите материал, размеры и&nbsp;массу садки, температуру и&nbsp;цикл&nbsp;— подберём комплектацию и&nbsp;рассчитаем стоимость.</p>
+          <p class="cdoc__actions"><a class="btn btn--primary" href="#leadgen">Получить подбор и&nbsp;техническое предложение <span class="btn__arrow">→</span></a> <a class="btn btn--secondary" href="#leadgen">Узнать цену</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="full-cycle" aria-label="Полный цикл — от подбора до сервиса">
   <div class="container">
     <div class="full-cycle__head">
