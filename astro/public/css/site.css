@@ -2926,6 +2926,7 @@ body.nav-open { overflow: hidden; }
 .cmp-bar__clear:hover { color: var(--text-primary); }
 @media (max-width: 640px) {
   .cmp-bar__inner { padding: 0 var(--sp-5); gap: var(--sp-3); }
-  .cmp-bar__count { font-size: 13px; }
-  .cmp-bar__go { padding: 10px var(--sp-4); font-size: 13px; }
+  .cmp-bar__count { font-size: 13px; white-space: nowrap; }
+  .cmp-bar__go { padding: 10px var(--sp-3); font-size: 12px; white-space: nowrap; }
+  .cmp-bar__clear { font-size: 12px; }
 }

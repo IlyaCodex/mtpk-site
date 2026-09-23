@@ -61,13 +61,6 @@
     return sectionsPromise;
   }
 
-  // Раздел страницы: для листинга — она сама, для товара — родительский путь.
-  function pageSections(path) {
-    var self = path.replace(/[^/]+$/, '').replace(/\/?$/, '/');
-    var parent = self.replace(/[^/]+\/$/, '');
-    return [path.replace(/\/?$/, '/'), parent];
-  }
-
   /* ── кнопка ──────────────────────────────────────────────────────── */
   var ICON = '<svg class="cmp-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
     + ' stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -146,7 +139,7 @@
     }
     bar.innerHTML =
       '<div class="cmp-bar__inner">'
-      + '<span class="cmp-bar__count">К сравнению: <b>' + data.items.length + '</b> из ' + LIMIT + '</span>'
+      + '<span class="cmp-bar__count">Сравнение: <b>' + data.items.length + '</b> / ' + LIMIT + '</span>'
       + '<a class="btn btn--primary cmp-bar__go" href="' + PAGE + '">Сравнить <span class="btn__arrow">→</span></a>'
       + '<button type="button" class="cmp-bar__clear">Очистить</button>'
       + '</div>';
@@ -155,7 +148,26 @@
       repaintAll();
       renderPanel();
     });
+    liftAboveCookie(bar);
   }
+
+  /* Плашка куки тоже висит внизу и перекрывает панель (z-index 3000
+     против 900) — до согласия кнопка «Сравнить» была бы недоступна.
+     Поднимаем панель на высоту плашки, пока та видна. */
+  function liftAboveCookie(bar) {
+    var ck = document.getElementById('cookie-consent');
+    var shown = ck && !ck.hidden && ck.offsetHeight > 0;
+    bar.style.bottom = shown ? ck.offsetHeight + 'px' : '0px';
+  }
+
+  window.addEventListener('cookie-consent-accepted', function () {
+    var bar = document.getElementById('cmp-bar');
+    if (bar) liftAboveCookie(bar);
+  });
+  window.addEventListener('resize', function () {
+    var bar = document.getElementById('cmp-bar');
+    if (bar) liftAboveCookie(bar);
+  });
 
   /* ── переключение позиции ────────────────────────────────────────── */
   function toggle(url, btn) {
