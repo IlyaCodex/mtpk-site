@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "astro dev",
     "stock": "node scripts/build-stock.mjs --verbose",
-    "prebuild": "node scripts/build-stock.mjs",
+    "prebuild": "node scripts/build-stock.mjs && node scripts/build-compare-index.mjs",
     "build": "astro build",
     "postbuild": "pagefind --site dist --output-subdir _pagefind && node scripts/prune-inline-extracted.mjs && node scripts/strip-html-comments.mjs && node scripts/alias-sitemap.mjs",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "compare": "node scripts/build-compare-index.mjs --report"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

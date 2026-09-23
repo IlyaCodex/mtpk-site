@@ -22,10 +22,12 @@ interface Props {
   ogType?: string;
   /** Картинка-превью для результатов поиска (Pagefind meta image). */
   searchImage?: string;
+  /** Закрыть страницу от поисковиков (служебные: сравнение, спасибо). */
+  noindex?: boolean;
 }
 const {
   title, description, canonical, activeNav, index = true, searchWeight = 1,
-  ogImage = '/og/default.jpg', ogType = 'website', searchImage,
+  ogImage = '/og/default.jpg', ogType = 'website', searchImage, noindex = false,
 } = Astro.props;
 
 // SEO-T1 (v2): canonical URL — С trailing slash, чтобы совпадать с реальным
@@ -124,6 +126,7 @@ const mainAttrs = index
   <title>{title}</title>
   {description && <meta name="description" content={description} />}
   <link rel="canonical" href={canonicalURL} />
+  {noindex && <meta name="robots" content="noindex, follow" />}
 
   <!-- SEO-T2: Open Graph — превью при шеринге (Telegram, VK, WhatsApp, Slack). -->
   <meta property="og:type" content={ogType} />
@@ -236,7 +239,7 @@ const mainAttrs = index
        в один файл. Подключается ДО slot=head, чтобы дельты страницы (external/
        inline из [...slug].astro) шли после и могли переопределять ядро.
        Render-blocking + immutable-кэш (nginx max-age) — повторные визиты бесплатны. -->
-  <link rel="stylesheet" href="/css/site.css?v=20260918c">
+  <link rel="stylesheet" href="/css/site.css?v=20260923a">
   <slot name="head" />
   <!-- Mobile-fixes + stock-badges — inline в head (T-PERF-15).
        Lighthouse показывал stock.css на хвосте критической цепочки с задержкой
@@ -267,6 +270,8 @@ const mainAttrs = index
   <!-- ТЗ-2 п.3: «Запросить цену» — дозапись позиции в форму + скролл. -->
   <script src="/js/quote-form.js?v=20260607" defer></script>
   <script src="/js/stock-badges.js?v=20260601" defer></script>
+  <!-- «К сравнению»: кнопки в карточках, панель и счётчик (все страницы каталога). -->
+  <script src="/js/compare.js?v=20260923" defer></script>
   <!-- Отметка «В наличии» внутри карточки товара (.phero): бейдж на обложке +
        срок отгрузки от 1 дня. Активируется только на страницах товара. -->
   <script src="/js/stock-product.js?v=20260623-1" defer></script>

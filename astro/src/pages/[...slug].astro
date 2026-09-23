@@ -111,6 +111,8 @@ const { body, meta } = Astro.props as {
     css_templates?: string[];
     /** LCP-картинка страницы — добавится в head как preload с fetchpriority=high. */
     preload_image?: string;
+    /** Служебная страница: закрыть от поисковиков (<meta robots noindex>). */
+    noindex?: boolean;
   };
 };
 // T-PERF-4: разделяем стили на external (>20 KB → /css/inline-extracted/) и
@@ -148,7 +150,9 @@ const isProject = slug.startsWith('proekty');
 const isSection = slug.startsWith('products') && body.includes('class="cat-hero"');
 // Служебная страница «Спасибо» — не в поисковой выдаче Pagefind (нет смысла
 // показывать экран благодарности в результатах поиска по сайту).
-const isUtility = slug === 'spasibo';
+// Сравнение товаров — тоже служебная: без выбранных позиций там пусто,
+// в поиск и в выдачу она не идёт (noindex + вне sitemap).
+const isUtility = slug === 'spasibo' || slug === 'sravnenie';
 const searchIndex = !isProject && !isUtility;
 const searchWeight = isSection ? 10 : 1;
 
@@ -261,7 +265,7 @@ for (let i = 0; i < parts.length; i++) {
   }
 }
 ---
-<BaseLayout title={meta.title} description={meta.description} activeNav={activeNav} index={searchIndex} searchWeight={searchWeight} searchImage={searchImage}>
+<BaseLayout title={meta.title} description={meta.description} activeNav={activeNav} index={searchIndex} searchWeight={searchWeight} searchImage={searchImage} noindex={meta.noindex === true}>
   {preloadImage && (
     <link slot="head" rel="preload" as="image" href={preloadImage} fetchpriority="high" />
   )}

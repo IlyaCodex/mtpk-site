@@ -93,5 +93,6 @@ scripts/         # вспомогательные скрипты
 | Деплой: процедура и грабли | briefs/hosting-spec.md + docs/deploy-gotchas.md |
 | Типы страниц T01–T12 | docs/page-types/README.md |
 | Подсистема «Наличие» | docs/stock-system.md |
+| Подсистема «Сравнение товаров» | docs/compare-system.md |
 | О проекте, команда, контент-источник, наследие WP | docs/project-info.md |
 | Сопровождение для оператора | MAINTENANCE.md |

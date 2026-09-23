@@ -1,0 +1,111 @@
+<style is:global>
+  /* Страница сравнения. Кнопка «К сравнению» и нижняя панель — глобальные
+     (они на всех страницах каталога), их стили лежат в site.css. Здесь
+     только то, что нужно самой таблице. */
+  .cmp-hero { padding: var(--sp-16, 64px) 0 var(--sp-6, 24px); background: var(--surface-page, #fff); }
+  .cmp-hero .s-lead { max-width: 62ch; }
+
+  .cmp-section { padding: 0 0 var(--section-py-base, 96px); background: var(--surface-page, #fff); }
+
+  .cmp-section-line { font-size: var(--fs-small, 14px); color: var(--text-secondary, #5b6b73); margin: 0 0 var(--sp-5, 20px); }
+  .cmp-section-line a { color: var(--teal-600, #1F5E78); text-decoration: underline; text-underline-offset: 2px; }
+
+  .cmp-tools {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: var(--sp-4, 16px); margin-bottom: var(--sp-5, 20px);
+  }
+  .cmp-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-small, 14px); cursor: pointer; }
+  .cmp-toggle input { width: 16px; height: 16px; accent-color: var(--green-500, #4fab3a); }
+  .cmp-clear {
+    border: 0; background: none; padding: 0; cursor: pointer;
+    font: inherit; font-size: var(--fs-small, 14px); color: var(--text-tertiary, #7b8b93);
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  .cmp-clear:hover { color: var(--text-primary, #101F26); }
+
+  /* Таблица. Первая колонка липкая — иначе на телефоне непонятно,
+     значение какого параметра ты читаешь. */
+  .cmp-scroll { overflow-x: auto; border: 1px solid var(--border-subtle, #e6eaee); border-radius: 14px; }
+  .cmp-table { border-collapse: collapse; width: 100%; background: var(--surface-page, #fff); }
+  .cmp-table th, .cmp-table td {
+    padding: var(--sp-3, 12px) var(--sp-4, 16px); text-align: left; vertical-align: top;
+    border-bottom: 1px solid var(--border-subtle, #e6eaee); font-size: var(--fs-small, 14px);
+  }
+  .cmp-table tr:last-child th, .cmp-table tr:last-child td { border-bottom: 0; }
+  .cmp-row__label, .cmp-table__corner {
+    position: sticky; left: 0; z-index: 1; min-width: 210px; max-width: 280px;
+    background: var(--surface-subtle, #f5f7f8); color: var(--text-secondary, #5b6b73);
+    font-weight: var(--fw-regular, 400);
+  }
+  .cmp-table__corner {
+    z-index: 2; font-family: var(--font-display); font-size: var(--fs-micro, 12px);
+    text-transform: uppercase; letter-spacing: var(--ls-eyebrow, .08em);
+    color: var(--text-tertiary, #7b8b93); vertical-align: bottom;
+  }
+  .cmp-col { min-width: 210px; background: var(--surface-page, #fff); position: relative; }
+  .cmp-col__cover { display: block; margin-bottom: 10px; }
+  .cmp-col__cover img {
+    width: 100%; max-width: 190px; aspect-ratio: 4 / 3; object-fit: contain;
+    display: block; background: var(--surface-subtle, #f5f7f8); border-radius: 8px;
+  }
+  .cmp-col__name {
+    font-family: var(--font-display); font-weight: 600; font-size: 15px; line-height: 1.3;
+    color: var(--text-primary, #101F26); text-decoration: none; display: block; padding-right: 22px;
+  }
+  .cmp-col__name:hover { color: var(--teal-600, #1F5E78); }
+  .cmp-col__remove {
+    position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%;
+    border: 1px solid var(--border-subtle, #e6eaee); background: #fff; color: var(--text-tertiary, #7b8b93);
+    font-size: 17px; line-height: 1; cursor: pointer;
+  }
+  .cmp-col__remove:hover { border-color: var(--teal-600, #1F5E78); color: var(--text-primary, #101F26); }
+
+  .cmp-table td.is-diff { color: var(--text-primary, #101F26); font-weight: 500; }
+  .cmp-table--diff .cmp-row.is-same { display: none; }
+
+  .cmp-empty { padding: var(--sp-10, 40px) 0 var(--sp-12, 48px); }
+  .cmp-empty__text { font-size: var(--fs-lead, 17px); color: var(--text-secondary, #5b6b73); max-width: 60ch; margin: 0 0 var(--sp-5, 20px); }
+
+  @media (max-width: 640px) {
+    .cmp-hero { padding-top: var(--sp-10, 40px); }
+    .cmp-row__label, .cmp-table__corner { min-width: 140px; max-width: 160px; }
+    .cmp-col { min-width: 170px; }
+    .cmp-table th, .cmp-table td { padding: 10px 12px; font-size: 13px; }
+  }
+</style>
+
+<!-- ============================================================
+     ПЕРВЫЙ ЭКРАН
+     ============================================================ -->
+<section class="cmp-hero" aria-label="Сравнение оборудования">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="/products/">Каталог оборудования</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Сравнение</span>
+    </nav>
+    <div class="s-eyebrow">Подбор</div>
+    <h1 class="s-title">Сравнение <em>оборудования</em></h1>
+    <p class="s-lead">Характеристики выбранных моделей рядом, в одной таблице. Отметьте «К&nbsp;сравнению» на&nbsp;карточках товара — позиции сохранятся, даже если вы закроете вкладку.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     ТАБЛИЦА — собирается скриптом из выбора и индекса характеристик
+     ============================================================ -->
+<section class="cmp-section" aria-label="Таблица сравнения">
+  <div class="container">
+    <div id="cmp-root"></div>
+  </div>
+</section>
+
+<!-- Форма заявки — канонический блок. Заголовок, подпись кнопки и метку
+     источника подменяет compare-page.js: сама форма остаётся общей, чтобы
+     не разъехаться с каноном (honeypot, скрытые поля, обработчик). -->
+<div id="cmp-form-wrap">
+<!--C:leadgen-->
+</div>
+
+<script src="/js/compare-page.js?v=20260923" defer></script>

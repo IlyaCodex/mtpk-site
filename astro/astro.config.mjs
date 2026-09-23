@@ -69,6 +69,9 @@ export default defineConfig({
       filter: (page) => {
         // Исключаем 404 и любые служебные страницы
         if (page.includes('/404')) return false;
+        // Сравнение товаров: содержимое собирается в браузере из выбора
+        // пользователя, индексировать нечего.
+        if (page.includes('/sravnenie')) return false;
         return true;
       },
       serialize: (item) => {

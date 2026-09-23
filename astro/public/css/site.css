@@ -2878,3 +2878,54 @@ body.nav-open { overflow: hidden; }
 .oprosnik__btn:hover { border-color: var(--teal-600); }
 .oprosnik__btn svg { flex-shrink: 0; }
 @media (max-width: 640px) { .oprosnik__btn { width: 100%; justify-content: center; } }
+
+/* ============================================================
+   СРАВНЕНИЕ ТОВАРОВ — кнопка в карточках и нижняя панель.
+   Разметку рисует public/js/compare.js, поэтому стили глобальные:
+   кнопка появляется на всех страницах каталога.
+   ============================================================ */
+.cmp-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: var(--sp-2); padding: 10px var(--sp-4);
+  background: transparent; border: 1px solid var(--border-default);
+  color: var(--text-secondary); font-family: var(--font-display);
+  font-size: var(--fs-small); font-weight: var(--fw-semibold); line-height: 1.2;
+  cursor: pointer; transition: border-color var(--duration-fast) var(--ease-out),
+                               color var(--duration-fast) var(--ease-out);
+}
+.cmp-btn:hover { border-color: var(--teal-600); color: var(--text-primary); }
+.cmp-btn.is-active { border-color: var(--green-500); color: var(--green-600, #348c26); }
+.cmp-btn__icon { width: 17px; height: 17px; flex: none; }
+/* На странице товара кнопка стоит в ряд с «Запросить цену» — не тянем её
+   на всю ширину и выравниваем по высоте с соседями. */
+.phero__actions .cmp-btn {
+  width: auto; margin-top: 0;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  font-size: var(--btn-font-size); letter-spacing: var(--btn-letter-spacing);
+  text-transform: uppercase; border-radius: var(--btn-radius);
+}
+
+.cmp-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
+  background: var(--neutral-0, #fff); border-top: 1px solid var(--border-default);
+  box-shadow: 0 -10px 30px -18px rgba(16, 31, 38, .5);
+  padding: var(--sp-3) 0 calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
+}
+.cmp-bar__inner {
+  max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--sp-8);
+  display: flex; align-items: center; gap: var(--sp-4);
+}
+.cmp-bar__count { font-size: var(--fs-small); color: var(--text-secondary); }
+.cmp-bar__count b { color: var(--text-primary); }
+.cmp-bar__go { margin-left: auto; }
+.cmp-bar__clear {
+  border: 0; background: none; padding: 0; cursor: pointer; font: inherit;
+  font-size: var(--fs-small); color: var(--text-tertiary);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.cmp-bar__clear:hover { color: var(--text-primary); }
+@media (max-width: 640px) {
+  .cmp-bar__inner { padding: 0 var(--sp-5); gap: var(--sp-3); }
+  .cmp-bar__count { font-size: 13px; }
+  .cmp-bar__go { padding: 10px var(--sp-4); font-size: 13px; }
+}
