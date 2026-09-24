@@ -220,8 +220,10 @@
 .cdoc__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
 /* Ссылки внутри описания: у сайта нет глобального стиля ссылки,
    браузер красил их синим по умолчанию. */
-.cdoc a:not(.btn) { color: var(--teal-600); text-decoration: underline; text-underline-offset: 2px; }
-.cdoc a:not(.btn):hover { color: var(--text-brand); }
+/* Оглавление слева — не текстовая ссылка: подчёркивание ему не нужно,
+   у него своя полоска слева. */
+.cdoc__body a:not(.btn) { color: var(--teal-600); text-decoration: underline; text-underline-offset: 2px; }
+.cdoc__body a:not(.btn):hover { color: var(--text-brand); }
 @media (max-width: 1024px) { .cdoc__layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); } .cdoc__nav { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--sp-2); } .cdoc__nav-link { border-left: 0; border-bottom: 2px solid var(--border-subtle); padding: var(--sp-2) var(--sp-3); } .cdoc__nav-eyebrow { width: 100%; margin-bottom: 0; } }
 </style>
 <section class="cdoc" aria-label="Описание и характеристики">
