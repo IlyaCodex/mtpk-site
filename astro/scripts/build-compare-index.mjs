@@ -108,10 +108,16 @@ function specs(html) {
   const out = [];
   for (const row of sec[1].matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)) {
     const cells = [...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((c) => text(c[1]));
-    if (cells.length !== 2) continue;          // трёхколоночные таблицы — не характеристики
+    // Две колонки «параметр — значение» либо три, где третья — комментарий
+    // (так устроены таблицы пескоструя после пакета V9).
+    if (cells.length < 2 || cells.length > 3) continue;
     const [label, value] = cells;
     if (!label || !value) continue;
-    if (/^(параметр|характеристика|показатель)$/i.test(label)) continue;  // строка-шапка
+    if (/^(параметр|характеристика|показатель|предварительная база|возможные опции|элемент кода)$/i
+        .test(label)) continue;  // строка-шапка или таблица не о характеристиках
+    // Перечни состава («аспирационный модуль», «одно ручное сопло») пишутся
+    // со строчной буквы — это не названия параметров.
+    if (/^[а-яё]/.test(label)) continue;
     out.push([label, value]);
   }
   return out;
