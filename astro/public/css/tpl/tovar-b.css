@@ -427,6 +427,9 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
 .phero__extra-link:hover {color: var(--teal-700); }
 .phero__facts {display: flex; flex-direction: column; gap: var(--sp-4); margin: 0; padding: var(--sp-6) 0 0; list-style: none; border-top: 1px solid var(--border-subtle); }
 .phero__facts li {display: flex; gap: var(--sp-3); align-items: flex-start; font-size: var(--fs-small); color: var(--text-secondary); line-height: var(--lh-body); }
+/* Текст факта — flex-элемент: без min-width:0 длинная строка не переносится
+   и на телефоне уезжает за экран (у пескоструя было до 343px). */
+.phero__facts li > span {min-width: 0; }
 .phero__facts svg {width: 20px; height: 20px; color: var(--teal-600); flex-shrink: 0; margin-top: 2px; }
 .phero__facts strong {color: var(--text-primary); font-weight: var(--fw-semibold); }
 /* --- Spec: sticky TOC + all panels visible (no tabs, no cards — just dividers) --- */
