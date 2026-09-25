@@ -73,7 +73,8 @@ function pickTitle(html, metaTitle) {
   const m = html.match(/<h1[^>]*class="[^"]*phero__title[^"]*"[^>]*>([\s\S]*?)<\/h1>/i)
          || html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
   if (m) {
-    const t = decode(m[1].replace(/<[^>]+>/g, '')).trim().replace(/\s+/g, ' ');
+    // теги заменяем пробелом: <br> и <span> внутри h1 иначе склеивают слова
+    const t = decode(m[1].replace(/<[^>]+>/g, ' ')).trim().replace(/\s+/g, ' ');
     if (t.length > 3) return t;
   }
   if (metaTitle) return metaTitle.split('—')[0].split('·')[0].trim();
@@ -186,7 +187,9 @@ function main() {
     if (it.qty      != null) out.qty      = it.qty;
     if (it.shipping)         out.shipping = it.shipping;
     if (it.note)             out.note     = it.note;
-    if (Array.isArray(it.specs) && it.specs.length) out.specs = it.specs;
+    if (Array.isArray(it.specs) && it.specs.length) out.specs = it.specs
+    // image в конфиге — когда первое фото страницы не каталожное
+    if (typeof it.image === 'string' && it.image) out.image = it.image;
     resolved.push(out);
 
     log(`✓ ${slug} → ${title}${card ? ' [+catalog card]' : ''}`);
