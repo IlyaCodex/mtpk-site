@@ -1050,6 +1050,12 @@ picture/
     `card-kovsh-stend-sushki` с подписью «Пример конструкции». Фото пакета V8 не берём:
     это сырые снимки чужого цеха с иероглифами, канону не соответствуют. Отрисовка
     по моделям — отдельной задачей через /product-image.
+  - **Электрические стенды (2026-09-25):** `card-stend-elektricheskij` — рендер от
+    Евгения (`MMP/product_card_heater_1`, 1024×1024 → 1200 px jpg+webp): зелёный корпус
+    с логотипом и нагревательными элементами на белом. Стоит на трёх страницах моделей,
+    в их карточках, на плитке хаба и в карточке раздела на /products/. Газовые пока
+    остаются на общем кадре `card-kovsh-stend-sushki`. Исходник —
+    `picture/products/stendy-elektricheskij-heater-source.png`.
   - Подкатегории печей: `card-pech-stal.png?v=3`, `card-pech-alyuminiy.png?v=3`, `card-pech-med.png?v=3`.
   - Дробемёты (9 шт.): `product-card-shotblast.png?v=7`, `card-baraban.png?v=7`,
     `card-shveller.png?v=4`, `card-stol.png?v=4`, `card-vykatnoy.png?v=3`,
