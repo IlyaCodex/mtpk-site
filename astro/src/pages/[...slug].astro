@@ -169,7 +169,7 @@ function decodeEntities(s: string): string {
   };
   return s.replace(/&[a-z]+;|&#\d+;/gi, (m) => map[m] ?? m).replace(/\s+/g, ' ').trim();
 }
-function buildBreadcrumbSchema(html: string): string | null {
+function buildBreadcrumbSchema(html: string, pageUrl: string): string | null {
   const navMatch = html.match(/<nav\s+class="breadcrumb[^"]*"[^>]*>([\s\S]*?)<\/nav>/);
   if (!navMatch) return null;
   const inner = navMatch[1];
@@ -183,7 +183,9 @@ function buildBreadcrumbSchema(html: string): string | null {
   // <span class="breadcrumb__current">...</span>
   const currentMatch = inner.match(/<span\s+class="breadcrumb__current"[^>]*>([^<]+)<\/span>/);
   if (currentMatch) {
-    items.push({ name: decodeEntities(currentMatch[1]) });
+    // У последней крошки тоже должен быть item: без него Я.Вебмастер считает
+    // цепочку незамкнутой. URL — сама страница (canonical, с trailing slash).
+    items.push({ name: decodeEntities(currentMatch[1]), url: pageUrl });
   }
   if (items.length < 2) return null;
   const listItems = items.map((it, i) => {
@@ -207,7 +209,7 @@ function buildBreadcrumbSchema(html: string): string | null {
     "itemListElement": listItems,
   });
 }
-const breadcrumbSchema = buildBreadcrumbSchema(body);
+const breadcrumbSchema = buildBreadcrumbSchema(body, `${SITE_SEO}/${slug}${slug ? '/' : ''}`);
 
 // SEO-T3c: JSON-LD Product — на товарных страницах (детектор: <section class="phero">).
 // Извлекаем name (h1.phero__title), image (главное фото), description (meta.description).
