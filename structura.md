@@ -153,11 +153,16 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │   ├── …/stalerazlivochnye-kovshi-stopornogo-tipa/               ✅ T04 · Стопорного типа
 │   │   ├── …/stalerazlivochnye-kovshi-chajnikovogo-tipa/             ✅ T04 · Чайникового типа
 │   │   ├── …/kovshi-dlya-modificirovaniya-chuguna/                  ✅ T04 · Для модифицирования чугуна (пакет V8)
+│   │   ├── …/kak-vybrat-litejnyj-kovsh/                          ✅ T02 · Как выбрать ковш (пакет V8)
+│   │   ├── …/kovshi-s-kryshkoj-i-specialnye-ispolneniya/         ✅ T02 · С крышкой и специсполнения
+│   │   ├── …/komplektuyushchie-litejnyh-kovshej/                 ✅ T02 · Комплектующие и запчасти
+│   │   ├── …/oprosnyj-list/                                      ✅ T02 · Опросный лист на ковш
 │   │   └── 62 карточки T05 УИК-… вложены под своими 5 категориями
 │   ├── /products/stendy-sushki-i-nagreva-kovshej/    ✅ T03a · Хаб «Стенды сушки и нагрева ковшей» (пакет V8, 25.09.2026)
 │   │   ├── …/gazovye/                                ✅ T04 · Газовые стенды (8 исполнений)
 │   │   └── …/elektricheskie/                         ✅ T04 · Электрические стенды (3 исполнения)
 │   │       — дизельный стенд 15 т не публикуется: исполнение по запросу (решение Евгения 25.09)
+│   │   └── …/oprosnyj-list/                             ✅ T02 · Опросный лист на стенд
 │   │       — прежняя страница …/stalerozlivochnye-kovshi/stend-dlya-sushki-i-nagreva-litejnogo-kovsha/ → 301 на хаб
 │   │   📷 Картинки: `astro/public/img/card-kovsh-{slug-короткий}.jpg` × 5
 │   │       — перерисованы через **fal-ai/gpt-image-1/edit-image** (GPT Image 2, quality=high)
