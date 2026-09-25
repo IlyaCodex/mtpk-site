@@ -2979,3 +2979,36 @@ body.nav-open { overflow: hidden; }
     margin-bottom: var(--sp-5);
   }
 }
+
+/* ============================================================
+   КАТАЛОГ НА ХАБЕ — сразу под первым экраном, плитки в поле зрения.
+   Порядок блоков правится в разметке (полоса цифр и вводный блок
+   ушли под каталог), здесь — шапка секции: отступ сверху, размер
+   заголовка и лида. Только десктоп.
+   ============================================================ */
+@media (min-width: 769px) {
+  section.catalog-list,
+  section.catalog-lvm,
+  section.catalog-lgm { padding-top: var(--sp-8); }
+
+  section.catalog-list .s-head,
+  section.catalog-lvm .s-head,
+  section.catalog-lgm .s-head { margin-bottom: var(--sp-6); }
+
+  section.catalog-list .s-title,
+  section.catalog-lvm .s-title,
+  section.catalog-lgm .s-title {
+    font-size: clamp(26px, 2.4vw, 34px);
+    margin-bottom: var(--sp-3);
+  }
+
+  section.catalog-list .s-lead,
+  section.catalog-lvm .s-lead,
+  section.catalog-lgm .s-lead {
+    font-size: var(--fs-body);
+    max-width: none;
+  }
+
+  /* первый экран: лид в одну строку шире — на длинных текстах он и задавал высоту */
+  section.cat-hero .cat-hero__subtitle { max-width: 80ch; font-size: 17px; }
+}
