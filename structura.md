@@ -152,8 +152,12 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │   ├── …/stalerazlivochnye-kovshi-dlya-rasplavlennogo-chuguna/   ✅ T04 · Для расплавленного чугуна
 │   │   ├── …/stalerazlivochnye-kovshi-stopornogo-tipa/               ✅ T04 · Стопорного типа
 │   │   ├── …/stalerazlivochnye-kovshi-chajnikovogo-tipa/             ✅ T04 · Чайникового типа
-│   │   └── …/stend-dlya-sushki-i-nagreva-litejnogo-kovsha/           ✅ T05 · Стенд для сушки и нагрева (товарная карточка)
-│   │       └── 42 карточки T05 УИК-… вложены под своими 5 категориями
+│   │   └── 44 карточки T05 УИК-… вложены под своими 4 категориями
+│   ├── /products/stendy-sushki-i-nagreva-kovshej/    ✅ T03a · Хаб «Стенды сушки и нагрева ковшей» (пакет V8, 25.09.2026)
+│   │   ├── …/gazovye/                                ✅ T04 · Газовые стенды (8 исполнений)
+│   │   └── …/elektricheskie/                         ✅ T04 · Электрические стенды (3 исполнения)
+│   │       — дизельный стенд 15 т не публикуется: исполнение по запросу (решение Евгения 25.09)
+│   │       — прежняя страница …/stalerozlivochnye-kovshi/stend-dlya-sushki-i-nagreva-litejnogo-kovsha/ → 301 на хаб
 │   │   📷 Картинки: `astro/public/img/card-kovsh-{slug-короткий}.jpg` × 5
 │   │       — перерисованы через **fal-ai/gpt-image-1/edit-image** (GPT Image 2, quality=high)
 │   │       с реальных фото клиента из `ФОТО/Сталеразливочные ковши/Галлерея с фото/` как референсов:
