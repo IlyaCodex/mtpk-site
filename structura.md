@@ -152,7 +152,8 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │   ├── …/stalerazlivochnye-kovshi-dlya-rasplavlennogo-chuguna/   ✅ T04 · Для расплавленного чугуна
 │   │   ├── …/stalerazlivochnye-kovshi-stopornogo-tipa/               ✅ T04 · Стопорного типа
 │   │   ├── …/stalerazlivochnye-kovshi-chajnikovogo-tipa/             ✅ T04 · Чайникового типа
-│   │   └── 44 карточки T05 УИК-… вложены под своими 4 категориями
+│   │   ├── …/kovshi-dlya-modificirovaniya-chuguna/                  ✅ T04 · Для модифицирования чугуна (пакет V8)
+│   │   └── 62 карточки T05 УИК-… вложены под своими 5 категориями
 │   ├── /products/stendy-sushki-i-nagreva-kovshej/    ✅ T03a · Хаб «Стенды сушки и нагрева ковшей» (пакет V8, 25.09.2026)
 │   │   ├── …/gazovye/                                ✅ T04 · Газовые стенды (8 исполнений)
 │   │   └── …/elektricheskie/                         ✅ T04 · Электрические стенды (3 исполнения)
