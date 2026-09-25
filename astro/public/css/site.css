@@ -2949,3 +2949,33 @@ body.nav-open { overflow: hidden; }
 .breadcrumb a:hover { color: var(--teal-600); }
 .breadcrumb__sep { color: var(--border-default); }
 .breadcrumb__current { color: var(--text-tertiary); }
+
+/* ============================================================
+   ПЕРВЫЙ ЭКРАН КАТЕГОРИЙ — ниже, чтобы из-под него выглядывал
+   следующий блок (как на главной: .hero--home { min-height: 44vh }).
+   Высоту давал не только min-height, но и левая колонка: заголовок
+   до 58px и лид в узкую колонку 52ch. Поэтому заголовок мельче,
+   лид шире, вертикальные отступы плотнее.
+
+   Только десктоп (min-width: 769px): на телефоне первый экран и так
+   листается, а правила там у каждого хаба свои — трогать их незачем.
+   Селекторы с тегом section: у восьми хабов те же правила лежат
+   в inline-стилях страницы и идут после site.css.
+   Боковой отступ задан на .cat-hero__content, поэтому только
+   padding-top/bottom: сокращённая запись padding его обнуляет.
+   ============================================================ */
+@media (min-width: 769px) {
+  section.cat-hero { min-height: 44vh; }
+  section.cat-hero .cat-hero__content {
+    padding-top: var(--sp-6);
+    padding-bottom: var(--sp-8);
+  }
+  section.cat-hero .cat-hero__title {
+    font-size: clamp(30px, 3.2vw, 44px);
+    margin-bottom: var(--sp-4);
+  }
+  section.cat-hero .cat-hero__subtitle {
+    max-width: 60ch;
+    margin-bottom: var(--sp-5);
+  }
+}
