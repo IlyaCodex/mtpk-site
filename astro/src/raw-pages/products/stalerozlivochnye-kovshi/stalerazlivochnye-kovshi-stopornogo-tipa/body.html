@@ -1,3 +1,14 @@
+<style>
+  .kovsh-figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-5);
+    margin: 0 0 var(--sp-5); }
+  .kovsh-figs figure { margin: 0; min-width: 0; }
+  .kovsh-figs img { width: 100%; height: auto; display: block; border: 1px solid var(--border-subtle);
+    border-radius: 4px; background: #fff; }
+  .kovsh-figs figcaption { margin-top: var(--sp-3); font-size: var(--fs-small);
+    color: var(--text-secondary); line-height: var(--lh-body); }
+  @media (max-width: 760px) { .kovsh-figs { grid-template-columns: 1fr; } }
+</style>
+
 <!-- ============================================================
      HEADER — единый белый блок с двумя визуальными рядами
      ============================================================ -->
@@ -397,6 +408,7 @@
     <div class="spec__layout">
       <nav class="spec__nav" aria-label="Разделы">
         <div class="spec__nav-eyebrow">Содержание</div>
+        <a class="spec__nav-link" href="#kovsh-ustrojstvo">Как устроен выпускной узел</a>
         <a class="spec__nav-link" href="#kovsh-dlya-kakih-zadach-nuzhen-donnyj-vypusk">Для каких задач нужен донный выпуск</a>
         <a class="spec__nav-link" href="#kovsh-kak-ustroen-stopornyj-kovsh">Как устроен стопорный ковш</a>
         <a class="spec__nav-link" href="#kovsh-chto-daet-konstrukciya-i-kakie-u-nee-ogr">Что даёт конструкция и&nbsp;какие у&nbsp;неё ограничения</a>
@@ -407,6 +419,21 @@
       </nav>
 
       <div class="spec__body">
+        <div class="spec__panel" id="kovsh-ustrojstvo">
+          <h2 class="spec__title">Как устроен выпускной узел</h2>
+          <div class="kovsh-figs" style="grid-template-columns: minmax(0, 520px);">
+          <figure>
+            <picture>
+              <source srcset="/img/kovshi/stopper-mechanism.webp" type="image/webp">
+              <img src="/img/kovshi/stopper-mechanism.jpg" alt="Стопорный механизм литейного ковша" loading="lazy">
+            </picture>
+            <figcaption>Стопорный узел: шток с&nbsp;пробкой, рычаг управления и&nbsp;донный стакан.</figcaption>
+          </figure>
+          </div>
+          <p>Выпуск идёт через донное отверстие: стопор открывает и&nbsp;перекрывает проход, наклонять корпус не&nbsp;требуется. Состав выпускного узла, огнеупорные детали и&nbsp;ЗИП фиксируются в&nbsp;спецификации заказа.</p>
+          <p>Диаметр корпуса из&nbsp;таблицы не&nbsp;равен диаметру выпускного отверстия. Для&nbsp;согласования стакана и&nbsp;стопора нужны параметры расплава и&nbsp;режим разливки; отдельно проверяют пространство под&nbsp;днищем и&nbsp;доступ для&nbsp;обслуживания узла.</p>
+        </div>
+
         <div class="spec__panel" id="kovsh-dlya-kakih-zadach-nuzhen-donnyj-vypusk">
           <h2 class="spec__title">Для каких задач нужен донный выпуск</h2>
           <p>Стопорную конструкцию применяют в&nbsp;схемах разливки, где металл должен поступать в&nbsp;приёмную чашу формы снизу из&nbsp;вертикально расположенного ковша. При открытии выпуска не требуется поворачивать весь корпус и&nbsp;перемещать верхний носок над&nbsp;формой.</p>

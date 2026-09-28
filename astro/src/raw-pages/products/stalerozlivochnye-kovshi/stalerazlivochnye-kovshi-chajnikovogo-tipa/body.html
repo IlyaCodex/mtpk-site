@@ -1,3 +1,14 @@
+<style>
+  .kovsh-figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-5);
+    margin: 0 0 var(--sp-5); }
+  .kovsh-figs figure { margin: 0; min-width: 0; }
+  .kovsh-figs img { width: 100%; height: auto; display: block; border: 1px solid var(--border-subtle);
+    border-radius: 4px; background: #fff; }
+  .kovsh-figs figcaption { margin-top: var(--sp-3); font-size: var(--fs-small);
+    color: var(--text-secondary); line-height: var(--lh-body); }
+  @media (max-width: 760px) { .kovsh-figs { grid-template-columns: 1fr; } }
+</style>
+
 <!-- ============================================================
      HEADER — единый белый блок с двумя визуальными рядами
      ============================================================ -->
@@ -375,6 +386,7 @@
     <div class="spec__layout">
       <nav class="spec__nav" aria-label="Разделы">
         <div class="spec__nav-eyebrow">Содержание</div>
+        <a class="spec__nav-link" href="#kovsh-ustrojstvo">Устройство и&nbsp;обозначения размеров</a>
         <a class="spec__nav-link" href="#kovsh-zachem-nuzhen-chajnikovyj-kovsh">Зачем нужен чайниковый ковш</a>
         <a class="spec__nav-link" href="#kovsh-kak-rabotaet-bokovoj-slivnoj-kanal">Как работает боковой сливной канал</a>
         <a class="spec__nav-link" href="#kovsh-preimuschestva-i-ogranicheniya-pri-razli">Преимущества и&nbsp;ограничения при&nbsp;разливке</a>
@@ -385,6 +397,29 @@
       </nav>
 
       <div class="spec__body">
+        <div class="spec__panel" id="kovsh-ustrojstvo">
+          <h2 class="spec__title">Устройство и&nbsp;обозначения размеров</h2>
+          <div class="kovsh-figs">
+          <figure>
+            <picture>
+              <source srcset="/img/kovshi/teapot-3d.webp" type="image/webp">
+              <img src="/img/kovshi/teapot-3d.jpg" alt="Чайниковый ковш в разрезе — объёмная схема" loading="lazy">
+            </picture>
+            <figcaption>Разрез: боковой сливной канал сообщается с&nbsp;нижней частью ванны, шлак остаётся в&nbsp;корпусе.</figcaption>
+          </figure>
+
+          <figure>
+            <picture>
+              <source srcset="/img/kovshi/teapot-dimensions.webp" type="image/webp">
+              <img src="/img/kovshi/teapot-dimensions.jpg" alt="Чайниковый ковш в разрезе — обозначения размеров Φ1, Φ2, H, A, B" loading="lazy">
+            </picture>
+            <figcaption>Обозначения размеров серии: Φ1, Φ2, H, A и&nbsp;B.</figcaption>
+          </figure>
+          </div>
+          <p>Вместимость в&nbsp;таблицах — масса металла, размеры — в&nbsp;миллиметрах. Обозначения относятся к&nbsp;схеме этой серии: <strong>Φ1</strong> — внутренний диаметр по&nbsp;верху, <strong>Φ2</strong> — диаметр по&nbsp;днищу, <strong>H</strong> — высота корпуса, <strong>A</strong> и&nbsp;<strong>B</strong> — габариты ковша в&nbsp;сборе.</p>
+          <p>Схема показывает принцип размерной привязки и&nbsp;не&nbsp;заменяет рабочий чертёж. Рабочее заполнение и&nbsp;окончательные размеры зависят от&nbsp;толщины футеровки и&nbsp;свободного борта — при&nbsp;согласовании заказа запросите чертёж выбранного исполнения.</p>
+        </div>
+
         <div class="spec__panel" id="kovsh-zachem-nuzhen-chajnikovyj-kovsh">
           <h2 class="spec__title">Зачем нужен чайниковый ковш</h2>
           <p>Чайниковую конструкцию выбирают, когда при&nbsp;разливке важно уменьшить захват поверхностного шлака. В обычном поворотном ковше металл проходит через верхнюю сливную часть. В чайниковом путь к&nbsp;носку начинается ниже поверхности расплава и&nbsp;проходит по&nbsp;отдельному каналу.</p>
