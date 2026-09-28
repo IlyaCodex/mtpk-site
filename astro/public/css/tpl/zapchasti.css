@@ -431,3 +431,47 @@ details[open] summary:after{content:'−'}
 
 /* Контейнер внутри контейнера — поля не складываем (см. zapchasti-catalog.css). */
 .zapchasti-page .container .container { padding-left: 0; padding-right: 0; }
+
+/* ============================================================
+   СЕРИИ УИ-Т И УИ-ТМ (пакет запчастей, редакция 11 от 28.09.2026)
+   Сравнение серий в разделе турбин, метка серии и поток дроби
+   в карточках, памятка «как отличить серию» на странице детали.
+   Правила из assets/drobemetnoe/catalog.css пакета; зелёный
+   акцент переведён на токен сайта.
+   ============================================================ */
+.series-comparison{margin:28px 0 36px;padding:26px;border:1px solid #dbe4e5;border-radius:18px;background:#f5f8f8}
+.series-comparison h2{font-size:clamp(22px,3vw,30px);line-height:1.25;margin:0 0 20px}
+.series-columns{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.series-columns article{padding:20px;border:1px solid #dbe4e5;border-radius:12px;background:#fff;min-width:0}
+.series-columns h3{font-size:22px;margin:14px 0 10px}
+.series-comparison p{line-height:1.65;color:#354b54}
+.comparison-part{display:block;width:100%;height:165px;object-fit:contain;margin:12px auto;background:#fff}
+.series-comparison .comparison-part-label{text-align:center;font-size:13px;color:#435862;margin:4px 0 14px}
+.series-tag{display:inline-block;padding:7px 10px;border-radius:6px;background:#e8eef3;color:#334b61;font-size:13px;font-weight:600;line-height:1.4;margin:12px 0 0}
+.series-tag-new{background:#dcf4e6;color:#175e37}
+.card-flow{font-size:13px;line-height:1.6;margin:10px 0 4px;color:#354b54}
+.flow-reference{border-top:1px solid #dbe4e5;margin-top:22px;padding-top:8px}
+.flow-reference h3{font-size:20px}
+.flow-reference dl{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0}
+.flow-reference dl div{border-left:3px solid var(--green-500);padding-left:14px}
+.flow-reference dt{font-size:14px;color:#435862}
+.flow-reference dd{font-size:22px;font-weight:600;margin:6px 0 0}
+.flow-reference p{font-size:14px}
+.series-product-note{background:#f5f8f8;border:1px solid #dbe4e5;border-radius:12px;padding:20px 24px;margin:24px 0}
+.series-product-note h2{font-size:21px;margin:0 0 10px}
+.series-product-note p{margin:0 0 12px;line-height:1.6}
+.series-product-note a{display:block;line-height:1.5;margin-top:8px;text-decoration:underline;text-underline-offset:3px;color:#285c39}
+@media(max-width:600px){
+.series-comparison{padding:18px 14px}
+.series-columns{grid-template-columns:1fr;gap:12px}
+.series-columns article{padding:16px}
+.flow-reference dl{gap:8px}
+.flow-reference dd{font-size:17px}
+.flow-reference dl div{padding-left:8px}
+.series-product-note{padding:18px 14px}
+}
+/* Поток дроби на телефоне: в трёх колонках пакета значение ломается
+   посередине («125 кг/ мин»), поэтому на узком экране — две колонки. */
+@media(max-width:600px){
+.flow-reference dl{grid-template-columns:repeat(2,1fr)}
+}
