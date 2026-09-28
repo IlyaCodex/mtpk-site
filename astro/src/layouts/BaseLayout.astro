@@ -121,10 +121,16 @@ const mainAttrs = index
   <meta name="yandex-verification" content="5cf3197708e8d0e7" />
 
   <!-- B242YA — коллтрекинг B242YA (подмена телефона/email, портал uinduktor.bitrix24.ru).
-       В <head>, чтобы подмена срабатывала до показа контактов. CSP: *.b242ya.ru. -->
+       В <head>, чтобы подмена срабатывала до показа контактов. CSP: *.b242ya.ru.
+       async/defer = true (28.09.2026, по замечанию аудита). Парсер скрипт и так
+       не блокировал: тег, созданный через createElement и вставленный в DOM,
+       грузится асинхронно по умолчанию — defer на такие теги не действует вовсе,
+       а async=false лишь выстраивает очередь исполнения среди динамических
+       скриптов. Браузер помечает запрос non-blocking, первая отрисовка идёт
+       раньше загрузки скрипта. Флаги выставлены явно, чтобы не возвращались. -->
   <script is:inline>
     (function(w,d,u){
-      var s=d.createElement('script');s.defer=false;s.async=false;s.id='b242ya-script';s.src=u+'?'+(Date.now()/60000|0);
+      var s=d.createElement('script');s.defer=true;s.async=true;s.id='b242ya-script';s.src=u+'?'+(Date.now()/60000|0);
       var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
     })(window,document,'https://67p.b242ya.ru/static/js/b242ya.js');
     var b242yaScript = document.querySelector('#b242ya-script');
