@@ -3152,3 +3152,11 @@ body.nav-open { overflow: hidden; }
   .tbadges { padding-top: var(--sp-8); }
   .tbadges__grid { grid-template-columns: 1fr; gap: var(--sp-3); }
 }
+
+/* ============================================================
+   .section-models — таблица серийного ряда (блоки пакетов INFO).
+   Тело страницы тёмное, светлую подложку секции красят сами
+   (см. style.md §16): без своего фона таблица ложилась тёмным
+   по тёмному. Ритм и отступы — как у .catalog-list.
+   ============================================================ */
+.section-models { background: var(--surface-page); padding: var(--section-py-base, 96px) 0; }
