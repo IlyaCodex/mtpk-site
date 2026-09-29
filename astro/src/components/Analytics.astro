@@ -4,7 +4,8 @@
  * Подключается в конце <body> на ВСЕХ страницах через BaseLayout.astro.
  *
  * Счётчики (см. briefs/forms-spec.md, раздел «Аналитика»):
- *   - Яндекс.Метрика — counter 25228307
+ *   - Яндекс.Метрика — счётчики 25228307 (кабинет УралИндуктор3)
+ *                      и 112991420 (кабинет uibusiness, добавлен 29.09.2026)
  *   - Top.Mail.Ru    — counter 3784620
  *   - Битрикс24      — сквозная аналитика / call tracker (портал b1785973)
  *
@@ -35,10 +36,12 @@
       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,
       a.parentNode.insertBefore(k,a)
     })(window, document,'script','https://mc.yandex.ru/metrika/tag.js', 'ym');
-    ym(25228307, 'init', {
-      webvisor: true, clickmap: true,
-      referrer: document.referrer, url: location.href,
-      accurateTrackBounce: true, trackLinks: true
+    [25228307, 112991420].forEach(function(counterId){
+      ym(counterId, 'init', {
+        webvisor: true, clickmap: true,
+        referrer: document.referrer, url: location.href,
+        accurateTrackBounce: true, trackLinks: true
+      });
     });
 
     /* ===== Top.Mail.Ru (VK) — counter 3784620 ===== */
@@ -91,4 +94,5 @@
 </script>
 <!-- Битрикс24 call tracker подключается в BaseLayout.astro строго перед </body>. -->
 <noscript><div><img src="https://mc.yandex.ru/watch/25228307" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<noscript><div><img src="https://mc.yandex.ru/watch/112991420" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <noscript><div><img src="https://top-fwz1.mail.ru/counter?id=3784620;js=na" style="position:absolute;left:-9999px;" alt="Top.Mail.Ru" /></div></noscript>

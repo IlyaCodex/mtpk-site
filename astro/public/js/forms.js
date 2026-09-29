@@ -6,7 +6,9 @@
   'use strict';
 
   var ENDPOINT = '/api/send.php';
-  var YM_COUNTER = 25228307;   // Яндекс.Метрика
+  var YM_LEGACY_COUNTER = 25228307;        // рекламный кабинет УралИндуктор3
+  var YM_UIBUSINESS_COUNTER = 112991420;   // рекламный кабинет uibusiness
+  var PRIMARY_YM_COUNTER = YM_UIBUSINESS_COUNTER;
   var TMR_COUNTER = 3784620;   // Top.Mail.Ru
   var forms = document.querySelectorAll('form.js-lead-form');
   if (!forms.length) return;
@@ -15,7 +17,8 @@
     var m = document.cookie.match(
       new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)')
     );
-    return m ? decodeURIComponent(m[1]) : '';
+    if (!m) return '';
+    try { return decodeURIComponent(m[1]); } catch (e) { return ''; }
   }
 
   // ── UTM / маркетинговые метки ───────────────────────────────
@@ -57,15 +60,36 @@
   getMarketing(); // зафиксировать первое касание сразу при загрузке страницы
 
   // ── Сквозная аналитика Битрикс24 ──────────────────────────────────
-  // b24_trace — токен пути клиента (ставит счётчик Битрикса), _ym_uid —
-  // Client ID Яндекс.Метрики. Обе куки уходят в заявку, чтобы в CRM
-  // считалась окупаемость рекламы. Куки ставятся не мгновенно, поэтому
-  // читаем их в момент отправки формы, а не при загрузке страницы.
+  // Полный TRACE берём через официальный API трекера Битрикс24. Cookie
+  // b24_trace оставляем только как fallback для старых версий трекера.
+  // Client ID берём у рекламного счётчика uibusiness; _ym_uid остаётся
+  // fallback, если API Метрики ещё не успел ответить.
+  var primaryYmClientId = '';
+  function refreshYmClientId() {
+    try {
+      if (typeof window.ym === 'function') {
+        window.ym(PRIMARY_YM_COUNTER, 'getClientID', function (clientId) {
+          if (clientId) primaryYmClientId = String(clientId).slice(0, 100);
+        });
+      }
+    } catch (e) {}
+  }
+  setTimeout(refreshYmClientId, 3000);
+  window.addEventListener('cookie-consent-accepted', refreshYmClientId);
+
   function appendAnalyticsCookies(fd) {
-    var b24Trace = getCookie('b24_trace');
+    var b24Trace = '';
+    try {
+      if (window.b24Tracker && window.b24Tracker.guest &&
+          typeof window.b24Tracker.guest.getTrace === 'function') {
+        b24Trace = window.b24Tracker.guest.getTrace() || '';
+      }
+    } catch (e) {}
+    if (!b24Trace) b24Trace = getCookie('b24_trace');
     if (b24Trace) fd.append('b24_trace', b24Trace);
 
-    var ymUid = getCookie('_ym_uid');
+    refreshYmClientId();
+    var ymUid = primaryYmClientId || getCookie('_ym_uid');
     if (ymUid) fd.append('_ym_uid', ymUid);
   }
 
@@ -76,9 +100,24 @@
   function reachGoal(form) {
     var label = (form.getAttribute('data-form') || 'lead').toLowerCase()
       .replace(/[^a-zа-я0-9]+/gi, '_').replace(/^_+|_+$/g, '').slice(0, 40);
+    var marketing = getMarketing();
+    var campaign = String(marketing.utm_campaign || '').toLowerCase();
+    var source = String(marketing.utm_source || '').toLowerCase();
+    // Кампании, созданные этим рекламным кабинетом, имеют стабильный префикс
+    // AImarketing_. Остальные размеченные кампании Яндекс Директа относятся
+    // к УралИндуктор3. Органику и прямые заходы не приписываем рекламе.
+    var goalCounter = 0;
+    if (campaign.indexOf('aimarketing_') === 0) {
+      goalCounter = YM_UIBUSINESS_COUNTER;
+    } else if (campaign && source === 'yandex') {
+      goalCounter = YM_LEGACY_COUNTER;
+    }
     try {
-      if (typeof window.ym === 'function') {
-        window.ym(YM_COUNTER, 'reachGoal', 'lead_form_submit', { form: label });
+      if (goalCounter && typeof window.ym === 'function') {
+        window.ym(goalCounter, 'reachGoal', 'lead_form_submit', {
+          form: label,
+          ad_account: goalCounter === YM_UIBUSINESS_COUNTER ? 'uibusiness' : 'uralinduktor3'
+        });
       }
     } catch (e) {}
     try {
