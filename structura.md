@@ -142,6 +142,14 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │       └── 4 карточки T05 uid-765, uid-7610, uid-7620, uid-7630
 │   │   └── /products/drobemetnoe-oborudovanie/peredvizhnye/                   ✅ T04 · Каталог «Передвижные дробемёты» (3 модели BH)
 │   │       └── 3 карточки T05 bh270, bh550, bh850
+│   │   └── /products/drobemetnoe-oborudovanie/podbor-drobemeta/            ✅ Подбор установки по изделию, массе и потоку
+│   │       └── таблица «что очищаем → тип → модели» на 10 строк, 4 шага подбора, FAQ + FAQPage (29.09.2026)
+│   │   └── /products/drobemetnoe-oborudovanie/dlya-ochistki-otlivok/       ✅ Страница по задаче: очистка отливок
+│   │   └── /products/drobemetnoe-oborudovanie/dlya-metallokonstruktsiy/    ✅ Страница по задаче: металлоконструкции
+│   │   └── /products/drobemetnoe-oborudovanie/dlya-pokovok/                ✅ Страница по задаче: поковки
+│   │       📌 Четыре страницы созданы по аудиту ИИ-видимости (Desktop/INFO): связка «задача → масса и
+│   │          габарит → тип установки → модель» в одном месте. «Прокат» и «трубы» не дублируются —
+│   │          для них уже есть /dlya-shvellera-i-sorta/ и /dlya-ochistki-trub/.
 │   ├── /products/sistemy-ohlazhdeniya/                 ✅ T03a · Хаб «Системы охлаждения» (2 тизера: градирни + чиллеры)
 │   │   ├── /products/sistemy-ohlazhdeniya/gradirni/    ✅ T04 · Каталог «Градирни УИГ» (10 моделей)
 │   │   │   └── 10 карточек T05 uig-10t … uig-200t
