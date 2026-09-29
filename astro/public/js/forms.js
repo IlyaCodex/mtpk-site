@@ -22,8 +22,10 @@
   }
 
   // ── UTM / маркетинговые метки ───────────────────────────────
-  // Первое касание сохраняем на 30 дней (localStorage + cookie); при отправке
-  // формы добавляем в заявку. Ключи: utm_*, yclid, gclid, fbclid + referrer/landing.
+  // Последнее размеченное рекламное касание сохраняем на 30 дней
+  // (localStorage + cookie) и добавляем в заявку. Новый визит с любой меткой
+  // начинает чистую атрибуцию: отсутствующие click-id не наследуются от
+  // предыдущей кампании, landing_url фиксируется заново.
   var UTM_KEY = 'ui_marketing_trace';
   function setCookie(name, value, days) {
     var d = new Date(); d.setTime(d.getTime() + days * 864e5);
@@ -32,23 +34,42 @@
   }
   function getMarketing() {
     var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'yclid', 'gclid', 'fbclid'];
-    var data = {};
+    var saved = {};
     try {
       var raw = localStorage.getItem(UTM_KEY) || getCookie(UTM_KEY);
-      if (raw) data = JSON.parse(raw) || {};
+      if (raw) saved = JSON.parse(raw) || {};
     } catch (e) {}
+    if (!saved || typeof saved !== 'object' || Array.isArray(saved)) saved = {};
     var params = null;
     try { params = new URLSearchParams(location.search); } catch (e) {}
-    var changed = false;
+    var hasIncomingMarketing = false;
     if (params) keys.forEach(function (k) {
-      var v = params.get(k);
-      if (v) { data[k] = v; changed = true; }             // новая метка перезаписывает старую
+      if (params.get(k)) hasIncomingMarketing = true;
     });
-    if (!data.landing_url) { data.landing_url = location.href.slice(0, 500); changed = true; }
-    if (!data.referrer && document.referrer && document.referrer.indexOf(location.host) === -1) {
-      data.referrer = document.referrer.slice(0, 500); changed = true;
+
+    var data = hasIncomingMarketing ? {} : saved;
+    var changed = hasIncomingMarketing;
+    if (hasIncomingMarketing) {
+      keys.forEach(function (k) {
+        var v = params.get(k);
+        if (v) data[k] = v.slice(0, 500);
+      });
+      data.landing_url = location.href.slice(0, 500);
+      if (document.referrer && document.referrer.indexOf(location.host) === -1) {
+        data.referrer = document.referrer.slice(0, 500);
+      }
+    } else {
+      if (!data.landing_url) {
+        data.landing_url = location.href.slice(0, 500);
+        changed = true;
+      }
+      if (!data.referrer && document.referrer && document.referrer.indexOf(location.host) === -1) {
+        data.referrer = document.referrer.slice(0, 500);
+        changed = true;
+      }
     }
-    if (changed) {
+
+    if (changed || !Object.keys(saved).length) {
       try {
         var s = JSON.stringify(data);
         localStorage.setItem(UTM_KEY, s);

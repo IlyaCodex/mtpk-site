@@ -129,6 +129,14 @@ const mainAttrs = index
        скриптов. Браузер помечает запрос non-blocking, первая отрисовка идёт
        раньше загрузки скрипта. Флаги выставлены явно, чтобы не возвращались. -->
   <script is:inline>
+    // B242YA ищет номер по этому классу. Помечаем основной номер до того,
+    // как обработчики коллтрекинга начнут сканировать готовый DOM.
+    // (правка коллеги от 29.09.2026, перенесена с прода в исходники)
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('a[href="tel:+73512116597"]').forEach(function (link) {
+        link.classList.add('b242ya-call-tracker');
+      });
+    }, { once: true });
     (function(w,d,u){
       var s=d.createElement('script');s.defer=true;s.async=true;s.id='b242ya-script';s.src=u+'?'+(Date.now()/60000|0);
       var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
