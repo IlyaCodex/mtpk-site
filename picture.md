@@ -182,6 +182,9 @@ picture/
     │   │   #   uid-3220 = uid-15 = uid-28 ← перерисовка CGI-рендера установки без текста (общий кадр на 3 крупные)
     │   │   # На product-страницах barabannogo-tipa/uid-<slug>/ — 2-е фото в phero (1-е = card-baraban рендер).
     │   │   # На каталоге barabannogo-tipa/ — те же 10 как pcard-обложки (4:3 cover).
+    │   │   # Галерея phero УИД-326 живёт отдельной папкой: /img/drobemet/uid-326/01…06.webp + t01…t06.webp
+    │   │   #   (полный кадр + миниатюра 480×360 cover). 06.webp добавлен 30.09.2026 из Desktop/photo
+    │   │   #   (фото Евгения: барабанный дробемёт в цеху, зелёный корпус с шильдиком УРАЛИНДУКТОР).
     │
     ├── induktsionnoe-oborudovanie/              # категория /products/induktsionnoe-oborudovanie/
     │   ├── cat-induction.png                    # карточка подкатегории — медь/латунь
