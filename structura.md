@@ -150,6 +150,12 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │       📌 Четыре страницы созданы по аудиту ИИ-видимости (Desktop/INFO): связка «задача → масса и
 │   │          габарит → тип установки → модель» в одном месте. «Прокат» и «трубы» не дублируются —
 │   │          для них уже есть /dlya-shvellera-i-sorta/ и /dlya-ochistki-trub/.
+│   📌 Редактура коллеги 30.09.2026 (ЛВМ, ЛГМ, ПГС, ХТС — 73 страницы): тексты, title и description
+│       переписаны, пять страниц переименованы, старые адреса закрыты 301-редиректами в nginx:
+│       lgm/avtoklav → lgm/press-avtomat · lvm/sistema-podachi-parovogo-voska → …/sistema-podachi-modelnogo-voska
+│       lvm/barabannyj-peskostrujnyj-apparat → …/barabannyj-apparat-obsypki-obolochek
+│       lvm/ochistka-voska → …/ochistka-voskovyh-modelej · pgs/multikontaktnaya-uif-0806 → …/multikontaktnaya-uism-3d806
+
 │   ├── /products/sistemy-ohlazhdeniya/                 ✅ T03a · Хаб «Системы охлаждения» (2 тизера: градирни + чиллеры)
 │   │   ├── /products/sistemy-ohlazhdeniya/gradirni/    ✅ T04 · Каталог «Градирни УИГ» (10 моделей)
 │   │   │   └── 10 карточек T05 uig-10t … uig-200t
@@ -271,9 +277,9 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │       └── …/shestiosnyj-robot-izgotovleniya-obolochek/   ✅ T05 · Шестиосный робот для изготовления оболочек УИ-К-6О (KUKA R-2000iC/210F) (2026-06-22)
 │   │       └── …/specialnaya-liniya-izgotovleniya-obolochek/  ✅ T05 · Специальная конвейерная линия для изготовления оболочек УИ-К-Л1 / YN-GZX-600Z (2026-06-22)
 │   │       └── …/specialnaya-mashina-pogruzheniya/      ✅ T05 · Специальная машина для погружения УИ-К-П1 (бак-пульпопровод с мешалкой, 995 л) (2026-06-22)
-│   │       └── …/barabannyj-peskostrujnyj-apparat/      ✅ T05 · Барабанный пескоструйный аппарат (для роботов) УИ-К-Б1 — обсыпка/стомление (2026-06-22)
+│   │       └── …/barabannyj-apparat-obsypki-obolochek/      ✅ T05 · Барабанный пескоструйный аппарат (для роботов) УИ-К-Б1 — обсыпка/стомление (2026-06-22)
 │   │       └── …/polnostyu-avtomaticheskij-kotel-deparafinizacii/  ✅ T05 · Полностью автоматический котёл для депарафинизации УИ-Д-А1 (электро, 333 кВт, 8 МПа) (2026-06-22)
-│   │       └── …/sistema-podachi-parovogo-voska/        ✅ T05 · Система подачи парового воска УИ-Т-П1 (пневмодозатор воска, 2,4 л) (2026-06-22)
+│   │       └── …/sistema-podachi-modelnogo-voska/        ✅ T05 · Система подачи парового воска УИ-Т-П1 (пневмодозатор воска, 2,4 л) (2026-06-22)
 │   │       # 10 ЛВМ-товаров выше добавлены 19–22.06.2026 (другая копия), сведены в общий источник 29.06.2026
 │   ├── /products/oborudovanie-lgm/                     ✅ T03b · Раздел «Оборудование ЛГМ» (12 дочерних T05, реал. фото)
 │   └── /products/linii-dlya-holodnotverdeyushhih-smesej-hts/   ✅ T03b · Раздел «Линии ХТС» (7 дочерних T05)
