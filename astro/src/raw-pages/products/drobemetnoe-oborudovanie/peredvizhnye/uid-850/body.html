@@ -306,7 +306,8 @@
       if (images[idx]) return; // уже есть (главная и thumb с index 0 указывают на одну картинку)
       const img = el.querySelector('img');
       if (!img) return;
-      images[idx] = { src: img.getAttribute('src'), alt: img.getAttribute('alt') || '' };
+      images[idx] = { src: img.getAttribute('data-full') || img.getAttribute('src'),
+                      alt: img.getAttribute('alt') || '' };   // полный кадр, миниатюра — только как запасной
     });
 
     const lb = document.getElementById('lightbox');
