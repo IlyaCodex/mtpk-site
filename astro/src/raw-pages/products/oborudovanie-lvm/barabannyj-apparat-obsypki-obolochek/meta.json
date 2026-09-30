@@ -1,0 +1,10 @@
+{
+  "title": "Барабанный аппарат УИ-К-Б1 для обсыпки оболочек ЛВМ",
+  "description": "Барабанный аппарат УИ-К-Б1 для автоматической обсыпки восковых модельных блоков огнеупорным зерном в роботизированных линиях ЛВМ.",
+  "css_templates": [
+    "/css/tpl/tovar-b.css"
+  ],
+  "inline_styles": [
+    "<style>html{scroll-behavior:smooth}.spec__nav-link.is-active{color:var(--text-brand);border-left-color:var(--teal-600);font-weight:600}.spec__body{min-width:0}</style>"
+  ]
+}
