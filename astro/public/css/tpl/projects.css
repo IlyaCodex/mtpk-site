@@ -34,3 +34,15 @@
 @media (max-width: 900px) {
   .cases .cases__head--split { flex-direction: column; align-items: flex-start; gap: 24px; }
 }
+
+/* Исходное наименование позиции из отгрузки — вторая строка под названием
+   в таблице состава (пакет проектов, 30.09.2026). Тон и размер как
+   у <small> в шапке записи, отдельной «карточки» не рисуем. */
+.pr-record-body .pr-spec {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary, #5b6b72);
+  font-weight: 400;
+}
