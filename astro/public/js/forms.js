@@ -80,6 +80,74 @@
   }
   getMarketing(); // зафиксировать первое касание сразу при загрузке страницы
 
+  // ── Коллтрекинг uibusiness / AImarketing ───────────────────────
+  // На части страниц может ещё находиться старая ранняя инициализация B242YA,
+  // которая выполнялась до готовности Метрики. Здесь есть общий страховочный
+  // запуск: после получения Client ID счётчика uibusiness загружаем свежий
+  // экземпляр B242YA и запрашиваем номер только из пула aimarketing.
+  function startAIMarketingCallTracking() {
+    var marketing = getMarketing();
+    if (!/^AImarketing_/i.test(String(marketing.utm_campaign || '')) ||
+        window.__uiAIMarketingCallTrackingStarted ||
+        typeof window.ym !== 'function') return false;
+    try {
+      window.ym(YM_UIBUSINESS_COUNTER, 'getClientID', function (clientId) {
+        if (!clientId || window.__uiAIMarketingCallTrackingStarted) return;
+
+        document.querySelectorAll('a[href="tel:+73512116597"]').forEach(function (link) {
+          link.classList.remove('b242ya-call-tracker');
+          if (link.parentElement && link.parentElement.classList.contains('b242ya-call-tracker')) return;
+          var wrapper = document.createElement('span');
+          wrapper.className = 'b242ya-call-tracker';
+          wrapper.style.display = 'contents';
+          link.parentNode.insertBefore(wrapper, link);
+          wrapper.appendChild(link);
+        });
+
+        function initialize() {
+          if (window.__uiAIMarketingCallTrackingStarted ||
+              typeof window.B242YAInit !== 'function') return;
+          window.__uiAIMarketingCallTrackingStarted = true;
+          window.B242YAInit({
+            portal: 'https://uinduktor.bitrix24.ru/',
+            pid: '6de41eb1d932b12cd4ec47ddc85ac1df',
+            yaCounterId: YM_UIBUSINESS_COUNTER,
+            callTrackingPoolName: 'aimarketing'
+          });
+        }
+
+        if (typeof window.B242YAInit === 'function') {
+          initialize();
+          return;
+        }
+        if (document.getElementById('b242ya-script-aimarketing')) return;
+        var script = document.createElement('script');
+        script.id = 'b242ya-script-aimarketing';
+        script.async = true;
+        script.src = 'https://67p.b242ya.ru/static/js/b242ya.js?aimarketing-' +
+          Math.floor(Date.now() / 60000);
+        script.addEventListener('load', initialize, { once: true });
+        document.head.appendChild(script);
+      });
+      return true;
+    } catch (e) { return false; }
+  }
+
+  window.addEventListener('ui-analytics-started', startAIMarketingCallTracking);
+  window.addEventListener('cookie-consent-accepted', function () {
+    setTimeout(startAIMarketingCallTracking, 500);
+  });
+  // Старые HTML-страницы события ui-analytics-started не отправляют, поэтому
+  // коротко ждём отложенный старт Метрики и прекращаем опрос после 15 секунд.
+  var callTrackingAttempt = 0;
+  var callTrackingTimer = setInterval(function () {
+    callTrackingAttempt += 1;
+    startAIMarketingCallTracking();
+    if (window.__uiAIMarketingCallTrackingStarted || callTrackingAttempt >= 15) {
+      clearInterval(callTrackingTimer);
+    }
+  }, 1000);
+
   // ── Сквозная аналитика Битрикс24 ──────────────────────────────────
   // Полный TRACE берём через официальный API трекера Битрикс24. Cookie
   // b24_trace оставляем только как fallback для старых версий трекера.
@@ -118,6 +186,15 @@
   // Целей не было вообще: конверсии форм в Метрике не считались.
   // Шлём одну общую цель lead_form_submit и вторую — по имени формы
   // (data-form), чтобы разделить экспресс-звонок и полную заявку.
+  function isUiBusinessPaidClick(marketing) {
+    var campaign = String(marketing.utm_campaign || '').toLowerCase();
+    var source = String(marketing.utm_source || '').toLowerCase();
+    var medium = String(marketing.utm_medium || '').toLowerCase();
+    var yclid = String(marketing.yclid || '');
+    return campaign.indexOf('aimarketing_') === 0 &&
+      source === 'yandex' && medium === 'cpc' && /^\d{10,40}$/.test(yclid);
+  }
+
   function reachGoal(form) {
     var label = (form.getAttribute('data-form') || 'lead').toLowerCase()
       .replace(/[^a-zа-я0-9]+/gi, '_').replace(/^_+|_+$/g, '').slice(0, 40);
@@ -128,7 +205,9 @@
     // AImarketing_. Остальные размеченные кампании Яндекс Директа относятся
     // к УралИндуктор3. Органику и прямые заходы не приписываем рекламе.
     var goalCounter = 0;
-    if (campaign.indexOf('aimarketing_') === 0) {
+    // Счётчик uibusiness получает конверсию только после настоящего клика
+    // из Директа: тестовые UTM без yclid больше не загрязняют эту цель.
+    if (isUiBusinessPaidClick(marketing)) {
       goalCounter = YM_UIBUSINESS_COUNTER;
     } else if (campaign && source === 'yandex') {
       goalCounter = YM_LEGACY_COUNTER;
