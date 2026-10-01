@@ -59,6 +59,12 @@
   .header-top__inner .contact-sep {
     display: none;
   }
+  /* Два номера в ряд не влезают (вылет 45px на 390px). Оставляем
+     бесплатный 8 800: он работает из любого региона. Челябинский
+     номер остаётся в меню, подвале и на странице контактов. */
+  .header-top__inner .contact-link--phone-local {
+    display: none;
+  }
   .contact-link--phone {
     font-size: var(--fs-small);
   }
