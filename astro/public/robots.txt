@@ -7,6 +7,12 @@
 User-agent: *
 Allow: /
 
-# Актуальную карту генерирует сборка (@astrojs/sitemap): sitemap-index.xml → sitemap-0.xml.
-# Старый статический sitemap.xml удалён — он не обновлялся и содержал уже несуществующие URL.
+# Рекламные и аналитические метки не меняют содержимое страницы. Директива
+# Яндекса Clean-param склеивает такие адреса с чистым URL, иначе одна страница
+# попадает в индекс десятком копий с разными utm (аудит 01.10.2026, P2-2).
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&fbclid&roistat
+
+# Карту генерирует сборка (@astrojs/sitemap): sitemap-index.xml → sitemap-0.xml.
+# Отдельной копии по адресу /sitemap.xml больше нет — nginx отдаёт на ней 301
+# на индекс, чтобы одни и те же адреса не публиковались двумя файлами.
 Sitemap: https://uralinduktor.ru/sitemap-index.xml

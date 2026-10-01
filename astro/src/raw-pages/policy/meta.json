@@ -4,5 +4,6 @@
   "inline_styles": [],
   "css_templates": [
     "/css/tpl/legal.css"
-  ]
+  ],
+  "noindex": true
 }

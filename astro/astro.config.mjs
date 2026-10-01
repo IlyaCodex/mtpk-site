@@ -72,6 +72,10 @@ export default defineConfig({
         // Сравнение товаров: содержимое собирается в браузере из выбора
         // пользователя, индексировать нечего.
         if (page.includes('/sravnenie')) return false;
+        // Служебные страницы (аудит 01.10.2026, P1-4): благодарность за заявку,
+        // политика ПДн и согласие на обработку. В поиске им делать нечего,
+        // в HTML у них стоит noindex — держим sitemap и мета согласованными.
+        if (/\/(spasibo|policy|soglasie)\/$/.test(page)) return false;
         return true;
       },
       serialize: (item) => {
