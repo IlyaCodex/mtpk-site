@@ -323,9 +323,84 @@ function buildProductSchema(html: string, meta: any, canonicalAbs: string): stri
   return JSON.stringify(schema);
 }
 
+// JSON-LD FAQPage — собирается из самого блока вопросов (.faq__item: <summary>
+// вопрос + <p class="faq__answer"> ответ). Раньше разметку дублировали руками
+// рядом с HTML: при правке текста ответа разметка оставалась старой. Теперь
+// источник один — видимый текст страницы, как и требуют Google и Яндекс.
+function buildFaqSchema(html: string): string | null {
+  const items: { q: string; a: string }[] = [];
+  const re = /<details[^>]*class="faq__item"[^>]*>\s*<summary[^>]*>([\s\S]*?)<\/summary>\s*<p[^>]*class="faq__answer"[^>]*>([\s\S]*?)<\/p>/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html)) !== null) {
+    const q = decodeEntities(m[1].replace(/<[^>]+>/g, ''));
+    const a = decodeEntities(m[2].replace(/<[^>]+>/g, ''));
+    if (q && a) items.push({ q, a });
+  }
+  // Вторая форма вопросов на сайте — панель «Вопросы перед заказом…» внутри
+  // раздела-документа: заголовок h3 с вопросом и абзац-ответ. Берём только
+  // панели с id про вопросы, чтобы риторические подзаголовки других разделов
+  // не попали в разметку как FAQ.
+  const panel = html.match(/<div class="cdoc__panel" id="[^"]*vopros[^"]*">([\s\S]*?)(?=<div class="cdoc__panel"|<\/div>\s*<\/div>)/);
+  if (panel) {
+    const qa = /<h3[^>]*>([\s\S]*?)<\/h3>\s*<p[^>]*>([\s\S]*?)<\/p>/g;
+    let p: RegExpExecArray | null;
+    while ((p = qa.exec(panel[1])) !== null) {
+      const q = decodeEntities(p[1].replace(/<[^>]+>/g, ''));
+      const a = decodeEntities(p[2].replace(/<[^>]+>/g, ''));
+      if (q.endsWith('?') && a) items.push({ q, a });
+    }
+  }
+  if (items.length < 2) return null;   // одиночный вопрос разметкой не считается
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": items.map(({ q, a }) => ({
+      "@type": "Question",
+      "name": q,
+      "acceptedAnswer": { "@type": "Answer", "text": a },
+    })),
+  });
+}
+const faqSchema = buildFaqSchema(body);
+
 // canonicalAbs — с trailing slash, как реальный 200-URL (Astro trailingSlash: 'always').
 const canonicalAbs = slug ? `${SITE_SEO}/${slug.replace(/\/$/, '')}/` : `${SITE_SEO}/`;
 const productSchema = buildProductSchema(body, meta, canonicalAbs);
+
+// P2-3 (аудит 01.10.2026): раньше все 16 скриптов ехали на каждую страницу —
+// фильтр каталога на контакты, реестр проектов на карточку запчасти. Скрипты
+// и так включались сами по наличию своего блока, но файл всё равно скачивался.
+// Теперь список считается по содержимому страницы. Маркеры намеренно шире, чем
+// нужно скрипту: лишний файл безвреден, недостающий ломает функциональность.
+// Общие для всех (меню, маска, формы, скролл) остаются в BaseLayout.
+// При правке скрипта поднимай версию ЗДЕСЬ — nginx кэширует /js/ на 7 дней.
+const PAGE_SCRIPTS: [string, string, RegExp][] = [
+  // галерея и бейджи карточки товара
+  ['phero-gallery', '20260914', /class="phero__(media|main)/],
+  ['stock-product', '20260623-1', /class="phero"/],
+  // «Запросить цену» — дозапись позиции в форму (карточка и плитки каталога)
+  ['quote-form', '20260607', /class="(phero__title|pcard)|js-quote-btn/],
+  // плитки каталога: наличие, «Сделано в России», сравнение, фильтр
+  ['stock-badges', '20260601', /class="pcard/],
+  // бейдж «Сделано в России» рисуется на обложках карточек, плиток категорий
+  // и тизеров — .cat-card__cover и .teaser-card__cover тоже считаются
+  ['made-badges', '20260623-1', /class="(pcard|phero|cat-card__cover|teaser-card__cover)/],
+  // кнопка сравнения стоит и в плитке листинга (.pcard__actions),
+  // и на странице товара (.phero__actions) — пропустить вторую нельзя
+  ['compare', '20260923b', /class="pcard|class="phero__actions|data-compare/],
+  ['catalog-filter', '20260601-3', /data-filter-form/],
+  // оглавление характеристик
+  ['spec-tabs', '20260608-2', /class="spec[\s"]/],
+  // каталоги запчастей
+  ['zapchasti-catalog', '20260918c', /class="product-card|id="products"/],
+  ['zapchasti-tranzistornye', '20260918', /ui-transistor-site|data-catalog/],
+  // проекты: реестр и подробный кейс
+  ['projects', '20260921a', /id="pr-data"|class="pr-root/],
+  ['project-case', '20260921c', /class="ui-case/],
+];
+const pageScripts: [string, string][] = PAGE_SCRIPTS
+  .filter(([, , test]) => test.test(body))
+  .map(([name, v]) => [name, v]);
 
 // Split body into segments by block markers <!--C:NAME-->
 const parts = body.split(/<!--C:([a-z0-9-]+)-->/);
@@ -340,12 +415,15 @@ for (let i = 0; i < parts.length; i++) {
   }
 }
 ---
-<BaseLayout title={meta.title} description={meta.description} activeNav={activeNav} index={searchIndex} searchWeight={searchWeight} searchImage={searchImage} noindex={meta.noindex === true}>
+<BaseLayout title={meta.title} description={meta.description} activeNav={activeNav} index={searchIndex} searchWeight={searchWeight} searchImage={searchImage} noindex={meta.noindex === true} pageScripts={pageScripts}>
   {preloadImage && (
     <link slot="head" rel="preload" as="image" href={preloadImage} fetchpriority="high" />
   )}
   {breadcrumbSchema && (
     <script slot="head" type="application/ld+json" set:html={breadcrumbSchema} />
+  )}
+  {faqSchema && (
+    <script slot="head" type="application/ld+json" set:html={faqSchema} />
   )}
   {productSchema && (
     <script slot="head" type="application/ld+json" set:html={productSchema} />

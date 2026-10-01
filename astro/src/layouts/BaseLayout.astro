@@ -24,10 +24,17 @@ interface Props {
   searchImage?: string;
   /** Закрыть страницу от поисковиков (служебные: сравнение, спасибо). */
   noindex?: boolean;
+  /**
+   * Скрипты, нужные именно этой странице: массив `['имя', '?v=версия']`.
+   * Считается в [...slug].astro по содержимому страницы — скрипт каталога
+   * не должен ехать на страницу контактов (аудит 01.10.2026, P2-3).
+   */
+  pageScripts?: [string, string][];
 }
 const {
   title, description, canonical, activeNav, index = true, searchWeight = 1,
   ogImage = '/og/default.jpg', ogType = 'website', searchImage, noindex = false,
+  pageScripts = [],
 } = Astro.props;
 
 // SEO-T1 (v2): canonical URL — С trailing slash, чтобы совпадать с реальным
@@ -285,36 +292,19 @@ const mainAttrs = index
   <CookieConsent />
   <!-- Cache-bust версии: nginx отдаёт /js/*.js и /css/*.css с max-age=7д,
        при правке файла поднимай ?v= — иначе пользователи получат старую версию. -->
+  <!-- Общие для всех страниц: меню, маска телефона, отправка заявок и скролл
+       к форме. Форма обратного звонка стоит в шапке, поэтому три последних
+       нужны везде, включая 404. -->
   <script src="/js/mobile-nav.js?v=20260601" defer></script>
   <script src="/js/phone-mask.js?v=20260601" defer></script>
   <script src="/js/forms.js?v=20260910" defer></script>
-  <script src="/js/phero-gallery.js?v=20260914" defer></script>
   <!-- Единое правило скролла к форме заявки (#leadgen/#contacts → к самой форме). -->
   <script src="/js/scroll-to-form.js?v=20260608" defer></script>
-  <!-- ТЗ-2 п.3: «Запросить цену» — дозапись позиции в форму + скролл. -->
-  <script src="/js/quote-form.js?v=20260607" defer></script>
-  <script src="/js/stock-badges.js?v=20260601" defer></script>
-  <!-- «К сравнению»: кнопки в карточках, панель и счётчик (все страницы каталога). -->
-  <script src="/js/compare.js?v=20260923b" defer></script>
-  <!-- Отметка «В наличии» внутри карточки товара (.phero): бейдж на обложке +
-       срок отгрузки от 1 дня. Активируется только на страницах товара. -->
-  <script src="/js/stock-product.js?v=20260623-1" defer></script>
-  <!-- Бейдж «Сделано в России» на обложках печей/дробемёта/охлаждения (кроме транзисторных и чиллеров). -->
-  <script src="/js/made-badges.js?v=20260623-1" defer></script>
-  <!-- Каталог запчастей: фильтры, поиск, страницы и диалоги.
-       Включается сам — только там, где на странице есть #products. -->
-  <script src="/js/zapchasti-catalog.js?v=20260918c" defer></script>
-  <!-- Проекты: поиск и фильтры реестра, галерея подробной страницы.
-       Оба включаются сами по наличию своих блоков. -->
-  <script src="/js/projects.js?v=20260921a" defer></script>
-  <script src="/js/project-case.js?v=20260921c" defer></script>
-  <!-- Каталог запчастей транзисторных установок: фильтры пакета,
-       стили и скрипт ограничены классом .ui-transistor-site. -->
-  <script src="/js/zapchasti-tranzistornye.js?v=20260918" defer></script>
-  <!-- Spec-оглавление (scrollspy): активируется только если на странице есть блок .spec (карточка товара). -->
-  <script src="/js/spec-tabs.js?v=20260608-2" defer></script>
-  <!-- Catalog filter: активируется только если на странице есть [data-filter-form]. -->
-  <script src="/js/catalog-filter.js?v=20260601-3" defer></script>
+  <!-- Остальное — только там, где на странице есть соответствующий блок.
+       Список собирает [...slug].astro, см. PAGE_SCRIPTS. -->
+  {pageScripts.map(([name, v]) => (
+    <script src={`/js/${name}.js?v=${v}`} defer></script>
+  ))}
   <script>
     /* T-PERF-9: scroll listener — обёрнут в requestAnimationFrame, чтобы
        избежать forced reflow (классификация Lighthouse — «принудительная
