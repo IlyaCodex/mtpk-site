@@ -516,7 +516,7 @@ html {
        Заголовок prefetch не блокирует, но сообщает браузеру: «скорее всего пригодится». --><link rel="prefetch" href="/_pagefind/pagefind.js" as="fetch" crossorigin><!-- B-2: общее CSS-ядро (445 правил, ~69 KB) — вынесено из meta.json-блобов
        в один файл. Подключается ДО slot=head, чтобы дельты страницы (external/
        inline из [...slug].astro) шли после и могли переопределять ядро.
-       Render-blocking + immutable-кэш (nginx max-age) — повторные визиты бесплатны. --><link rel="stylesheet" href="/css/site.css?v=20260911a"><link rel="stylesheet" href="/css/praktikum-nav-v26.css"><link rel="stylesheet" href="/praktikum/plavilshchik-induktsionnoy-pechi/assets/article.css"><!-- Mobile-fixes + stock-badges — inline в head (T-PERF-15).
+       Render-blocking + immutable-кэш (nginx max-age) — повторные визиты бесплатны. --><link rel="stylesheet" href="/css/site.css?v=20260911a"><link rel="stylesheet" href="/css/praktikum-nav-v26.css?v=20261002a"><link rel="stylesheet" href="/praktikum/plavilshchik-induktsionnoy-pechi/assets/article.css"><!-- Mobile-fixes + stock-badges — inline в head (T-PERF-15).
        Lighthouse показывал stock.css на хвосте критической цепочки с задержкой
        1.8 сек. Inline убирает 2 HTTP-запроса, max chain delay падает с 1799 до ~300 мс.
        Размер ~7 KB — приемлемо для inline. --><style is:global>/* ============================================================
