@@ -21,7 +21,7 @@
   margin: 0 auto;
   padding: 40px 24px 64px;
 }
-.praktikum-breadcrumbs, .praktikum-course-nav {
+.praktikum-breadcrumbs.praktikum-breadcrumbs, .praktikum-course-nav.praktikum-course-nav {
   max-width: 1160px;
   margin: 0 auto;
   padding: 20px 24px 0;
@@ -33,6 +33,54 @@
 .praktikum-breadcrumbs a, .praktikum-course-nav a { color: #3c8e33; }
 .praktikum-course-nav [aria-current="page"] { font-weight: 700; color: #101f26; }
 @media print {
-  .header-shell, .nav-drawer, .praktikum-breadcrumbs, .praktikum-course-nav,
+  .header-shell, .nav-drawer, .praktikum-breadcrumbs.praktikum-breadcrumbs, .praktikum-course-nav,
   body > footer, .cookie-consent { display: none !important; }
+}
+
+/* ============================================================
+   Ширина раздела «Практикум» — как на остальных страницах сайта
+   (замечание Евгения, 02.10.2026).
+
+   Было: хаб 1160 px, статья 1080 px, уроки 980 px — раздел выглядел
+   у́же каталога и услуг. Стало: тот же контейнер, что у .container
+   на всём сайте — 1440 px с боковыми полями 32 px (20 px на мобильном).
+
+   Текст статьи при этом держим в читаемой колонке 1068 px: столько же
+   занимают текстовые панели на страницах каталога и решений. Картинки,
+   таблицы и широкие блоки идут во всю ширину карточки.
+   ============================================================ */
+.praktikum-content .ui-praktikum-hub.ui-praktikum-hub,
+.praktikum-content .ui-article.ui-article,
+.praktikum-content > .ui-education.ui-education,
+.praktikum-breadcrumbs.praktikum-breadcrumbs,
+.praktikum-course-nav.praktikum-course-nav {
+  max-width: 1440px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+/* Все блоки статьи — в одной колонке 1068 px: столько же занимает
+   текстовая панель на страницах каталога и решений. Текст, иллюстрации,
+   таблицы и врезки идут по одной сетке, от левого края контейнера. */
+.praktikum-content .ui-article.ui-article > *,
+.praktikum-content > .ui-education.ui-education > * {
+  max-width: 1068px;
+}
+
+@media (max-width: 768px) {
+  .praktikum-content .ui-praktikum-hub.ui-praktikum-hub,
+  .praktikum-content .ui-article.ui-article,
+  .praktikum-content > .ui-education.ui-education,
+  .praktikum-breadcrumbs.praktikum-breadcrumbs,
+  .praktikum-course-nav.praktikum-course-nav {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* Портретные снимки и схемы держим у́же колонки: у них object-fit: contain,
+   и на всю ширину по бокам остаются широкие поля подложки. */
+.praktikum-content .ui-article.ui-article > .hero-photo,
+.praktikum-content .ui-article.ui-article > .portrait-photo {
+  max-width: 720px;
 }

@@ -24,6 +24,8 @@ APPLY = '--apply' in sys.argv
 SRC = 'astro/dist/index.html'
 ROOT = 'astro/public/praktikum'
 
+MOBILE_FIXES_LINK = '<link rel="stylesheet" href="/css/mobile-fixes.css?v=20261002b">'
+
 # (имя, начало, конец) — границы общих блоков, одинаковые в обеих сборках
 BLOCKS = [
     ('шапка', r'<div class="header-shell">', r'</header>'),
@@ -63,6 +65,15 @@ def main():
         html = io.open(p, encoding='utf-8', errors='replace').read()
         new = html
         touched = []
+        # Наш mobile-fixes.css страницы раздела не подключают: на сайте он
+        # инлайнится через BaseLayout, а эти страницы собираются отдельно.
+        # Без него верхняя строка контактов не ужимается, и на 390 px
+        # мессенджеры уезжают за экран на 57 px.
+        if '/css/mobile-fixes.css' not in new:
+            m = re.search(r'<link[^>]+href="/css/praktikum-nav-v26\.css[^"]*"[^>]*>', new)
+            if m:
+                new = new[:m.end()] + MOBILE_FIXES_LINK + new[m.end():]
+                touched.append('mobile-fixes.css')
         for name, start, end in BLOCKS:
             a, b = cut(new, start, end, p)
             if new[a:b] != fresh[name]:
