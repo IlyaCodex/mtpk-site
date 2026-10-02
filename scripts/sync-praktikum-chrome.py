@@ -26,6 +26,25 @@ ROOT = 'astro/public/praktikum'
 
 MOBILE_FIXES_LINK = '<link rel="stylesheet" href="/css/mobile-fixes.css?v=20261002b">'
 
+
+def standard_breadcrumbs(html):
+    """Крошки раздела — на классах сайта, чтобы выглядели как везде.
+
+    У напарника свои: <nav class="praktikum-breadcrumbs"> с зелёными ссылками
+    и <span aria-hidden="true">/</span>. Переводим на .breadcrumb из site.css
+    (его страницы раздела подключают) с разделителем .breadcrumb__sep —
+    тогда типографика и цвета совпадают со всем сайтом без отдельных правил.
+    Класс praktikum-breadcrumbs оставляем: на нём держатся ширина и отступы.
+    """
+    m = re.search(r'<nav class="praktikum-breadcrumbs"([^>]*)>([\s\S]*?)</nav>', html)
+    if not m or 'breadcrumb__sep' in m.group(2):
+        return html, False
+    inner = re.sub(r'<span[^>]*aria-hidden="true"[^>]*>\s*/\s*</span>',
+                   '<span class="breadcrumb__sep">/</span>', m.group(2))
+    inner = re.sub(r'\s+', ' ', inner).strip()
+    new = ('<nav class="breadcrumb praktikum-breadcrumbs"%s>%s</nav>' % (m.group(1), inner))
+    return html[:m.start()] + new + html[m.end():], True
+
 # (имя, начало, конец) — границы общих блоков, одинаковые в обеих сборках
 BLOCKS = [
     ('шапка', r'<div class="header-shell">', r'</header>'),
@@ -74,6 +93,9 @@ def main():
             if m:
                 new = new[:m.end()] + MOBILE_FIXES_LINK + new[m.end():]
                 touched.append('mobile-fixes.css')
+        new, crumbs = standard_breadcrumbs(new)
+        if crumbs:
+            touched.append('крошки на классах сайта')
         for name, start, end in BLOCKS:
             a, b = cut(new, start, end, p)
             if new[a:b] != fresh[name]:

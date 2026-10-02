@@ -9,7 +9,10 @@
   background: var(--green-600, #3c8e33);
   color: #fff;
 }
-.praktikum-content { min-width: 0; background: #fff; color: #142b31; }
+/* Постраничный CSS раздела красит подложку в #e9eeef и рисует белую
+   карточку поверх. На остальных страницах сайта фон белый — убираем
+   рамку, чтобы раздел не выделялся (замечание Евгения, 02.10.2026). */
+.praktikum-content.praktikum-content { min-width: 0; background: #fff; color: #142b31; }
 @media (min-width: 1025px) and (max-width: 1180px) {
   .header__inner { gap: 8px; }
   .nav__link { padding-left: 4px; padding-right: 4px; font-size: 12px; }
@@ -21,16 +24,25 @@
   margin: 0 auto;
   padding: 40px 24px 64px;
 }
-.praktikum-breadcrumbs.praktikum-breadcrumbs, .praktikum-course-nav.praktikum-course-nav {
-  max-width: 1160px;
+/* Крошки раздела — те же, что на всём сайте: типографику и цвета даёт
+   .breadcrumb из site.css, здесь только ширина контейнера и отступы
+   (повторяют .breadcrumb--light: sp-6 сверху, sp-5 снизу). */
+.praktikum-breadcrumbs.praktikum-breadcrumbs,
+.praktikum-course-nav.praktikum-course-nav {
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 20px 24px 0;
-  font-size: 14px;
+  padding: 24px 32px 20px;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
+  align-items: center;
+  gap: var(--sp-2, 8px);
+  font-size: var(--fs-caption, 14px);
+  color: var(--text-tertiary, #6b7280);
 }
-.praktikum-breadcrumbs a, .praktikum-course-nav a { color: #3c8e33; }
+.praktikum-breadcrumbs.praktikum-breadcrumbs a { color: var(--text-secondary, #3f4a52); text-decoration: none; }
+.praktikum-breadcrumbs.praktikum-breadcrumbs a:hover { color: var(--text-brand, #15607a); }
+.praktikum-breadcrumbs.praktikum-breadcrumbs .breadcrumb__sep { color: var(--border-default, #d6dade); }
+.praktikum-course-nav.praktikum-course-nav a { color: var(--text-secondary, #3f4a52); }
 .praktikum-course-nav [aria-current="page"] { font-weight: 700; color: #101f26; }
 @media print {
   .header-shell, .nav-drawer, .praktikum-breadcrumbs.praktikum-breadcrumbs, .praktikum-course-nav,
