@@ -1,6 +1,34 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Раздел «Практикум» собирается отдельно и лежит готовыми файлами в
+// public/praktikum/ — для Astro это не страницы, и в карту сайта они сами
+// не попадут. Собираем их адреса по папкам с index.html, чтобы список не
+// расходился с содержимым при добавлении новых статей.
+function praktikumPages() {
+  const root = path.resolve('./public/praktikum');
+  if (!fs.existsSync(root)) return [];
+  const urls = [];
+  (function walk(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (!e.isDirectory()) continue;
+      const sub = path.join(dir, e.name);
+      if (fs.existsSync(path.join(sub, 'index.html'))) {
+        urls.push('https://uralinduktor.ru/praktikum/' +
+          path.relative(root, sub).split(path.sep).join('/') + '/');
+      }
+      walk(sub);
+    }
+  })(root);
+  if (fs.existsSync(path.join(root, 'index.html'))) {
+    urls.unshift('https://uralinduktor.ru/praktikum/');
+  }
+  return urls.sort();
+}
+const PRAKTIKUM = praktikumPages();
 
 // SEO-T6 (fix): lastmod из git-истории, а НЕ из даты сборки.
 // Astro делает полную пересборку каждый раз; со старым `lastmod: new Date()`
@@ -65,6 +93,7 @@ export default defineConfig({
       // - служебные (404 и т.п.): не включаем
       changefreq: 'weekly',
       priority: 0.6,
+      customPages: PRAKTIKUM,
       // lastmod выставляется per-page в serialize() из git-истории (см. выше).
       filter: (page) => {
         // Исключаем 404 и любые служебные страницы

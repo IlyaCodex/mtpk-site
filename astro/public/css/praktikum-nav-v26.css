@@ -1,0 +1,38 @@
+.nav__link--praktikum {
+  border: 1px solid var(--green-600, #3c8e33);
+  border-radius: 6px;
+  color: var(--green-600, #3c8e33);
+  white-space: nowrap;
+}
+.nav__link--praktikum:hover,
+.nav__link--praktikum.is-active {
+  background: var(--green-600, #3c8e33);
+  color: #fff;
+}
+.praktikum-content { min-width: 0; background: #fff; color: #142b31; }
+@media (min-width: 1025px) and (max-width: 1180px) {
+  .header__inner { gap: 8px; }
+  .nav__link { padding-left: 4px; padding-right: 4px; font-size: 12px; }
+  .header__brand img { max-height: 34px; }
+  .header-quick-form__input { width: 105px; }
+}
+.praktikum-content > .ui-education {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+.praktikum-breadcrumbs, .praktikum-course-nav {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 20px 24px 0;
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.praktikum-breadcrumbs a, .praktikum-course-nav a { color: #3c8e33; }
+.praktikum-course-nav [aria-current="page"] { font-weight: 700; color: #101f26; }
+@media print {
+  .header-shell, .nav-drawer, .praktikum-breadcrumbs, .praktikum-course-nav,
+  body > footer, .cookie-consent { display: none !important; }
+}

@@ -271,6 +271,9 @@ const mainAttrs = index
        inline из [...slug].astro) шли после и могли переопределять ядро.
        Render-blocking + immutable-кэш (nginx max-age) — повторные визиты бесплатны. -->
   <link rel="stylesheet" href="/css/site.css?v=20260929a">
+  {/* Оформление пункта «Практикум» в меню и контентных блоков раздела.
+      Файл общий с самими страницами практикума (public/praktikum/). */}
+  <link rel="stylesheet" href="/css/praktikum-nav-v26.css">
   <slot name="head" />
   <!-- Mobile-fixes + stock-badges — inline в head (T-PERF-15).
        Lighthouse показывал stock.css на хвосте критической цепочки с задержкой

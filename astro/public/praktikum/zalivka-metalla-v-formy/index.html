@@ -1,0 +1,1570 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><!-- Google Search Console — подтверждение прав на сайт (установлено 2026-08-28). --><meta name="google-site-verification" content="klj1lj9utoieH9ZljmhDYykW6XSM3G7dtdVklWGJQw4"><!-- B242YA — коллтрекинг B242YA (подмена телефона/email, портал uinduktor.bitrix24.ru).
+       В <head>, чтобы подмена срабатывала до показа контактов. CSP: *.b242ya.ru. --><script>
+    // B242YA ищет номер по этому классу. Помечаем основной номер до того,
+    // как обработчики коллтрекинга начнут сканировать готовый DOM.
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('a[href="tel:+73512116597"]').forEach(function (link) {
+        // Класс должен стоять на контейнере, иначе B242YA вставляет новый <a>
+        // внутрь существующего <a>. display:contents сохраняет текущую вёрстку.
+        link.classList.remove('b242ya-call-tracker');
+        if (link.parentElement && link.parentElement.classList.contains('b242ya-call-tracker')) return;
+        var wrapper = document.createElement('span');
+        wrapper.className = 'b242ya-call-tracker';
+        wrapper.style.display = 'contents';
+        link.parentNode.insertBefore(wrapper, link);
+        wrapper.appendChild(link);
+      });
+    }, { once: true });
+    var b242yaLoaded = false;
+    var b242yaAnalyticsStarted = false;
+    var b242yaInitialized = false;
+    var b242yaCounterId = 112991420;
+
+    // Отдельный номер B242YA используется только для рекламного кабинета
+    // uibusiness. Кампании этого кабинета всегда имеют префикс AImarketing_.
+    // На внутренних переходах сохраняем принадлежность по маркетинговому следу.
+    function isAImarketingVisit() {
+      var params = null;
+      try { params = new URLSearchParams(window.location.search); } catch (e) {}
+      var incomingCampaign = params ? (params.get('utm_campaign') || '') : '';
+      if (incomingCampaign) return /^AImarketing_/i.test(incomingCampaign);
+      try {
+        var saved = JSON.parse(localStorage.getItem('ui_marketing_trace') || '{}');
+        return /^AImarketing_/i.test(String(saved.utm_campaign || ''));
+      } catch (e) { return false; }
+    }
+
+    function initB242YA() {
+      if (b242yaInitialized || window.__uiAIMarketingCallTrackingStarted ||
+          !b242yaLoaded || !b242yaAnalyticsStarted ||
+          !isAImarketingVisit() || typeof window.ym !== 'function' ||
+          typeof window.B242YAInit !== 'function') return;
+      try {
+        // getClientID вызывается через очередь Метрики и выполняет callback,
+        // когда API выбранного счётчика действительно готово.
+        window.ym(b242yaCounterId, 'getClientID', function (clientId) {
+          if (b242yaInitialized || window.__uiAIMarketingCallTrackingStarted || !clientId) return;
+          b242yaInitialized = true;
+          window.__uiAIMarketingCallTrackingStarted = true;
+          window.B242YAInit({
+            portal: 'https://uinduktor.bitrix24.ru/',
+            pid: '6de41eb1d932b12cd4ec47ddc85ac1df',
+            yaCounterId: b242yaCounterId,
+            callTrackingPoolName: 'aimarketing'
+          });
+        });
+      } catch (e) {}
+    }
+
+    window.addEventListener('ui-analytics-started', function () {
+      b242yaAnalyticsStarted = true;
+      initB242YA();
+    });
+
+    (function(w,d,u){
+      var s=d.createElement('script');s.defer=false;s.async=false;s.id='b242ya-script';s.src=u+'?'+(Date.now()/60000|0);
+      var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
+    })(window,document,'https://67p.b242ya.ru/static/js/b242ya.js');
+    var b242yaScript = document.querySelector('#b242ya-script');
+    b242yaScript.addEventListener('load', function () {
+      b242yaLoaded = true;
+      initB242YA();
+    });
+  </script><title>Заливка металла в литейные формы | УралИндуктор</title><meta name="description" content="Как подготовить ковш и форму, выбрать температуру и темп заливки, удерживать устойчивую струю, отделять шлак и безопасно заливать металл."><link rel="canonical" href="https://uralinduktor.ru/praktikum/zalivka-metalla-v-formy/"><!-- SEO-T2: Open Graph — превью при шеринге (Telegram, VK, WhatsApp, Slack). --><meta property="og:type" content="article"><meta property="og:url" content="https://uralinduktor.ru/praktikum/zalivka-metalla-v-formy/"><meta property="og:title" content="Заливка металла в литейные формы | УралИндуктор"><meta property="og:description" content="Как подготовить ковш и форму, выбрать температуру и темп заливки, удерживать устойчивую струю, отделять шлак и безопасно заливать металл."><meta property="og:image" content="https://uralinduktor.ru/praktikum/zalivka-metalla-v-formy/assets/vypusk-metalla-pavlodar.webp"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:site_name" content="УралИндуктор · МТПК"><meta property="og:locale" content="ru_RU"><!-- SEO-T2: Twitter Card — превью в X / LinkedIn. --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Заливка металла в литейные формы | УралИндуктор"><meta name="twitter:description" content="Как подготовить ковш и форму, выбрать температуру и темп заливки, удерживать устойчивую струю, отделять шлак и безопасно заливать металл."><meta name="twitter:image" content="https://uralinduktor.ru/praktikum/zalivka-metalla-v-formy/assets/vypusk-metalla-pavlodar.webp"><!-- SEO-T3: JSON-LD Organization — единое описание компании для Я.Вебмастера
+       (карточка организации) и Google Knowledge Graph. --><script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://uralinduktor.ru/#organization","name":"УралИндуктор","legalName":"ООО «МТПК»","alternateName":"МТПК-Уралиндуктор","url":"https://uralinduktor.ru","logo":{"@type":"ImageObject","@id":"https://uralinduktor.ru/brand/logo-color.png","url":"https://uralinduktor.ru/brand/logo-color.png","width":512,"height":512},"image":"https://uralinduktor.ru/og/default.jpg","description":"Производство индукционных плавильных печей, дробемётных установок, чиллеров и градирен, сталеразливочных ковшей и оборудования для литейных производств.","telephone":"+7-351-211-65-97","email":"info@uralinduktor.ru","address":{"@type":"PostalAddress","streetAddress":"ул. Уральских Добровольцев, стр. 1В","addressLocality":"Миасс","addressRegion":"Челябинская область","postalCode":"456318","addressCountry":"RU"},"areaServed":[{"@type":"Country","name":"Россия"},{"@type":"Country","name":"Казахстан"},{"@type":"Country","name":"Беларусь"}],"sameAs":["https://t.me/uralinduktor","https://max.ru/uralinduktor"]}</script><!-- Self-hosted шрифты + preload основных весов 400/600 cyrillic (T-PERF-2).
+       Font-face declarations и design tokens — inline (T-PERF-8), убирают
+       2 render-blocking CSS-запроса и весь критический путь рендера сводят
+       к одному HTTP-обмену. --><!-- Лого в header — это реальный LCP-элемент по данным Lighthouse.
+       Preload + fetchpriority=high → браузер качает картинку параллельно
+       с парсингом HTML, к моменту первого пейнта она уже в кеше. --><link rel="preload" as="image" href="/brand/logo-header-clean.png" fetchpriority="high"><!-- Preload основных весов Inter 400/600 в latin+cyrillic — параллельно с HTML,
+       без них в дереве критических запросов цепочка длиннее (Lighthouse). --><link rel="preload" href="/fonts/inter-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/inter-600-cyrillic.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/inter-600-latin.woff2" as="font" type="font/woff2" crossorigin><style is:global>/* fonts-critical.css — inline в head (T-PERF-10).
+ * Содержит только Inter 400/600 latin+cyrillic — те веса, что preload-ятся
+ * и нужны для FCP. Остальные веса — в fonts-extended.css (async).
+ */
+
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/inter-400-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/inter-400-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/inter-600-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/inter-600-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}</style><style is:global>/* ============================================================
+   МТПК / Уралиндуктор — Design Tokens
+   Anchor: «DMG MORI Industrial × Уралиндуктор Brand»
+
+   Compiled by my-uxui-designer-websaas-v1
+   Date: 2026-05-10
+   Source-of-truth: design/tokens/tokens.css
+   Methodology: 3 layers — primitives → semantic → component
+   ============================================================ */
+
+/* ============================================================
+   LAYER 1 — PRIMITIVES (raw scales, never reference in components)
+   ============================================================ */
+
+:root {
+  /* ---- Brand: Teal (Уралиндуктор корпоративный тёмно-бирюзовый) ---- */
+  --teal-50:  #F0F5F8;
+  --teal-100: #DDE9EE;
+  --teal-200: #BAD2DC;
+  --teal-300: #88B0BF;
+  --teal-400: #5288A0;
+  --teal-500: #2C6985;
+  --teal-600: #1F5E78;  /* ★ brand teal */
+  --teal-700: #1A4D62;
+  --teal-800: #163E4F;
+  --teal-900: #122F3D;
+  --teal-950: #0A1C25;
+
+  /* ---- Brand: Living Green (Уралиндуктор — индукция/готовность) ---- */
+  --green-50:  #F1F9EE;
+  --green-100: #DEF0D7;
+  --green-200: #BFE2B1;
+  --green-300: #8FCC7B;
+  --green-400: #6CBB54;
+  --green-500: #4FAB3A;  /* ★ brand green — success / в наличии */
+  --green-600: #3C8E33;
+  --green-700: #2F702A;
+  --green-800: #285923;
+  --green-900: #21491D;
+  --green-950: #0F260D;
+
+  /* ---- Neutrals (warm-cool balanced, ближе к DMG MORI cool gray) ---- */
+  --neutral-0:    #FFFFFF;
+  --neutral-50:   #FAFAFA;
+  --neutral-100:  #F4F5F4;
+  --neutral-150:  #ECEDEC;
+  --neutral-200:  #E5E5E5;
+  --neutral-300:  #D4D4D8;
+  --neutral-400:  #A1A1AA;
+  --neutral-500:  #71717A;
+  --neutral-600:  #52525B;
+  --neutral-700:  #3F3F46;
+  --neutral-800:  #27272A;
+  --neutral-900:  #18181B;
+  --neutral-950:  #101F26;  /* ★ deep — корпоративный dark accent */
+  --neutral-1000: #000000;
+
+  /* ---- Semantic raw (для warning/danger/info — НЕ использовать прямо) ---- */
+  --amber-500:  #D97706;
+  --amber-600:  #B45309;
+  --red-500:    #DC2626;
+  --red-600:    #B91C1C;
+  --blue-500:   #2563EB;
+
+  /* ---- Typography — font families ----
+     v1 anchor: DMG MORI Industrial × Уралиндуктор Brand
+     Inter осознанно оставлен (не Barlow) — пользовательский выбор после ревью */
+  --font-display: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-body:    "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---- Typography — type scale (DMG MORI industrial rhythm) ---- */
+  /* Major scale jumps, не арифметическая прогрессия */
+  --fs-micro:     11px;   /* eyebrow labels uppercase */
+  --fs-caption:   12px;   /* meta, helper */
+  --fs-small:     14px;   /* secondary body */
+  --fs-body:      16px;   /* основной body */
+  --fs-lead:      18px;   /* lead paragraph */
+  --fs-h4:        20px;
+  --fs-h3:        24px;
+  --fs-h2:        30px;
+  --fs-h1:        44px;
+  --fs-display:   64px;   /* hero h1 (Hermle × ruslitteh: меньше DMG) */
+  --fs-display-xl: 88px;  /* большие промо-цифры (опц.) */
+
+  /* ---- Typography — weights ---- */
+  --fw-light:     300;
+  --fw-regular:   400;
+  --fw-medium:    500;
+  --fw-semibold:  600;
+  --fw-bold:      700;
+  --fw-black:     800;
+
+  /* ---- Typography — line-height (inverse to size) ---- */
+  --lh-display: 1.0;
+  --lh-h1:      1.05;
+  --lh-h2:      1.12;
+  --lh-h3:      1.2;
+  --lh-h4:      1.3;
+  --lh-body:    1.55;
+  --lh-tight:   1.25;
+
+  /* ---- Typography — letter-spacing (negative on display, positive on caps) ---- */
+  --ls-display:  -0.025em;
+  --ls-h1:       -0.02em;
+  --ls-h2:       -0.015em;
+  --ls-h3:       -0.01em;
+  --ls-body:     0;
+  --ls-eyebrow:  0.08em;   /* uppercase labels */
+  --ls-caps:     0.05em;
+
+  /* ---- Spacing scale (4-based, generous DMG MORI rhythm) ---- */
+  --sp-0:    0;
+  --sp-px:   1px;
+  --sp-0_5:  2px;
+  --sp-1:    4px;
+  --sp-1_5:  6px;
+  --sp-2:    8px;
+  --sp-3:    12px;
+  --sp-4:    16px;
+  --sp-5:    20px;
+  --sp-6:    24px;
+  --sp-7:    28px;
+  --sp-8:    32px;
+  --sp-10:   40px;
+  --sp-12:   48px;
+  --sp-14:   56px;
+  --sp-16:   64px;
+  --sp-20:   80px;
+  --sp-24:   96px;     /* section padding-y small */
+  --sp-32:   128px;    /* section padding-y default */
+  --sp-40:   160px;    /* section padding-y large (hero) */
+  --sp-48:   192px;
+  --sp-64:   256px;
+
+  /* ---- Border radius (v1 / DMG MORI: sharp, industrial precision) ---- */
+  --radius-none:  0;
+  --radius-xs:    2px;    /* инпуты, мелкие чипы */
+  --radius-sm:    4px;    /* card-edges (минимально) */
+  --radius-md:    6px;    /* selectable chips */
+  --radius-lg:    8px;    /* модальные окна */
+  --radius-pill:  999px;  /* badges, status pills */
+
+  /* ---- Border width ---- */
+  --border-hairline: 1px;
+  --border-medium:   2px;
+  --border-thick:    4px;  /* accent underline у CTA при hover */
+
+  /* ---- Elevation (DMG MORI: hard light from above, минимальные тени) ---- */
+  --shadow-none:  none;
+  --shadow-xs:    0 1px 2px 0 rgba(16, 31, 38, 0.04);
+  --shadow-sm:    0 1px 3px 0 rgba(16, 31, 38, 0.06), 0 1px 2px -1px rgba(16, 31, 38, 0.06);
+  --shadow-md:    0 4px 8px -2px rgba(16, 31, 38, 0.08), 0 2px 4px -2px rgba(16, 31, 38, 0.06);
+  --shadow-lg:    0 12px 24px -8px rgba(16, 31, 38, 0.12), 0 4px 8px -4px rgba(16, 31, 38, 0.06);
+  --shadow-xl:    0 24px 48px -12px rgba(16, 31, 38, 0.16);
+  --shadow-focus: 0 0 0 3px rgba(31, 94, 120, 0.30); /* teal-600 alpha */
+
+  /* ---- Motion — durations ---- */
+  --duration-instant: 75ms;
+  --duration-fast:    150ms;
+  --duration-base:    250ms;
+  --duration-slow:    400ms;
+  --duration-orchestrated: 800ms;  /* page-load reveals */
+
+  /* ---- Motion — easing ---- */
+  --ease-linear:    linear;
+  --ease-out:       cubic-bezier(0.22, 1, 0.36, 1);     /* DMG-feel: decisive arrive */
+  --ease-in-out:    cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);  /* для acknowledge-микро */
+
+  /* ---- Z-index scale ---- */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+  --z-tooltip:  600;
+
+  /* ---- Breakpoints (mirrors Tailwind для предсказуемости) ---- */
+  --bp-sm:  640px;
+  --bp-md:  768px;
+  --bp-lg:  1024px;
+  --bp-xl:  1280px;
+  --bp-2xl: 1536px;
+
+  /* ---- Container widths (DMG MORI generous, but не fluid) ---- */
+  --container-narrow: 768px;   /* article, longread */
+  --container-base:   1200px;  /* стандартная страница */
+  --container-wide:   1440px;  /* hero, hub каталога */
+  --container-full:   1600px;  /* промо-блоки edge-to-edge с padding */
+
+  /* ---- Opacity scale ---- */
+  --opacity-disabled: 0.4;
+  --opacity-muted:    0.6;
+  --opacity-overlay:  0.7;
+  --opacity-scrim:    0.85;
+}
+
+
+/* ============================================================
+   LAYER 2 — SEMANTIC (intent, not value — этот слой использовать в коде)
+   ============================================================ */
+
+:root {
+  /* ---- Surface (фоны / поверхности) ---- */
+  --surface-page:        var(--neutral-0);     /* primary page bg */
+  --surface-subtle:      var(--neutral-50);    /* секции на чередовании */
+  --surface-muted:       var(--neutral-100);   /* подложки карточек, форм */
+  --surface-deep:        var(--neutral-950);   /* dark contrast block + footer */
+  --surface-overlay:     rgba(16, 31, 38, 0.85); /* modal scrim */
+  --surface-brand-soft:  var(--teal-50);       /* подложка под brand-акценты */
+
+  /* ---- Text (по семантике, не по цвету) ---- */
+  --text-primary:    var(--neutral-900);   /* H1-H3, основной body */
+  --text-secondary:  var(--neutral-600);   /* lead, описания */
+  --text-tertiary:   var(--neutral-500);   /* мета, helpers */
+  --text-disabled:   var(--neutral-400);
+  --text-inverse:    var(--neutral-0);     /* на dark surfaces */
+  --text-brand:      var(--teal-600);      /* ссылки, акцентные слова */
+  --text-success:    var(--green-700);
+
+  /* ---- Border ---- */
+  --border-subtle:   var(--neutral-200);
+  --border-default:  var(--neutral-300);
+  --border-strong:   var(--neutral-700);
+  --border-brand:    var(--teal-600);
+  --border-focus:    var(--teal-600);
+
+  /* ---- Interactive (CTA / actions) ----
+     CTA переведены с тёмно-бирюзового на фирменный зелёный: по Метрике
+     кнопки первого экрана и шапки «слепли» на тёмном фото цеха.
+     Текст белый — по решению заказчика (2026-09-10). Контраст к #4FAB3A
+     2.91:1, ниже порога WCAG AA 4.5:1; графит #0A1C25 давал 5.99:1.
+     Если понадобится вернуть доступность, не теряя белый текст, —
+     затемнить --brand-green-bright до #35802C (белый даст 4.91:1). */
+  --brand-green-bright: #4FAB3A;   /* = --green-500, основной акцент */
+  --brand-green-hover:  #3C8E33;
+  --brand-green-active: #2F702A;
+
+  --action-primary-bg:        var(--brand-green-bright);
+  --action-primary-bg-hover:  var(--brand-green-hover);
+  --action-primary-bg-active: var(--brand-green-active);
+  --action-primary-fg:        #FFFFFF;
+
+  --btn-green-glow:       0 8px 20px -4px rgba(79, 171, 58, 0.45);
+  --btn-green-glow-hover: 0 12px 28px -4px rgba(79, 171, 58, 0.65);
+
+  --action-secondary-bg:        transparent;
+  --action-secondary-bg-hover:  var(--teal-50);
+  --action-secondary-fg:        var(--teal-700);
+  --action-secondary-border:    var(--teal-600);
+
+  --action-ghost-bg:        transparent;
+  --action-ghost-bg-hover:  var(--neutral-100);
+  --action-ghost-fg:        var(--neutral-900);
+
+  --action-dark-bg:        var(--neutral-900);
+  --action-dark-bg-hover:  var(--neutral-800);
+  --action-dark-fg:        var(--neutral-0);
+
+  --action-disabled-bg:    var(--neutral-200);
+  --action-disabled-fg:    var(--neutral-500);
+
+  /* ---- Status (semantic state colors) ---- */
+  --status-success-bg:    var(--green-50);
+  --status-success-fg:    var(--green-700);
+  --status-success-solid: var(--green-500);
+
+  --status-warning-bg:    #FEF3C7;
+  --status-warning-fg:    var(--amber-600);
+  --status-warning-solid: var(--amber-500);
+
+  --status-danger-bg:     #FEE2E2;
+  --status-danger-fg:     var(--red-600);
+  --status-danger-solid:  var(--red-500);
+
+  --status-info-bg:       var(--teal-50);
+  --status-info-fg:       var(--teal-700);
+  --status-info-solid:    var(--teal-600);
+
+  /* ---- Selection / focus ring ---- */
+  --selection-bg:   var(--teal-100);
+  --selection-fg:   var(--teal-900);
+  --focus-ring:     var(--shadow-focus);
+}
+
+
+/* ============================================================
+   LAYER 3 — COMPONENT TOKENS (узкие, конкретные)
+   ============================================================ */
+
+:root {
+  /* ---- Button (v1: flat square, UPPERCASE, semibold) ---- */
+  --btn-radius:           0;                /* flat square без скруглений (user request) */
+  --btn-padding-x:        var(--sp-6);
+  --btn-padding-y:        var(--sp-3);
+  --btn-padding-x-sm:     var(--sp-4);
+  --btn-padding-y-sm:     var(--sp-2);
+  --btn-padding-x-lg:     var(--sp-8);
+  --btn-padding-y-lg:     var(--sp-4);
+  --btn-font-weight:      var(--fw-semibold);
+  --btn-font-size:        var(--fs-small);
+  --btn-letter-spacing:   var(--ls-caps);
+  --btn-text-transform:   uppercase;        /* DMG MORI стилистика */
+  --btn-transition:       background-color var(--duration-fast) var(--ease-out),
+                          color var(--duration-fast) var(--ease-out),
+                          border-color var(--duration-fast) var(--ease-out);
+
+  /* ---- Card (product / category) ---- */
+  --card-radius:        var(--radius-sm);
+  --card-bg:            var(--surface-page);
+  --card-border:        var(--border-subtle);
+  --card-padding:       var(--sp-6);
+  --card-shadow:        var(--shadow-none);
+  --card-shadow-hover:  var(--shadow-md);
+  --card-image-ratio:   4 / 3;             /* product cards */
+
+  /* ---- Input / form field ---- */
+  --field-radius:       var(--radius-xs);
+  --field-bg:           var(--surface-page);
+  --field-border:       var(--border-default);
+  --field-border-hover: var(--neutral-500);
+  --field-border-focus: var(--border-focus);
+  --field-padding-x:    var(--sp-4);
+  --field-padding-y:    var(--sp-3);
+  --field-font-size:    var(--fs-body);
+  --field-height:       48px;
+
+  /* ---- Section padding-y (DMG MORI воздушный ритм) ---- */
+  --section-py-tight:   var(--sp-16);   /* compact секции */
+  --section-py-base:    var(--sp-24);   /* стандарт */
+  --section-py-loose:   var(--sp-32);   /* hero, fence-blocks */
+  --section-py-hero:    var(--sp-40);   /* главный hero */
+
+  /* ---- Header (sticky top nav) ---- */
+  --header-height:      72px;
+  --header-bg:          rgba(255, 255, 255, 0.95);
+  --header-blur:        12px;
+  --header-border:      var(--border-subtle);
+
+  /* ---- Footer ---- */
+  --footer-bg:          var(--surface-deep);
+  --footer-fg:          var(--text-inverse);
+  --footer-padding-y:   var(--sp-20);
+
+  /* ---- Eyebrow label (uppercase tag перед заголовком — DMG MORI signature) ---- */
+  --eyebrow-font-size:    var(--fs-micro);
+  --eyebrow-font-weight:  var(--fw-bold);
+  --eyebrow-letter-spacing: var(--ls-eyebrow);
+  --eyebrow-text-transform: uppercase;
+  --eyebrow-color:        var(--text-brand);
+}
+
+
+/* ============================================================
+   GLOBAL BASE (применять в layout root)
+   ============================================================ */
+
+html {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--text-primary);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-fg);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style><!-- Расширенные шрифты (T-PERF-10) — все остальные веса Inter + JetBrains
+       загружаются async после first paint. Lighthouse не флагует их как
+       критические зависимости — нет в critical request chain. --><link rel="preload" href="/fonts/fonts-extended.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/fonts/fonts-extended.css"></noscript><link rel="icon" type="image/x-icon" href="/brand/favicon-original.ico"><!-- Pagefind CSS подключается lazy при первом открытии модалки (T-PERF-5).
+       Заголовок prefetch не блокирует, но сообщает браузеру: «скорее всего пригодится». --><link rel="prefetch" href="/_pagefind/pagefind.js" as="fetch" crossorigin><!-- B-2: общее CSS-ядро (445 правил, ~69 KB) — вынесено из meta.json-блобов
+       в один файл. Подключается ДО slot=head, чтобы дельты страницы (external/
+       inline из [...slug].astro) шли после и могли переопределять ядро.
+       Render-blocking + immutable-кэш (nginx max-age) — повторные визиты бесплатны. --><link rel="stylesheet" href="/css/site.css?v=20260911a"><link rel="stylesheet" href="/css/praktikum-nav-v26.css"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","headline":"Заливка металла в литейные формы: ковш, температура и устойчивая струя","description":"Подготовка ковша и формы, температура и время, устойчивость струи, шлак, скорость заполнения и безопасность.","dateModified":"2026-10-01","inLanguage":"ru-RU","author":{"@type":"Organization","name":"Урал Индуктор"},"publisher":{"@type":"Organization","name":"УралИндуктор","url":"https://uralinduktor.ru/"},"mainEntityOfPage":"https://uralinduktor.ru/praktikum/zalivka-metalla-v-formy/","image":"https://uralinduktor.ru/praktikum/zalivka-metalla-v-formy/assets/vypusk-metalla-pavlodar.webp"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://uralinduktor.ru/"},{"@type":"ListItem","position":2,"name":"Практикум","item":"https://uralinduktor.ru/praktikum/"},{"@type":"ListItem","position":3,"name":"Заливка металла в формы","item":"https://uralinduktor.ru/praktikum/zalivka-metalla-v-formy/"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Как выбрать температуру заливки?","acceptedAnswer":{"@type":"Answer","text":"Температуру задают технологией конкретного сплава и отливки с учётом перегрева, обработки расплава, потерь в ковше, времени транспортировки, толщины стенок и формы. Универсального значения нет."}},{"@type":"Question","name":"Почему нельзя лить с большой высоты?","acceptedAnswer":{"@type":"Answer","text":"Длинная свободно падающая струя легче разрывается, вовлекает воздух, образует брызги и усиливает удар по чаше или форме."}},{"@type":"Question","name":"Нужно ли заполнять литниковую чашу?","acceptedAnswer":{"@type":"Answer","text":"Для многих систем устойчивое заполнение чаши помогает не допускать подсоса воздуха в стояк. Конкретный режим определяется конструкцией литниковой системы и технологией."}},{"@type":"Question","name":"Можно ли возвращать металл в ковш после прерванной заливки?","acceptedAnswer":{"@type":"Answer","text":"Действуют только по технологической инструкции предприятия. Самовольное продолжение, перелив или возврат металла создают риск травмы и брака."}},{"@type":"Question","name":"Какие данные нужны для подбора ковша?","acceptedAnswer":{"@type":"Answer","text":"Сплав, масса металла на форму и цикл, температура, число форм, расстояние и время транспортировки, высота подъёма, способ наведения и кантования, тип выпуска, ограничение по габаритам и требования безопасности."}}]}]}</script><link rel="stylesheet" href="/praktikum/zalivka-metalla-v-formy/assets/article.css"><!-- Mobile-fixes + stock-badges — inline в head (T-PERF-15).
+       Lighthouse показывал stock.css на хвосте критической цепочки с задержкой
+       1.8 сек. Inline убирает 2 HTTP-запроса, max chain delay падает с 1799 до ~300 мс.
+       Размер ~7 KB — приемлемо для inline. --><style is:global>/* ============================================================
+ * mobile-fixes.css — глобальные правки мобильной вёрстки
+ * Подключается в BaseLayout ПОСЛЕ инлайновых стилей страницы,
+ * поэтому переопределяет их (одинаковый/выше приоритет + позже в каскаде).
+ * Чинит проблемы, общие для всех 433 страниц, без правки каждого meta.json.
+ * ============================================================ */
+
+/* ------------------------------------------------------------
+ * 1. Боковые отступы hero / cat-hero.
+ *    .hero__content и .cat-hero__content задают
+ *    `padding: <верт> 0 <верт>` (shorthand) → обнуляют боковой
+ *    padding у .container. На десктопе это маскируется
+ *    `margin:0 auto`, а на мобильном поля схлопываются и текст
+ *    прилипает к краю экрана. Возвращаем боковой padding и
+ *    выравниваем hero по той же сетке, что и остальные секции.
+ * ------------------------------------------------------------ */
+.hero .hero__content,
+.cat-hero .cat-hero__content {
+  padding-left: var(--sp-8);
+  padding-right: var(--sp-8);
+}
+
+@media (max-width: 768px) {
+  .hero .hero__content,
+  .cat-hero .cat-hero__content {
+    padding-left: var(--sp-5);
+    padding-right: var(--sp-5);
+  }
+}
+
+/* Подстраховка: любой .container внутри секций-героев точно
+   с боковым padding на мобильном (если встретится иной враппер). */
+@media (max-width: 768px) {
+  .hero .container,
+  .cat-hero .container,
+  .phero .container {
+    padding-left: var(--sp-5);
+    padding-right: var(--sp-5);
+  }
+}
+
+/* ------------------------------------------------------------
+ * 2. Верхняя строка контактов (.header-top).
+ *    На десктопе: телефон · email · мессенджеры, выровнены вправо
+ *    (justify-content: flex-end). На узком экране строка не
+ *    помещается и из-за flex-end переполнение уходит ВЛЕВО —
+ *    телефон обрезается («…1-65-97»).
+ *    Фикс: телефон слева (виден полностью), мессенджеры справа,
+ *    email и разделители прячем — email есть в подвале и по
+ *    кнопке «почта» в других местах.
+ * ------------------------------------------------------------ */
+@media (max-width: 640px) {
+  .header-top__inner {
+    justify-content: space-between;
+    gap: var(--sp-3);
+  }
+  .header-top__inner .contact-link:not(.contact-link--phone),
+  .header-top__inner .contact-hours,
+  .header-top__inner .contact-sep {
+    display: none;
+  }
+  .contact-link--phone {
+    font-size: var(--fs-small);
+  }
+}
+
+/* Очень узкие экраны (≤380px): на всякий случай не даём телефону
+   переполнять — допускаем перенос мессенджеров под телефон не нужен,
+   просто слегка ужимаем шрифт телефона. */
+@media (max-width: 360px) {
+  .contact-link--phone {
+    font-size: var(--fs-micro, 12px);
+  }
+}
+
+/* ------------------------------------------------------------
+ * 3. Блок «Полный цикл» (.full-cycle / .cycle-step) на мобильном.
+ *    На десктопе — горизонтальный таймлайн (сетка 4–7 колонок).
+ *    На телефоне сетка смотрелась неорганично. Упрощаем до чистого
+ *    вертикального списка: только ИКОНКА + ЗАГОЛОВОК этапа.
+ *    Номера (01–07) и подписи-пояснения на мобильном скрываем —
+ *    меньше визуального шума, ряды ровные, нечётный «07» больше
+ *    не висит в пустой ячейке.
+ *    Селекторы-потомки (0,2,0) перекрывают инлайновые nth-child
+ *    без !important за счёт более позднего подключения файла.
+ * ------------------------------------------------------------ */
+@media (max-width: 640px) {
+  .full-cycle .full-cycle__timeline {
+    display: flex;
+    flex-direction: column;
+  }
+  .full-cycle .full-cycle__timeline::before {
+    display: none;
+  }
+
+  .full-cycle__timeline .cycle-step {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--sp-5);
+    padding: var(--sp-5) 0;
+    border: 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .full-cycle__timeline .cycle-step:last-child {
+    border-bottom: 0;
+  }
+
+  /* Номер и пояснение убираем — оставляем иконку и заголовок */
+  .full-cycle__timeline .cycle-step__num,
+  .full-cycle__timeline .cycle-step__meta {
+    display: none;
+  }
+
+  /* Иконка — в аккуратном квадрате с лёгкой подложкой, слева */
+  .full-cycle__timeline .cycle-step__icon {
+    flex: 0 0 auto;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin: 0;
+    background: var(--surface-muted, #f3f5f6);
+    color: var(--teal-600);
+  }
+  .full-cycle__timeline .cycle-step__icon svg {
+    width: 1.625rem;
+    height: 1.625rem;
+  }
+
+  /* Заголовок — основной читаемый текст этапа */
+  .full-cycle__timeline .cycle-step__title {
+    margin: 0;
+    font-size: var(--fs-body, 16px);
+    line-height: 1.35;
+  }
+}
+
+/* ------------------------------------------------------------
+ * 4. Защита от горизонтального переполнения (белое поле справа/снизу).
+ *    overflow-x: clip — клипает лишнее по горизонтали, но (в отличие от
+ *    hidden) НЕ создаёт scroll-контейнер и НЕ ломает position: sticky
+ *    (липкую шапку и sticky-оглавление товара).
+ * ------------------------------------------------------------ */
+html { overflow-x: clip; }
+
+/* Текстовое значение в stat-плашке («Полный цикл» вместо числа) —
+   крупный номер 44px великоват для фразы, делаем компактнее. */
+.stat__num--text {
+  font-size: clamp(22px, 3.2vw, 30px);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+/* ------------------------------------------------------------
+ * 5. Мобильное меню (drawer): раскрываемые группы «Каталог» и «Услуги».
+ *    Кнопка-аккордеон + панель подпунктов (скрыта, открывается по .is-open).
+ * ------------------------------------------------------------ */
+.nav-drawer__acc {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3, 12px);
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: var(--sp-4, 16px) 0;
+  font-family: var(--font-display, inherit);
+  font-size: var(--fs-lead, 18px);
+  font-weight: var(--fw-semibold, 600);
+  /* drawer тёмный → текст светлый, иначе сливается с фоном */
+  color: var(--text-inverse, #ffffff);
+  text-align: left;
+  cursor: pointer;
+}
+.nav-drawer__acc-chev {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--duration-fast, .15s) ease;
+  flex: 0 0 auto;
+  margin-right: 2px;
+  opacity: .55;
+}
+.nav-drawer__item--acc.is-open .nav-drawer__acc-chev {
+  transform: rotate(-135deg);
+}
+
+.nav-drawer__panel {
+  display: none;
+  padding: 0 0 var(--sp-3, 12px) var(--sp-3, 12px);
+  border-left: 2px solid var(--border-subtle, #e5e9eb);
+  margin: 0 0 var(--sp-2, 8px) var(--sp-1, 4px);
+}
+.nav-drawer__item--acc.is-open .nav-drawer__panel {
+  display: block;
+}
+
+.nav-drawer__group-label {
+  font-family: var(--font-display, inherit);
+  font-size: var(--fs-micro, 12px);
+  font-weight: var(--fw-bold, 700);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  /* приглушённый светлый — на тёмном drawer */
+  color: rgba(255, 255, 255, 0.55);
+  margin: var(--sp-4, 16px) 0 var(--sp-2, 8px);
+}
+.nav-drawer__group-label:first-child { margin-top: var(--sp-2, 8px); }
+
+.nav-drawer__sublink {
+  display: block;
+  padding: var(--sp-2, 8px) 0;
+  font-size: var(--fs-body, 16px);
+  line-height: 1.35;
+  /* читаемый светлый текст на тёмном drawer */
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+}
+.nav-drawer__sublink:hover,
+.nav-drawer__sublink:active { color: var(--text-inverse, #ffffff); }
+.nav-drawer__sublink--all {
+  margin-top: var(--sp-3, 12px);
+  font-weight: var(--fw-semibold, 600);
+  /* акцентная ссылка — светлее tiрkвы для контраста с тёмным */
+  color: var(--green-400, #6CBB54);
+}
+
+/* ------------------------------------------------------------
+ * 8. Белое поле под футером (iOS overscroll bounce показывал
+ *    белый body-bg). Делаем body тёмным — секции страницы имеют
+ *    свои светлые фоны, а под футером и в зоне bounce будет
+ *    тёмный, как футер.
+ * ------------------------------------------------------------ */
+body { background: var(--neutral-950, #101F26); }
+
+/* ------------------------------------------------------------
+ * 9. Бейдж «В наличии» на карточках товара (каталог + /nalichie/).
+ *    Ставится JS-скриптом /js/stock-badges.js при совпадении slug
+ *    с записью в /data/stock.json. Стиль глобальный — нужен на
+ *    всех каталожных страницах.
+ * ------------------------------------------------------------ */
+.pcard__cover { position: relative; }
+.pcard__stock-badge {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  z-index: 2;
+  display: inline-block;
+  background: var(--green-600, #3C8E33);
+  color: #ffffff;
+  font-family: var(--font-display, "Inter", sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  text-decoration: none;
+  border: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
+
+/* ------------------------------------------------------------
+ * 6. Блок кейсов (.case-feature) — фикс горизонтального переполнения.
+ *    .case-feature — CSS grid; колонка 1fr НЕ сжималась (у grid-элементов
+ *    min-width:auto = min-content), из-за чего трек становился шире контейнера
+ *    (~338px при доступных ~271px) и вся страница уезжала на ~16px вправо —
+ *    у всех блоков (включая форму внизу) срезался правый край.
+ *    Решение: minmax(0,1fr) + min-width:0 у grid-элементов → колонка сжимается.
+ * ------------------------------------------------------------ */
+.case-feature { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 961px) {
+  /* на десктопе возвращаем двухколоночную раскладку, но со сжимаемыми треками */
+  .case-feature { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+}
+.case-feature__details,
+.case-feature__gallery { min-width: 0; }
+.case-meta, .case-meta li,
+.case-block, .case-block__text,
+.case-result, .case-result li { min-width: 0; }
+/* Кнопки «Предыдущий/Следующий» — flex-элементы с min-width:auto не сжимались
+   и давали +16px. Разрешаем сжатие и перенос. */
+.case-feature__nav { flex-wrap: wrap; min-width: 0; }
+.case-feature__nav-btn { min-width: 0; }
+.case-feature__counter { min-width: 0; }
+
+/* ------------------------------------------------------------
+ * 7. Блок «Лучшее предложение» (.best-offer__card) — тот же grid-баг.
+ *    Колонка grid не сжималась (min-width:auto у grid-элементов) → контакты
+ *    и форма становились шире карточки, текст резался справа на мобильном.
+ *    minmax(0,1fr) + min-width:0 у вложенных flex/grid элементов.
+ * ------------------------------------------------------------ */
+.best-offer__card { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1025px) {
+  .best-offer__card { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+}
+.best-offer__contacts,
+.best-offer__form,
+.bo-contact,
+.bo-contact__body { min-width: 0; }
+.bo-contact__value { overflow-wrap: anywhere; }
+
+/* ------------------------------------------------------------
+ * 9. Hero scroll-индикатор перекрывает кнопку «Подобрать оборудование»
+ *    на мобильной (он лежит абсолютно справа внизу). Скрываем — текст
+ *    «SCROLL» с направляющей это декор, не интерактив, на мобильной
+ *    избыточен (пользователь и так скроллит свайпом).
+ * ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .hero__scroll {
+    display: none !important;
+  }
+}
+
+/* ------------------------------------------------------------
+ * 10. Квадратные карточки категорий на главной (.catalog .cat-card__cover).
+ *     Стандартный 16:10 на главной обрезал оборудование сверху/снизу
+ *     (горизонтальные фото в маленькой высоте). Квадрат 1:1 показывает
+ *     объект целиком — оборудование в центре, по бокам отрезается фон.
+ *     object-fit: cover + object-position: center гарантируют что
+ *     композиционный центр (само оборудование) останется в кадре.
+ * ------------------------------------------------------------ */
+.catalog .cat-card__cover {
+  aspect-ratio: 1 / 1 !important;
+}
+.catalog .cat-card__cover img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* ------------------------------------------------------------
+ * 10a. Моб. каталог (≤640): 2 плитки в ряд, компактно — крупное фото
+ *      + название. Списки/ссылку скрываем (на узком экране лишнее),
+ *      фото за счёт 2 колонок становится заметно меньше.
+ * ------------------------------------------------------------ */
+@media (max-width: 640px) {
+  .catalog .catalog__grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--sp-3) !important;
+  }
+  .catalog .cat-card__body { padding: var(--sp-3) !important; }
+  .catalog .cat-card__title {
+    font-size: var(--fs-small) !important;
+    line-height: 1.25 !important;
+    margin: 0 !important;
+  }
+  .catalog .cat-card__list,
+  .catalog .cat-card__link { display: none !important; }
+  .catalog .cat-card__num {
+    font-size: 10px !important;
+    padding: 1px var(--sp-1) !important;
+  }
+}
+
+/* ------------------------------------------------------------
+ * 10b. Блок «География работы»: на планшете/мобильном карта под текстом,
+ *      высота компактнее (иначе 3:2 на узком экране слишком высокая).
+ * ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+ * 10c. Каталог /products/ (.cat-index .scard-grid): на мобильном 2 карточки
+ *      в ряд (по умолчанию inline-стиль ставит 1). Ужимаем отступы/шрифт,
+ *      чтобы плитки читались. `.cat-index` + !important — бьёт инлайн ≤600px.
+ * ------------------------------------------------------------ */
+@media (max-width: 600px) {
+  .cat-index .scard-grid {
+    /* minmax(0,1fr) — иначе 1fr=minmax(auto,1fr) не даёт колонке сжаться уже
+       min-content карточки, и правый столбец вылезает за экран. */
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+  .cat-index .scard { min-width: 0 !important; }
+  .cat-index .scard__body { padding: 10px 12px 12px !important; min-width: 0 !important; }
+  .cat-index .scard__title { font-size: 14px !important; line-height: 1.25 !important; overflow-wrap: anywhere; }
+  .cat-index .scard__meta { font-size: 12px !important; }
+}
+
+@media (max-width: 900px) {
+  .geo__layout {
+    grid-template-columns: 1fr !important;
+    gap: var(--sp-8) !important;
+  }
+  .geo__map {
+    /* aspect-ratio + min-height раздували ширину (h*16/11) и карта вылезала
+       за колонку → горизонтальный разъезд. Фикс: без aspect-ratio, фикс-высота,
+       ширина строго по колонке. */
+    aspect-ratio: auto !important;
+    height: 340px !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  /* Overlay-вариант (О компании): на мобильном не оверлей, а стопка —
+     текст обычным блоком, карта под ним. */
+  .geo--overlay { display: block !important; min-height: 0 !important; }
+  .geo--overlay .geo__map--full {
+    position: relative !important;
+    height: 320px !important;
+    min-height: 320px !important;
+    aspect-ratio: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .geo--overlay .geo__overlay-wrap {
+    pointer-events: auto !important;
+    padding-top: var(--sp-10) !important;
+    padding-bottom: var(--sp-8) !important;
+  }
+  .geo--overlay .geo__panel {
+    max-width: none !important;
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}
+
+/* ------------------------------------------------------------
+ * 11. SEO: H4-заголовки в навигации (мегаменю + футер) заменены на
+ *     <div class="megamenu__col-title"> / .footer__col-title> для
+ *     корректной семантики заголовков (h4 не должен быть до h1).
+ *     CSS-alias — копия стилей оригинальных селекторов h4.
+ * ------------------------------------------------------------ */
+.megamenu__col .megamenu__col-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--sp-4);
+}
+.footer__col .footer__col-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--green-400);
+  margin: 0 0 var(--sp-4);
+}
+
+/* ============================================================
+ * 12. В-5: мобильные хвосты (горизонтальный скролл на 375px).
+ *     Корень почти всех 63 случаев: grid/flex-элемент с min-width:auto
+ *     не сжимается ниже min-content своего содержимого — интринсик-ширина
+ *     фото, длинная неразрывная строка или таблица «распирают» колонку
+ *     шире экрана. Лечим точечным min-width:0 + переносом текста +
+ *     скролл-обёрткой широких таблиц. Файл грузится ПОСЛЕ блобов → правит
+ *     каскад без !important. Проверено scripts/oneoff/mobile-recheck.mjs.
+ * ============================================================ */
+
+/* 12.1 Карточка товара: hero-фото и лента превью (12 дробемётов).
+ *      Колонка `.phero__grid` на мобильном = `1fr` (= minmax(auto,1fr)) →
+ *      её auto-минимум держит min-content фото (~480px) и трек распирает
+ *      экран. Меняем трек на minmax(0,1fr) — он сжимается до контейнера,
+ *      фото кропается object-fit'ом. Доп. min-width:0 на вложенных flex/grid
+ *      (лента превью с inline repeat(6,1fr)). */
+@media (max-width: 900px) {
+  .phero__grid { grid-template-columns: minmax(0, 1fr); }
+}
+.phero__media, .phero__main,
+.phero__thumbs, .phero__thumb { min-width: 0; }
+.phero__main img, .phero__thumb img { min-width: 0; }
+
+/* 12.2 Статблок (.stat) — крупное число/текст (44px) и многословные
+ *      значения («со склада», «12 мес») не сжимались (~40 страниц:
+ *      запчасти, муфельные, ковши, чиллеры, нагреватели). Уменьшаем число
+ *      на мобильном и разрешаем перенос. */
+@media (max-width: 640px) {
+  .stat { min-width: 0; }
+  .stat__body { min-width: 0; }
+  .stat__num { font-size: clamp(26px, 7vw, 40px); overflow-wrap: anywhere; }
+  .stat__num small { white-space: nowrap; }
+  .stat__label, .stat__text { overflow-wrap: anywhere; }
+}
+
+/* 12.3 Таблицы спецификаций и экономики — суммарный min-content колонок
+ *      шире экрана. Спека (param|value) — разрешаем перенос в ячейках
+ *      (без скролла, аккуратнее); экономика (3 числовые колонки) —
+ *      горизонтальный скролл внутри карточки, числа не ломаем. */
+@media (max-width: 640px) {
+  .spec__panel, .spec__body { min-width: 0; }
+  .spec-table { min-width: 0; }
+  .spec-table th { overflow-wrap: anywhere; }
+  /* Спека param|value: значение в td имеет white-space:nowrap (tovar-b.css),
+     поэтому длинное значение растягивало таблицу, а колонка-параметр (th)
+     схлопывалась в текст по одной букве. На мобильном разрешаем перенос
+     значения (по словам, break-word) и фиксируем колонки 50/50 — th
+     возвращает ширину, длинные значения («алюминиевый / стальной сварной»)
+     не ломаются по символам. */
+  .spec-table:not(.spec-table--models) td { white-space: normal; overflow-wrap: break-word; }
+  .spec-table:not(.spec-table--models) tbody th { width: 50%; }
+  /* Многоколоночные таблицы моделей (числовые) — перенос ломал бы числа,
+     поэтому панель с такой таблицей получает горизонтальный скролл. */
+  .spec__panel:has(.spec-table--models) { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .econ__table { min-width: 0; overflow-x: auto; }
+}
+
+/* 12.3b Ключевые показатели в шапке товара (.phero__keyspec-num) — крупный
+ *       display-шрифт. Когда в значение попадает многословный текст с &nbsp;
+ *       («износостойкие пластины», «у места выбивки»), неразрывный токен не
+ *       помещался в колонку 1fr и вылезал за край (PGS/ХТС-страницы).
+ *       На мобильном уменьшаем кегль и разрешаем перенос/принудительный
+ *       разрыв длинного токена. */
+@media (max-width: 640px) {
+  /* 1fr == minmax(auto,1fr): auto-трек не уже min-content, поэтому неразрывное
+     значение распирало колонку за край сетки. minmax(0,1fr) разрешает трекам
+     сжиматься, а min-width:0 на info снимает min-content-распор у flex-колонки. */
+  .phero__info { min-width: 0; }
+  .phero__keyspecs { min-width: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .phero__keyspec { min-width: 0; }
+  .phero__keyspec-num {
+    font-size: clamp(18px, 5.4vw, 26px);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  /* Длинный слитный токен в подписи («Охлаждение+обеспыливание+просев») не
+     имел точек переноса и распирал ячейку сетки. */
+  .phero__keyspec-label { overflow-wrap: anywhere; word-break: break-word; }
+}
+
+/* 12.4 Блок «ситуаций» услуги (/uslugi/remont-drobemetov/) — карточка
+ *      с длинным списком пунктов не сжималась под 375px. */
+@media (max-width: 768px) {
+  .situations__grid, .situation-card { min-width: 0; }
+  .situation-card__title,
+  .situation-card__text,
+  .situation-card__list li { overflow-wrap: anywhere; }
+}
+
+/* 12.5 Медиа-блок кейса (/o-company/). Две причины переполнения:
+ *      (1) трек `.case__layout` 1fr держал min-content картинки →
+ *          меняем на minmax(0,1fr);
+ *      (2) на ≤1024 блок получает `min-height:320 + aspect-ratio:4/3`,
+ *          из-за чего ВЫСОТА (320) задаёт ШИРИНУ (320×4/3=427) мимо трека.
+ *          Снимаем aspect-ratio на мобильном → ширина идёт от трека (335),
+ *          высоту держит min-height, картинка кропается object-fit'ом. */
+@media (max-width: 1024px) {
+  .case__layout { grid-template-columns: minmax(0, 1fr); }
+  .case__media { aspect-ratio: auto; }
+}
+.case__media { min-width: 0; }
+.case__media img { min-width: 0; }
+
+/* 12.6 Карточка товара в сетках «похожее/каталог» (.pcard-grid) —
+ *      cover-картинка и длинные тех.строки распирали колонку на узких
+ *      экранах (всплыло на запчастях после починки .stat). */
+@media (max-width: 640px) {
+  .pcard { min-width: 0; }
+  .pcard__cover { min-width: 0; }
+  .pcard__cover img { min-width: 0; }
+  .pcard__title, .pcard__spec { overflow-wrap: anywhere; }
+}
+
+/* 12.7 Длинные заголовки секций с неразрывными фразами (&nbsp;) —
+ *      на хабах ЛВМ/ЛГМ/ХТС/ПГС <em>песка и смолы к минимуму</em> и т.п.
+ *      склеены &nbsp; в один токен шире 375px и не переносились.
+ *      Разрешаем перенос только на мобильном. */
+@media (max-width: 640px) {
+  .s-title, .leadgen__title, .prod-rf__title,
+  .cat-hero__title, .hero__title,
+  .phero__title { overflow-wrap: anywhere; }
+}
+
+/* ============================================================
+ * 13. Мобильная навигация — гамбургер вместо десктопного меню.
+ *     Раньше правила «спрятать .nav / показать .nav-toggle» жили
+ *     ТОЛЬКО в per-page inline_styles каждой страницы. На страницах,
+ *     чей inline-блок их не содержал (напр. /kontakty/), на мобильном
+ *     показывалось десктопное .nav без гамбургера. Выносим сюда —
+ *     единый источник для всех страниц (Header/Drawer глобальны в BaseLayout).
+ * ============================================================ */
+@media (max-width: 1024px) {
+  .nav { display: none; }
+  .nav-toggle { display: inline-flex; }
+}
+@media (max-width: 640px) {
+  .header__actions .btn--primary { display: none; }
+}
+
+/* На экранах 320px логотип, поиск и гамбургер должны помещаться в одну строку. */
+@media (max-width: 340px) {
+  .header .container { padding-left: var(--sp-3); padding-right: var(--sp-3); }
+  .header__inner { gap: var(--sp-1); }
+  .header__brand img { height: 40px; max-width: 150px; }
+  .header__actions { gap: 0; }
+  .header__actions .nav-toggle,
+  .header__actions .icon-btn { width: 40px; height: 40px; }
+}
+
+/* ============================================================
+ * 14. Футер — схлопывание колонок на мобильном.
+ *     .footer__top по умолчанию 5 колонок (1.4fr 1fr×4) и НЕ
+ *     сворачивается — правила были только в per-page inline_styles.
+ *     На страницах без них (kontakty, nalichie, otzyvy, policy,
+ *     soglasie, spasibo, новости) футер оставался в 5 колонок и
+ *     распирал страницу до ~820px (горизонтальный overflow, из-за
+ *     которого «уезжала» и модалка поиска — position:fixed на mobile).
+ * ============================================================ */
+@media (max-width: 1024px) {
+  .footer__top { grid-template-columns: 1fr 1fr; gap: var(--sp-8); }
+  .footer__brand-block { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .footer__top { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+ * 15. Формы-компоненты на страницах без tpl-CSS.
+ *     Схлопывание двухколоночных рядов формы (.leadgen__grid,
+ *     .form__row) жило только в /css/tpl/*.css. Страницы, которые
+ *     эти шаблоны не подключают (новый раздел «Решения», сервисные
+ *     страницы), оставались с 2 колонками и распирали вьюпорт.
+ * ============================================================ */
+@media (max-width: 1024px) {
+  .leadgen__grid { grid-template-columns: minmax(0, 1fr); }
+  .form__row { grid-template-columns: minmax(0, 1fr); }
+}
+.form__row, .form__field { min-width: 0; }
+.form__input, .form__textarea { max-width: 100%; box-sizing: border-box; }
+
+/* ============================================================
+ * 16. Шапка на «ноутбучных» ширинах 1025-1280px.
+ *     Здесь ещё показывается полное меню (гамбургер включается
+ *     только с 1024px и ниже), и логотип + 7 пунктов + поиск +
+ *     кнопка не умещались: строка распирала страницу и появлялась
+ *     горизонтальная прокрутка. Раньше кнопку просто прятали —
+ *     но это и есть главный CTA сайта, терять его нельзя.
+ *     Теперь она остаётся видимой, а место освобождает компактный
+ *     размер: меньше паддинги, кегль и межбуквенное расстояние.
+ * ============================================================ */
+@media (min-width: 1025px) and (max-width: 1560px) {
+  /* Место под микроформу звонка освобождает меню: строка не сжималась
+     ниже 1157px, из них 671px занимали 7 пунктов с паддингом 12px и
+     кеглем 14px. Кнопки «Запросить КП / ТЗ» в шапке больше нет. */
+  .nav { gap: 0; }
+  .nav__link { padding-left: var(--sp-2); padding-right: var(--sp-2); font-size: 13px; }
+  .header__inner { gap: var(--sp-4); }
+  .header .container { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+}
+@media (min-width: 1025px) and (max-width: 1120px) {
+  /* Самая узкая полоса — ещё плотнее, иначе строка всё равно распирает. */
+  .nav__link { padding-left: 6px; padding-right: 6px; font-size: 12px; }
+  .header__brand img { max-height: 34px; }
+}
+
+/* Ячейки основных сеток должны уметь сжиматься. В CSS-гриде `1fr` — это
+   minmax(auto, 1fr), то есть колонка не становится уже содержимого. Сетки
+   свёрстаны под широкий экран, а схлопываются только на 1024px, поэтому в
+   полосе 1025-1200px они распирали страницу. min-width: 0 снимает нижнюю
+   границу трека — блоки просто ужимаются, без горизонтальной прокрутки. */
+.stats__grid > *,
+.partner__pillars > *,
+.adv__grid > *,
+.catalog__grid > *,
+.geo__layout > *,
+.modern__grid > *,
+.highlights__grid > * { min-width: 0; }
+.geo__map { max-width: 100%; }
+/* Внутренние обёртки плашек тоже должны сжиматься, иначе минимальную ширину
+   задаёт содержимое. Крупные значения вроде «полный цикл» склеены неразрывным
+   пробелом — overflow-wrap: anywhere разрешает перенос и уменьшает min-content,
+   иначе плашка распирала сетку. */
+.stat__body, .stat > * { min-width: 0; }
+.stat__num, .stat__label, .stat__text { overflow-wrap: anywhere; }
+
+/* Карточки каталога. У значений характеристик стоял white-space: nowrap —
+   он рассчитан на короткие числа, а после синхронизации с ТЗ там появились
+   развёрнутые значения («380 В, 3 фазы, N и PE; 50 Гц»). Из-за nowrap карточка
+   не могла сузиться, и сетка из трёх колонок распирала страницу. */
+.pcard-grid > *, .scard-grid > *, .subcat-grid > *, .teaser-grid > * { min-width: 0; }
+.pcard__spec dd, .pcard__spec dt { white-space: normal; overflow-wrap: anywhere; }
+.pcard__title, .pcard__cover img { min-width: 0; max-width: 100%; }
+</style><style is:global>/* ============================================================
+   stock.css — стили подсистемы «В наличии на складе».
+   Глобальные стили (подключаются в BaseLayout.astro), нужны на:
+     - /nalichie/ — листинг карточек (.pcard через JS-рендер)
+     - /products/.../ — бейдж «В наличии» поверх обложек в каталоге
+   ============================================================ */
+
+/* Бейдж «В наличии» — зелёная плашка СНИЗУ-слева обложки.
+   Используется и в /nalichie/ (на инжектированных карточках каталога),
+   и в каталогах /products/ (через stock-badges.js).
+   Снизу, потому что сверху-слева на pcard уже есть .pcard__badge
+   (например «Сталь / чугун», «Для проката», «Градирня УИГ») — раньше
+   бейдж наличия перекрывал её. */
+.pcard__cover { position: relative; }
+.pcard__stock-badge {
+  position: absolute;
+  bottom: var(--sp-4, 16px);
+  left: 0;
+  z-index: 2;
+  display: inline-block;
+  background: var(--green-600, #3C8E33);
+  color: #fff;
+  font-family: var(--font-display, "Inter", sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  text-decoration: none;
+  line-height: 1.2;
+}
+.pcard__stock-badge:hover { background: var(--green-700, #2D7A2B); }
+
+/* Бейдж «Сделано в России» — белая плашка с триколор-флажком, СНИЗУ-СПРАВА
+   обложки. Ставится JS (made-badges.js) на карточках каталога (.pcard__cover)
+   и товара (.phero__main) для разделов печей/дробемёта/охлаждения.
+   Снизу-справа — чтобы не пересекаться с «В наличии» (снизу-слева) и
+   «Сталь / чугун» / баннером (сверху-слева). */
+.made-badge {
+  position: absolute;
+  bottom: var(--sp-4, 16px);
+  right: 0;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: var(--text-primary, #14211f);
+  font-family: var(--font-display, "Inter", sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 12px 5px 10px;
+  line-height: 1.2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+/* Триколор: три горизонтальные полосы — белая / синяя / красная. */
+.made-badge__flag {
+  display: block;
+  width: 18px;
+  height: 12px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: linear-gradient(
+    to bottom,
+    #fff 0 33.33%,
+    #0039a6 33.33% 66.66%,
+    #d52b1e 66.66% 100%
+  );
+}
+
+/* Категория-каптион поверх карточки (используется в JS-рендере /nalichie/). */
+.pcard__cat {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary, #8a98a0);
+  margin-bottom: 6px;
+}
+
+/* Метаинформация «N шт · отгрузка от 1 дня» под названием */
+.pcard__stock-meta {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-secondary, #4a5862);
+  line-height: 1.4;
+}
+
+/* Полоска-обёртка фильтра: лейбл «Фильтр по категории:» слева + сами кнопки.
+   Скрывается JS если позиций меньше двух категорий. */
+.stock-filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3, 12px) var(--sp-4, 16px);
+  margin: var(--sp-5, 24px) 0 var(--sp-6, 32px);
+  padding: var(--sp-4, 16px) var(--sp-5, 20px);
+  background: var(--surface-subtle, #f6f8f9);
+  border: 1px solid var(--border-subtle, #e6eaee);
+  border-radius: 2px;
+}
+.stock-filterbar[hidden] { display: none; }
+.stock-filterbar__label {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary, #8a98a0);
+  white-space: nowrap;
+}
+/* Контейнер кнопок (внутри .stock-filterbar): использует .case-filter
+   из общего CSS блоба, здесь — только flex + gap. */
+[data-stock-filter] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2, 8px);
+}
+[data-stock-filter]:empty { display: none; }
+[data-stock-filter][hidden] { display: none; }
+@media (max-width: 767px) {
+  .stock-filterbar { padding: var(--sp-3, 12px); }
+  .stock-filterbar__label { font-size: 10px; }
+}
+</style><link rel="stylesheet" href="/_astro/BaseLayout.CK1KI5ak.css"></head> <body> <div class="header-shell">  <div class="header-top"> <div class="container header-top__inner"> <span class="contact-hours" aria-label="Режим работы"> <svg class="contact-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"> <circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path> </svg>
+Режим работы 9:00–18:00 по&nbsp;времени ЕКБ
+</span> <span class="contact-sep"></span> <a href="tel:+78003513401" class="contact-link contact-link--phone" aria-label="Позвонить бесплатно по России"> <svg class="contact-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path> </svg>
+8&nbsp;800&nbsp;351-34-01
+</a> <span class="contact-sep"></span> <a href="tel:+73512116597" class="contact-link contact-link--phone contact-link--phone-local" aria-label="Позвонить"> <svg class="contact-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path> </svg>
++7 (351) 211-65-97
+</a> <span class="contact-sep"></span> <a href="mailto:info@uralinduktor.ru" class="contact-link" aria-label="Написать на email"> <svg class="contact-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <rect x="3" y="5" width="18" height="14" rx="1"></rect> <path d="m3 7 9 6 9-6"></path> </svg>
+info@uralinduktor.ru
+</a> <span class="contact-sep"></span> <div class="messengers" aria-label="Связь в мессенджерах"> <a href="https://t.me/uralinduktor" class="msg-icon" aria-label="Написать в Telegram" title="Telegram"> <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg"> <defs> <linearGradient id="tgGrad" x1=".667" x2=".417" y1=".167" y2=".75"> <stop offset="0" stop-color="#37AEE2"></stop> <stop offset="1" stop-color="#1E96C8"></stop> </linearGradient> </defs> <circle cx="120" cy="120" r="120" fill="url(#tgGrad)"></circle> <path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687c1.906 0 30.255-29.492 30.255-29.492l31.525-60.89-79.448 37.225z"></path> <path fill="#C8DAEA" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0c8.898-8.9 17.415-15.764 17.415-15.764"></path> <path fill="#fff" d="M81.486 130.179L52.2 120.636s-3.5-1.42-2.373-4.64c.232-.664.7-1.229 2.1-2.2 6.489-4.523 120.106-45.36 120.106-45.36s3.208-1.081 5.1-.362a2.766 2.766 0 0 1 1.885 2.055 9.357 9.357 0 0 1 .254 2.585c-.009.752-.1 1.449-.169 2.542-.692 11.165-21.4 94.493-21.4 94.493s-1.239 4.876-5.678 5.043a8.13 8.13 0 0 1-5.925-2.292c-8.711-7.493-38.819-27.727-45.472-32.177a1.27 1.27 0 0 1-.546-.9c-.093-.469.417-1.05.417-1.05s52.426-46.6 53.821-51.492c.108-.379-.3-.566-.848-.4-3.482 1.281-63.844 39.4-70.506 43.607a3.21 3.21 0 0 1-1.48.09z"></path> </svg> </a> <a href="https://max.ru/join/_jtaGUl05P2n89T6htH_ANJV1CDSfJXki7ftWcOb-80" class="msg-icon" aria-label="Написать в MAX" title="MAX"> <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg"> <defs> <linearGradient id="maxGrad-header" x1="0" x2="1" y1="0" y2="1"> <stop offset="0" stop-color="#3370FF"></stop> <stop offset="0.5" stop-color="#6B57F4"></stop> <stop offset="1" stop-color="#9333EA"></stop> </linearGradient> </defs> <rect width="240" height="240" rx="56" fill="url(#maxGrad-header)"></rect> <path fill="#fff" d="M120 50c-39.5 0-71.5 28.4-71.5 63.5 0 19.4 9.7 36.7 25 48.5l-9.5 24.2c-1.6 4.1 2.9 7.8 6.7 5.5l32.4-19.4c5.4 1.1 11 1.6 16.9 1.6 39.5 0 71.5-28.4 71.5-63.5S159.5 50 120 50z"></path> </svg> </a> </div> </div> </div>  <header class="header"> <div class="container header__inner"> <a href="/" class="header__brand" aria-label="УралИндуктор · МТПК — на главную"> <img src="/brand/logo-header-clean.png" alt="УралИндуктор · производство и поставка оборудования для металлургии" width="200" height="56" fetchpriority="high" decoding="async"> </a> <nav class="nav" aria-label="Главная навигация"> <div class="nav__item"> <a href="/products/" class="nav__link">Каталог <span class="nav__chevron"></span></a> <div class="megamenu"> <div class="megamenu__inner"> <div class="megamenu__col"> <div class="megamenu__col-title">Плавка и&nbsp;обработка металлов</div> <ul class="megamenu__list"> <li><a class="megamenu__link" href="/products/induktsionnye-plavilnye-pechi/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16"></rect><path d="M12 9c-1.5 1.5-1.5 4.5 0 6 1.5-1.5 1.5-4.5 0-6z"></path><path d="M8 19h8"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Индукционные плавильные печи</span> <span class="megamenu__link-desc">Тиристорные · от&nbsp;100&nbsp;кг до&nbsp;15&nbsp;т</span> </span> </a></li> <li><a class="megamenu__link" href="/products/induktsionnye-nagrevateli/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7c2.5-2.5 6 2.5 9 0s6-2.5 9 0"></path><path d="M3 12c2.5-2.5 6 2.5 9 0s6-2.5 9 0"></path><path d="M3 17c2.5-2.5 6 2.5 9 0s6-2.5 9 0"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Индукционные нагреватели</span> <span class="megamenu__link-desc">Средне- и&nbsp;высокочастотные · 1–1100&nbsp;кГц</span> </span> </a></li> <li><a class="megamenu__link" href="/products/drobemetnoe-oborudovanie/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><circle cx="12" cy="12" r="1.2" fill="currentColor"></circle><circle cx="5" cy="6" r="0.8" fill="currentColor"></circle><circle cx="19" cy="7" r="0.8" fill="currentColor"></circle><circle cx="6" cy="18" r="0.8" fill="currentColor"></circle><circle cx="19" cy="18" r="0.8" fill="currentColor"></circle><path d="M8.5 8.5L6 6M15.5 8.5L18 6M8.5 15.5L6 18M15.5 15.5L18 18"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Дробемётные установки</span> <span class="megamenu__link-desc">Кранового и&nbsp;барабанного типа</span> </span> </a></li> <li><a class="megamenu__link" href="/products/peskostruynoe-oborudovanie/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h7l4-3v14l-4-3H3z"></path><path d="M17 8l4-1M17 12h4M17 16l4 1"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Пескоструйные установки</span> <span class="megamenu__link-desc">Проходные, напорные, ручные кабины</span> </span> </a></li> <li><a class="megamenu__link" href="/products/sistemy-ohlazhdeniya/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c2 3 5 6 5 9a5 5 0 0 1-10 0c0-3 3-6 5-9z"></path><path d="M10 14a2 2 0 0 0 4 0" opacity="0.6"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Системы охлаждения</span> <span class="megamenu__link-desc">Градирни и&nbsp;чиллеры · до&nbsp;900&nbsp;000&nbsp;кКал/ч</span> </span> </a></li> <li><a class="megamenu__link" href="/products/termoobrabotka-plavka-alyuminiya/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"></path><path d="M9 15a3 3 0 0 0 6 0" opacity="0.6"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Термообработка и&nbsp;плавка алюминия</span> <span class="megamenu__link-desc">Тигельные, бассейновые, башенные печи</span> </span> </a></li> </ul> </div> <div class="megamenu__col"> <div class="megamenu__col-title">Производственные линии</div> <ul class="megamenu__list"> <li><a class="megamenu__link" href="/products/oborudovanie-dlya-peschano-glinistyh-smesej-pgs/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18"></path><path d="M5 18c0-3 2-5 5-5s5 2 5 5"></path><path d="M10 18c0-2 2-4 5-4s4 2 4 4"></path><circle cx="7" cy="20" r="0.5" fill="currentColor"></circle><circle cx="11" cy="20" r="0.5" fill="currentColor"></circle><circle cx="15" cy="20" r="0.5" fill="currentColor"></circle><circle cx="19" cy="20" r="0.5" fill="currentColor"></circle></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">ПГС</span> <span class="megamenu__link-desc">Песчано-глинистые смеси</span> </span> </a></li> <li><a class="megamenu__link" href="/products/linii-dlya-holodnotverdeyushhih-smesej-hts/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="14" width="18" height="7"></rect><rect x="6" y="8" width="12" height="6"></rect><rect x="9" y="3" width="6" height="5"></rect></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">ХТС</span> <span class="megamenu__link-desc">Холодно-твердеющие смеси</span> </span> </a></li> <li><a class="megamenu__link" href="/products/oborudovanie-lgm/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19a4 4 0 0 1-1-7.9 5.5 5.5 0 0 1 10.7-1.5A4.5 4.5 0 0 1 18 19z"></path><circle cx="10" cy="14" r="0.5" fill="currentColor"></circle><circle cx="14" cy="14" r="0.5" fill="currentColor"></circle></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">ЛГМ</span> <span class="megamenu__link-desc">Литьё по&nbsp;газифицируемым моделям</span> </span> </a></li> <li><a class="megamenu__link" href="/products/oborudovanie-lvm/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 5 11 5 15a7 7 0 0 0 14 0c0-4-7-12-7-12z"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">ЛВМ</span> <span class="megamenu__link-desc">Литьё по&nbsp;выплавляемым моделям</span> </span> </a></li> <li><a class="megamenu__link" href="/products/sterzhnevye-mashiny/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="18" height="8"></rect><rect x="7" y="8" width="10" height="5"></rect><path d="M10 8V5h4v3"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Стержневые и&nbsp;формовочные машины</span> <span class="megamenu__link-desc">Горячий/холодный ящик, формовка</span> </span> </a></li> </ul> </div> <div class="megamenu__col"> <div class="megamenu__col-title">Доп оборудование</div> <ul class="megamenu__list"> <li><a class="megamenu__link" href="/products/termicheskie-pechi/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14"></rect><rect x="6" y="8" width="12" height="8"></rect><path d="M12 10c-1.5 1-1.5 3 0 4 1.5-1 1.5-3 0-4z" fill="currentColor" fill-opacity=".25"></path><circle cx="18.5" cy="6.5" r="0.5" fill="currentColor"></circle></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Термические печи</span> <span class="megamenu__link-desc">Камерные, шахтные, вакуумные · до&nbsp;1800&nbsp;°C</span> </span> </a></li> <li><a class="megamenu__link" href="/products/zapchasti/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"></circle><circle cx="16" cy="16" r="3"></circle><path d="M8.5 4v2M8.5 11v2M4 8.5h2M11 8.5h2 M16 12v2M16 20v0M12 16h2M20 16h0"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Запчасти на&nbsp;оборудование</span> <span class="megamenu__link-desc">Для&nbsp;индукционного и&nbsp;дробемётного оборудования</span> </span> </a></li> <li><a class="megamenu__link" href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V11a7 7 0 0 1 14 0v10z"></path><path d="M3 21h18"></path><circle cx="12" cy="12" r="2"></circle><path d="M12 4V2M12 14v4"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Вакуумное оборудование</span> <span class="megamenu__link-desc">Для&nbsp;термообработки в&nbsp;вакууме</span> </span> </a></li> <li><a class="megamenu__link" href="/products/stalerozlivochnye-kovshi/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h12l-1 11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 7z"></path><path d="M5 7l-2-2M17 7l3-1l-1 4l-2-1"></path><path d="M8 11h6"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Сталеразливочные ковши</span> <span class="megamenu__link-desc">Для&nbsp;стали и&nbsp;чугуна, стопорные, чайниковые</span> </span> </a></li> <li><a class="megamenu__link" href="/products/stendy-sushki-i-nagreva-kovshej/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20h12"></path><path d="M8 20V9h8v11"></path><path d="M9 9V6h6v3"></path><path d="M12 3v3"></path><path d="M10 13h4"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Стенды сушки и&nbsp;нагрева ковшей</span> <span class="megamenu__link-desc">Газовые и&nbsp;электрические · 11&nbsp;исполнений</span> </span> </a></li> </ul> </div> </div> </div> </div> <div class="nav__item"> <a href="/uslugi/" class="nav__link">Услуги <span class="nav__chevron"></span></a> <div class="megamenu"> <div class="megamenu__inner"> <div class="megamenu__feature"> <div> <div class="megamenu__feature-eyebrow">Под ключ</div> <div class="megamenu__feature-title">Проектирование литейного производства с&nbsp;нуля под&nbsp;ключ</div> <p class="megamenu__feature-text">От&nbsp;аудита площадки и&nbsp;инженерного проекта до&nbsp;запуска участка, обучения операторов и&nbsp;сервиса.</p> </div> <a href="/proizvodstvo/" class="megamenu__feature-link">Обсудить проект</a> </div> <div class="megamenu__col"> <div class="megamenu__col-title">Полный цикл запуска</div> <ul class="megamenu__list"> <li><a class="megamenu__link" href="/uslugi/puskonaladka/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L4 14h7l-1 7 9-11h-7z"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Пусконаладка</span> <span class="megamenu__link-desc">Запуск оборудования на&nbsp;площадке заказчика</span> </span> </a></li> <li><a class="megamenu__link" href="/uslugi/montazh-shefmontazh/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1-4 6.4l-6.7 6.7a2 2 0 0 1-2.7-2.7l6.7-6.7a4 4 0 0 1 6.7-3.7z"></path><circle cx="5.5" cy="18.5" r="0.5" fill="currentColor"></circle></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Монтаж и&nbsp;шефмонтаж</span> <span class="megamenu__link-desc">Сборка узлов, установка и&nbsp;обвязка</span> </span> </a></li> <li><a class="megamenu__link" href="/uslugi/obuchenie-personala/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"></path><path d="M6 11v5c2 1.3 4 2 6 2s4-0.7 6-2v-5"></path><path d="M22 9v6"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Обучение персонала</span> <span class="megamenu__link-desc">Подготовка операторов и&nbsp;инженеров</span> </span> </a></li> </ul> </div> <div class="megamenu__col"> <div class="megamenu__col-title">Аудит, ремонт и&nbsp;модернизация</div> <ul class="megamenu__list"> <li><a class="megamenu__link" href="/uslugi/remont-plavilnyh-pechey/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16"></rect><path d="M12 9c-1.5 1.5-1.5 4.5 0 6 1.5-1.5 1.5-4.5 0-6z"></path><path d="M8 19h8"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Плавильных печей</span> <span class="megamenu__link-desc">Диагностика, замена узлов, модернизация</span> </span> </a></li> <li><a class="megamenu__link" href="/uslugi/remont-dugovyh-pechey/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16"></rect><path d="M13 8l-4 5h3l-1 4 4-5h-3l1-4z"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Дуговых печей</span> <span class="megamenu__link-desc">Реновация ДСП, модернизация АСУ&nbsp;ТП</span> </span> </a></li> <li><a class="megamenu__link" href="/uslugi/remont-drobemetov/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><circle cx="12" cy="12" r="1.2" fill="currentColor"></circle><circle cx="5" cy="6" r="0.8" fill="currentColor"></circle><circle cx="19" cy="7" r="0.8" fill="currentColor"></circle><circle cx="6" cy="18" r="0.8" fill="currentColor"></circle><circle cx="19" cy="18" r="0.8" fill="currentColor"></circle><path d="M8.5 8.5L6 6M15.5 8.5L18 6M8.5 15.5L6 18M15.5 15.5L18 18"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Дробемётных установок</span> <span class="megamenu__link-desc">Восстановление и&nbsp;переоснащение</span> </span> </a></li> <li><a class="megamenu__link" href="/uslugi/tehnicheskij-audit/"> <span class="megamenu__link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v6H3z"></path><path d="M3 13h18v8H3z"></path><path d="M7 6h.01M11 6h.01M7 17h6M7 19h4"></path></svg></span> <span class="megamenu__link-body"> <span class="megamenu__link-title">Технический аудит</span> <span class="megamenu__link-desc">Оценка состояния и&nbsp;слабых мест оборудования</span> </span> </a></li> </ul> </div> </div> </div> </div> <div class="nav__item"><a href="/nalichie/" class="nav__link">Наличие</a></div> <div class="nav__item"><a href="/proekty/" class="nav__link">Проекты</a></div> <div class="nav__item"><a href="/o-company/" class="nav__link">О компании</a></div> <div class="nav__item"><a href="/kontakty/" class="nav__link">Контакты</a></div> <div class="nav__item"><a href="/otzyvy/" class="nav__link">Отзывы</a></div>  <div class="nav__item"><a href="/praktikum/" class="nav__link nav__link--praktikum">Практикум</a></div> </nav> <div class="header__actions"> <button class="nav-toggle" aria-label="Открыть меню" aria-expanded="false" data-nav-toggle> <span class="nav-toggle__bar"></span> <span class="nav-toggle__bar"></span> <span class="nav-toggle__bar"></span> </button> <button class="icon-btn" aria-label="Поиск" data-search-open> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg> </button>  <form class="header-quick-form js-lead-form" data-form="Шапка: быстрый звонок"> <input type="text" name="hp_token" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true"> <input type="hidden" name="form_ts" class="js-form-ts"> <input type="hidden" name="source" class="js-form-source"> <input type="hidden" name="consent" value="v2026.1-implicit"> <input type="tel" name="phone" class="header-quick-form__input" placeholder="+7 (___) ___-__-__" required autocomplete="tel" aria-label="Контактный телефон для обратного звонка"> <button type="submit" class="header-quick-form__btn">Перезвонить</button> <span class="header-quick-form__hint">Перезвоним в&nbsp;течение 10&nbsp;минут</span> <span class="js-form-status" style="display:none" role="status" aria-live="polite"></span> </form> </div> </div> </header> </div><!-- /.header-shell --> <main data-pagefind-body="true" data-pagefind-weight="1" class="astro-37fxchfa"> <span data-pagefind-meta="image[data-src], image_alt[data-alt]" data-src="https://uralinduktor.ru/praktikum/zalivka-metalla-v-formy/assets/vypusk-metalla-pavlodar.webp" data-alt="Заливка металла в литейные формы | УралИндуктор" style="display:none"></span>   <div class="praktikum-content"> <nav class="praktikum-breadcrumbs" aria-label="Хлебные крошки"> <a href="/">Главная</a><span aria-hidden="true">/</span> <a href="/praktikum/">Практикум</a> </nav>  <article class="ui-praktikum ui-article" lang="ru">
+<p class="article-meta">Практикум «УралИндуктор» · заливочный участок · 30 сентября 2026 года</p><h1>Заливка металла в литейные формы: ковш, температура и устойчивая струя</h1>
+<p class="lead">В момент заливки несколько часов подготовки формы встречаются с несколькими минутами работы ковша. Металл должен прийти в нужном состоянии, заполнить литниковую систему без опасных перерывов и не увлечь в отливку шлак, воздух и разрушенные частицы формы. Здесь важна не скорость сама по себе, а управляемый и повторяемый поток.</p>
+<div class="contents"><strong>Содержание</strong><ol><li><a href="#task">Что задаёт технолог</a></li><li><a href="#ladle">Как выбрать ковш</a></li><li><a href="#prepare">Подготовка ковша и формы</a></li><li><a href="#temperature">Температура и время</a></li><li><a href="#stream">Устойчивая струя</a></li><li><a href="#slag">Шлак и чистота металла</a></li><li><a href="#operation">Последовательность заливки</a></li><li><a href="#defects">Связь с дефектами</a></li><li><a href="#safety">Безопасность</a></li><li><a href="#brief">Данные для подбора</a></li><li><a href="#faq">Ответы инженера</a></li></ol></div>
+
+<h2 id="task">Заливка начинается с технологической карты</h2><p>До подхода ковша должны быть определены сплав, масса металла, диапазон температуры, допустимое время от выпуска до окончания заливки, порядок обработки расплава, положение форм, последовательность обхода и действия при отклонении. Оператор не должен во время операции угадывать, куда поставить ковш или что делать при неполной чаше.</p>
+<div class="decision-grid"><div><strong>Металл</strong><span>Марка сплава, химический состав, обработка, температура и склонность к окислению.</span></div><div><strong>Отливка</strong><span>Масса, минимальная стенка, протяжённость каналов и тепловые узлы.</span></div><div><strong>Форма</strong><span>ПГС, ХТС, ЛГМ или ЛВМ; температура, прочность, покрытие, вентиляция и фиксация.</span></div><div><strong>Литники</strong><span>Чаша, стояк, шлакоуловитель, питатели и сечения, рассчитанные для конкретной задачи.</span></div><div><strong>Маршрут</strong><span>Расстояние, кран или тележка, высота, число форм и фактическая потеря температуры.</span></div><div><strong>Контроль</strong><span>Идентификация плавки, начало и конец операции, температура, отклонения и результат.</span></div></div>
+<figure><img src="/praktikum/zalivka-metalla-v-formy/assets/vypusk-metalla-pavlodar-760.webp" srcset="/praktikum/zalivka-metalla-v-formy/assets/vypusk-metalla-pavlodar-760.webp 760w, /praktikum/zalivka-metalla-v-formy/assets/vypusk-metalla-pavlodar.webp 1200w" sizes="(max-width:760px) calc(100vw - 40px),760px" width="1057" height="1488" fetchpriority="high" decoding="async" alt="Выпуск расплавленного металла из индукционной печи Урал Индуктор"><figcaption>Реальный выпуск металла на плавильном участке. До наклона печи проверяют готовность ковша, свободный маршрут, связь между работниками и отсутствие влаги в опасной зоне.</figcaption></figure>
+
+<h2 id="ladle">Ковш выбирают по процессу, а не только по номинальной вместимости</h2><p>Рабочая вместимость должна покрывать заданный цикл с учётом безопасного свободного борта, остатков металла и принятого порядка разливки. Избыточно большой ковш увеличивает тепловую инерцию и нагрузку на транспортное оборудование; слишком малый вынуждает прерывать заполнение или делить металл между операциями.</p>
+<div class="table-scroll"><table><thead><tr><th>Вопрос</th><th>Что проверяют</th><th>Почему это важно</th></tr></thead><tbody><tr><td>Как выпускают металл?</td><td>Через носок, донный стопорный механизм или другой предусмотренный узел.</td><td>От этого зависят траектория струи, отделение шлака и управление расходом.</td></tr><tr><td>Как перемещают?</td><td>Кран, монорельс, тележка, вилочный захват; центр тяжести и точки подвеса.</td><td>Ковш должен оставаться устойчивым во всём маршруте.</td></tr><tr><td>Как наводят?</td><td>Ручное, редукторное, гидравлическое или автоматизированное кантование.</td><td>Оператору нужен контролируемый расход без рывка и опасного положения.</td></tr><tr><td>Как сохраняют тепло?</td><td>Футеровка, крышка, предварительный нагрев и длительность цикла.</td><td>Определяет фактическую температуру у последней формы.</td></tr><tr><td>Как обслуживают?</td><td>Осмотр футеровки, носка, цапф, редуктора, стопора и ограждений.</td><td>Износ не должен обнаруживаться во время заливки.</td></tr></tbody></table></div>
+
+<h2 id="prepare">Ковш и форма должны быть готовы до выпуска металла</h2><p>Ковш очищают от настылей и шлака установленным способом, осматривают футеровку, сушат и подогревают по регламенту. Температурный режим подогрева зависит от материала футеровки и конструкции; внешне сухая поверхность не подтверждает отсутствие влаги в глубине.</p><p>Формы устанавливают устойчиво, закрывают и скрепляют, очищают литниковые чаши, проверяют грузы или зажимы и освобождают путь эвакуации. В <a href="/praktikum/litie-po-lgm/">ЛГМ</a> дополнительно важны вакуумная система и состояние плёнки, в <a href="/praktikum/litie-po-vyplavlyaemym-modelyam/">ЛВМ</a> — целостность и температура оболочки, в <a href="/praktikum/litie-v-pgs/">ПГС</a> и <a href="/praktikum/hts-tehnologiya-formovki/">ХТС</a> — сборка, вентиляция и прочность формы.</p>
+<figure><img src="/praktikum/zalivka-metalla-v-formy/assets/formy-pgs-pered-zalivkoy-760.webp" srcset="/praktikum/zalivka-metalla-v-formy/assets/formy-pgs-pered-zalivkoy-760.webp 760w, /praktikum/zalivka-metalla-v-formy/assets/formy-pgs-pered-zalivkoy.webp 1400w" sizes="(max-width:760px) calc(100vw - 40px),916px" width="1400" height="933" loading="lazy" decoding="async" alt="Закрытые формы ПГС на участке перед заливкой металла"><figcaption>Формы перед заливкой: устойчивое положение, доступная чаша, идентификация партии и свободный путь ковша должны быть обеспечены заранее.</figcaption></figure>
+
+<h2 id="temperature">Температура — это цепочка измерений и потерь</h2><p>Различают температуру в печи, при выпуске, после обработки, в ковше перед первой формой и у конца маршрута. Одна цифра без места и времени измерения мало полезна. Потери зависят от массы металла, состояния ковша, площади зеркала, крышки, времени транспортировки, температуры окружающей среды и количества переливов.</p><p>Слишком холодный металл может не заполнить тонкие участки и образовать спаи. Избыточный перегрев усиливает взаимодействие с футеровкой и формой, окисление, газонасыщение и тепловую нагрузку. Диапазон задаёт технология конкретной отливки, а фактическую цепочку проверяют пробными замерами.</p>
+
+<h2 id="stream">Устойчивая струя снижает вовлечение воздуха и разрушение формы</h2><p>Ковш подводят так, чтобы свободная высота падения была разумно мала, но носок не касался формы. После начала чашу поддерживают в предусмотренном заполненном состоянии; рывки, длинная разорванная струя и многократные остановки повышают риск брызг, окисных плёнок и размыва.</p>
+<figure><img src="/praktikum/zalivka-metalla-v-formy/assets/ustoychivaya-zalivka-shema.svg" width="1400" height="820" loading="lazy" decoding="async" alt="Сравнение устойчивой короткой струи и прерывистой заливки с большой высоты"><figcaption>Принципиальная схема. Реальные сечения литников и требуемый расход рассчитывают под сплав, массу, стенку и расположение полости формы.</figcaption><p class="ui-image-zoom"><a href="/praktikum/zalivka-metalla-v-formy/assets/ustoychivaya-zalivka-shema.svg" target="_blank" rel="noopener">Открыть схему крупно</a></p></figure>
+<p>«Лить медленно» и «лить быстро» — плохие универсальные советы. Требуемый расход должен заполнить форму до потери жидкотекучести, не превысить способность литниковой системы пропускать металл и не разрушить форму. Управляют временем заливки, высотой напора и наполнением чаши, а не субъективным впечатлением.</p>
+
+<h2 id="slag">Шлак отделяют до того, как он войдёт в литниковую систему</h2><p>Поверхность металла подготавливают по принятой технологии. Носок ковша поддерживают чистым, а положение ковша выбирают так, чтобы шлаковый слой не ушёл вместе с последней порцией металла. Литниковые элементы могут задерживать часть включений, но не заменяют чистый расплав и спокойную заливку.</p><p>Для сплавов, склонных к образованию плёнок, опасно многократно переливать металл и разрушать поверхность. Любое фильтрование должно быть рассчитано: загрязнённый, неподходящий или неверно установленный фильтр способен снизить расход и вызвать недолив.</p>
+
+<h2 id="operation">Последовательность работы у формы</h2><ol><li><strong>Разрешение на заливку.</strong> Ответственный подтверждает готовность металла, формы, ковша, маршрута и персонала.</li><li><strong>Подход.</strong> Ковш перемещают без людей под грузом и без резкого раскачивания.</li><li><strong>Позиционирование.</strong> Носок совмещают с чашей; оператор видит уровень и имеет устойчивое рабочее положение.</li><li><strong>Начало.</strong> Расход наращивают управляемо, не ударяя мощной струёй по пустой чаше.</li><li><strong>Заполнение.</strong> Поддерживают заданный поток, следят за чашей, выходом газов и состоянием формы.</li><li><strong>Окончание.</strong> Не допускают ухода шлака и перелива; ковш возвращают в безопасное положение.</li><li><strong>Запись.</strong> Отмечают форму, плавку, температуру, время, продолжительность и отклонения.</li></ol>
+
+<h2 id="defects">Какие отклонения заливки отражаются на отливке</h2><div class="table-scroll"><table><thead><tr><th>Наблюдение</th><th>Возможное последствие</th><th>Что проверить</th></tr></thead><tbody><tr><td>Разрыв струи, брызги</td><td>Окисные плёнки, газовые полости, засоры</td><td>Высоту, носок, управление ковшом, заполнение чаши.</td></tr><tr><td>Длительная пауза</td><td>Спай, недолив, холодная граница</td><td>Вместимость ковша, маршрут, сечения и организацию поста.</td></tr><tr><td>Перелив чаши</td><td>Опасная зона, загрязнение формы, нестабильный напор</td><td>Обзор, расход, положение ковша и подготовку площадки.</td></tr><tr><td>Выход шлака</td><td>Неметаллические включения</td><td>Подготовку зеркала, остаток в ковше и литниковые элементы.</td></tr><tr><td>Вздутие или утечка формы</td><td>Прорыв металла, облой, смещение</td><td>Сборку, крепление, прочность, массу груза и состояние опоки.</td></tr></tbody></table></div><p>Общий алгоритм рассмотрен в статье <a href="/praktikum/defekty-otlivok/">«Дефекты отливок»</a>.</p>
+
+<h2 id="safety">Вода и расплав несовместимы</h2><p>Влага в ковше, инструменте, шихте, приямке или замкнутой полости способна мгновенно превратиться в пар и выбросить металл. Опасны также повреждённая футеровка, ненадёжный подвес, человек под ковшом, захламлённый путь, непросушенная форма, для которой технология требует сушки, перелив и попытка остановить утечку вручную.</p><div class="callout warning"><p><strong>Конкретный порядок работ устанавливает предприятие.</strong> Нужны обученный персонал, исправные краны и ковши, ограждение опасной зоны, вытяжка, сухие пути, связь между операторами, подходящие средства защиты и заранее определённые действия при отказе.</p></div>
+
+<h2 id="brief">Исходные данные для ковша и заливочного поста</h2><ul><li>сплавы, температуры и технология обработки металла;</li><li>масса на одну форму, на цикл и максимальный остаток;</li><li>число форм, расстояние, длительность маршрута и требуемый темп;</li><li>высота и доступ к чаше, габариты опок и шаг линии;</li><li>кран, монорельс или тележка, грузоподъёмность и траектория;</li><li>нужный тип выпуска и способ управления кантованием;</li><li>помещение, аспирация, площадки обслуживания и аварийный маршрут;</li><li>фото участка и схема взаимного расположения <a href="https://uralinduktor.ru/products/induktsionnye-plavilnye-pechi/">плавильных печей</a>, форм и поста.</li></ul>
+
+<h2 id="faq">Ответы инженера</h2><h3>Можно ли назначить температуру только по марке сплава?</h3><p>Нет. Нужны геометрия и масса отливки, форма, литниковая система, обработка расплава, ковш и фактические потери по маршруту.</p><h3>Как понять, что ковш слишком мал?</h3><p>Если для одной формы требуется опасно высокий уровень, нет технологического остатка, поток приходится прерывать или не хватает металла с учётом потерь, вместимость и весь маршрут пересматривают.</p><h3>Что важнее — температура или скорость?</h3><p>Они связаны. Металл должен сохранить жидкотекучесть на протяжении рассчитанного заполнения, а поток — не разрушать форму и не вовлекать лишний воздух.</p>
+<div class="project-card"><h3>Заливочный пост рассматривают вместе с плавильным участком</h3><p>Оборудование должно работать как система: печь, выпуск, ковш, транспорт, формы и вытяжка. Посмотрите <a href="https://uralinduktor.ru/proekty/">проекты</a>, <a href="https://uralinduktor.ru/products/">каталог</a> и <a href="https://uralinduktor.ru/otzyvy/">отзывы заказчиков</a>.</p></div><div class="cta"><h2>Нужно подобрать ковш или организовать заливочный участок?</h2><p>Передайте исходные данные и компоновку через раздел <a href="https://uralinduktor.ru/kontakty/">«Контакты»</a>. Мы свяжем вместимость, транспортировку, темп формовочной линии и фактический цикл плавки.</p></div>
+</article>
+ </div>  </main> <footer class="footer"> <div class="container"> <div class="footer__top"> <div class="footer__brand-block"> <a href="/" class="footer__brand"> <img src="/brand/logo-footer-white.png" alt="УралИндуктор · ООО МТПК" width="252" height="72" loading="lazy" decoding="async"> </a> <p class="footer__brand-tagline">Производство и&nbsp;поставка оборудования для&nbsp;металлургии и&nbsp;литейных производств с&nbsp;2013&nbsp;года.</p> <div class="footer__contact"> <a href="tel:+78003513401" class="footer__phone">8&nbsp;800&nbsp;351-34-01</a> <a href="tel:+73512116597" class="footer__phone">+7 (351) 211-65-97</a> <a href="mailto:info@uralinduktor.ru"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1"></rect><path d="m3 7 9 6 9-6"></path></svg>
+info@uralinduktor.ru
+</a> </div> <div class="footer__social"> <a href="https://t.me/uralinduktor" aria-label="Telegram"> <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"></path></svg> </a> <a href="https://max.ru/join/_jtaGUl05P2n89T6htH_ANJV1CDSfJXki7ftWcOb-80" aria-label="MAX"> <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <defs> <linearGradient id="maxGrad-footer" x1="0" x2="1" y1="0" y2="1"> <stop offset="0" stop-color="#3370FF"></stop> <stop offset="0.5" stop-color="#6B57F4"></stop> <stop offset="1" stop-color="#9333EA"></stop> </linearGradient> </defs> <rect width="24" height="24" rx="5.5" fill="url(#maxGrad-footer)"></rect> <path fill="#fff" d="M12 5c-3.95 0-7.15 2.84-7.15 6.35 0 1.94.97 3.67 2.5 4.85l-.95 2.42c-.16.41.29.78.67.55l3.24-1.94c.54.11 1.1.16 1.69.16 3.95 0 7.15-2.84 7.15-6.35S15.95 5 12 5z"></path> </svg> </a> </div> </div> <div class="footer__col"> <div class="footer__col-title">Основное оборудование</div> <ul> <li><a href="/products/induktsionnye-plavilnye-pechi/">Индукционные плавильные печи</a></li> <li><a href="/products/induktsionnye-nagrevateli/">Индукционные нагреватели</a></li> <li><a href="/products/drobemetnoe-oborudovanie/">Дробемётное оборудование</a></li> <li><a href="/products/sistemy-ohlazhdeniya/">Системы охлаждения</a></li> <li><a href="/products/oborudovanie-lvm/">Оборудование ЛВМ</a></li> <li><a href="/products/oborudovanie-lgm/">Оборудование ЛГМ</a></li> <li><a href="/products/linii-dlya-holodnotverdeyushhih-smesej-hts/">Линии ХТС</a></li> <li><a href="/products/oborudovanie-dlya-peschano-glinistyh-smesej-pgs/">Оборудование ПГС</a></li> <li><a href="/products/sterzhnevye-mashiny/">Стержневые и&nbsp;формовочные машины</a></li> <li><a href="/products/termoobrabotka-plavka-alyuminiya/">Термообработка и&nbsp;плавка алюминия</a></li> </ul> </div> <div class="footer__col"> <div class="footer__col-title">Допоборудование</div> <ul> <li><a href="/products/termicheskie-pechi/">Термические печи</a></li> <li><a href="/products/zapchasti/">Запчасти на&nbsp;оборудование</a></li> <li><a href="/products/vakuumnoe-oborudovanie-dlya-termoobrabotki/">Вакуумное оборудование</a></li> <li><a href="/products/stalerozlivochnye-kovshi/">Сталеразливочные ковши</a></li> </ul> </div> <div class="footer__col"> <div class="footer__col-title">Услуги</div> <ul> <li><a href="/uslugi/montazh-shefmontazh/">Монтаж и&nbsp;шефмонтаж</a></li> <li><a href="/uslugi/puskonaladka/">Пусконаладка</a></li> <li><a href="/uslugi/obuchenie-personala/">Обучение персонала</a></li> <li><a href="/uslugi/tehnicheskij-audit/">Технический аудит</a></li> <li><a href="/proizvodstvo/">Производство под&nbsp;ключ</a></li> <li><a href="/uslugi/remont-plavilnyh-pechey/">Ремонт плавильных печей</a></li> <li><a href="/uslugi/remont-drobemetov/">Ремонт дробемётов</a></li> </ul> </div> <div class="footer__col"> <div class="footer__col-title">Компания</div> <ul> <li><a href="/o-company/">О&nbsp;компании</a></li> <li><a href="/proekty/">Проекты и&nbsp;кейсы</a></li> <li><a href="/kontakty/">Контакты</a></li> <li><a href="/otzyvy/">Отзывы</a></li> <li><a href="/news/">Новости</a></li> </ul> </div> </div> <div class="footer__bottom"> <div class="footer__copyright"> <div class="footer__copyright-name">© 2013–2026 ООО «Миасская Торгово-Промышленная Компания»</div> <div class="footer__copyright-legal">ОГРН&nbsp;1137415000315 · ИНН&nbsp;7415079152</div> </div> <div class="footer__bottom-links"> <a href="/policy/">Политика конфиденциальности</a> <a href="/soglasie/">Согласие на&nbsp;обработку персональных данных</a> </div> </div> </div> </footer> <aside class="nav-drawer" aria-hidden="true" data-nav-drawer> <div class="nav-drawer__header"> <span class="nav-drawer__brand">УралИндуктор</span> <button class="nav-drawer__close" aria-label="Закрыть меню" data-nav-close>&times;</button> </div> <ul class="nav-drawer__list">  <li class="nav-drawer__item nav-drawer__item--acc"> <button class="nav-drawer__acc" type="button" data-drawer-acc aria-expanded="false">
+Каталог <span class="nav-drawer__acc-chev" aria-hidden="true"></span> </button> <div class="nav-drawer__panel"> <div class="nav-drawer__group-label">Плавка и&nbsp;обработка металлов</div> <a class="nav-drawer__sublink" href="/products/induktsionnye-plavilnye-pechi/">Индукционные плавильные печи</a> <a class="nav-drawer__sublink" href="/products/induktsionnye-nagrevateli/">Индукционные нагреватели</a> <a class="nav-drawer__sublink" href="/products/drobemetnoe-oborudovanie/">Дробемётные установки</a> <a class="nav-drawer__sublink" href="/products/sistemy-ohlazhdeniya/">Системы охлаждения</a> <div class="nav-drawer__group-label">Производственные линии</div> <a class="nav-drawer__sublink" href="/products/linii-dlya-holodnotverdeyushhih-smesej-hts/">ХТС — холодно-твердеющие смеси</a> <a class="nav-drawer__sublink" href="/products/oborudovanie-lvm/">ЛВМ — литьё по&nbsp;выплавляемым моделям</a> <a class="nav-drawer__sublink" href="/products/oborudovanie-lgm/">ЛГМ — литьё по&nbsp;газифицируемым моделям</a> <a class="nav-drawer__sublink" href="/products/oborudovanie-dlya-peschano-glinistyh-smesej-pgs/">ПГС — песчано-глинистые смеси</a> <a class="nav-drawer__sublink nav-drawer__sublink--all" href="/products/">Весь каталог&nbsp;&rarr;</a> </div> </li>  <li class="nav-drawer__item nav-drawer__item--acc"> <button class="nav-drawer__acc" type="button" data-drawer-acc aria-expanded="false">
+Услуги <span class="nav-drawer__acc-chev" aria-hidden="true"></span> </button> <div class="nav-drawer__panel"> <a class="nav-drawer__sublink" href="/uslugi/puskonaladka/">Пусконаладка</a> <a class="nav-drawer__sublink" href="/uslugi/montazh-shefmontazh/">Монтаж и&nbsp;шефмонтаж</a> <a class="nav-drawer__sublink" href="/uslugi/obuchenie-personala/">Обучение персонала</a> <a class="nav-drawer__sublink" href="/uslugi/remont-plavilnyh-pechey/">Ремонт плавильных печей</a> <a class="nav-drawer__sublink" href="/uslugi/remont-drobemetov/">Ремонт дробемётов</a> <a class="nav-drawer__sublink" href="/uslugi/tehnicheskij-audit/">Технический аудит</a> </div> </li> <li class="nav-drawer__item"><a class="nav-drawer__link" href="/nalichie/">Наличие</a></li> <li class="nav-drawer__item"><a class="nav-drawer__link" href="/proekty/">Проекты</a></li> <li class="nav-drawer__item"><a class="nav-drawer__link" href="/o-company/">О&nbsp;компании</a></li> <li class="nav-drawer__item"><a class="nav-drawer__link" href="/kontakty/">Контакты</a></li> <li class="nav-drawer__item"><a class="nav-drawer__link" href="/otzyvy/">Отзывы</a></li> <li class="nav-drawer__item"><a class="nav-drawer__link" href="/praktikum/">Практикум</a></li> </ul> <div class="nav-drawer__contacts"> <div class="nav-drawer__contacts-label">Связаться</div> <a href="tel:+78003513401">8&nbsp;800&nbsp;351-34-01</a> <a href="tel:+73512116597">+7 (351) 211-65-97</a> <a href="mailto:info@uralinduktor.ru">info@uralinduktor.ru</a> </div> </aside> <div class="cookie-consent" id="cookie-consent" data-consent-version="v2026.1" hidden aria-live="polite"> <div class="cookie-consent__inner"> <p class="cookie-consent__text">
+Мы&nbsp;используем файлы cookie и&nbsp;сервис веб-аналитики Яндекс&nbsp;Метрика для&nbsp;сбора
+      технических данных, обеспечения корректной работы сайта и&nbsp;анализа посещаемости.
+      Продолжая использовать сайт, вы&nbsp;соглашаетесь на&nbsp;обработку этих данных
+      в&nbsp;соответствии с&nbsp;<a href="/policy/" target="_blank" rel="noopener">Политикой обработки персональных данных</a>.
+</p> <div class="cookie-consent__actions"> <a class="cookie-consent__more" href="/policy/" target="_blank" rel="noopener">Подробнее</a> <button type="button" class="cookie-consent__accept" id="cookie-accept">Принять</button> </div> </div> </div>  <script>
+(function () {
+  var KEY = 'ui_cookie_consent';
+  var el = document.getElementById('cookie-consent');
+  if (!el) return;
+  // Во фрейме (инструменты Яндекс.Метрики: карты/Вебвизор) плашку не показываем —
+  // она бы перекрывала страницу в предпросмотре, а согласие тут не требуется.
+  try { if (window.top !== window.self) return; } catch (e) {}
+  var version = el.getAttribute('data-consent-version') || 'v1';
+
+  function stored() {
+    try { return localStorage.getItem(KEY); } catch (e) {}
+    // fallback cookie
+    var m = document.cookie.match(/(?:^|; )ui_cookie_consent=([^;]*)/);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  // Уже согласились — баннер не показываем (аналитику поднимет Analytics.astro сам).
+  if (stored()) return;
+
+  el.hidden = false;
+
+  var btn = document.getElementById('cookie-accept');
+  if (btn) btn.addEventListener('click', function () {
+    var val = '1|' + version + '|' + new Date().toISOString();
+    try { localStorage.setItem(KEY, val); } catch (e) {}
+    try {
+      var d = new Date(); d.setTime(d.getTime() + 365 * 864e5);
+      document.cookie = KEY + '=' + encodeURIComponent(val) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+    } catch (e) {}
+    el.hidden = true;
+    // Запускаем аналитику (Метрика/Roistat/Top.Mail) после согласия.
+    try { window.dispatchEvent(new Event('cookie-consent-accepted')); } catch (e) {}
+  });
+})();
+</script> <!-- Cache-bust версии: nginx отдаёт /js/*.js и /css/*.css с max-age=7д,
+       при правке файла поднимай ?v= — иначе пользователи получат старую версию. --> <script src="/js/mobile-nav.js?v=20260601" defer></script> <script src="/js/phone-mask.js?v=20260601" defer></script> <script src="/js/forms.js?v=20260929-3" defer></script> <!-- Единое правило скролла к форме заявки (#leadgen/#contacts → к самой форме). --> <script src="/js/scroll-to-form.js?v=20260608" defer></script> <!-- ТЗ-2 п.3: «Запросить цену» — дозапись позиции в форму + скролл. --> <script src="/js/quote-form.js?v=20260607" defer></script> <script src="/js/stock-badges.js?v=20260601" defer></script> <!-- Отметка «В наличии» внутри карточки товара (.phero): бейдж на обложке +
+       срок отгрузки от 1 дня. Активируется только на страницах товара. --> <script src="/js/stock-product.js?v=20260623-1" defer></script> <!-- Бейдж «Сделано в России» на обложках печей/дробемёта/охлаждения (кроме транзисторных и чиллеров). --> <script src="/js/made-badges.js?v=20260623-1" defer></script> <!-- Spec-оглавление (scrollspy): активируется только если на странице есть блок .spec (карточка товара). --> <script src="/js/spec-tabs.js?v=20260608-2" defer></script> <!-- Catalog filter: активируется только если на странице есть [data-filter-form]. --> <script src="/js/catalog-filter.js?v=20260601-3" defer></script> <script type="module">(function(){const s=document.querySelector(".header-shell");if(!s)return;let e=!1;const t=()=>{s.classList.toggle("is-scrolled",window.scrollY>8),e=!1};window.addEventListener("scroll",()=>{e||(requestAnimationFrame(t),e=!0)},{passive:!0}),t()})();</script> <!-- Поиск по сайту (Pagefind). Индекс /_pagefind/ создаётся командой
+       `npx pagefind --site dist` после сборки. Модалка открывается по «лупе». --> <div class="search-modal" id="search-modal" hidden> <div class="search-modal__backdrop" data-search-close></div> <div class="search-modal__panel" role="dialog" aria-modal="true" aria-label="Поиск по сайту"> <div class="ss-searchbar"> <svg class="ss-searchbar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg> <input type="text" id="ss-input" class="ss-searchbar__input" placeholder="Поиск оборудования…" autocomplete="off" aria-label="Поиск по сайту"> <button class="ss-searchbar__clear" type="button" aria-label="Закрыть поиск" data-search-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6l-12 12"></path></svg></button> </div> <div class="ss-results" id="ss-results" hidden> <div class="ss-count" id="ss-count" hidden></div> <div class="ss-list" id="ss-list"></div> <div class="ss-empty" id="ss-empty" hidden></div> </div> </div> </div> <!-- Pagefind lazy loader (T-PERF-5): CSS + JS подгружаются динамически
+       при первом клике на кнопку поиска. До этого -35 KB JS и -7 KB CSS
+       из критического пути на каждой из 513 страниц. --> <script>
+    (function () {
+      var modal = document.getElementById('search-modal');
+      if (!modal) return;
+      var input = document.getElementById('ss-input');
+      var results = document.getElementById('ss-results');
+      var list = document.getElementById('ss-list');
+      var countEl = document.getElementById('ss-count');
+      var emptyEl = document.getElementById('ss-empty');
+      var pf = null, loadingPromise = null, timer = null, lastQuery = '';
+
+      function loadPagefind() {
+        if (pf) return Promise.resolve(pf);
+        if (loadingPromise) return loadingPromise;
+        loadingPromise = import('/_pagefind/pagefind.js').then(function (mod) {
+          pf = mod; if (pf.init) { try { pf.init(); } catch (e) {} } return pf;
+        });
+        return loadingPromise;
+      }
+      function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+      function renderData(items, total, q) {
+        if (q !== lastQuery) return;
+        results.hidden = false; countEl.hidden = false;
+        countEl.innerHTML = 'Найдено: <b>' + total + '</b>';
+        if (!total) { list.innerHTML = ''; emptyEl.hidden = false; emptyEl.textContent = 'Ничего не найдено по запросу «' + q + '»'; return; }
+        emptyEl.hidden = true;
+        list.innerHTML = items.map(function (d) {
+          var img = d.meta && d.meta.image;
+          var cover = img ? '<div class="ss-card__cover" style="background-image:url(\'' + esc(img) + '\')"></div>' : '';
+          var title = esc((d.meta && d.meta.title) || d.url);
+          var ex = d.excerpt || '';
+          return '<a class="ss-card" href="' + esc(d.url) + '"><div class="ss-card__body">' +
+            '<div class="ss-card__title">' + title + '</div>' +
+            '<div class="ss-card__excerpt">' + ex + '</div>' +
+            '<span class="ss-card__more">Подробнее →</span></div>' + cover + '</a>';
+        }).join('');
+      }
+
+      function relevant(d, q) {
+        var words = q.toLowerCase().split(/\s+/).filter(function (w) { return w.length >= 2; });
+        if (!words.length) return true;
+        var hay = (((d.meta && d.meta.title) || '') + ' ' + (d.excerpt || '').replace(/<[^>]+>/g, '')).toLowerCase();
+        return words.every(function (w) { var stem = w.length >= 3 ? w.slice(0, 3) : w; return hay.indexOf(stem) !== -1; });
+      }
+      function doSearch(q) {
+        lastQuery = q;
+        if (!q || q.trim().length < 2) { results.hidden = true; countEl.hidden = true; emptyEl.hidden = true; list.innerHTML = ''; return; }
+        loadPagefind().then(function () { return pf.search(q); }).then(function (res) {
+          if (q !== lastQuery) return;
+          Promise.all(res.results.slice(0, 40).map(function (r) { return r.data(); })).then(function (all) {
+            if (q !== lastQuery) return;
+            var items = all.filter(function (d) { return relevant(d, q); });
+            renderData(items, items.length, q);
+          });
+        }).catch(function () {});
+      }
+
+      if (input) input.addEventListener('input', function () { var q = input.value; clearTimeout(timer); timer = setTimeout(function () { doSearch(q); }, 160); });
+
+      function open() { modal.hidden = false; document.documentElement.style.overflow = 'hidden'; loadPagefind(); setTimeout(function () { if (input) input.focus(); }, 60); }
+      function close() { modal.hidden = true; document.documentElement.style.overflow = ''; }
+      document.querySelectorAll('[data-search-open]').forEach(function (b) { b.addEventListener('click', open); });
+      modal.querySelectorAll('[data-search-close]').forEach(function (b) { b.addEventListener('click', close); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) close(); });
+    })();
+  </script> <!-- Сторонние аналитические скрипты (Roistat, Яндекс.Метрика) — в конце body --> <!-- Аналитика откладывается до idle / first interaction (T-PERF-12) --><script>
+(function(){
+  var started = false;
+  function startAnalytics(){
+    if (started) return;
+    started = true;
+
+    /* ===== Яндекс.Метрика ===== */
+    (function(m,e,t,r,i,k,a){
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,
+      a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js', 'ym');
+    [25228307, 112991420].forEach(function(counterId){
+      ym(counterId, 'init', {
+        webvisor: true, clickmap: true,
+        referrer: document.referrer, url: location.href,
+        accurateTrackBounce: true, trackLinks: true
+      });
+    });
+    // Коллтрекинг B242YA ждёт этого события и запрашивает Client ID только
+    // после старта Метрики. Без синхронизации он успевает завершиться ошибкой
+    // `Metrika API is not ready` до загрузки tag.js.
+    try {
+      window.dispatchEvent(new CustomEvent('ui-analytics-started', {
+        detail: { counters: [25228307, 112991420] }
+      }));
+    } catch (e) {}
+
+    /* ===== Top.Mail.Ru (VK) — counter 3784620 ===== */
+    var _tmr = window._tmr || (window._tmr = []);
+    _tmr.push({id: "3784620", type: "pageView", start: (new Date()).getTime()});
+    (function (d, w, id) {
+      if (d.getElementById(id)) return;
+      var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+      ts.src = "https://top-fwz1.mail.ru/js/code.js";
+      var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
+      if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+    })(document, window, "tmr-code");
+  }
+
+  /* Cookie-согласие: до нажатия «Принять» аналитику НЕ запускаем (152-ФЗ /
+     GDPR-подход). Флаг ставит CookieConsent.astro. */
+  function hasConsent(){
+    try { if (localStorage.getItem('ui_cookie_consent')) return true; } catch(e){}
+    return /(?:^|; )ui_cookie_consent=/.test(document.cookie);
+  }
+  /* Отложенный старт: requestIdleCallback (Chrome/Firefox/Edge) или
+     setTimeout fallback на 2.5 сек для Safari/старых, + запуск по первому
+     взаимодействию, чтобы не терять hit от активного пользователя. */
+  function armStart(){
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(startAnalytics, { timeout: 4000 });
+    } else {
+      setTimeout(startAnalytics, 2500);
+    }
+    ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){
+      window.addEventListener(ev, startAnalytics, { once: true, passive: true });
+    });
+  }
+
+  /* Страница во фрейме = инструменты Яндекс.Метрики (карты ссылок/кликов/
+     скроллинга, Вебвизор, «Взаимодействие с сайтом»). Счётчик нужен сразу,
+     иначе Метрика пишет «код счётчика не установлен». CSP frame-ancestors
+     пускает во фрейм только Метрику — сторонних сайтов тут быть не может. */
+  function inFrame(){ try { return window.top !== window.self; } catch(e){ return true; } }
+
+  if (inFrame()) {
+    startAnalytics();
+  } else if (hasConsent()) {
+    armStart();
+  } else {
+    /* Согласия ещё нет — ждём «Принять» в cookie-баннере. */
+    window.addEventListener('cookie-consent-accepted', startAnalytics);
+  }
+})();
+</script> <!-- Битрикс24 call tracker подключается в BaseLayout.astro строго перед </body>. --><noscript><div><img src="https://mc.yandex.ru/watch/25228307" style="position:absolute; left:-9999px;" alt=""></div></noscript><noscript><div><img src="https://mc.yandex.ru/watch/112991420" style="position:absolute; left:-9999px;" alt=""></div></noscript><noscript><div><img src="https://top-fwz1.mail.ru/counter?id=3784620;js=na" style="position:absolute;left:-9999px;" alt="Top.Mail.Ru"></div></noscript> <!-- Битрикс24 — сквозная аналитика / call tracker (портал b1785973).
+       ВАЖНО: строго перед </body> (требование проверки «готовности сайта» в
+       кабинете Битрикс — в <head> их система код НЕ находит). Грузится сразу,
+       чтобы подмена номера работала до первого действия пользователя.
+       CSP: script/connect/img/frame *.bitrix24.ru (call.tracker.ed.js создаёт
+       iframe к порталу uinduktor.bitrix24.ru). --> <script>
+    (function(w,d,u){
+      var s=d.createElement('script');s.async=true;s.src=u+'?'+(Date.now()/60000|0);
+      var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
+    })(window,document,'https://cdn-ru.bitrix24.ru/b1785973/crm/tag/call.tracker.js');
+  </script> </body> </html>

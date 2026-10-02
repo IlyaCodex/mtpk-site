@@ -309,6 +309,10 @@ const cls = (name: string) =>
       <div class="nav__item"><a href="/o-company/" class={cls('o-kompanii')}>О компании</a></div>
       <div class="nav__item"><a href="/kontakty/" class={cls('kontakty')}>Контакты</a></div>
       <div class="nav__item"><a href="/otzyvy/" class={cls('otzyvy')}>Отзывы</a></div>
+      {/* Раздел «Практикум» — статьи по литейным и термическим процессам.
+          Собирается отдельно и лежит в public/praktikum/; пункт выделен рамкой
+          (стиль в /css/praktikum-nav-v26.css). */}
+      <div class="nav__item"><a href="/praktikum/" class={cls('praktikum') + ' nav__link--praktikum'}>Практикум</a></div>
     </nav>
 
     <div class="header__actions">
