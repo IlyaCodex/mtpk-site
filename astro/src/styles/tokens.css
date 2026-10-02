@@ -1,6 +1,6 @@
 /* ============================================================
-   МТПК / Уралиндуктор — Design Tokens
-   Anchor: «DMG MORI Industrial × Уралиндуктор Brand»
+   МТПК / УралИндуктор — Design Tokens
+   Anchor: «DMG MORI Industrial × УралИндуктор Brand»
 
    Compiled by my-uxui-designer-websaas-v1
    Date: 2026-05-10
@@ -13,7 +13,7 @@
    ============================================================ */
 
 :root {
-  /* ---- Brand: Teal (Уралиндуктор корпоративный тёмно-бирюзовый) ---- */
+  /* ---- Brand: Teal (УралИндуктор корпоративный тёмно-бирюзовый) ---- */
   --teal-50:  #F0F5F8;
   --teal-100: #DDE9EE;
   --teal-200: #BAD2DC;
@@ -26,7 +26,7 @@
   --teal-900: #122F3D;
   --teal-950: #0A1C25;
 
-  /* ---- Brand: Living Green (Уралиндуктор — индукция/готовность) ---- */
+  /* ---- Brand: Living Green (УралИндуктор — индукция/готовность) ---- */
   --green-50:  #F1F9EE;
   --green-100: #DEF0D7;
   --green-200: #BFE2B1;
@@ -63,7 +63,7 @@
   --blue-500:   #2563EB;
 
   /* ---- Typography — font families ----
-     v1 anchor: DMG MORI Industrial × Уралиндуктор Brand
+     v1 anchor: DMG MORI Industrial × УралИндуктор Brand
      Inter осознанно оставлен (не Barlow) — пользовательский выбор после ревью */
   --font-display: "Inter", "Helvetica Neue", Arial, sans-serif;
   --font-body:    "Inter", "Helvetica Neue", Arial, sans-serif;
