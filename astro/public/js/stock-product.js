@@ -41,14 +41,22 @@
 
       // 2) Бейдж «В наличии» поверх обложки (снизу-слева, как в каталоге).
       var cover = phero.querySelector('.phero__main');
-      if (cover && !cover.querySelector('.pcard__stock-badge')) {
-        if (getComputedStyle(cover).position === 'static') cover.style.position = 'relative';
+      if (cover && !phero.querySelector('.pcard__stock-badge')) {
+        // Keep the stock link a sibling of the lightbox button, never a
+        // focusable link inside another interactive control.
+        var badgeHost = cover.parentElement;
+        if (!badgeHost.classList.contains('phero__stage')) {
+          badgeHost = document.createElement('div');
+          badgeHost.className = 'audit-stock-cover';
+          cover.parentNode.insertBefore(badgeHost, cover);
+          badgeHost.appendChild(cover);
+        }
         var badge = document.createElement('a');
         badge.className = 'pcard__stock-badge';
         badge.href = '/nalichie/';
         badge.setAttribute('aria-label', 'В наличии на складе');
         badge.textContent = 'В наличии';
-        cover.appendChild(badge);
+        badgeHost.appendChild(badge);
       }
 
       phero.setAttribute('data-stock', 'true');

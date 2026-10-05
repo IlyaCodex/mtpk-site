@@ -17,7 +17,7 @@
   'use strict';
 
   function formIn(section) {
-    return section ? section.querySelector('form.js-lead-form') : null;
+    return section ? (section.matches('form.js-lead-form') ? section : section.querySelector('form.js-lead-form')) : null;
   }
 
   // Высота sticky-шапки + небольшой зазор, чтобы карточка формы не липла к шапке.
@@ -31,7 +31,10 @@
     var form = formIn(section);
     if (!form) return false;
     var y = form.getBoundingClientRect().top + window.pageYOffset - headerOffset();
-    window.scrollTo({ top: y < 0 ? 0 : y, behavior: 'smooth' });
+    var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: y < 0 ? 0 : y, behavior: reducedMotion ? 'instant' : 'smooth' });
+    var firstField = form.querySelector('input:not([type="hidden"]):not([aria-hidden="true"]),textarea,select,button');
+    if (firstField) firstField.focus({ preventScroll: true });
     return true;
   }
   window.uiScrollToForm = scrollToForm;

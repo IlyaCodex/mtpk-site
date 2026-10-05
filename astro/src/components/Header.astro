@@ -330,7 +330,12 @@ const cls = (name: string) =>
         <input type="text" name="hp_token" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
         <input type="hidden" name="form_ts" class="js-form-ts">
         <input type="hidden" name="source" class="js-form-source">
-        <input type="hidden" name="consent" value="v2026.1-implicit">
+        {/* Согласие стало видимым и обязательным (правка коллеги 03.10.2026):
+            скрытое поле не даёт пользователю выбора, это требование 152-ФЗ. */}
+        <label class="header-quick-form__consent">
+          <input type="checkbox" name="consent" value="v2026.1" required>
+          <span>Даю <a href="/soglasie/" target="_blank" rel="noopener">согласие</a> на обработку данных по <a href="/policy/" target="_blank" rel="noopener">политике</a></span>
+        </label>
         <input type="tel" name="phone" class="header-quick-form__input"
                placeholder="+7 (___) ___-__-__" required autocomplete="tel"
                aria-label="Контактный телефон для обратного звонка">

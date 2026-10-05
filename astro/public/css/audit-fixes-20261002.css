@@ -1,0 +1,123 @@
+/* Targeted corrections verified against the live 2026-10-02 audit. */
+body .header-quick-form {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) auto;
+  align-items: center;
+}
+body .header-quick-form__consent {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px 8px;
+  max-width: 250px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-secondary, #5a6166);
+  cursor: pointer;
+}
+body .header-quick-form__consent input { flex: 0 0 auto; margin: 2px 0 0; }
+body .header-quick-form__consent a { text-decoration: underline; }
+body .header-quick-form .js-form-status { grid-column: 1 / -1; max-width: 250px; }
+body .header-quick-form__hint {
+  position: static;
+  grid-column: 1 / -1;
+  margin: 2px 8px;
+  color: #3b623a;
+  opacity: 1;
+}
+@media (min-width: 1025px) {
+  body .header .container.header__inner { height: auto; min-height: 72px; padding-block: 6px; }
+}
+body .header-quick-form input:focus-visible,
+body .header-quick-form a:focus-visible { outline: 2px solid #267221; outline-offset: 2px; }
+@media (max-width: 1024px) { body .header-quick-form { display: none; } }
+@media (max-width: 360px) {
+  body .header .container.header__inner { padding-inline: 12px; gap: 8px; }
+  body .header .header__brand { min-width: 0; flex: 1 1 auto; max-width: 150px; }
+  body .header .header__brand img { width: 100%; max-width: 150px; height: auto; max-height: 42px; object-fit: contain; }
+  body .header .header__actions { flex: 0 0 auto; gap: 8px; }
+  body .cases__head-btn { max-width: 100%; min-width: 0; white-space: normal; padding-inline: 12px; }
+  body .stock-aspect__list li { flex-wrap: wrap; }
+  body .scope__grid { grid-template-columns: minmax(0, 1fr); padding-left: 0; }
+  body .scope-item { min-width: 0; padding-inline: 12px; gap: 12px; }
+  body .scope-item__text { min-width: 0; overflow-wrap: anywhere; }
+}
+/* Блок стоит последним в <main>. На страницах запчастей фон за пределами
+   обёртки .zp тёмный, поэтому своя подложка и свои цвета — иначе текст
+   и ссылки сливаются с фоном. */
+.audit-related-links {
+  margin-block: 0;
+  padding: 24px 28px 32px;
+  border-radius: 12px;
+  background: #fff;
+  color: #18181b;
+}
+.audit-related-links h2 { font-size: 24px; margin: 0 0 12px; }
+.audit-related-links ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin: 0;
+  padding-left: 20px;
+}
+.audit-related-links a { color: #176e6e; text-decoration: underline; }
+label:has(> .audit-file-input) { position: relative; }
+body input.audit-file-input {
+  display: block !important;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+label:has(> .audit-file-input:focus-visible) {
+  outline: 3px solid #267221;
+  outline-offset: 3px;
+}
+.js-form-status:focus-visible { outline: 2px solid #267221; outline-offset: 3px; }
+/* White text on the original bright green failed WCAG AA at small sizes. */
+body .btn--primary,
+body .btn--green,
+body .form__submit,
+body .header-quick-form__btn,
+body #cookie-accept { background-color: #2c792c; border-color: #2c792c; color: #fff; }
+body .btn--primary:hover,
+body .btn--green:hover,
+body .form__submit:hover,
+body .header-quick-form__btn:hover,
+body #cookie-accept:hover { background-color: #236623; border-color: #236623; }
+body .footer__copyright-legal { color: #9da8ad; }
+body .nav__link--praktikum { color: #2c792c; border-color: #2c792c; }
+body .ss-card__more { color: #2c792c; }
+body .pcard__stock-badge { background-color: #2c792c; color: #fff; min-height: 28px; }
+/* Forms have both light and dark templates: give the small file hint its own
+   explicit surface instead of assuming the surrounding form is dark. */
+body .leadgen .form__hint {
+  color: #52525b;
+  background-color: #fff;
+  padding: 2px 4px;
+  border-radius: 2px;
+  display: inline-block;
+  max-width: 100%;
+}
+body .pr-kicker, body .consider-item__num { color: #2c792c; }
+body .pr-code, body .pr-record-name small, body #pr-page { color: #58675a; }
+body .ui-case .ui-eyebrow { color: #2c7024; }
+body .ui-case .ui-fact small { color: #60606a; }
+body .news-article a { color: #176e6e; }
+body .hub-cta#question p a,
+body .section > .container > p > a[href="/products/zapchasti/futerovochnye-smesi/"] { color: #b7e4b2; }
+.cdoc__scroll:focus-visible { outline: 3px solid #267221; outline-offset: 3px; }
+.audit-stock-cover { position: relative; min-width: 0; }
+.audit-stock-cover > .phero__main { width: 100%; }
+.audit-search-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}

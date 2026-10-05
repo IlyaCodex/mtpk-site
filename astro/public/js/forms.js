@@ -14,9 +14,8 @@
   if (!forms.length) return;
 
   function getCookie(name) {
-    var m = document.cookie.match(
-      new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)')
-    );
+    var escaped = name.replace(/[.*+?^$(){}|[\]\\]/g, '\\$&');
+    var m = document.cookie.match(new RegExp('(?:^|; )' + escaped + '=([^;]*)'));
     if (!m) return '';
     try { return decodeURIComponent(m[1]); } catch (e) { return ''; }
   }
@@ -80,73 +79,8 @@
   }
   getMarketing(); // зафиксировать первое касание сразу при загрузке страницы
 
-  // ── Коллтрекинг uibusiness / AImarketing ───────────────────────
-  // На части страниц может ещё находиться старая ранняя инициализация B242YA,
-  // которая выполнялась до готовности Метрики. Здесь есть общий страховочный
-  // запуск: после получения Client ID счётчика uibusiness загружаем свежий
-  // экземпляр B242YA и запрашиваем номер только из пула aimarketing.
-  function startAIMarketingCallTracking() {
-    var marketing = getMarketing();
-    if (!/^AImarketing_/i.test(String(marketing.utm_campaign || '')) ||
-        window.__uiAIMarketingCallTrackingStarted ||
-        typeof window.ym !== 'function') return false;
-    try {
-      window.ym(YM_UIBUSINESS_COUNTER, 'getClientID', function (clientId) {
-        if (!clientId || window.__uiAIMarketingCallTrackingStarted) return;
-
-        document.querySelectorAll('a[href="tel:+73512116597"]').forEach(function (link) {
-          link.classList.remove('b242ya-call-tracker');
-          if (link.parentElement && link.parentElement.classList.contains('b242ya-call-tracker')) return;
-          var wrapper = document.createElement('span');
-          wrapper.className = 'b242ya-call-tracker';
-          wrapper.style.display = 'contents';
-          link.parentNode.insertBefore(wrapper, link);
-          wrapper.appendChild(link);
-        });
-
-        function initialize() {
-          if (window.__uiAIMarketingCallTrackingStarted ||
-              typeof window.B242YAInit !== 'function') return;
-          window.__uiAIMarketingCallTrackingStarted = true;
-          window.B242YAInit({
-            portal: 'https://uinduktor.bitrix24.ru/',
-            pid: '6de41eb1d932b12cd4ec47ddc85ac1df',
-            yaCounterId: YM_UIBUSINESS_COUNTER,
-            callTrackingPoolName: 'aimarketing'
-          });
-        }
-
-        if (typeof window.B242YAInit === 'function') {
-          initialize();
-          return;
-        }
-        if (document.getElementById('b242ya-script-aimarketing')) return;
-        var script = document.createElement('script');
-        script.id = 'b242ya-script-aimarketing';
-        script.async = true;
-        script.src = 'https://67p.b242ya.ru/static/js/b242ya.js?aimarketing-' +
-          Math.floor(Date.now() / 60000);
-        script.addEventListener('load', initialize, { once: true });
-        document.head.appendChild(script);
-      });
-      return true;
-    } catch (e) { return false; }
-  }
-
-  window.addEventListener('ui-analytics-started', startAIMarketingCallTracking);
-  window.addEventListener('cookie-consent-accepted', function () {
-    setTimeout(startAIMarketingCallTracking, 500);
-  });
-  // Старые HTML-страницы события ui-analytics-started не отправляют, поэтому
-  // коротко ждём отложенный старт Метрики и прекращаем опрос после 15 секунд.
-  var callTrackingAttempt = 0;
-  var callTrackingTimer = setInterval(function () {
-    callTrackingAttempt += 1;
-    startAIMarketingCallTracking();
-    if (window.__uiAIMarketingCallTrackingStarted || callTrackingAttempt >= 15) {
-      clearInterval(callTrackingTimer);
-    }
-  }, 1000);
+  // Динамическая подмена B242YA отключена по запросу владельца.
+  // Здесь остаются только поля атрибуции самих заявок.
 
   // ── Сквозная аналитика Битрикс24 ──────────────────────────────────
   // Полный TRACE берём через официальный API трекера Битрикс24. Cookie
@@ -227,7 +161,23 @@
     } catch (e) {}
   }
 
-  forms.forEach(function (form) {
+  forms.forEach(function (form, formIndex) {
+    var submitting = false;
+    var requestId = '';
+    var requestFingerprint = '';
+    var goalReceipt = '';
+    var loadedAt = Date.now();
+    var formStatus = form.querySelector('.js-form-status');
+    if (formStatus && typeof formStatus.setAttribute === 'function') {
+      if (!formStatus.id) formStatus.id = 'ui-form-status-' + formIndex;
+      formStatus.setAttribute('role', 'status');
+      formStatus.setAttribute('aria-live', 'polite');
+      var phoneField = form.querySelector('[name="phone"]');
+      if (phoneField) {
+        var describedBy = phoneField.getAttribute('aria-describedby') || '';
+        phoneField.setAttribute('aria-describedby', (describedBy + ' ' + formStatus.id).trim());
+      }
+    }
     // Проставляем timestamp загрузки формы (для time-check на бэке)
     var tsField = form.querySelector('.js-form-ts');
     if (tsField) tsField.value = String(Date.now());
@@ -278,6 +228,7 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (submitting) return;
 
       var submitBtn = form.querySelector('[type="submit"]');
       var status = form.querySelector('.js-form-status');
@@ -291,12 +242,30 @@
       // phone обязателен — дополнительная проверка (минимум 6 цифр)
       var phone = form.querySelector('[name="phone"]');
       if (phone && phone.value.replace(/\D/g, '').length < 6) {
+        phone.setAttribute('aria-invalid', 'true');
         showStatus(status, 'error', 'Укажите корректный телефон');
         if (phone.focus) phone.focus();
         return;
       }
+      if (phone) phone.removeAttribute('aria-invalid');
 
       var fd = new FormData(form); // файл «Прикрепить КП» уходит вместе с остальными полями
+      var fingerprint = ['phone', 'name', 'email', 'task', 'message', 'part', 'model', 'quantity', 'source', 'consent'].map(function (key) {
+        return String(fd.get(key) || '');
+      }).join('\n');
+      var attached = fileInput && fileInput.files && fileInput.files[0];
+      if (attached) fingerprint += '\n' + attached.name + ':' + attached.size + ':' + attached.lastModified;
+      if (!requestId || fingerprint !== requestFingerprint) {
+        if (!window.crypto || !window.crypto.getRandomValues) {
+          showStatus(status, 'error', 'Браузер не поддерживает защищённую отправку. Позвоните: +7 (351) 211-65-97');
+          return;
+        }
+        var bytes = new Uint8Array(16);
+        window.crypto.getRandomValues(bytes);
+        requestId = Array.prototype.map.call(bytes, function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+        requestFingerprint = fingerprint;
+      }
+      fd.set('request_id', requestId);
       // маркетинговые метки (utm_*, yclid, gclid, fbclid, referrer, landing_url)
       var mk = getMarketing();
       Object.keys(mk).forEach(function (k) { if (mk[k]) fd.append(k, mk[k]); });
@@ -307,18 +276,48 @@
         submitBtn.innerHTML = 'Отправляем…';
       }
       showStatus(status, 'pending', '');
-
-      fetch(ENDPOINT, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
-        .then(function (r) { return r.json().catch(function () { return { ok: r.ok, message: r.ok ? 'Заявка отправлена' : 'Ошибка отправки' }; }); })
+      submitting = true;
+      form.setAttribute('aria-busy', 'true');
+      var controller = new AbortController();
+      var timeout = setTimeout(function () { controller.abort(); }, 65000);
+      // Автозаполнение может завершиться раньше антиспам-порога. Данные не
+      // выбрасываем: дожидаемся трёх секунд вместо ложного «успеха».
+      var waitMs = Math.min(3100, Math.max(0, 3100 - (Date.now() - loadedAt)));
+      new Promise(function (resolve) { setTimeout(resolve, waitMs); })
+        .then(function () {
+          return fetch(ENDPOINT, { method: 'POST', body: fd, signal: controller.signal,
+            headers: { 'Accept': 'application/json' } });
+        })
+        .then(function (r) {
+          if (!(r.headers.get('Content-Type') || '').toLowerCase().includes('application/json')) {
+            throw new Error('Invalid server response');
+          }
+          return r.json().then(function (data) {
+            if (!data || typeof data.ok !== 'boolean' || typeof data.message !== 'string') {
+              throw new Error('Invalid server response');
+            }
+            if (data.ok && (!r.ok || data.receipt !== requestId ||
+                ['delivered', 'queued'].indexOf(data.delivery) === -1)) {
+              throw new Error('Unconfirmed submission');
+            }
+            return data;
+          });
+        })
         .then(function (data) {
           if (data.ok) {
+            if (data.delivery === 'queued') {
+              showStatus(status, 'success', data.message);
+              if (goalReceipt !== requestId) { reachGoal(form); goalReceipt = requestId; }
+              // Не обещаем доставку в CRM до её подтверждения; остаёмся на
+              // странице с номером квитанции. Повторный клик имеет тот же ID.
+              return;
+            }
             // Успех → уводим на полноценную страницу «Спасибо» (/spasibo/).
-            // Телефон передаём в query, чтобы там показать его для проверки
-            // и предзаполнить форму, если клиент захочет исправить номер.
-            reachGoal(form);
+            // Телефон хранится только в текущей вкладке, не в URL/логах.
+            if (goalReceipt !== requestId) { reachGoal(form); goalReceipt = requestId; }
             var phoneVal = phone ? phone.value.trim() : '';
             var url = '/spasibo/';
-            if (phoneVal) url += '?phone=' + encodeURIComponent(phoneVal);
+            try { sessionStorage.setItem('ui_lead_confirmed_phone', phoneVal); } catch (e) {}
             showStatus(status, 'success', 'Заявка отправлена! Переходим…');
             window.location.assign(url);
             return; // дальше не выполняем — уходим со страницы
@@ -327,9 +326,12 @@
           }
         })
         .catch(function () {
-          showStatus(status, 'error', 'Ошибка сети. Позвоните: +7 (351) 211-65-97');
+          showStatus(status, 'error', 'Не удалось получить подтверждение отправки. Данные сохранены в форме — попробуйте ещё раз. Позвоните: +7 (351) 211-65-97');
         })
         .finally(function () {
+          clearTimeout(timeout);
+          submitting = false;
+          form.removeAttribute('aria-busy');
           if (submitBtn) {
             submitBtn.disabled = false;
             if (submitBtn.dataset.label) submitBtn.innerHTML = submitBtn.dataset.label;
@@ -346,6 +348,11 @@
     }
     el.textContent = msg;
     el.className = 'js-form-status form-status form-status--' + type;
+    el.hidden = !msg;
     el.style.display = msg ? 'block' : 'none';
+    if (type === 'error' && msg && typeof el.focus === 'function') {
+      el.setAttribute('tabindex', '-1');
+      el.focus();
+    }
   }
 })();

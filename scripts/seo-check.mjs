@@ -58,6 +58,9 @@ const rows = files.map((f) => {
       (h.match(/(?:src|href)="(\/(?:js|css)\/[^"]+\.(?:js|css))"/g) || [])
         .map((s) => s.replace(/^(?:src|href)="/, "").replace(/"$/, ""))
         .filter((u) => !u.startsWith("/css/inline-extracted/"))
+        // Хеш в самом имени файла — тоже версия: правка даёт новое имя,
+        // старое из кэша никому не помешает (/js/mango-…-6a7d1dff2fde.js).
+        .filter((u) => !/-[0-9a-f]{8,}\.(?:js|css)$/.test(u))
     )],
     url: f.slice(ROOT.length).replace(/index\.html$/, "").replace(/\\/g, "/") || "/",
     title: get(h, /<title[^>]*>([\s\S]*?)<\/title>/i),

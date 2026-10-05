@@ -560,7 +560,7 @@ const articleSchema = buildArticleSchema(body, meta, canonicalAbs, dates as any)
 const PAGE_SCRIPTS: [string, string, RegExp][] = [
   // галерея и бейджи карточки товара
   ['phero-gallery', '20260914', /class="phero__(media|main)/],
-  ['stock-product', '20260623-1', /class="phero"/],
+  ['stock-product', '20261003-a11y1', /class="phero"/],
   // «Запросить цену» — дозапись позиции в форму (карточка и плитки каталога)
   ['quote-form', '20260607', /class="(phero__title|pcard)|js-quote-btn/],
   // плитки каталога: наличие, «Сделано в России», сравнение, фильтр
@@ -581,6 +581,9 @@ const PAGE_SCRIPTS: [string, string, RegExp][] = [
   ['projects', '20260921a', /id="pr-data"|class="pr-root/],
   ['project-case', '20260921c', /class="ui-case/],
 ];
+// Якорь #leadgen уже занят, если на странице есть блок заявки — маркером
+// (<!--C:leadgen-->) или вписанный в разметку руками (главная).
+const hasLeadgenBlock = body.includes('<!--C:leadgen-->') || body.includes('id="leadgen"');
 const pageScripts: [string, string][] = PAGE_SCRIPTS
   .filter(([, , test]) => test.test(body))
   .map(([name, v]) => [name, v]);
@@ -630,6 +633,10 @@ for (let i = 0; i < parts.length; i++) {
   {segments.map((seg) => {
     if (seg.type === 'html') return <Fragment set:html={seg.content} />;
     const Comp = COMPONENTS[seg.name];
-    return Comp ? <Comp /> : null;
+    if (!Comp) return null;
+    // Если на странице есть и блок заявки, и блок предложения — у второго
+    // свой якорь, иначе получаются два id=leadgen.
+    if (seg.name === 'best-offer' && hasLeadgenBlock) return <Comp anchorId="best-offer" />;
+    return <Comp />;
   })}
 </BaseLayout>

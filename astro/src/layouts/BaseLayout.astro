@@ -127,32 +127,11 @@ const mainAttrs = index
        останутся подтверждёнными вторым. -->
   <meta name="yandex-verification" content="5cf3197708e8d0e7" />
 
-  <!-- B242YA — коллтрекинг B242YA (подмена телефона/email, портал uinduktor.bitrix24.ru).
-       В <head>, чтобы подмена срабатывала до показа контактов. CSP: *.b242ya.ru.
-       async/defer = true (28.09.2026, по замечанию аудита). Парсер скрипт и так
-       не блокировал: тег, созданный через createElement и вставленный в DOM,
-       грузится асинхронно по умолчанию — defer на такие теги не действует вовсе,
-       а async=false лишь выстраивает очередь исполнения среди динамических
-       скриптов. Браузер помечает запрос non-blocking, первая отрисовка идёт
-       раньше загрузки скрипта. Флаги выставлены явно, чтобы не возвращались. -->
-  <script is:inline>
-    // B242YA ищет номер по этому классу. Помечаем основной номер до того,
-    // как обработчики коллтрекинга начнут сканировать готовый DOM.
-    // (правка коллеги от 29.09.2026, перенесена с прода в исходники)
-    document.addEventListener('DOMContentLoaded', function () {
-      document.querySelectorAll('a[href="tel:+73512116597"]').forEach(function (link) {
-        link.classList.add('b242ya-call-tracker');
-      });
-    }, { once: true });
-    (function(w,d,u){
-      var s=d.createElement('script');s.defer=true;s.async=true;s.id='b242ya-script';s.src=u+'?'+(Date.now()/60000|0);
-      var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
-    })(window,document,'https://67p.b242ya.ru/static/js/b242ya.js');
-    var b242yaScript = document.querySelector('#b242ya-script');
-    b242yaScript.addEventListener('load', function () {
-      B242YAInit({ portal: 'https://uinduktor.bitrix24.ru/', pid: '6de41eb1d932b12cd4ec47ddc85ac1df' });
-    });
-  </script>
+  <!-- Подмена телефона B242YA отключена по решению владельца (03.10.2026,
+       правка коллеги, перенесена с прода). Вместо неё подключён коллтрекинг
+       Mango — скрипт лежит у нас, тег стоит рядом с Битрикс24 внизу страницы.
+       Класс b242ya-call-tracker на телефонных ссылках больше не нужен. -->
+  <!-- Dynamic B242YA phone substitution disabled by owner request. -->
 
   <title>{title}</title>
   {description && <meta name="description" content={description} />}
@@ -274,6 +253,9 @@ const mainAttrs = index
   {/* Оформление пункта «Практикум» в меню и контентных блоков раздела.
       Файл общий с самими страницами практикума (public/praktikum/). */}
   <link rel="stylesheet" href="/css/praktikum-nav-v26.css?v=20261002c">
+  {/* Правки доступности и форм от 02.10.2026 (пакет коллеги audit-fixes):
+      видимый чекбокс согласия в шапке, стиль поля файла, статус поиска. */}
+  <link rel="stylesheet" href="/css/audit-fixes-20261002.css?v=20261005a">
   <slot name="head" />
   <!-- Mobile-fixes + stock-badges — inline в head (T-PERF-15).
        Lighthouse показывал stock.css на хвосте критической цепочки с задержкой
@@ -298,11 +280,11 @@ const mainAttrs = index
   <!-- Общие для всех страниц: меню, маска телефона, отправка заявок и скролл
        к форме. Форма обратного звонка стоит в шапке, поэтому три последних
        нужны везде, включая 404. -->
-  <script src="/js/mobile-nav.js?v=20260601" defer></script>
+  <script src="/js/mobile-nav.js?v=20261003-a11y1" defer></script>
   <script src="/js/phone-mask.js?v=20260601" defer></script>
-  <script src="/js/forms.js?v=20260910" defer></script>
+  <script src="/js/forms.js?v=20261002-delivery1" defer></script>
   <!-- Единое правило скролла к форме заявки (#leadgen/#contacts → к самой форме). -->
-  <script src="/js/scroll-to-form.js?v=20260608" defer></script>
+  <script src="/js/scroll-to-form.js?v=20261002-fix1" defer></script>
   <!-- Остальное — только там, где на странице есть соответствующий блок.
        Список собирает [...slug].astro, см. PAGE_SCRIPTS. -->
   {pageScripts.map(([name, v]) => (
@@ -338,6 +320,9 @@ const mainAttrs = index
         <input type="text" id="ss-input" class="ss-searchbar__input" placeholder="Поиск оборудования…" autocomplete="off" aria-label="Поиск по сайту">
         <button class="ss-searchbar__clear" type="button" aria-label="Закрыть поиск" data-search-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6l-12 12"/></svg></button>
       </div>
+      {/* Живая область для скринридера: сообщает число найденного и ошибку
+          (правка доступности коллеги от 03.10.2026). */}
+      <div id="ss-status" class="audit-search-status" role="status" aria-live="polite" aria-atomic="true"></div>
       <div class="ss-results" id="ss-results" hidden>
         <div class="ss-count" id="ss-count" hidden></div>
         <div class="ss-list" id="ss-list"></div>
@@ -369,7 +354,7 @@ const mainAttrs = index
       }
       function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
-      function renderData(items, total, q) {
+      function renderData(items, total, q) { var announcement = document.getElementById('ss-status'); if (announcement && q === lastQuery) announcement.textContent = total ? 'Найдено: ' + total : 'Ничего не найдено';
         if (q !== lastQuery) return;
         results.hidden = false; countEl.hidden = false;
         countEl.innerHTML = 'Найдено: <b>' + total + '</b>';
@@ -398,22 +383,54 @@ const mainAttrs = index
         if (!q || q.trim().length < 2) { results.hidden = true; countEl.hidden = true; emptyEl.hidden = true; list.innerHTML = ''; return; }
         loadPagefind().then(function () { return pf.search(q); }).then(function (res) {
           if (q !== lastQuery) return;
-          Promise.all(res.results.slice(0, 40).map(function (r) { return r.data(); })).then(function (all) {
+          return Promise.all(res.results.slice(0, 40).map(function (r) { return r.data(); })).then(function (all) {
             if (q !== lastQuery) return;
             var items = all.filter(function (d) { return relevant(d, q); });
             renderData(items, items.length, q);
           });
-        }).catch(function () {});
+        }).catch(function () { if (q !== lastQuery) return; results.hidden = false; countEl.hidden = true; list.textContent = ''; emptyEl.hidden = false; emptyEl.textContent = 'Поиск временно недоступен. Попробуйте позже.'; var announcement = document.getElementById('ss-status'); if (announcement) announcement.textContent = emptyEl.textContent; });
       }
 
       if (input) input.addEventListener('input', function () { var q = input.value; clearTimeout(timer); timer = setTimeout(function () { doSearch(q); }, 160); });
 
-      function open() { modal.hidden = false; document.documentElement.style.overflow = 'hidden'; loadPagefind(); setTimeout(function () { if (input) input.focus(); }, 60); }
-      function close() { modal.hidden = true; document.documentElement.style.overflow = ''; }
+            var searchOpener = null, previousOverflow = '', backgroundState = [];
+      function open() {
+        if (!modal.hidden) return;
+        searchOpener = document.activeElement;
+        previousOverflow = document.documentElement.style.overflow;
+        modal.hidden = false;
+        document.documentElement.style.overflow = 'hidden';
+        backgroundState = Array.from(document.body.children).filter(function (node) {
+          return node !== modal && !node.contains(modal) && !['SCRIPT', 'STYLE'].includes(node.tagName);
+        }).map(function (node) { var state = { node: node, inert: node.inert }; node.inert = true; return state; });
+        loadPagefind().catch(function () {});
+        if (input) input.focus();
+      }
+      function close() {
+        modal.hidden = true;
+        document.documentElement.style.overflow = previousOverflow;
+        backgroundState.forEach(function (state) { state.node.inert = state.inert; });
+        backgroundState = [];
+        if (searchOpener && searchOpener.isConnected) searchOpener.focus();
+      }
       document.querySelectorAll('[data-search-open]').forEach(function (b) { b.addEventListener('click', open); });
       modal.querySelectorAll('[data-search-close]').forEach(function (b) { b.addEventListener('click', close); });
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) close(); });
-    })();
+      document.addEventListener('keydown', function (e) {
+        if (modal.hidden) return;
+        if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+        if (e.key !== 'Tab') return;
+        var focusable = Array.from(modal.querySelectorAll('a[href],button,input,select,textarea,[tabindex]')).filter(function (node) {
+          return !node.disabled && node.tabIndex >= 0 && node.getClientRects().length > 0;
+        });
+        var first = focusable[0], last = focusable[focusable.length - 1];
+        if (!first) { e.preventDefault(); return; }
+        if (e.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) {
+          e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) {
+          e.preventDefault(); first.focus();
+        }
+      });
+})();
   </script>
 
   <!-- Сторонние аналитические скрипты (Roistat, Яндекс.Метрика) — в конце body -->
@@ -431,5 +448,11 @@ const mainAttrs = index
       var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
     })(window,document,'https://cdn-ru.bitrix24.ru/b1785973/crm/tag/call.tracker.js');
   </script>
+
+  <!-- Коллтрекинг Mango Office вместо отключённого B242YA (правка коллеги
+       от 02.10.2026, перенесена с прода). Скрипт лежит у нас в /js/, а не
+       тянется со стороннего домена: имя файла содержит дату и хэш сборки,
+       поэтому кэшируется на год вместе с остальными /js/. -->
+  <script src="/js/mango-uibusiness-tracking-20261002-6a7d1dff2fde.js" defer></script>
 </body>
 </html>
