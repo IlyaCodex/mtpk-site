@@ -1064,6 +1064,16 @@ picture/
     в их карточках, на плитке хаба и в карточке раздела на /products/. Газовые пока
     остаются на общем кадре `card-kovsh-stend-sushki`. Исходник —
     `picture/products/stendy-elektricheskij-heater-source.png`.
+  - **Электрические стенды — новое фото (2026-10-05):** `card-stend-elektricheskij`
+    перезаписан фотографией Евгения (`Desktop/фото new photo/Стенды`, 1500×1200, 5:4).
+    **Приведён к 4:3 белыми полями по бокам, а не обрезкой:** рамки карточек на хабе
+    и в категории — `aspect-ratio: 4/3` с `object-fit: cover`, и любой другой формат
+    они режут (старый кадр был квадратным 1:1 — у стенда срезало верхний фланец и
+    опорное кольцо, из-за этого и пришла правка). Фон фото ровно белый, поля не видны;
+    на странице товара рамка 5:4 с `object-fit: contain` — там кадр тоже целиком.
+    Имя файла прежнее, поэтому заменилось сразу во всех 7 местах. Стало легче:
+    138 → 49 KB jpg, 51 → 30 KB webp, 1200×900. Исходник и результат —
+    `picture/products/stendy-sushki-i-nagreva-kovshej/`.
   - Подкатегории печей: `card-pech-stal.png?v=3`, `card-pech-alyuminiy.png?v=3`, `card-pech-med.png?v=3`.
   - Дробемёты (9 шт.): `product-card-shotblast.png?v=7`, `card-baraban.png?v=7`,
     `card-shveller.png?v=4`, `card-stol.png?v=4`, `card-vykatnoy.png?v=3`,
