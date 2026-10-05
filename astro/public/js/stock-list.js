@@ -158,11 +158,26 @@
     return renderFallbackCard(it);
   }
 
+  // Карточку забрали из родительской подкатегории, а там часть ссылок
+  // относительные («uik-cht-0-5/» вместо полного адреса). На /nalichie/
+  // такая ссылка разворачивалась от адреса страницы и вела на
+  // /nalichie/uik-cht-0-5/ — 404. Разворачиваем их от адреса подкатегории.
+  function absolutizeLinks(card, url) {
+    var base = String(url).replace(/[^/]+\/?$/, '');   // /products/a/b/c/ → /products/a/b/
+    var links = card.querySelectorAll('a[href]');
+    for (var i = 0; i < links.length; i++) {
+      var h = links[i].getAttribute('href');
+      if (!h || /^([a-z][a-z0-9+.-]*:|\/|#)/i.test(h)) continue;
+      links[i].setAttribute('href', base + h.replace(/^\.\//, ''));
+    }
+  }
+
   function injectCatalogCard(it) {
     var tmp = document.createElement('div');
     tmp.innerHTML = it.cardHtml.trim();
     var card = tmp.firstElementChild;
     if (!card || !card.classList || !card.classList.contains('pcard')) return null;
+    absolutizeLinks(card, it.url);
 
     // Помечаем карточку для нашего слоя — нужно для data-stock-cat (фильтр)
     card.setAttribute('data-stock', 'true');

@@ -1,7 +1,7 @@
 {
   "_generated": "autogen — не редактируй вручную. Источник: data/stock.config.json",
   "_generated_from": "data\\stock.config.json",
-  "_count": 14,
+  "_count": 12,
   "items": [
     {
       "slug": "induktsionnye-plavilnye-pechi/po-stali/ui-0-15t-160",
@@ -28,44 +28,12 @@
       "cardHtml": "<article class=\"pcard\" data-mass=\"500\" data-power=\"400\" data-metal=\"steel\">\n        <a href=\"/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-5t-400/\" class=\"pcard__cover\">\n          <span class=\"pcard__badge\">Сталь / чугун</span>\n          <img src=\"/img/pech-main-standard.jpg?v=3\" alt=\"УИ-0.5Т-400\" loading=\"lazy\">\n        </a>\n        <div class=\"pcard__body\">\n          <h3 class=\"pcard__title\"><a href=\"/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-5t-400/\">УИ-0.5Т-400</a></h3>\n          <div class=\"pcard__origin\">Производство&nbsp;Россия</div>\n          <dl class=\"pcard__specs\">\n            <div class=\"pcard__spec\"><dt>Масса плавки, сталь/чугун</dt><dd>500&nbsp;кг</dd></div>\n            <div class=\"pcard__spec\"><dt>Номинальная мощность ТПЧ</dt><dd>400&nbsp;кВт</dd></div>\n            <div class=\"pcard__spec\"><dt>Механизм наклона</dt><dd>редукторный или гидравлический</dd></div>\n            <div class=\"pcard__spec\"><dt>Питающая сеть</dt><dd>380 / 50&nbsp;В/Гц</dd></div>\n          </dl>\n          <div class=\"pcard__actions\">\n            <a href=\"#leadgen\" class=\"btn btn--primary btn--block js-quote-btn\">Запросить цену <span class=\"btn__arrow\">→</span></a>\n            <a href=\"/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-5t-400/\" class=\"pcard__more\">Подробнее о позиции <span class=\"btn__arrow\">→</span></a>\n          </div>\n        </div>\n      </article>"
     },
     {
-      "slug": "induktsionnye-plavilnye-pechi/po-stali/ui-1t-800",
-      "url": "/products/induktsionnye-plavilnye-pechi/po-stali/ui-1t-800/",
-      "title": "Индукционная печь УИ-1Т-800 для стали и чугуна на 1 т",
-      "category": "Индукционные плавильные печи",
-      "image": "/img/pech-main-gidravlika.jpg",
-      "cardHtml": "<article class=\"pcard\" data-mass=\"1000\" data-power=\"800\" data-metal=\"steel\">\n        <a href=\"/products/induktsionnye-plavilnye-pechi/po-stali/ui-1t-800/\" class=\"pcard__cover\">\n          <span class=\"pcard__badge\">Сталь / чугун</span>\n          <img src=\"/img/pech-main-standard.jpg?v=3\" alt=\"УИ-1Т-800\" loading=\"lazy\">\n        </a>\n        <div class=\"pcard__body\">\n          <h3 class=\"pcard__title\"><a href=\"/products/induktsionnye-plavilnye-pechi/po-stali/ui-1t-800/\">УИ-1Т-800</a></h3>\n          <div class=\"pcard__origin\">Производство&nbsp;Россия</div>\n          <dl class=\"pcard__specs\">\n            <div class=\"pcard__spec\"><dt>Масса плавки, сталь/чугун</dt><dd>1 000&nbsp;кг</dd></div>\n            <div class=\"pcard__spec\"><dt>Номинальная мощность ТПЧ</dt><dd>800&nbsp;кВт</dd></div>\n            <div class=\"pcard__spec\"><dt>Механизм наклона</dt><dd>редукторный или гидравлический</dd></div>\n          </dl>\n          <div class=\"pcard__actions\">\n            <a href=\"#leadgen\" class=\"btn btn--primary btn--block js-quote-btn\">Запросить цену <span class=\"btn__arrow\">→</span></a>\n            <a href=\"/products/induktsionnye-plavilnye-pechi/po-stali/ui-1t-800/\" class=\"pcard__more\">Подробнее о позиции <span class=\"btn__arrow\">→</span></a>\n          </div>\n        </div>\n      </article>"
-    },
-    {
-      "slug": "sistemy-ohlazhdeniya/gradirni/uig-20t",
-      "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-20t/",
-      "title": "Промышленная закрытая градирня УИГ-20Т (100 000 ккал/ч)",
-      "category": "Системы охлаждения",
-      "image": "/img/card-gradirni.png",
-      "cardHtml": "<article class=\"pcard\" data-power=\"low\" data-cap=\"cap-low\">\n        <a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-20t/\" class=\"pcard__cover\">\n          <span class=\"pcard__badge\">Градирня&nbsp;УИГ</span>\n          <img src=\"/img/card-gradirni.png?v=8\" alt=\"Градирня оборотного водоснабжения УИГ-20Т\" loading=\"lazy\">\n        </a>\n        <div class=\"pcard__body\">\n          <h3 class=\"pcard__title\"><a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-20t/\">Градирня УИГ-20Т</a></h3>\n          <div class=\"pcard__origin\">Производство&nbsp;Россия</div>\n          <dl class=\"pcard__specs\">\n            <div class=\"pcard__spec\"><dt>Охлаждающая способность</dt><dd>100 000&nbsp;ккал/⁠ч</dd></div>\n            <div class=\"pcard__spec\"><dt>Потребляемая мощность</dt><dd>5,5 / 7,7&nbsp;кВт</dd></div>\n            <div class=\"pcard__spec\"><dt>Габариты блока Д×Ш×В</dt><dd>1875×1160×2120&nbsp;мм</dd></div>\n            <div class=\"pcard__spec\"><dt>Масса блока теплообмена</dt><dd>500&nbsp;кг</dd></div>\n            <div class=\"pcard__spec\"><dt>Электропитание</dt><dd>380&nbsp;В, 3&nbsp;фазы, N и&nbsp;PE; 50&nbsp;Гц</dd></div>\n          </dl>\n          <div class=\"pcard__actions\">\n            <a href=\"#leadgen\" class=\"btn btn--primary btn--block js-quote-btn\">Запросить цену <span class=\"btn__arrow\">→</span></a>\n            <a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-20t/\" class=\"pcard__more\">Подробнее о позиции <span class=\"btn__arrow\">→</span></a>\n          </div>\n        </div>\n      </article>"
-    },
-    {
-      "slug": "sistemy-ohlazhdeniya/gradirni/uig-30t",
-      "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-30t/",
-      "title": "Промышленная закрытая градирня УИГ-30Т (150 000 ккал/ч)",
-      "category": "Системы охлаждения",
-      "image": "/img/card-gradirni.png",
-      "cardHtml": "<article class=\"pcard\" data-power=\"low\" data-cap=\"cap-low\">\n        <a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-30t/\" class=\"pcard__cover\">\n          <span class=\"pcard__badge\">Градирня&nbsp;УИГ</span>\n          <img src=\"/img/card-gradirni.png?v=8\" alt=\"Градирня оборотного водоснабжения УИГ-30Т\" loading=\"lazy\">\n        </a>\n        <div class=\"pcard__body\">\n          <h3 class=\"pcard__title\"><a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-30t/\">Градирня УИГ-30Т</a></h3>\n          <div class=\"pcard__origin\">Производство&nbsp;Россия</div>\n          <dl class=\"pcard__specs\">\n            <div class=\"pcard__spec\"><dt>Охлаждающая способность</dt><dd>150 000&nbsp;ккал/⁠ч</dd></div>\n            <div class=\"pcard__spec\"><dt>Потребляемая мощность</dt><dd>10,7 / 16,2&nbsp;кВт</dd></div>\n            <div class=\"pcard__spec\"><dt>Габариты блока Д×Ш×В</dt><dd>2480×1030×2120&nbsp;мм</dd></div>\n            <div class=\"pcard__spec\"><dt>Масса блока теплообмена</dt><dd>650&nbsp;кг</dd></div>\n            <div class=\"pcard__spec\"><dt>Электропитание</dt><dd>380&nbsp;В, 3&nbsp;фазы, N и&nbsp;PE; 50&nbsp;Гц</dd></div>\n          </dl>\n          <div class=\"pcard__actions\">\n            <a href=\"#leadgen\" class=\"btn btn--primary btn--block js-quote-btn\">Запросить цену <span class=\"btn__arrow\">→</span></a>\n            <a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-30t/\" class=\"pcard__more\">Подробнее о позиции <span class=\"btn__arrow\">→</span></a>\n          </div>\n        </div>\n      </article>"
-    },
-    {
       "slug": "sistemy-ohlazhdeniya/gradirni/uig-40t",
       "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-40t/",
       "title": "Промышленная закрытая градирня УИГ-40Т (200 000 ккал/ч)",
       "category": "Системы охлаждения",
       "image": "/img/card-gradirni.png",
       "cardHtml": "<article class=\"pcard\" data-power=\"mid\" data-cap=\"cap-low\">\n        <a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-40t/\" class=\"pcard__cover\">\n          <span class=\"pcard__badge\">Градирня&nbsp;УИГ</span>\n          <img src=\"/img/card-gradirni.png?v=8\" alt=\"Градирня оборотного водоснабжения УИГ-40Т\" loading=\"lazy\">\n        </a>\n        <div class=\"pcard__body\">\n          <h3 class=\"pcard__title\"><a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-40t/\">Градирня УИГ-40Т</a></h3>\n          <div class=\"pcard__origin\">Производство&nbsp;Россия</div>\n          <dl class=\"pcard__specs\">\n            <div class=\"pcard__spec\"><dt>Охлаждающая способность</dt><dd>200 000&nbsp;ккал/⁠ч</dd></div>\n            <div class=\"pcard__spec\"><dt>Потребляемая мощность</dt><dd>10,7 / 16,2&nbsp;кВт</dd></div>\n            <div class=\"pcard__spec\"><dt>Габариты блока Д×Ш×В</dt><dd>2480×1160×2120&nbsp;мм</dd></div>\n            <div class=\"pcard__spec\"><dt>Масса блока теплообмена</dt><dd>700&nbsp;кг</dd></div>\n            <div class=\"pcard__spec\"><dt>Электропитание</dt><dd>380&nbsp;В, 3&nbsp;фазы, N и&nbsp;PE; 50&nbsp;Гц</dd></div>\n          </dl>\n          <div class=\"pcard__actions\">\n            <a href=\"#leadgen\" class=\"btn btn--primary btn--block js-quote-btn\">Запросить цену <span class=\"btn__arrow\">→</span></a>\n            <a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-40t/\" class=\"pcard__more\">Подробнее о позиции <span class=\"btn__arrow\">→</span></a>\n          </div>\n        </div>\n      </article>"
-    },
-    {
-      "slug": "sistemy-ohlazhdeniya/gradirni/uig-80t",
-      "url": "/products/sistemy-ohlazhdeniya/gradirni/uig-80t/",
-      "title": "Промышленная закрытая градирня УИГ-80Т (400 000 ккал/ч)",
-      "category": "Системы охлаждения",
-      "image": "/img/card-gradirni.png",
-      "cardHtml": "<article class=\"pcard\" data-power=\"mid\" data-cap=\"cap-mid\">\n        <a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-80t/\" class=\"pcard__cover\">\n          <span class=\"pcard__badge\">Градирня&nbsp;УИГ</span>\n          <img src=\"/img/card-gradirni.png?v=8\" alt=\"Градирня оборотного водоснабжения УИГ-80Т\" loading=\"lazy\">\n        </a>\n        <div class=\"pcard__body\">\n          <h3 class=\"pcard__title\"><a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-80t/\">Градирня УИГ-80Т</a></h3>\n          <div class=\"pcard__origin\">Производство&nbsp;Россия</div>\n          <dl class=\"pcard__specs\">\n            <div class=\"pcard__spec\"><dt>Охлаждающая способность</dt><dd>400 000&nbsp;ккал/⁠ч</dd></div>\n            <div class=\"pcard__spec\"><dt>Потребляемая мощность</dt><dd>15,7 / 23,2&nbsp;кВт</dd></div>\n            <div class=\"pcard__spec\"><dt>Габариты блока Д×Ш×В</dt><dd>2785×1160×2820&nbsp;мм</dd></div>\n            <div class=\"pcard__spec\"><dt>Масса блока теплообмена</dt><dd>950&nbsp;кг</dd></div>\n            <div class=\"pcard__spec\"><dt>Электропитание</dt><dd>380&nbsp;В, 3&nbsp;фазы, N и&nbsp;PE; 50&nbsp;Гц</dd></div>\n          </dl>\n          <div class=\"pcard__actions\">\n            <a href=\"#leadgen\" class=\"btn btn--primary btn--block js-quote-btn\">Запросить цену <span class=\"btn__arrow\">→</span></a>\n            <a href=\"/products/sistemy-ohlazhdeniya/gradirni/uig-80t/\" class=\"pcard__more\">Подробнее о позиции <span class=\"btn__arrow\">→</span></a>\n          </div>\n        </div>\n      </article>"
     },
     {
       "slug": "induktsionnye-plavilnye-pechi/tranzistornye/ui-25p",
@@ -151,6 +119,56 @@
       "title": "Запчасти для дробемётных установок",
       "category": "",
       "image": "/img/card-zap-impeller.jpg?v=2"
+    },
+    {
+      "slug": "drobemetnoe-oborudovanie/turbina-s-pryamym-privodom",
+      "url": "/products/drobemetnoe-oborudovanie/turbina-s-pryamym-privodom/",
+      "title": "Дробемётная турбина УИ-ТМ11П с прямым приводом",
+      "category": "Дробемётное оборудование",
+      "image": "/img/turbina-pryamoy-privod.png",
+      "specs": [
+        [
+          "Модель",
+          "УИ-ТМ11П"
+        ],
+        [
+          "Мощность привода, кВт",
+          "11"
+        ],
+        [
+          "Производительность по дроби, кг/мин",
+          "180"
+        ],
+        [
+          "Тип привода",
+          "Прямой"
+        ]
+      ]
+    },
+    {
+      "slug": "drobemetnoe-oborudovanie/turbina-s-pryamym-privodom",
+      "url": "/products/drobemetnoe-oborudovanie/turbina-s-pryamym-privodom/",
+      "title": "Дробемётная турбина УИ-ТМ15П с прямым приводом",
+      "category": "Дробемётное оборудование",
+      "image": "/img/turbina-pryamoy-privod.png",
+      "specs": [
+        [
+          "Модель",
+          "УИ-ТМ15П"
+        ],
+        [
+          "Мощность привода, кВт",
+          "15"
+        ],
+        [
+          "Производительность по дроби, кг/мин",
+          "250"
+        ],
+        [
+          "Тип привода",
+          "Прямой"
+        ]
+      ]
     }
   ]
 }

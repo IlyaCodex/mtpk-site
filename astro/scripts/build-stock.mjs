@@ -190,9 +190,13 @@ function main() {
     if (Array.isArray(it.specs) && it.specs.length) out.specs = it.specs
     // image в конфиге — когда первое фото страницы не каталожное
     if (typeof it.image === 'string' && it.image) out.image = it.image;
+    // title в конфиге — когда на одну страницу приходится несколько складских
+    // позиций (две модели турбин ведут на общую страницу исполнения), иначе
+    // карточки получаются с одинаковым заголовком со страницы.
+    if (typeof it.title === 'string' && it.title) out.title = it.title;
     resolved.push(out);
 
-    log(`✓ ${slug} → ${title}${card ? ' [+catalog card]' : ''}`);
+    log(`✓ ${slug} → ${out.title}${card ? ' [+catalog card]' : ''}`);
   }
 
   const payload = {
