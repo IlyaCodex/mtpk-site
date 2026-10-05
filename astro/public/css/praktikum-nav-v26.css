@@ -1,14 +1,9 @@
-.nav__link--praktikum {
-  border: 1px solid var(--green-600, #3c8e33);
-  border-radius: 6px;
-  color: var(--green-600, #3c8e33);
-  white-space: nowrap;
-}
-.nav__link--praktikum:hover,
-.nav__link--praktikum.is-active {
-  background: var(--green-600, #3c8e33);
-  color: #fff;
-}
+/* Пункт «Практикум» выглядит как остальные пункты меню. Раньше у него были
+   зелёная рамка и заливка на ховере — раздел выделялся из общего ряда
+   (замечание Евгения, 05.10.2026). Класс .nav__link--praktikum остался в
+   разметке страниц самого раздела (их шапку синхронизирует
+   scripts/sync-praktikum-chrome.py) и теперь ни на что не влияет. */
+.nav__link--praktikum { white-space: nowrap; }
 /* Постраничный CSS раздела красит подложку в #e9eeef и рисует белую
    карточку поверх. На остальных страницах сайта фон белый — убираем
    рамку, чтобы раздел не выделялся (замечание Евгения, 02.10.2026). */
