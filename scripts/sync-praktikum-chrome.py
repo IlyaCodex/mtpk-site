@@ -24,7 +24,48 @@ APPLY = '--apply' in sys.argv
 SRC = 'astro/dist/index.html'
 ROOT = 'astro/public/praktikum'
 
-MOBILE_FIXES_LINK = '<link rel="stylesheet" href="/css/mobile-fixes.css?v=20261002b">'
+MOBILE_FIXES_LINK = '<link rel="stylesheet" href="/css/mobile-fixes.css?v=20261005a">'
+
+
+def sync_css_links(html, src):
+    """Подключения CSS в разделе — те же файлы и те же версии, что на сайте.
+
+    Страницы раздела собираются отдельно, и их <link> на наши стили застывают
+    на версии, какая была в момент генерации. А `/css/` отдаётся с
+    `immutable` на год: правка файла до вернувшегося посетителя не дойдёт,
+    пока не сменится `?v=`. Отсюда расхождения вроде «на сайте меню
+    переделали, а в практикуме старое».
+
+    Берём адреса из свежесобранной главной: если такой файл в странице уже
+    подключён — обновляем версию, если нет — вставляем. mobile-fixes.css на
+    сайте инлайнится, поэтому его адрес задан константой выше.
+    """
+    # Только общие стили. Постраничные (tpl/*, inline-extracted/*) у главной
+    # свои, и в раздел их тащить незачем.
+    SHARED = ('site', 'praktikum-nav-v26', 'audit-fixes-20261002')
+    want = {}
+    for m in re.finditer(r'<link[^>]+href="(/css/([^"?]+)\.css)(\?v=[^"]*)?"[^>]*>', src):
+        if m.group(2) in SHARED:
+            want[m.group(2)] = m.group(1) + (m.group(3) or '')
+    mf = re.search(r'href="(/css/mobile-fixes\.css[^"]*)"', MOBILE_FIXES_LINK)
+    want['mobile-fixes'] = mf.group(1)
+
+    touched = []
+    for base, href in sorted(want.items()):
+        cur = re.search(r'<link[^>]+href="/css/%s\.css[^"]*"[^>]*>' % re.escape(base), html)
+        if cur:
+            fixed = re.sub(r'href="[^"]*"', 'href="%s"' % href, cur.group(0))
+            if fixed != cur.group(0):
+                html = html[:cur.start()] + fixed + html[cur.end():]
+                touched.append('версия ' + base)
+            continue
+        anchor = re.search(r'<link[^>]+href="/css/[^"]*"[^>]*>', html)
+        if anchor:
+            html = (html[:anchor.end()]
+                    + '<link rel="stylesheet" href="%s">' % href
+                    + html[anchor.end():])
+            touched.append('подключён ' + base)
+    return html, touched
 
 
 def standard_breadcrumbs(html):
@@ -84,15 +125,8 @@ def main():
         html = io.open(p, encoding='utf-8', errors='replace').read()
         new = html
         touched = []
-        # Наш mobile-fixes.css страницы раздела не подключают: на сайте он
-        # инлайнится через BaseLayout, а эти страницы собираются отдельно.
-        # Без него верхняя строка контактов не ужимается, и на 390 px
-        # мессенджеры уезжают за экран на 57 px.
-        if '/css/mobile-fixes.css' not in new:
-            m = re.search(r'<link[^>]+href="/css/praktikum-nav-v26\.css[^"]*"[^>]*>', new)
-            if m:
-                new = new[:m.end()] + MOBILE_FIXES_LINK + new[m.end():]
-                touched.append('mobile-fixes.css')
+        new, css = sync_css_links(new, src)
+        touched += css
         new, crumbs = standard_breadcrumbs(new)
         if crumbs:
             touched.append('крошки на классах сайта')

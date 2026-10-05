@@ -160,43 +160,28 @@ html { overflow-x: clip; }
  * 5. Мобильное меню (drawer): раскрываемые группы «Каталог» и «Услуги».
  *    Кнопка-аккордеон + панель подпунктов (скрыта, открывается по .is-open).
  * ------------------------------------------------------------ */
-.nav-drawer__acc {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3, 12px);
-  width: 100%;
-  background: none;
-  border: 0;
-  padding: var(--sp-4, 16px) 0;
-  font-family: var(--font-display, inherit);
-  font-size: var(--fs-lead, 18px);
-  font-weight: var(--fw-semibold, 600);
-  /* drawer тёмный → текст светлый, иначе сливается с фоном */
-  color: var(--text-inverse, #ffffff);
-  text-align: left;
-  cursor: pointer;
-}
+/* Сама кнопка-аккордеон свёрстана вместе с карточками пункта в site.css.
+   Здесь — только шеврон и раскрывающаяся панель. */
 .nav-drawer__acc-chev {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-right: 2px solid currentColor;
   border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
+  transform: rotate(-45deg);
   transition: transform var(--duration-fast, .15s) ease;
   flex: 0 0 auto;
-  margin-right: 2px;
-  opacity: .55;
+  margin-right: 3px;
+  color: var(--text-tertiary, #737373);
 }
 .nav-drawer__item--acc.is-open .nav-drawer__acc-chev {
-  transform: rotate(-135deg);
+  transform: rotate(45deg);
 }
 
 .nav-drawer__panel {
   display: none;
-  padding: 0 0 var(--sp-3, 12px) var(--sp-3, 12px);
-  border-left: 2px solid var(--border-subtle, #e5e9eb);
-  margin: 0 0 var(--sp-2, 8px) var(--sp-1, 4px);
+  padding: var(--sp-1, 4px) var(--sp-4, 16px) var(--sp-3, 12px) calc(22px + var(--sp-3, 12px) + var(--sp-4, 16px));
+  border-top: 1px solid var(--border-subtle, #e5e5e5);
+  background: var(--surface-subtle, #fafafa);
 }
 .nav-drawer__item--acc.is-open .nav-drawer__panel {
   display: block;
@@ -208,8 +193,7 @@ html { overflow-x: clip; }
   font-weight: var(--fw-bold, 700);
   letter-spacing: .06em;
   text-transform: uppercase;
-  /* приглушённый светлый — на тёмном drawer */
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-tertiary, #737373);
   margin: var(--sp-4, 16px) 0 var(--sp-2, 8px);
 }
 .nav-drawer__group-label:first-child { margin-top: var(--sp-2, 8px); }
@@ -219,17 +203,15 @@ html { overflow-x: clip; }
   padding: var(--sp-2, 8px) 0;
   font-size: var(--fs-body, 16px);
   line-height: 1.35;
-  /* читаемый светлый текст на тёмном drawer */
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--text-secondary, #525252);
   text-decoration: none;
 }
 .nav-drawer__sublink:hover,
-.nav-drawer__sublink:active { color: var(--text-inverse, #ffffff); }
+.nav-drawer__sublink:active { color: var(--text-primary, #18181b); }
 .nav-drawer__sublink--all {
   margin-top: var(--sp-3, 12px);
   font-weight: var(--fw-semibold, 600);
-  /* акцентная ссылка — светлее tiрkвы для контраста с тёмным */
-  color: var(--green-400, #6CBB54);
+  color: var(--green-700, #2F702A);
 }
 
 /* ------------------------------------------------------------

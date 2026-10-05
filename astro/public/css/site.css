@@ -2364,12 +2364,15 @@ a.contact-tizer:hover .contact-tizer__value { color: var(--text-brand); }
   background: var(--text-primary);
   transition: transform 0.2s, opacity 0.2s;
 }
+/* Мобильное меню: светлая подложка, пункты — карточками с иконкой слева
+   (переделано 05.10.2026 по референсу Евгения; было тёмное полотно со
+   строками через разделители). Открывается на ширинах до 1024px. */
 .nav-drawer {
   position: fixed; top: 0; right: 0; bottom: 0; left: 0;
-  background: var(--neutral-950);
-  color: var(--text-inverse);
+  background: var(--surface-subtle, #fafafa);
+  color: var(--text-primary);
   z-index: 9999;
-  padding: var(--sp-6) var(--sp-5);
+  padding: var(--sp-5) var(--sp-4) var(--sp-6);
   display: flex; flex-direction: column;
   opacity: 0; visibility: hidden;
   transform: translateX(20px);
@@ -2377,6 +2380,7 @@ a.contact-tizer:hover .contact-tizer__value { color: var(--text-brand); }
               transform 0.25s var(--ease-out),
               visibility 0s linear 0.25s;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 body.nav-open .nav-drawer {
   opacity: 1; visibility: visible;
@@ -2388,60 +2392,90 @@ body.nav-open .nav-drawer {
 body.nav-open { overflow: hidden; }
 .nav-drawer__header {
   display: flex; justify-content: space-between; align-items: center;
-  padding-bottom: var(--sp-5);
-  margin-bottom: var(--sp-6);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: var(--sp-4);
+  margin-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border-subtle, #e5e5e5);
 }
 .nav-drawer__brand {
   font-family: var(--font-display);
   font-size: var(--fs-h4); font-weight: var(--fw-bold);
   letter-spacing: var(--ls-h3);
-  color: var(--text-inverse);
+  color: var(--text-primary);
 }
 .nav-drawer__close {
-  background: none; border: 0; color: white;
-  font-size: 24px; cursor: pointer;
+  background: none; border: 0; color: var(--text-secondary);
+  font-size: 26px; line-height: 1; cursor: pointer;
   width: 44px; height: 44px;
   display: inline-flex; align-items: center; justify-content: center;
 }
 .nav-drawer__list {
   list-style: none; padding: 0; margin: 0;
+  display: grid; gap: var(--sp-2);
 }
-.nav-drawer__item { border-bottom: 1px solid rgba(255,255,255,0.08); }
-.nav-drawer__link {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: var(--sp-4) 0;
+/* Карточка пункта. overflow: hidden — чтобы раскрытая панель подпунктов
+   не вылезала за скруглённые углы. */
+.nav-drawer__item {
+  background: var(--surface-page, #fff);
+  border: 1px solid var(--border-subtle, #e5e5e5);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.nav-drawer__link,
+.nav-drawer__acc {
+  display: flex; align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: 52px;
+  padding: var(--sp-3) var(--sp-4);
   font-family: var(--font-display);
-  font-size: var(--fs-h4); font-weight: var(--fw-semibold);
-  color: var(--text-inverse);
+  font-size: var(--fs-body, 16px); font-weight: var(--fw-semibold);
+  color: var(--text-primary);
   text-decoration: none;
-  transition: color 0.2s;
+  text-align: left;
+  background: none; border: 0;
+  cursor: pointer;
 }
-.nav-drawer__link::after {
-  content: "\2192"; color: var(--green-400);
-  transition: transform 0.2s;
+.nav-drawer__text { flex: 1 1 auto; min-width: 0; }
+/* Иконка — Lucide, 24×24, красится currentColor. Приглушаем относительно
+   подписи, чтобы ряд читался по тексту, а не по значкам. */
+.nav-drawer__icon {
+  flex: 0 0 auto;
+  width: 22px; height: 22px;
+  color: var(--text-tertiary, #737373);
 }
-.nav-drawer__link:hover { color: var(--green-400); }
-.nav-drawer__link:hover::after { transform: translateX(4px); }
+.nav-drawer__icon svg { display: block; width: 100%; height: 100%; }
+.nav-drawer__link:hover,
+.nav-drawer__acc:hover { color: var(--green-700); }
+.nav-drawer__link:hover .nav-drawer__icon,
+.nav-drawer__acc:hover .nav-drawer__icon { color: var(--green-600); }
+.nav-drawer__link:focus-visible,
+.nav-drawer__acc:focus-visible {
+  outline: 2px solid var(--green-600); outline-offset: -2px;
+}
 .nav-drawer__contacts {
   margin-top: auto;
-  padding-top: var(--sp-6);
+  padding-top: var(--sp-5);
 }
 .nav-drawer__contacts-label {
   font-family: var(--font-display);
   font-size: var(--fs-micro); font-weight: var(--fw-bold);
   letter-spacing: var(--ls-eyebrow); text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: var(--text-tertiary);
   margin-bottom: var(--sp-3);
 }
 .nav-drawer__contacts a {
-  display: block;
+  display: flex; align-items: center; gap: var(--sp-2);
   margin-bottom: var(--sp-2);
   font-family: var(--font-display);
   font-size: var(--fs-lead); font-weight: var(--fw-semibold);
-  color: var(--text-inverse); text-decoration: none;
+  color: var(--text-primary); text-decoration: none;
 }
-.nav-drawer__contacts a:hover { color: var(--green-400); }
+.nav-drawer__contact-icon {
+  flex: 0 0 auto; width: 18px; height: 18px;
+  color: var(--green-600);
+}
+.nav-drawer__contact-icon svg { display: block; width: 100%; height: 100%; }
+.nav-drawer__contacts a:hover { color: var(--green-700); }
 /* === Featured block с картинкой (Услуги) === */
 .megamenu__feature-image {
   margin: calc(var(--sp-6) * -1) calc(var(--sp-6) * -1) var(--sp-4);
