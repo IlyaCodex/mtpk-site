@@ -27,8 +27,24 @@ ROOT = 'astro/public/praktikum'
 MOBILE_FIXES_LINK = '<link rel="stylesheet" href="/css/mobile-fixes.css?v=20261005a">'
 
 
+def drop_stale_inline_css(html):
+    """Выкидываем инлайн-копию mobile-fixes.css из старой сборки.
+
+    Страницы раздела сгенерированы с того варианта сайта, где mobile-fixes
+    инлайнился в <head>. Копия застыла и лежит ПОСЛЕ всех <link>, поэтому
+    побеждала свежий файл: в ней у кнопок меню остался белый цвет от тёмного
+    дровера — на новых белых карточках подписи «Каталог» и «Услуги» исчезали
+    (замечено Евгением 05.10.2026). Файл подключается ссылкой, копия лишняя.
+    """
+    for m in re.finditer(r'(?s)<style[^>]*>(.*?)</style>', html):
+        body = m.group(1)
+        if 'mobile-fixes.css' in body and '.nav-drawer__panel' in body:
+            return html[:m.start()] + html[m.end():], True
+    return html, False
+
+
 def sync_css_links(html, src):
-    """Подключения CSS в разделе — те же файлы и те же версии, что на сайте.
+    """Подключения CSS в разделе — те же файлы, версии и порядок, что на сайте.
 
     Страницы раздела собираются отдельно, и их <link> на наши стили застывают
     на версии, какая была в момент генерации. А `/css/` отдаётся с
@@ -50,22 +66,33 @@ def sync_css_links(html, src):
     mf = re.search(r'href="(/css/mobile-fixes\.css[^"]*)"', MOBILE_FIXES_LINK)
     want['mobile-fixes'] = mf.group(1)
 
-    touched = []
-    for base, href in sorted(want.items()):
-        cur = re.search(r'<link[^>]+href="/css/%s\.css[^"]*"[^>]*>' % re.escape(base), html)
-        if cur:
-            fixed = re.sub(r'href="[^"]*"', 'href="%s"' % href, cur.group(0))
-            if fixed != cur.group(0):
-                html = html[:cur.start()] + fixed + html[cur.end():]
-                touched.append('версия ' + base)
-            continue
-        anchor = re.search(r'<link[^>]+href="/css/[^"]*"[^>]*>', html)
-        if anchor:
-            html = (html[:anchor.end()]
-                    + '<link rel="stylesheet" href="%s">' % href
-                    + html[anchor.end():])
-            touched.append('подключён ' + base)
-    return html, touched
+    # Порядок как в собранной странице сайта: mobile-fixes ПОСЛЕДНИМ.
+    # Он перебивает site.css на равной специфичности — в нём, например,
+    # медиазапрос, который показывает гамбургер: в site.css у .nav-toggle
+    # стоит display:none, и если mobile-fixes идёт раньше, кнопка меню
+    # пропадает совсем (проверено 05.10.2026 — так и сломалось).
+    ORDER = ['site', 'praktikum-nav-v26', 'audit-fixes-20261002', 'mobile-fixes']
+    hrefs = [want[b] for b in ORDER if b in want]
+    block = ''.join('<link rel="stylesheet" href="%s">' % h for h in hrefs)
+
+    spots, old = [], []
+    for base in ORDER:
+        m = re.search(r'<link[^>]+href="/css/%s\.css[^"]*"[^>]*>' % re.escape(base), html)
+        if m:
+            spots.append(m.start())
+            old.append(m.group(0))
+    if not spots:
+        return html, []
+    was = ''.join(old)
+    if was == block and html.find(block) == min(spots):
+        return html, []                       # уже всё как надо
+
+    for tag in old:                           # убираем старые подключения
+        html = html.replace(tag, '', 1)
+    at = re.search(r'<link[^>]+href="/css/[^"]*"[^>]*>', html)
+    pos = at.start() if at else min(spots)
+    html = html[:pos] + block + html[pos:]
+    return html, ['подключения CSS: %d файлов, порядок и версии' % len(hrefs)]
 
 
 def standard_breadcrumbs(html):
@@ -125,6 +152,9 @@ def main():
         html = io.open(p, encoding='utf-8', errors='replace').read()
         new = html
         touched = []
+        new, dropped = drop_stale_inline_css(new)
+        if dropped:
+            touched.append('убрана инлайн-копия mobile-fixes')
         new, css = sync_css_links(new, src)
         touched += css
         new, crumbs = standard_breadcrumbs(new)

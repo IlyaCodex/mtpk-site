@@ -34,7 +34,12 @@ const LINKS: [string, string, string][] = [
 ---
 <aside class="nav-drawer" aria-hidden="true" data-nav-drawer>
   <div class="nav-drawer__header">
-    <span class="nav-drawer__brand">УралИндуктор</span>
+    {/* Логотип вместо текстового «УралИндуктор» (просьба Евгения 05.10.2026).
+        Тот же файл, что в шапке, — он уже в кэше браузера. */}
+    <a href="/" class="nav-drawer__brand" aria-label="УралИндуктор — на главную">
+      <img src="/brand/logo-header-clean.png" alt="УралИндуктор"
+           width="200" height="56" loading="lazy" decoding="async">
+    </a>
     <button class="nav-drawer__close" aria-label="Закрыть меню" data-nav-close>&times;</button>
   </div>
 

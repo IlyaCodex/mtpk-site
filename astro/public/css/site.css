@@ -2397,10 +2397,18 @@ body.nav-open { overflow: hidden; }
   border-bottom: 1px solid var(--border-subtle, #e5e5e5);
 }
 .nav-drawer__brand {
+  display: inline-flex; align-items: center;
   font-family: var(--font-display);
   font-size: var(--fs-h4); font-weight: var(--fw-bold);
   letter-spacing: var(--ls-h3);
   color: var(--text-primary);
+  text-decoration: none;
+}
+.nav-drawer__brand img {
+  display: block;
+  width: auto; height: 40px;
+  max-width: 190px;
+  object-fit: contain;
 }
 .nav-drawer__close {
   background: none; border: 0; color: var(--text-secondary);
