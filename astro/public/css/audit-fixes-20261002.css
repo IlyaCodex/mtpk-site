@@ -3,35 +3,57 @@ body .header-quick-form {
   display: grid;
   grid-template-columns: minmax(100px, 1fr) auto;
   align-items: center;
+  row-gap: 1px;
+}
+/* Строки раскладываем явно. В разметке согласие стоит перед кнопкой — так
+   его раньше слышит скринридер и раньше проходит табом, — а показываем
+   последней строкой: сверху оно растягивало шапку до 104 px (05.10.2026). */
+body .header-quick-form__input { grid-row: 1; grid-column: 1; }
+body .header-quick-form__btn { grid-row: 1; grid-column: 2; }
+body .header-quick-form__hint {
+  position: static;
+  grid-row: 2;
+  grid-column: 1 / -1;
+  margin: 0 4px;
+  color: #3b623a;
+  opacity: 1;
 }
 body .header-quick-form__consent {
+  grid-row: 3;
   grid-column: 1 / -1;
   display: flex;
   align-items: flex-start;
-  gap: 6px;
-  padding: 4px 8px;
-  max-width: 250px;
-  font-size: 11px;
-  line-height: 1.4;
+  gap: 5px;
+  margin: 0 4px 1px;
+  padding: 0;
+  font-size: 10.5px;
+  line-height: 1.3;
+  text-wrap: balance;
   color: var(--text-secondary, #5a6166);
   cursor: pointer;
 }
-body .header-quick-form__consent input { flex: 0 0 auto; margin: 2px 0 0; }
+body .header-quick-form__consent input {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  margin: 1px 0 0;
+}
 body .header-quick-form__consent a { text-decoration: underline; }
-body .header-quick-form .js-form-status { grid-column: 1 / -1; max-width: 250px; }
-body .header-quick-form__hint {
-  position: static;
+body .header-quick-form .js-form-status {
+  grid-row: 4;
   grid-column: 1 / -1;
-  margin: 2px 8px;
-  color: #3b623a;
-  opacity: 1;
+  max-width: 250px;
 }
 @media (min-width: 1025px) {
   body .header .container.header__inner { height: auto; min-height: 72px; padding-block: 6px; }
 }
 body .header-quick-form input:focus-visible,
 body .header-quick-form a:focus-visible { outline: 2px solid #267221; outline-offset: 2px; }
-@media (max-width: 1024px) { body .header-quick-form { display: none; } }
+/* Ниже 1091 px форма в строку не влезает: логотип, меню и поиск занимают
+   почти всю ширину, форме остаётся ~220 px вместо нужных ~286 — и она
+   вылезала за правый край (на 1025 px было 20 px вылета). Прячем её там,
+   как и на мобиле: телефоны остаются в верхней строке шапки. */
+@media (max-width: 1090px) { body .header-quick-form { display: none; } }
 @media (max-width: 360px) {
   body .header .container.header__inner { padding-inline: 12px; gap: 8px; }
   body .header .header__brand { min-width: 0; flex: 1 1 auto; max-width: 150px; }
