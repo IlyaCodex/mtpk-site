@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import { auditLog, count, desc, ilike, or } from '@mtpk/db';
 import { Badge, EmptyState, formatDate, PageHeader, Pager, Table } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
-import { db } from '@/lib/db';
+import { listAudit } from '@/lib/audit';
 
 export const metadata: Metadata = { title: 'Журнал действий' };
 const LIMIT = 50;
@@ -12,13 +11,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const offset = Math.max(0, Number(sp.offset ?? 0) || 0);
   const search = sp.search?.trim();
-  const where = search
-    ? or(ilike(auditLog.action, `%${search}%`), ilike(auditLog.target, `%${search}%`), ilike(auditLog.userEmail, `%${search}%`))
-    : undefined;
-  const [[{ total }], items] = await Promise.all([
-    db().select({ total: count() }).from(auditLog).where(where),
-    db().select().from(auditLog).where(where).orderBy(desc(auditLog.at)).offset(offset).limit(LIMIT),
-  ]);
+  const { total, items } = await listAudit(search, offset, LIMIT);
 
   return (
     <>

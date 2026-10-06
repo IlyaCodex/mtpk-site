@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { contentTypeFor, listObjects, putObject, type S3Client, type Logger } from '@mtpk/shared';
-import { assets, sql, type Db } from '@mtpk/db';
+import type { Db } from '@mtpk/db';
 
 /**
  * Каталоги public/ Astro-проекта, которые являются КОНТЕНТОМ и живут в S3.
@@ -100,19 +100,13 @@ export async function syncAssets(
   if (!opts.dryRun && catalog.length) {
     // Каталог объектов в БД: медиасервис по нему решает, есть ли WebP-сосед,
     // не дёргая S3 на каждый запрос.
+    // запись каталога целиком заменяется свежей (связей у таблицы нет)
     for (let i = 0; i < catalog.length; i += 500) {
-      await db
-        .insert(assets)
-        .values(catalog.slice(i, i + 500).map((c) => ({ ...c, updatedAt: new Date() })))
-        .onConflictDoUpdate({
-          target: assets.key,
-          set: {
-            size: sql`excluded.size`,
-            etag: sql`excluded.etag`,
-            contentType: sql`excluded.content_type`,
-            updatedAt: sql`excluded.updated_at`,
-          },
-        });
+      const chunk = catalog.slice(i, i + 500);
+      await db.$transaction([
+        db.asset.deleteMany({ where: { key: { in: chunk.map((c) => c.key) } } }),
+        db.asset.createMany({ data: chunk.map((c) => ({ ...c, updatedAt: new Date() })) }),
+      ]);
     }
   }
   return stats;

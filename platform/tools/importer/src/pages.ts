@@ -9,7 +9,7 @@ import {
   detectTemplate,
   type RawPage,
 } from '@mtpk/content-kit';
-import { pages, styleBlocks, sql, inArray, type Db, type NewPage } from '@mtpk/db';
+import type { Db, Prisma } from '@mtpk/db';
 import { walkBlocks } from '@mtpk/content-model';
 import { cssFileRecord } from '@mtpk/content-kit/styles';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
@@ -23,6 +23,8 @@ import { htmlToBlocks, newReport, type ConvertReport } from './blocks/to-blocks.
 export const CONVERTER_VERSION = '2026-10-08.1';
 
 const KNOWN_META = new Set(['title', 'description', 'inline_styles', 'css_templates', 'preload_image', 'noindex']);
+
+type NewPage = Prisma.PageCreateInput;
 
 function sha1(s: string): string {
   return crypto.createHash('sha1').update(s).digest('hex');
@@ -108,7 +110,7 @@ function rawToRecord(
       styleHashes: headStyles.map((s) => s.hash),
       preloadImage: meta.preload_image ?? null,
       noindex: meta.noindex === true,
-      extraMeta,
+      extraMeta: extraMeta as Prisma.InputJsonObject,
       publishedAt: toDate(bodyDates?.first),
       modifiedAt: toDate(bodyDates?.last),
       lastmodAt: toDate(lastmod) ?? importTime,
@@ -196,9 +198,7 @@ export async function importPages(
   const styleMap = new Map<string, ReturnType<typeof classifyStyleBlock>>();
   for (const r of records) for (const s of r.styles) styleMap.set(s.hash, s);
 
-  const existing = await db
-    .select({ path: pages.path, sourceHash: pages.sourceHash, extraMeta: pages.extraMeta })
-    .from(pages);
+  const existing = await db.page.findMany({ select: { path: true, sourceHash: true, extraMeta: true } });
   const existingByPath = new Map(existing.map((e) => [e.path, e]));
   const incoming = new Set(allPages.map((p) => p.path));
 
@@ -231,39 +231,21 @@ export async function importPages(
 
   if (opts.dryRun) return { stats, changed, deleted };
 
-  await db.transaction(async (tx) => {
-    const styleRows = [...styleMap.values()];
-    for (let i = 0; i < styleRows.length; i += 200) {
-      await tx.insert(styleBlocks).values(styleRows.slice(i, i + 200)).onConflictDoNothing();
-    }
-    for (let i = 0; i < toWrite.length; i += 100) {
-      const chunk = toWrite.slice(i, i + 100).map((p) => ({ ...p, updatedAt: importTime }));
-      await tx
-        .insert(pages)
-        .values(chunk)
-        .onConflictDoUpdate({
-          target: pages.path,
-          set: {
-            kind: sql`excluded.kind`,
-            template: sql`excluded.template`,
-            title: sql`excluded.title`,
-            description: sql`excluded.description`,
-            blocks: sql`excluded.blocks`,
-            body: sql`excluded.body`,
-            cssTemplates: sql`excluded.css_templates`,
-            styleHashes: sql`excluded.style_hashes`,
-            preloadImage: sql`excluded.preload_image`,
-            noindex: sql`excluded.noindex`,
-            extraMeta: sql`excluded.extra_meta`,
-            publishedAt: sql`excluded.published_at`,
-            modifiedAt: sql`excluded.modified_at`,
-            lastmodAt: sql`excluded.lastmod_at`,
-            sourceHash: sql`excluded.source_hash`,
-            updatedAt: sql`excluded.updated_at`,
-          },
-        });
-    }
-    if (deleted.length) await tx.delete(pages).where(inArray(pages.path, deleted));
-  });
+  // Всё одной транзакцией: сайт не увидит наполовину обновлённый контент.
+  // Новые страницы — пачками, изменённые — по одной (id страниц сохраняются).
+  await db.$transaction(
+    async (tx) => {
+      await tx.styleBlock.createMany({ data: [...styleMap.values()], skipDuplicates: true });
+      const fresh = toWrite.filter((p) => !existingByPath.has(p.path));
+      for (let i = 0; i < fresh.length; i += 100) {
+        await tx.page.createMany({ data: fresh.slice(i, i + 100).map((p) => ({ ...p, updatedAt: importTime })) });
+      }
+      for (const p of toWrite) {
+        if (existingByPath.has(p.path)) await tx.page.update({ where: { path: p.path }, data: { ...p, updatedAt: importTime } });
+      }
+      if (deleted.length) await tx.page.deleteMany({ where: { path: { in: deleted } } });
+    },
+    { maxWait: 10_000, timeout: 10 * 60_000 },
+  );
   return { stats, changed, deleted };
 }

@@ -10,3 +10,6 @@ next-env.d.ts
 .cache/
 tools/parity/report/
 apps/web/public/assets/
+
+# Prisma Client — генерируется из packages/db/prisma/schema.prisma (npm install / npm run db:generate)
+packages/db/src/generated/

@@ -9,7 +9,7 @@
  */
 import readline from 'node:readline/promises';
 import path from 'node:path';
-import { createDb, eq, users } from '@mtpk/db';
+import { createDb } from '@mtpk/db';
 import { hashPassword, passwordProblem } from '../src/lib/password.ts';
 
 try {
@@ -46,12 +46,12 @@ if (problem) {
 
 const { db, close } = createDb(process.env.DATABASE_URL ?? '', { max: 1, appName: 'admin-cli' });
 const passwordHash = await hashPassword(password);
-const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+const existing = await db.user.findUnique({ where: { email }, select: { id: true } });
 if (existing) {
-  await db.update(users).set({ passwordHash, role, name, active: true, updatedAt: new Date() }).where(eq(users.id, existing.id));
+  await db.user.update({ where: { id: existing.id }, data: { passwordHash, role, name, active: true } });
   console.log(`Обновлён пользователь ${email} (${role})`);
 } else {
-  await db.insert(users).values({ email, name, role, passwordHash });
+  await db.user.create({ data: { email, name, role, passwordHash } });
   console.log(`Создан пользователь ${email} (${role})`);
 }
 await close();

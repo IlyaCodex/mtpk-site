@@ -28,7 +28,10 @@
     "clean": "node scripts/clean.mjs",
     "build:admin": "npm run build -w @mtpk/admin",
     "admin:user": "npm run create-user -w @mtpk/admin --",
-    "media:warm": "tsx scripts/warm-images.ts"
+    "media:warm": "tsx scripts/warm-images.ts",
+    "db:migration": "npm run migration -w @mtpk/db --",
+    "db:status": "npm run status -w @mtpk/db",
+    "postinstall": "npm run generate -w @mtpk/db"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

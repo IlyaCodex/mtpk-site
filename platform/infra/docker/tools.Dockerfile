@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Служебный образ: миграции БД и импорт контента из Astro-проекта.
+# Служебный образ: миграции БД (Prisma) и импорт контента из Astro-проекта.
 #   docker compose run --rm migrate
 #   docker compose --profile tools run --rm importer [--only=pages]
 ARG NODE_IMAGE=node:22-alpine
@@ -29,11 +29,14 @@ COPY packages packages
 COPY services services
 COPY tools/importer tools/importer
 COPY scripts scripts
-RUN node scripts/build-services.mjs migrate importer
+RUN npm run generate -w @mtpk/db && node scripts/build-services.mjs importer
 
-# зависимости импортёра покрывают и миграции (drizzle-orm, pg, zod, pino)
+# Зависимости импортёра и пакета БД вместе с devDependencies: Prisma CLI
+# (prisma migrate deploy) — в них. Движок миграций скачивается здесь же,
+# при сборке: в рантайме контейнеру сеть для этого не нужна.
 FROM manifests AS prod-deps
-RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev --ignore-scripts --workspace tools/importer
+RUN --mount=type=cache,target=/root/.npm npm ci --ignore-scripts --workspace tools/importer --workspace packages/db \
+ && cd packages/db && npx prisma version
 
 FROM ${NODE_IMAGE} AS runtime
 # git — импортёр берёт даты публикации страниц из истории репозитория
@@ -41,8 +44,10 @@ RUN apk add --no-cache git && git config --system --add safe.directory '*'
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=build /app/packages/db/dist ./packages/db/dist
-COPY --from=build /app/packages/db/migrations ./packages/db/migrations
+COPY --from=build /app/packages/db/package.json /app/packages/db/prisma.config.ts ./packages/db/
+COPY --from=build /app/packages/db/prisma ./packages/db/prisma
 COPY --from=build /app/tools/importer/dist ./tools/importer/dist
 USER node
-CMD ["node", "packages/db/dist/migrate.js"]
+# по умолчанию — миграции; импортёр запускается своей командой (docker-compose.yml)
+WORKDIR /app/packages/db
+CMD ["/app/node_modules/.bin/prisma", "migrate", "deploy"]

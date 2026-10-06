@@ -1,33 +1,51 @@
-import pg from 'pg';
-import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
-import * as contentTables from './schema/content.ts';
-import * as leadsTables from './schema/leads.ts';
-import * as searchTables from './schema/search.ts';
-import * as adminTables from './schema/admin.ts';
+/**
+ * База данных платформы: Prisma Client поверх пула соединений pg.
+ * Схема и миграции — prisma/schema.prisma и prisma/migrations; клиент
+ * генерируется в src/generated/prisma (npm run db:generate, в git не хранится).
+ */
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Prisma, PrismaClient } from './generated/prisma/client.ts';
 
-export const schema = { ...contentTables, ...leadsTables, ...searchTables, ...adminTables };
-export type Db = NodePgDatabase<typeof schema>;
+export type Db = PrismaClient;
 
 export interface DbHandle {
   db: Db;
-  pool: pg.Pool;
   close: () => Promise<void>;
 }
 
-/** Пул соединений + Drizzle. Каждому сервису — своё имя в pg_stat_activity. */
+/** Клиент базы с пулом соединений. Каждому сервису — своё имя в pg_stat_activity. */
 export function createDb(url: string, opts: { max?: number; appName?: string } = {}): DbHandle {
-  const pool = new pg.Pool({
+  const adapter = new PrismaPg({
     connectionString: url,
     max: opts.max ?? 10,
     application_name: opts.appName ?? 'mtpk',
     idleTimeoutMillis: 30_000,
   });
-  const db = drizzle(pool, { schema });
-  return { db, pool, close: () => pool.end() };
+  const db = new PrismaClient({ adapter });
+  return { db, close: () => db.$disconnect() };
 }
 
-export * from './schema/content.ts';
-export * from './schema/leads.ts';
-export * from './schema/search.ts';
-export * from './schema/admin.ts';
-export { sql, eq, ne, and, or, inArray, notInArray, desc, asc, isNull, isNotNull, count, like, ilike, lt, gt } from 'drizzle-orm';
+/** Изменение или удаление по ключу, а записи нет (Prisma бросает P2025) → null. */
+export async function orNotFound<T>(query: Promise<T>): Promise<T | null> {
+  try {
+    return await query;
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') return null;
+    throw err;
+  }
+}
+
+export { Prisma };
+export type {
+  Asset,
+  AuditEntry,
+  Lead,
+  LeadReject,
+  Page,
+  Redirect,
+  SearchDocument,
+  Setting,
+  StockItem,
+  StyleBlock,
+  User,
+} from './generated/prisma/client.ts';

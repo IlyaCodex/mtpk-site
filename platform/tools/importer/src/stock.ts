@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { stockItems, type Db } from '@mtpk/db';
+import { Prisma, type Db } from '@mtpk/db';
 
 const KNOWN = new Set(['url', 'qty', 'shipping', 'note', 'title', 'image', 'specs']);
 
@@ -9,11 +9,10 @@ export async function importStock(db: Db, configFile: string, opts: { dryRun?: b
   const config = JSON.parse(fs.readFileSync(configFile, 'utf-8')) as { items?: Record<string, unknown>[] };
   const items = Array.isArray(config.items) ? config.items : [];
   if (opts.dryRun) return { total: items.length, missing: false };
-  await db.transaction(async (tx) => {
-    await tx.delete(stockItems);
-    if (!items.length) return;
-    await tx.insert(stockItems).values(
-      items.map((it, i) => {
+  await db.$transaction([
+    db.stockItem.deleteMany(),
+    db.stockItem.createMany({
+      data: items.map((it, i) => {
         const extra: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(it)) if (!KNOWN.has(k)) extra[k] = v;
         return {
@@ -24,11 +23,11 @@ export async function importStock(db: Db, configFile: string, opts: { dryRun?: b
           note: typeof it.note === 'string' ? it.note : null,
           title: typeof it.title === 'string' ? it.title : null,
           image: typeof it.image === 'string' ? it.image : null,
-          specs: Array.isArray(it.specs) ? (it.specs as [string, string][]) : null,
-          extra,
+          specs: Array.isArray(it.specs) ? (it.specs as [string, string][]) : Prisma.DbNull,
+          extra: extra as Prisma.InputJsonObject,
         };
       }),
-    );
-  });
+    }),
+  ]);
   return { total: items.length, missing: false };
 }

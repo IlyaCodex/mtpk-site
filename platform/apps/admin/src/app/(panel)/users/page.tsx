@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { asc, users } from '@mtpk/db';
 import { PageHeader } from '@/components/ui';
 import { requireUser, ROLE_LABELS } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -10,7 +9,7 @@ export const metadata: Metadata = { title: 'Пользователи' };
 
 export default async function UsersPage() {
   const me = await requireUser('users');
-  const list = await db().select(publicUser).from(users).orderBy(asc(users.email));
+  const list = await db().user.findMany({ select: publicUser, orderBy: { email: 'asc' } });
   return (
     <>
       <PageHeader

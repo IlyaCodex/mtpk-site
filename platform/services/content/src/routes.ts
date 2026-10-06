@@ -6,7 +6,7 @@ import { cssFileRecord } from '@mtpk/content-kit/styles';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
 import { renderBlocksToHtml } from '@mtpk/ui/server';
-import { asc, count, desc, eq, ilike, inArray, or, pages, redirects, settings, sql, stockItems, styleBlocks, type Db } from './db.ts';
+import { orNotFound, Prisma, type Db } from './db.ts';
 import type { ContentStore } from './store.ts';
 
 interface Deps {
@@ -156,35 +156,35 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     { schema: { tags: ['Админка: страницы'], summary: 'Список страниц с фильтрами', querystring: listQuery, security: ADMIN } },
     async (req) => {
       const q = req.query;
-      const where = sql.join(
-        [
-          sql`true`,
-          q.search ? sql`(${pages.path} ilike ${`%${q.search}%`} or ${pages.title} ilike ${`%${q.search}%`})` : sql`true`,
-          q.template ? sql`${pages.template} = ${q.template}` : sql`true`,
-          q.kind ? sql`${pages.kind} = ${q.kind}` : sql`true`,
-          q.status ? sql`${pages.status} = ${q.status}` : sql`true`,
-        ],
-        sql` and `,
-      );
-      const [{ total }] = await db.select({ total: count() }).from(pages).where(where);
-      const rows = await db
-        .select({
-          id: pages.id,
-          path: pages.path,
-          title: pages.title,
-          kind: pages.kind,
-          template: pages.template,
-          status: pages.status,
-          noindex: pages.noindex,
-          blocks: pages.blocks,
-          extraMeta: pages.extraMeta,
-          updatedAt: pages.updatedAt,
-        })
-        .from(pages)
-        .where(where)
-        .orderBy(asc(pages.path))
-        .offset(q.offset)
-        .limit(q.limit);
+      const where: Prisma.PageWhereInput = {
+        ...(q.search
+          ? { OR: [{ path: { contains: q.search, mode: 'insensitive' } }, { title: { contains: q.search, mode: 'insensitive' } }] }
+          : {}),
+        ...(q.template ? { template: q.template } : {}),
+        ...(q.kind ? { kind: q.kind } : {}),
+        ...(q.status ? { status: q.status } : {}),
+      };
+      const [total, rows] = await Promise.all([
+        db.page.count({ where }),
+        db.page.findMany({
+          where,
+          select: {
+            id: true,
+            path: true,
+            title: true,
+            kind: true,
+            template: true,
+            status: true,
+            noindex: true,
+            blocks: true,
+            extraMeta: true,
+            updatedAt: true,
+          },
+          orderBy: { path: 'asc' },
+          skip: q.offset,
+          take: q.limit,
+        }),
+      ]);
       return {
         total,
         items: rows.map(({ blocks, extraMeta, ...r }) => ({
@@ -200,7 +200,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     '/admin/v1/stats',
     { schema: { tags: ['Админка: страницы'], summary: 'Сводка: страницы, блоки, правки в админке', security: ADMIN } },
     async () => {
-      const rows = await db.select({ kind: pages.kind, status: pages.status, blocks: pages.blocks, extraMeta: pages.extraMeta }).from(pages);
+      const rows = await db.page.findMany({ select: { kind: true, status: true, blocks: true, extraMeta: true } });
       const byType: Record<string, number> = {};
       let blocks = 0;
       let htmlBlocks = 0;
@@ -220,8 +220,8 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
         blocks,
         htmlBlocks,
         byType,
-        redirects: (await db.select({ n: count() }).from(redirects))[0].n,
-        stock: (await db.select({ n: count() }).from(stockItems))[0].n,
+        redirects: await db.redirect.count(),
+        stock: await db.stockItem.count(),
       };
     },
   );
@@ -229,17 +229,21 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
   app.get(
     '/admin/v1/pages/templates',
     { schema: { tags: ['Админка: страницы'], summary: 'Типы страниц и их количество', security: ADMIN } },
-    async () => db.select({ template: pages.template, count: count() }).from(pages).groupBy(pages.template).orderBy(desc(count())),
+    async () =>
+      (await db.page.groupBy({ by: ['template'], _count: { _all: true }, orderBy: { _count: { template: 'desc' } } })).map((r) => ({
+        template: r.template,
+        count: r._count._all,
+      })),
   );
 
   app.get(
     '/admin/v1/pages/:id',
     { schema: { tags: ['Админка: страницы'], summary: 'Страница для редактирования', params: idParam, security: ADMIN } },
     async (req, reply) => {
-      const [row] = await db.select().from(pages).where(eq(pages.id, req.params.id)).limit(1);
+      const row = await db.page.findUnique({ where: { id: req.params.id } });
       if (!row) return reply.code(404).send({ error: 'not_found' });
       const styles = row.styleHashes.length
-        ? await db.select().from(styleBlocks).where(inArray(styleBlocks.hash, row.styleHashes))
+        ? await db.styleBlock.findMany({ where: { hash: { in: row.styleHashes } } })
         : [];
       const byHash = new Map(styles.map((s) => [s.hash, s]));
       // body у обычных страниц — архив исходного HTML, в редактор не отдаём
@@ -265,7 +269,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     if (rules.size) styleRows.push(classifyStyleBlock(`<style>${rulesToCss(rules)}</style>`));
     // CSS блоков «Стили» — тоже файлами (сайт подключает их ссылкой по хешу)
     const blockCss = [...walkBlocks(blocks)].flatMap((b) => (b.type === 'style' ? [cssFileRecord(b.css)] : []));
-    if (styleRows.length || blockCss.length) await db.insert(styleBlocks).values([...styleRows, ...blockCss]).onConflictDoNothing();
+    if (styleRows.length || blockCss.length) await db.styleBlock.createMany({ data: [...styleRows, ...blockCss], skipDuplicates: true });
     const now = new Date();
     const values = {
       path,
@@ -273,7 +277,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       template: input.template ?? detectTemplate(path, ''),
       title: input.title,
       description: input.description ?? null,
-      blocks,
+      blocks: blocks as Prisma.InputJsonValue,
       cssTemplates: input.cssTemplates,
       styleHashes: styleRows.map((s) => s.hash),
       preloadImage: input.preloadImage ?? null,
@@ -285,17 +289,14 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       updatedAt: now,
     };
     if (id) {
-      const [prev] = await db.select({ path: pages.path, extraMeta: pages.extraMeta }).from(pages).where(eq(pages.id, id)).limit(1);
+      const prev = await db.page.findUnique({ where: { id }, select: { path: true, extraMeta: true } });
       if (!prev) return null;
       // правка в админке: повторный импорт из Astro страницу больше не перезапишет
       const extraMeta = { ...(prev.extraMeta as Record<string, unknown>), source: 'admin' };
-      await db.update(pages).set({ ...values, extraMeta }).where(eq(pages.id, id));
+      await db.page.update({ where: { id }, data: { ...values, extraMeta } });
       return { id, paths: prev.path === path ? [path] : [prev.path, path] };
     }
-    const [row] = await db
-      .insert(pages)
-      .values({ ...values, publishedAt: now, extraMeta: { source: 'admin' } })
-      .returning({ id: pages.id });
+    const row = await db.page.create({ data: { ...values, publishedAt: now, extraMeta: { source: 'admin' } }, select: { id: true } });
     return { id: row.id, paths: [path] };
   };
 
@@ -303,7 +304,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     '/admin/v1/pages',
     { schema: { tags: ['Админка: страницы'], summary: 'Создать страницу', body: pageInput, security: ADMIN } },
     async (req, reply) => {
-      const [dup] = await db.select({ id: pages.id }).from(pages).where(eq(pages.path, normalizePath(req.body.path))).limit(1);
+      const dup = await db.page.findUnique({ where: { path: normalizePath(req.body.path) }, select: { id: true } });
       if (dup) return reply.code(409).send({ error: 'path_exists', id: dup.id });
       const res = (await savePage(req.body))!;
       await changed(res.paths);
@@ -315,7 +316,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     '/admin/v1/pages/:id',
     { schema: { tags: ['Админка: страницы'], summary: 'Сохранить страницу', params: idParam, body: pageInput, security: ADMIN } },
     async (req, reply) => {
-      const [dup] = await db.select({ id: pages.id }).from(pages).where(eq(pages.path, normalizePath(req.body.path))).limit(1);
+      const dup = await db.page.findUnique({ where: { path: normalizePath(req.body.path) }, select: { id: true } });
       if (dup && dup.id !== req.params.id) return reply.code(409).send({ error: 'path_exists', id: dup.id });
       const res = await savePage(req.body, req.params.id);
       if (!res) return reply.code(404).send({ error: 'not_found' });
@@ -328,7 +329,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     '/admin/v1/pages/:id',
     { schema: { tags: ['Админка: страницы'], summary: 'Удалить страницу', params: idParam, security: ADMIN } },
     async (req, reply) => {
-      const [row] = await db.delete(pages).where(eq(pages.id, req.params.id)).returning({ path: pages.path });
+      const row = await orNotFound(db.page.delete({ where: { id: req.params.id }, select: { path: true } }));
       if (!row) return reply.code(404).send({ error: 'not_found' });
       await changed([row.path], 'page.deleted');
       return { ok: true };
@@ -370,10 +371,8 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     { schema: { tags: ['Админка: настройки'], summary: 'Сохранить настройки сайта', body: siteSettings, security: ADMIN } },
     async (req) => {
       const by = typeof req.headers['x-admin-user'] === 'string' ? req.headers['x-admin-user'] : null;
-      await db
-        .insert(settings)
-        .values({ key: 'site', value: req.body, updatedBy: by })
-        .onConflictDoUpdate({ target: settings.key, set: { value: req.body, updatedBy: by, updatedAt: sql`now()` } });
+      const value = req.body as Prisma.InputJsonValue;
+      await db.setting.upsert({ where: { key: 'site' }, create: { key: 'site', value, updatedBy: by }, update: { value, updatedBy: by } });
       // шапка и подвал есть на каждой странице
       await store.purge();
       await notifyWeb('all');
@@ -392,9 +391,13 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     { schema: { tags: ['Админка: редиректы'], summary: 'Редиректы', querystring: redirectQuery, security: ADMIN } },
     async (req) => {
       const q = req.query;
-      const where = q.search ? or(ilike(redirects.fromPath, `%${q.search}%`), ilike(redirects.toPath, `%${q.search}%`)) : undefined;
-      const [{ total }] = await db.select({ total: count() }).from(redirects).where(where);
-      const items = await db.select().from(redirects).where(where).orderBy(asc(redirects.fromPath)).offset(q.offset).limit(q.limit);
+      const where: Prisma.RedirectWhereInput = q.search
+        ? { OR: [{ fromPath: { contains: q.search, mode: 'insensitive' } }, { toPath: { contains: q.search, mode: 'insensitive' } }] }
+        : {};
+      const [total, items] = await Promise.all([
+        db.redirect.count({ where }),
+        db.redirect.findMany({ where, orderBy: { fromPath: 'asc' }, skip: q.offset, take: q.limit }),
+      ]);
       return { total, items };
     },
   );
@@ -403,11 +406,11 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     { schema: { tags: ['Админка: редиректы'], summary: 'Добавить (или заменить) редирект', body: redirectInput, security: ADMIN } },
     async (req, reply) => {
       const r = req.body;
-      const [row] = await db
-        .insert(redirects)
-        .values({ fromPath: r.from, toPath: r.to, code: r.code, source: 'manual', comment: r.comment })
-        .onConflictDoUpdate({ target: redirects.fromPath, set: { toPath: r.to, code: r.code, comment: r.comment, updatedAt: sql`now()` } })
-        .returning();
+      const row = await db.redirect.upsert({
+        where: { fromPath: r.from },
+        create: { fromPath: r.from, toPath: r.to, code: r.code, source: 'manual', comment: r.comment },
+        update: { toPath: r.to, code: r.code, comment: r.comment },
+      });
       await store.purgeRedirects();
       return reply.code(201).send(row);
     },
@@ -417,11 +420,9 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     { schema: { tags: ['Админка: редиректы'], summary: 'Изменить редирект', params: idParam, body: redirectInput, security: ADMIN } },
     async (req, reply) => {
       const r = req.body;
-      const [row] = await db
-        .update(redirects)
-        .set({ fromPath: r.from, toPath: r.to, code: r.code, comment: r.comment, updatedAt: sql`now()` })
-        .where(eq(redirects.id, req.params.id))
-        .returning();
+      const row = await orNotFound(
+        db.redirect.update({ where: { id: req.params.id }, data: { fromPath: r.from, toPath: r.to, code: r.code, comment: r.comment } }),
+      );
       if (!row) return reply.code(404).send({ error: 'not_found' });
       await store.purgeRedirects();
       return row;
@@ -431,7 +432,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     '/admin/v1/redirects/:id',
     { schema: { tags: ['Админка: редиректы'], summary: 'Удалить редирект', params: idParam, security: ADMIN } },
     async (req, reply) => {
-      const [row] = await db.delete(redirects).where(eq(redirects.id, req.params.id)).returning({ id: redirects.id });
+      const row = await orNotFound(db.redirect.delete({ where: { id: req.params.id }, select: { id: true } }));
       if (!row) return reply.code(404).send({ error: 'not_found' });
       await store.purgeRedirects();
       return { ok: true };
@@ -442,31 +443,29 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
   app.get(
     '/admin/v1/stock',
     { schema: { tags: ['Админка: наличие'], summary: 'Позиции на складе', security: ADMIN } },
-    async () => db.select().from(stockItems).orderBy(asc(stockItems.position)),
+    async () => db.stockItem.findMany({ orderBy: { position: 'asc' } }),
   );
   app.put(
     '/admin/v1/stock',
     { schema: { tags: ['Админка: наличие'], summary: 'Сохранить список позиций (целиком, в порядке показа)', body: stockInput, security: ADMIN } },
     async (req) => {
       const items = req.body;
-      await db.transaction(async (tx) => {
-        await tx.delete(stockItems);
-        if (items.length) {
-          await tx.insert(stockItems).values(
-            items.map((it, i) => ({
-              position: i,
-              url: it.url,
-              qty: it.qty ?? null,
-              shipping: it.shipping ?? null,
-              note: it.note ?? null,
-              title: it.title ?? null,
-              image: it.image ?? null,
-              specs: it.specs ?? null,
-              extra: it.extra ?? {},
-            })),
-          );
-        }
-      });
+      await db.$transaction([
+        db.stockItem.deleteMany(),
+        db.stockItem.createMany({
+          data: items.map((it, i) => ({
+            position: i,
+            url: it.url,
+            qty: it.qty ?? null,
+            shipping: it.shipping ?? null,
+            note: it.note ?? null,
+            title: it.title ?? null,
+            image: it.image ?? null,
+            specs: it.specs ?? Prisma.DbNull,
+            extra: (it.extra ?? {}) as Prisma.InputJsonValue,
+          })),
+        }),
+      ]);
       // бейджи «В наличии» есть в карточках каталога и на страницах товаров — пересобрать всё
       await store.purge();
       await notifyWeb('all');

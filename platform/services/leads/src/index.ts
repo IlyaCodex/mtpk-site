@@ -11,7 +11,7 @@
 import multipart from '@fastify/multipart';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { createLogger, createRedis, createS3, putObject, startService, type LeadResponse } from '@mtpk/shared';
-import { createDb, eq, leadRejects, leads, type Lead } from '@mtpk/db';
+import { createDb, type Lead } from '@mtpk/db';
 import { ALLOWED_HOSTS, env } from './env.ts';
 import { clean, isTooFast, originAllowed, pageUrlFrom, parseLead, validateLead, type Fields } from './fields.ts';
 import { ATTACH_MAX_BYTES, checkAttachment } from './attachment.ts';
@@ -19,7 +19,7 @@ import { createQueue, type DeliveryResult } from './queue.ts';
 import { adminRoutes } from './admin.ts';
 
 const log = createLogger('leads');
-const { db, pool, close } = createDb(env.DATABASE_URL, { max: 5, appName: 'leads' });
+const { db, close } = createDb(env.DATABASE_URL, { max: 5, appName: 'leads' });
 const redis = createRedis(env.REDIS_URL);
 const s3 = createS3(env);
 const { queue, events } = createQueue(env.REDIS_URL);
@@ -104,15 +104,16 @@ async function readForm(req: FastifyRequest): Promise<{ fields: Fields; file: Up
 
 async function reject(reason: string, f: Fields, req: FastifyRequest, ip: string) {
   log.info({ reason }, 'заявка отброшена антиспамом');
-  await db
-    .insert(leadRejects)
-    .values({
-      reason,
-      phone: clean(f.phone, 32),
-      name: clean(f.name, 120),
-      source: clean(f.source, 300),
-      ip,
-      userAgent: clean(req.headers['user-agent'], 200),
+  await db.leadReject
+    .create({
+      data: {
+        reason,
+        phone: clean(f.phone, 32),
+        name: clean(f.name, 120),
+        source: clean(f.source, 300),
+        ip,
+        userAgent: clean(req.headers['user-agent'], 200),
+      },
     })
     .catch((err) => log.error({ err }, 'не записан отказ'));
 }
@@ -163,7 +164,7 @@ async function handle(req: FastifyRequest, reply: FastifyReply) {
 
   // Повторная отправка той же заявки (forms.js повторяет с тем же request_id) — без дубля.
   if (lead.requestId) {
-    const [prev] = await db.select().from(leads).where(eq(leads.requestId, lead.requestId)).limit(1);
+    const prev = await db.lead.findUnique({ where: { requestId: lead.requestId } });
     if (prev) return respond(reply, 200, { ok: true, message: OK_MESSAGE, receipt: lead.requestId, delivery: deliveryOf(prev) });
   }
 
@@ -175,9 +176,10 @@ async function handle(req: FastifyRequest, reply: FastifyReply) {
     else attachmentNote = check.note;
   }
 
-  const [row] = await db
-    .insert(leads)
-    .values({
+  // параллельный дубль с тем же request_id не вставляется (skipDuplicates) и не возвращается
+  const [row] = await db.lead.createManyAndReturn({
+    skipDuplicates: true,
+    data: {
       requestId: lead.requestId || null,
       source: lead.source || null,
       pageUrl: pageUrlFrom(req.headers.referer, ALLOWED_HOSTS) || null,
@@ -198,9 +200,8 @@ async function handle(req: FastifyRequest, reply: FastifyReply) {
       attachmentNote,
       mailStatus: 'pending',
       b24Status: env.B24_WEBHOOK ? 'pending' : 'skipped',
-    })
-    .onConflictDoNothing({ target: leads.requestId })
-    .returning();
+    },
+  });
   if (!row) {
     // параллельный дубль с тем же request_id
     return respond(reply, 200, { ok: true, message: OK_MESSAGE, receipt: lead.requestId, delivery: 'queued' });
@@ -212,13 +213,13 @@ async function handle(req: FastifyRequest, reply: FastifyReply) {
     const key = `leads/${row.id}/${attachment.name}`;
     try {
       await putObject(s3, env.S3_BUCKET_PRIVATE, key, attachment.data, 'application/octet-stream');
-      await db.update(leads).set({ attachmentKey: key }).where(eq(leads.id, row.id));
+      await db.lead.update({ where: { id: row.id }, data: { attachmentKey: key } });
     } catch (err) {
       log.error({ err, leadId: row.id }, 'вложение не сохранено');
-      await db
-        .update(leads)
-        .set({ attachmentName: null, attachmentNote: `Файл «${attachment.name}» не сохранился на сервере` })
-        .where(eq(leads.id, row.id));
+      await db.lead.update({
+        where: { id: row.id },
+        data: { attachmentName: null, attachmentNote: `Файл «${attachment.name}» не сохранился на сервере` },
+      });
     }
   }
 
@@ -250,7 +251,7 @@ await startService({
     await app.register(adminRoutes, { db, queue, adminToken: env.ADMIN_TOKEN });
   },
   async readiness() {
-    await pool.query('select 1');
+    await db.$queryRaw`select 1`;
     await redis.ping();
   },
   async onClose() {

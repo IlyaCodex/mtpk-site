@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { eq, users } from '@mtpk/db';
 import { db, redis } from './db';
 import { env } from './env';
 
@@ -68,7 +67,7 @@ export async function currentUser(): Promise<SessionUser | null> {
   if (!id) return null;
   const userId = Number(await redis().get(sessionKey(id)));
   if (!userId) return null;
-  const [user] = await db().select().from(users).where(eq(users.id, userId)).limit(1);
+  const user = await db().user.findUnique({ where: { id: userId } });
   if (!user || !user.active) return null;
   await redis().expire(sessionKey(id), TTL);
   return { id: user.id, email: user.email, name: user.name, role: user.role as Role };

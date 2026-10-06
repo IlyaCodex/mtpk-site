@@ -24,8 +24,9 @@ RUN --mount=type=cache,target=/root/.npm npm ci --ignore-scripts
 COPY tsconfig.base.json tsconfig.json ./
 COPY packages packages
 COPY apps/admin apps/admin
-# Сборка не обращается к БД и сервисам: все страницы админки динамические
-RUN npm run build -w @mtpk/admin
+# Сборка не обращается к БД и сервисам: все страницы админки динамические.
+# Prisma Client генерируется из схемы (базы для этого не нужно).
+RUN npm run generate -w @mtpk/db && npm run build -w @mtpk/admin
 
 FROM ${NODE_IMAGE} AS runtime
 WORKDIR /app

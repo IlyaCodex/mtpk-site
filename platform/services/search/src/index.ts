@@ -18,7 +18,7 @@ import {
   type SearchResponse,
   type ZodTypeProvider,
 } from '@mtpk/shared';
-import { createDb, documents, eq, sql, notInArray } from '@mtpk/db';
+import { createDb } from '@mtpk/db';
 
 const env = readEnv(
   z.object({
@@ -32,7 +32,7 @@ const env = readEnv(
 );
 
 const log = createLogger('search');
-const { db, pool, close } = createDb(env.DATABASE_URL, { max: 5, appName: 'search' });
+const { db, close } = createDb(env.DATABASE_URL, { max: 5, appName: 'search' });
 const redis = createRedis(env.REDIS_URL);
 const cache = new JsonCache(redis, 'search:v1', (err) => log.warn({ err }, 'redis недоступен — поиск без кеша'));
 
@@ -44,21 +44,14 @@ interface SearchDoc {
   weight: number;
 }
 
+/** Записать документы (tsv база вычисляет сама). Пачками по 200 — по транзакции на пачку. */
 async function upsert(docs: SearchDoc[]) {
   for (let i = 0; i < docs.length; i += 200) {
-    await db
-      .insert(documents)
-      .values(docs.slice(i, i + 200).map((d) => ({ ...d, updatedAt: new Date() })))
-      .onConflictDoUpdate({
-        target: documents.path,
-        set: {
-          title: sql`excluded.title`,
-          body: sql`excluded.body`,
-          image: sql`excluded.image`,
-          weight: sql`excluded.weight`,
-          updatedAt: sql`excluded.updated_at`,
-        },
-      });
+    await db.$transaction(
+      docs.slice(i, i + 200).map(({ path, ...doc }) =>
+        db.searchDocument.upsert({ where: { path }, create: { path, ...doc }, update: doc }),
+      ),
+    );
   }
 }
 
@@ -72,7 +65,7 @@ async function reindexAll(): Promise<number> {
     .map((l) => JSON.parse(l) as SearchDoc);
   await upsert(docs);
   const keep = docs.map((d) => d.path);
-  if (keep.length) await db.delete(documents).where(notInArray(documents.path, keep));
+  if (keep.length) await db.searchDocument.deleteMany({ where: { path: { notIn: keep } } });
   await cache.clear();
   log.info({ documents: docs.length }, 'индекс пересобран');
   return docs.length;
@@ -80,7 +73,7 @@ async function reindexAll(): Promise<number> {
 
 async function reindexOne(path: string): Promise<void> {
   const res = await fetch(`${env.CONTENT_URL}/v1/search-docs/by-path?path=${encodeURIComponent(path)}`);
-  if (res.status === 404) await db.delete(documents).where(eq(documents.path, path));
+  if (res.status === 404) await db.searchDocument.deleteMany({ where: { path } });
   else if (res.ok) await upsert([(await res.json()) as SearchDoc]);
   else throw new Error(`контент-сервис ответил ${res.status}`);
   await cache.clear();
@@ -120,26 +113,26 @@ async function search(q: string, limit: number): Promise<SearchResponse> {
   const word = `(^|[^[:alnum:]])${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^[:alnum:]]|$)`;
   // Ранжирование: релевантность текста × вес страницы (разделы каталога ×10);
   // запрос целиком в заголовке (код модели «УИД-376») — сразу наверх.
-  const rows = await db.execute<{ path: string; title: string; image: string | null; excerpt: string; total: number }>(sql`
+  const rows = await db.$queryRaw<{ path: string; title: string; image: string | null; excerpt: string; total: bigint }[]>`
     with q as (select to_tsquery('russian', ${tsq}) as tsq)
     select d.path, d.title, d.image,
       ts_headline('russian', d.body, q.tsq,
         'StartSel=' || chr(1) || ', StopSel=' || chr(2) || ', MaxWords=28, MinWords=12, ShortWord=2, MaxFragments=1') as excerpt,
       count(*) over() as total
-    from ${documents} d, q
+    from search.documents d, q
     where d.tsv @@ q.tsq or d.title ilike ${like}
     order by ts_rank_cd(d.tsv, q.tsq, 32) * d.weight
       + case when d.title ilike ${like} then 20 else 0 end
       + case when d.title ~* ${word} then 20 else 0 end desc, d.title
     limit ${limit}
-  `);
-  const results = rows.rows.map((r) => ({
+  `;
+  const results = rows.map((r) => ({
     url: r.path,
     title: r.title,
     image: r.image,
     excerpt: escapeHtml(r.excerpt).replace(/\u0001/g, '<mark>').replace(/\u0002/g, '</mark>'),
   }));
-  return { query: q, total: Number(rows.rows[0]?.total ?? 0), results };
+  return { query: q, total: Number(rows[0]?.total ?? 0), results };
 }
 
 // ── HTTP ──────────────────────────────────────────────────────────────────
@@ -181,13 +174,13 @@ await startService({
         },
       },
       async () => {
-        const [row] = (await db.execute<{ n: number; updated: string | null }>(sql`select count(*)::int as n, max(updated_at) as updated from ${documents}`)).rows;
-        return { documents: row.n, updatedAt: row.updated };
+        const agg = await db.searchDocument.aggregate({ _count: { _all: true }, _max: { updatedAt: true } });
+        return { documents: agg._count._all, updatedAt: agg._max.updatedAt };
       },
     );
   },
   async readiness() {
-    await pool.query('select 1');
+    await db.$queryRaw`select 1`;
   },
   async onClose() {
     abort.abort();
@@ -197,8 +190,7 @@ await startService({
 });
 
 // Пустой индекс (первый запуск) — собрать сразу; дальше — по событиям контента.
-const [{ n }] = (await db.execute<{ n: number }>(sql`select count(*)::int as n from ${documents}`)).rows;
-if (n === 0) {
+if ((await db.searchDocument.count()) === 0) {
   reindexAll().catch((err) => log.error({ err }, 'первичная индексация не удалась — повторится по событию'));
 }
 

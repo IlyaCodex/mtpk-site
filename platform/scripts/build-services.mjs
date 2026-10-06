@@ -19,7 +19,6 @@ const TARGETS = {
   media: { dir: 'services/media', entries: ['src/index.ts'] },
   search: { dir: 'services/search', entries: ['src/index.ts'] },
   leads: { dir: 'services/leads', entries: ['src/index.ts', 'src/worker.ts'] },
-  migrate: { dir: 'packages/db', entries: ['src/migrate.ts'] },
   importer: { dir: 'tools/importer', entries: ['src/index.ts'] },
 };
 

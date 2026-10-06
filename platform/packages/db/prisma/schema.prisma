@@ -1,0 +1,262 @@
+// Схема базы данных платформы — единственное её описание. По ней Prisma
+// строит миграции (prisma/migrations) и типизированный клиент
+// (src/generated/prisma). Таблицы разложены по схемам PostgreSQL —
+// у каждого сервиса своя: content, leads, search, admin.
+//
+//   npm run db:migrate                      — применить миграции
+//   npm run db:migration -- --name <имя>    — новая миграция по изменениям схемы
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["admin", "content", "leads", "search"]
+}
+
+// ─── content: страницы, стили, редиректы, склад, настройки, файлы ───────────
+
+/// Страница сайта: содержимое — блоки (@mtpk/content-model).
+model Page {
+  id           Int       @id @default(autoincrement())
+  path         String    @unique(map: "pages_path_unique")
+  /// page — страница в общем каркасе сайта; document — готовый HTML-документ (Практикум)
+  kind         String    @default("page")
+  /// тип шаблона (T01…T15 по docs/page-types): home, section, category, product, spare…
+  template     String    @default("page")
+  title        String
+  description  String?
+  /// содержимое страницы: блоки (@mtpk/content-model); у документов — пусто
+  blocks       Json      @default("[]")
+  /// kind=document — готовый HTML-документ; у страниц — исходник, из которого получены блоки (архив)
+  body         String?
+  /// общие шаблонные CSS, порядок важен (каскад)
+  cssTemplates String[]  @default([]) @map("css_templates")
+  /// стили страницы (StyleBlock.hash) по порядку
+  styleHashes  String[]  @default([]) @map("style_hashes")
+  preloadImage String?   @map("preload_image")
+  noindex      Boolean   @default(false)
+  /// прочие поля meta.json исходной страницы (сохранены, чтобы ничего не потерять)
+  extraMeta    Json      @default("{}") @map("extra_meta")
+  /// первая публикация — datePublished в JSON-LD
+  publishedAt  DateTime? @map("published_at") @db.Timestamptz(6)
+  /// последняя правка содержимого — dateModified в JSON-LD
+  modifiedAt   DateTime? @map("modified_at") @db.Timestamptz(6)
+  /// lastmod для sitemap
+  lastmodAt    DateTime  @default(now()) @map("lastmod_at") @db.Timestamptz(6)
+  /// хеш исходника: повторный импорт пропускает неизменённые страницы
+  sourceHash   String    @map("source_hash")
+  status       String    @default("published")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([template], map: "pages_template_idx")
+  @@index([kind], map: "pages_kind_idx")
+  @@map("pages")
+  @@schema("content")
+}
+
+/// CSS страниц (файлы /css/inline-extracted/inline-<hash>.css), общий для страниц с одинаковыми стилями.
+model StyleBlock {
+  hash      String   @id
+  /// external — CSS как есть; inline — блок вместе с тегом <style> (мелкие блоки старого импорта)
+  mode      String
+  css       String
+  bytes     Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("style_blocks")
+  @@schema("content")
+}
+
+/// 301-редиректы (наследие WordPress и добавленные вручную).
+model Redirect {
+  id        Int      @id @default(autoincrement())
+  fromPath  String   @unique(map: "redirects_from_path_unique") @map("from_path")
+  toPath    String   @map("to_path")
+  code      Int      @default(301)
+  /// legacy-map — импорт из server/redirects-legacy.map; manual — добавлен вручную
+  source    String   @default("manual")
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("redirects")
+  @@schema("content")
+}
+
+/// Позиция «Наличия на складе».
+model StockItem {
+  id        Int      @id @default(autoincrement())
+  position  Int      @default(0)
+  url       String
+  qty       Int?
+  shipping  String?
+  note      String?
+  title     String?
+  image     String?
+  /// характеристики: [название, значение][]
+  specs     Json?
+  /// неизвестные поля исходного конфига — как есть
+  extra     Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("stock_items")
+  @@schema("content")
+}
+
+/// Настройки сайта (ключ → JSON): 'site' — контакты, реквизиты, меню, подвал (@mtpk/content-model).
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  /// кто изменил (e-mail пользователя админки)
+  updatedBy String?  @map("updated_by")
+
+  @@map("settings")
+  @@schema("content")
+}
+
+/// Каталог объектов в S3-бакете ассетов (картинки, файлы, ассеты Практикума).
+model Asset {
+  key         String   @id
+  size        Int
+  etag        String
+  contentType String   @map("content_type")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("assets")
+  @@schema("content")
+}
+
+// ─── leads: заявки с сайта ──────────────────────────────────────────────────
+
+/// Заявка с формы сайта (заменяет leads.log старого send.php).
+model Lead {
+  id              Int       @id @default(autoincrement())
+  /// request_id формы: повторная отправка той же заявки не создаёт дубль
+  requestId       String?   @unique(map: "leads_request_id_unique") @map("request_id")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  /// форма и страница: «Подбор и расчёт · /products/…»
+  source          String?
+  /// полный адрес страницы (из Referer, на боевом домене)
+  pageUrl         String?   @map("page_url")
+  phone           String
+  name            String?
+  email           String?
+  task            String?
+  /// прочие поля форм (запчасти и др.): message, part, model, quantity…
+  fields          Json      @default("{}")
+  /// utm_*, yclid, gclid, fbclid, referrer, landing_url
+  utm             Json      @default("{}")
+  consent         String?
+  b24Trace        String?   @map("b24_trace")
+  b24TraceValid   Boolean   @default(false) @map("b24_trace_valid")
+  ymUid           String?   @map("ym_uid")
+  roistatVisit    String?   @map("roistat_visit")
+  ip              String?
+  userAgent       String?   @map("user_agent")
+  /// вложение «Прикрепить КП»: ключ в приватном бакете (удаляется после отправки письма)
+  attachmentKey   String?   @map("attachment_key")
+  attachmentName  String?   @map("attachment_name")
+  attachmentNote  String?   @map("attachment_note")
+  /// received → delivered | partial | failed
+  status          String    @default("received")
+  mailStatus      String    @default("pending") @map("mail_status")
+  mailError       String?   @map("mail_error")
+  mailSentAt      DateTime? @map("mail_sent_at") @db.Timestamptz(6)
+  b24Status       String    @default("pending") @map("b24_status")
+  b24LeadId       Int?      @map("b24_lead_id")
+  b24Http         Int?      @map("b24_http")
+  b24TraceStatus  String?   @map("b24_trace_status")
+  b24TraceId      Int?      @map("b24_trace_id")
+  b24Error        String?   @map("b24_error")
+  deliveredAt     DateTime? @map("delivered_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([createdAt], map: "leads_created_idx")
+  @@index([status], map: "leads_status_idx")
+  @@map("leads")
+  @@schema("leads")
+}
+
+/// Отброшенная попытка отправки (honeypot, слишком быстрое заполнение).
+model LeadReject {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  reason    String
+  phone     String?
+  name      String?
+  source    String?
+  ip        String?
+  userAgent String?  @map("user_agent")
+
+  @@map("lead_rejects")
+  @@schema("leads")
+}
+
+// ─── search: поисковый индекс сайта ─────────────────────────────────────────
+
+/// Страница в поисковом индексе.
+model SearchDocument {
+  path      String                   @id
+  title     String
+  /// видимый текст страницы без разметки
+  body      String
+  image     String?
+  /// вес в выдаче: разделы каталога — 10, остальное — 1
+  weight    Int                      @default(1)
+  /// русская морфология, заголовок весит больше текста. Столбец вычисляет
+  /// PostgreSQL (GENERATED ALWAYS AS … STORED, миграция 0_init); Prisma видит
+  /// это выражение как значение по умолчанию — оно должно совпадать с базой.
+  tsv       Unsupported("tsvector")? @default(dbgenerated("(setweight(to_tsvector('russian'::regconfig, COALESCE(title, ''::text)), 'A'::\"char\") || setweight(to_tsvector('russian'::regconfig, COALESCE(body, ''::text)), 'C'::\"char\"))"))
+  updatedAt DateTime                 @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([tsv], map: "documents_tsv_idx", type: Gin)
+  @@index([title(ops: raw("gin_trgm_ops"))], map: "documents_title_trgm_idx", type: Gin)
+  @@map("documents")
+  @@schema("search")
+}
+
+// ─── admin: пользователи админки и журнал действий ──────────────────────────
+
+/// Пользователь админки. Роли: admin — всё; editor — контент; manager — заявки.
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique(map: "users_email_unique")
+  name         String
+  /// scrypt: 'scrypt$N$r$p$соль$хеш' (base64url)
+  passwordHash String    @map("password_hash")
+  role         String    @default("editor")
+  active       Boolean   @default(true)
+  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("users")
+  @@schema("admin")
+}
+
+/// Журнал действий в админке: кто, когда и что изменил.
+model AuditEntry {
+  id        Int      @id @default(autoincrement())
+  at        DateTime @default(now()) @db.Timestamptz(6)
+  userId    Int?     @map("user_id")
+  userEmail String?  @map("user_email")
+  /// page.update, page.create, settings.update, redirect.delete, lead.resend, login…
+  action    String
+  /// адрес страницы, id записи, ключ файла
+  target    String?
+  details   Json?
+  ip        String?
+
+  @@index([at], map: "audit_at_idx")
+  @@index([target], map: "audit_target_idx")
+  @@map("audit_log")
+  @@schema("admin")
+}

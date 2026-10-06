@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { auditLog, desc } from '@mtpk/db';
 import { BLOCK_LABELS, type Block } from '@mtpk/content-model';
 import { Badge, Card, formatDate, PageHeader, Stat } from '@/components/ui';
 import { can, requireUser } from '@/lib/auth';
@@ -29,7 +28,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     can(user, 'content') ? safe(serviceJson<ContentStats>('content', 'stats', { user })) : null,
     can(user, 'leads') ? safe(serviceJson<LeadStats>('leads', 'leads/stats', { user })) : null,
     can(user, 'search') ? safe(serviceJson<{ documents: number; updatedAt: string | null }>('search', 'stats', { user })) : null,
-    can(user, 'audit') ? db().select().from(auditLog).orderBy(desc(auditLog.at)).limit(8) : null,
+    can(user, 'audit') ? db().auditEntry.findMany({ orderBy: { at: 'desc' }, take: 8 }) : null,
   ]);
   const typedShare = content && content.blocks ? Math.round(((content.blocks - content.htmlBlocks) / content.blocks) * 100) : 0;
   const leads14 = leads?.byDay.reduce((s, d) => s + d.count, 0) ?? 0;

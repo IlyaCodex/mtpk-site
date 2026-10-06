@@ -6,7 +6,7 @@
 import { Worker, type Job } from 'bullmq';
 import nodemailer from 'nodemailer';
 import { createLogger, createS3, deleteObject, getObject } from '@mtpk/shared';
-import { createDb, eq, leads, type Lead } from '@mtpk/db';
+import { createDb, type Lead, type Prisma } from '@mtpk/db';
 import { env } from './env.ts';
 import { bitrixLeadFields, emailBody, MAIL_SUBJECT, phpBuildQuery } from './messages.ts';
 import { bullConnection, QUEUE, type DeliveryJob, type DeliveryResult } from './queue.ts';
@@ -69,9 +69,9 @@ async function b24call(method: string, params: Record<string, unknown>): Promise
 }
 
 async function deliver(job: Job<DeliveryJob, DeliveryResult>): Promise<DeliveryResult> {
-  const [lead] = await db.select().from(leads).where(eq(leads.id, job.data.leadId)).limit(1);
+  const lead = await db.lead.findUnique({ where: { id: job.data.leadId } });
   if (!lead) throw new Error(`заявка ${job.data.leadId} не найдена`);
-  const patch: Partial<Lead> = {};
+  const patch: Prisma.LeadUpdateInput = {};
   const errors: string[] = [];
 
   // 1. Письмо
@@ -122,12 +122,12 @@ async function deliver(job: Job<DeliveryJob, DeliveryResult>): Promise<DeliveryR
   patch.status = delivered ? 'delivered' : mail === 'sent' || b24 === 'sent' ? (lastAttempt ? 'partial' : 'received') : lastAttempt ? 'failed' : 'received';
   if (delivered) patch.deliveredAt = new Date();
   patch.updatedAt = new Date();
-  await db.update(leads).set(patch).where(eq(leads.id, lead.id));
+  await db.lead.update({ where: { id: lead.id }, data: patch });
 
   // Вложение хранится только до отправки письма — как в send.php (файл нигде не оседал)
   if (mail === 'sent' && lead.attachmentKey) {
     await deleteObject(s3, env.S3_BUCKET_PRIVATE, lead.attachmentKey).catch(() => {});
-    await db.update(leads).set({ attachmentKey: null }).where(eq(leads.id, lead.id));
+    await db.lead.update({ where: { id: lead.id }, data: { attachmentKey: null } });
   }
 
   log.info({ leadId: lead.id, mail, b24, attempt: job.attemptsMade + 1 }, 'доставка заявки');

@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import type { Queue } from 'bullmq';
 import { isAuthorized, type ZodTypeProvider } from '@mtpk/shared';
-import { and, count, desc, eq, gt, leadRejects, leads, lt, or, sql, type Db } from '@mtpk/db';
+import type { Db, Prisma } from '@mtpk/db';
 import type { DeliveryJob, DeliveryResult } from './queue.ts';
 
 interface Deps {
@@ -33,65 +33,57 @@ export async function adminRoutes(base: FastifyInstance, { db, queue, adminToken
 
   app.get('/admin/v1/leads', { schema: { tags: TAGS, summary: 'Заявки (новые сверху)', querystring: listQuery, security: ADMIN } }, async (req) => {
     const q = req.query;
-    const like = q.search ? `%${q.search}%` : null;
-    const where = and(
-      q.status ? eq(leads.status, q.status) : undefined,
-      q.from ? gt(leads.createdAt, q.from) : undefined,
-      q.to ? lt(leads.createdAt, q.to) : undefined,
-      like
-        ? or(
-            sql`${leads.phone} ilike ${like}`,
-            sql`${leads.name} ilike ${like}`,
-            sql`${leads.email} ilike ${like}`,
-            sql`${leads.source} ilike ${like}`,
-            sql`${leads.task} ilike ${like}`,
-          )
-        : undefined,
-    );
-    const [{ total }] = await db.select({ total: count() }).from(leads).where(where);
-    const items = await db
-      .select({
-        id: leads.id,
-        createdAt: leads.createdAt,
-        source: leads.source,
-        pageUrl: leads.pageUrl,
-        phone: leads.phone,
-        name: leads.name,
-        email: leads.email,
-        status: leads.status,
-        mailStatus: leads.mailStatus,
-        b24Status: leads.b24Status,
-        b24LeadId: leads.b24LeadId,
-        hasAttachment: sql<boolean>`${leads.attachmentName} is not null`,
-      })
-      .from(leads)
-      .where(where)
-      .orderBy(desc(leads.createdAt))
-      .offset(q.offset)
-      .limit(q.limit);
-    return { total, items };
+    const contains = q.search ? { contains: q.search, mode: 'insensitive' as const } : null;
+    const where: Prisma.LeadWhereInput = {
+      ...(q.status ? { status: q.status } : {}),
+      ...(q.from || q.to ? { createdAt: { ...(q.from ? { gt: q.from } : {}), ...(q.to ? { lt: q.to } : {}) } } : {}),
+      ...(contains
+        ? { OR: [{ phone: contains }, { name: contains }, { email: contains }, { source: contains }, { task: contains }] }
+        : {}),
+    };
+    const [total, rows] = await Promise.all([
+      db.lead.count({ where }),
+      db.lead.findMany({
+        where,
+        select: {
+          id: true,
+          createdAt: true,
+          source: true,
+          pageUrl: true,
+          phone: true,
+          name: true,
+          email: true,
+          status: true,
+          mailStatus: true,
+          b24Status: true,
+          b24LeadId: true,
+          attachmentName: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: q.offset,
+        take: q.limit,
+      }),
+    ]);
+    return { total, items: rows.map(({ attachmentName, ...r }) => ({ ...r, hasAttachment: attachmentName !== null })) };
   });
 
   app.get('/admin/v1/leads/stats', { schema: { tags: TAGS, summary: 'Сводка: по статусам и по дням (14 дней)', security: ADMIN } }, async () => {
-    const byStatus = await db.select({ status: leads.status, count: count() }).from(leads).groupBy(leads.status);
-    const byDay = await db.execute<{ day: string; count: number }>(sql`
+    const byStatus = await db.lead.groupBy({ by: ['status'], _count: { _all: true } });
+    const byDay = await db.$queryRaw<{ day: string; count: number }[]>`
       select to_char(date_trunc('day', created_at at time zone 'Asia/Yekaterinburg'), 'YYYY-MM-DD') as day, count(*)::int as count
       from leads.leads
       where created_at > now() - interval '14 days'
-      group by 1 order by 1`);
-    const [{ rejects }] = await db
-      .select({ rejects: count() })
-      .from(leadRejects)
-      .where(gt(leadRejects.createdAt, sql`now() - interval '14 days'`));
+      group by 1 order by 1`;
+    const rejects = await db.leadReject.count({ where: { createdAt: { gt: new Date(Date.now() - 14 * 24 * 3600 * 1000) } } });
     return {
-      byStatus: Object.fromEntries(byStatus.map((r) => [r.status, r.count])),
-      byDay: byDay.rows,
+      byStatus: Object.fromEntries(byStatus.map((r) => [r.status, r._count._all])),
+      byDay,
       rejects14d: rejects,
     };
   });
 
   app.get('/admin/v1/leads/:id', { schema: { tags: TAGS, summary: 'Заявка целиком', params: idParam, security: ADMIN } }, async (req, reply) => {
-    const [row] = await db.select().from(leads).where(eq(leads.id, req.params.id)).limit(1);
+    const row = await db.lead.findUnique({ where: { id: req.params.id } });
     if (!row) return reply.code(404).send({ error: 'not_found' });
     const jobs = await Promise.all(
       (await queue.getJobs(['active', 'waiting', 'delayed', 'failed', 'completed'], 0, 200))
@@ -105,9 +97,9 @@ export async function adminRoutes(base: FastifyInstance, { db, queue, adminToken
     '/admin/v1/leads/:id/resend',
     { schema: { tags: TAGS, summary: 'Повторить доставку (только недоставленные каналы)', params: idParam, security: ADMIN } },
     async (req, reply) => {
-      const [row] = await db.select({ id: leads.id }).from(leads).where(eq(leads.id, req.params.id)).limit(1);
+      const row = await db.lead.findUnique({ where: { id: req.params.id }, select: { id: true } });
       if (!row) return reply.code(404).send({ error: 'not_found' });
-      await db.update(leads).set({ status: 'received', updatedAt: new Date() }).where(eq(leads.id, row.id));
+      await db.lead.update({ where: { id: row.id }, data: { status: 'received' } });
       const job = await queue.add('deliver', { leadId: row.id }, { jobId: `lead-${row.id}-resend-${Date.now()}` });
       return { ok: true, jobId: job.id };
     },
@@ -124,8 +116,10 @@ export async function adminRoutes(base: FastifyInstance, { db, queue, adminToken
       },
     },
     async (req) => {
-      const [{ total }] = await db.select({ total: count() }).from(leadRejects);
-      const items = await db.select().from(leadRejects).orderBy(desc(leadRejects.createdAt)).offset(req.query.offset).limit(req.query.limit);
+      const [total, items] = await Promise.all([
+        db.leadReject.count(),
+        db.leadReject.findMany({ orderBy: { createdAt: 'desc' }, skip: req.query.offset, take: req.query.limit }),
+      ]);
       return { total, items };
     },
   );

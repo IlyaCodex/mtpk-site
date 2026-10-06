@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { eq, users } from '@mtpk/db';
 import { audit, clientIp } from '@/lib/audit';
 import { jsonError } from '@/lib/api';
 import { createSession } from '@/lib/auth';
@@ -26,14 +25,14 @@ export async function POST(req: Request): Promise<Response> {
   if (!parsed.success) return jsonError(400, 'bad_request', { message: 'Укажите e-mail и пароль' });
   const { email, password } = parsed.data;
 
-  const [user] = await db().select().from(users).where(eq(users.email, email)).limit(1);
+  const user = await db().user.findUnique({ where: { email } });
   const ok = user ? await verifyPassword(password, user.passwordHash) : false;
   if (!user || !ok || !user.active) {
     await audit(null, 'login.failed', email);
     return jsonError(401, 'invalid_credentials', { message: 'Неверный e-mail или пароль' });
   }
   await createSession(user.id);
-  await db().update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, user.id));
+  await db().user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
   await redis().del(attemptsKey);
   await audit(user, 'login', user.email);
   return Response.json({ ok: true });

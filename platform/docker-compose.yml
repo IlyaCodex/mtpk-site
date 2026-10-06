@@ -278,7 +278,7 @@ services:
   importer:
     image: mtpk/tools:${IMAGE_TAG:-latest}
     profiles: [tools]
-    command: ["node", "tools/importer/dist/index.js"]
+    command: ["node", "/app/tools/importer/dist/index.js"]
     environment:
       <<: *node-env
       CONTENT_SOURCE_DIR: /source/astro

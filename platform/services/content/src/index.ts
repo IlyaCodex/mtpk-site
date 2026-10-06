@@ -9,7 +9,7 @@ import { ContentStore } from './store.ts';
 import { adminRoutes, publicRoutes } from './routes.ts';
 
 const log = createLogger('content');
-const { db, pool, close } = createDb(env.DATABASE_URL, { max: 10, appName: 'content' });
+const { db, close } = createDb(env.DATABASE_URL, { max: 10, appName: 'content' });
 const redis = createRedis(env.REDIS_URL);
 // Версия формата PageDto в префиксе ключей: после смены контракта старые записи
 // кеша просто не читаются (поднимать при изменении packages/shared/src/contracts.ts).
@@ -45,7 +45,7 @@ await startService({
     await app.register(adminRoutes, deps);
   },
   async readiness() {
-    await pool.query('select 1');
+    await db.$queryRaw`select 1`;
     await redis.ping();
   },
   async onClose() {

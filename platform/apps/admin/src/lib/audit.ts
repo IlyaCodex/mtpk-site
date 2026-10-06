@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { auditLog } from '@mtpk/db';
+import type { Prisma } from '@mtpk/db';
 import { db } from './db';
 import type { SessionUser } from './auth';
 
@@ -17,10 +17,28 @@ export async function audit(
   details?: Record<string, unknown>,
 ): Promise<void> {
   try {
-    await db()
-      .insert(auditLog)
-      .values({ userId: user?.id ?? null, userEmail: user?.email ?? null, action, target: target ?? null, details: details ?? null, ip: await clientIp() });
+    await db().auditEntry.create({
+      data: {
+        userId: user?.id ?? null,
+        userEmail: user?.email ?? null,
+        action,
+        target: target ?? null,
+        details: details as Prisma.InputJsonObject | undefined,
+        ip: await clientIp(),
+      },
+    });
   } catch (err) {
     console.error('журнал действий: запись не удалась', err);
   }
+}
+
+/** Записи журнала, новые сверху; поиск — по действию, адресу и e-mail. */
+export async function listAudit(search: string | undefined, offset: number, limit: number) {
+  const contains = search ? { contains: search, mode: 'insensitive' as const } : null;
+  const where: Prisma.AuditEntryWhereInput = contains ? { OR: [{ action: contains }, { target: contains }, { userEmail: contains }] } : {};
+  const [total, items] = await Promise.all([
+    db().auditEntry.count({ where }),
+    db().auditEntry.findMany({ where, orderBy: { at: 'desc' }, skip: offset, take: limit }),
+  ]);
+  return { total, items };
 }

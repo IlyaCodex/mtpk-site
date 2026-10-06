@@ -27,7 +27,7 @@ import {
   startService,
   type ZodTypeProvider,
 } from '@mtpk/shared';
-import { assets, asc, createDb, eq, like, sql } from '@mtpk/db';
+import { createDb } from '@mtpk/db';
 import { dropVariants, getVariant, pickFormat, snapWidth, VARIANT_SOURCE } from './variants.ts';
 
 const env = readEnv(
@@ -58,7 +58,7 @@ let catalog = new Map<string, string>();
 let catalogLoaded = false;
 async function loadCatalog(): Promise<void> {
   try {
-    const rows = await db.select({ key: assets.key, etag: assets.etag }).from(assets);
+    const rows = await db.asset.findMany({ select: { key: true, etag: true } });
     if (rows.length) {
       catalog = new Map(rows.map((r) => [r.key, r.etag]));
     } else {
@@ -136,11 +136,7 @@ async function adminRoutes(base: import('fastify').FastifyInstance) {
     },
     async (req) => {
       const { prefix, search, offset, limit } = req.query;
-      const rows = await db
-        .select()
-        .from(assets)
-        .where(like(assets.key, `${prefix.replace(/[%_\\]/g, '\\$&')}%`))
-        .orderBy(asc(assets.key));
+      const rows = await db.asset.findMany({ where: { key: { startsWith: prefix } }, orderBy: { key: 'asc' } });
       const folders = new Map<string, number>();
       const files: typeof rows = [];
       for (const r of rows) {
@@ -188,10 +184,11 @@ async function adminRoutes(base: import('fastify').FastifyInstance) {
       const key = await freeKey(wanted);
       const contentType = contentTypeFor(key);
       const etag = await putObject(s3, bucket, key, req.body, contentType);
-      await db
-        .insert(assets)
-        .values({ key, size: req.body.length, etag, contentType })
-        .onConflictDoUpdate({ target: assets.key, set: { size: req.body.length, etag, contentType, updatedAt: sql`now()` } });
+      await db.asset.upsert({
+        where: { key },
+        create: { key, size: req.body.length, etag, contentType },
+        update: { size: req.body.length, etag, contentType },
+      });
       catalog.set(key, etag);
       return { ok: true, key, url: `/${key}`, etag };
     },
@@ -225,7 +222,7 @@ async function freeKey(key: string): Promise<string> {
 /** Удалить файл из бакета, таблицы и каталога. */
 async function removeObject(key: string): Promise<void> {
   await deleteObject(s3, bucket, key);
-  await db.delete(assets).where(eq(assets.key, key));
+  await db.asset.deleteMany({ where: { key } });
   catalog.delete(key);
 }
 
