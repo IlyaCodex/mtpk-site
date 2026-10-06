@@ -1,0 +1,20 @@
+{
+  "name": "@mtpk/content-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@mtpk/blocks": "*",
+    "@mtpk/content-kit": "*",
+    "@mtpk/db": "*",
+    "@mtpk/shared": "*",
+    "fastify": "^5.12.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
+}

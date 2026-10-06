@@ -1,0 +1,426 @@
+/* Каталог запчастей индукционного оборудования (пакет V10).
+   Часть селекторов у автора вне скоупа (#request-dialog, .v9-*, .v10-*),
+   поэтому они дополнительно обёрнуты в .ui-spares-scope. Выброшены демо-обёртка
+   пакета и правило «.header a.btn[href^=mailto]», которое лезло в нашу шапку. */
+
+.ui-spares{font:16px/1.65 Arial,sans-serif;color:#203342;max-width:1120px;margin:0 auto;overflow-wrap:anywhere}
+.ui-spares *{box-sizing:border-box}
+.ui-spares h1{font-size:clamp(27px,4vw,38px);line-height:1.2;color:#152d40;margin:18px 0 22px}
+.ui-spares h2{font-size:24px;line-height:1.3;margin:38px 0 14px;color:#152d40}
+.ui-spares h3{font-size:18px;margin:22px 0 8px}
+.ui-spares p{margin:0 0 16px}
+.ui-spares a{color:#176489;text-underline-offset:3px}
+.ui-spares a:focus-visible{outline:3px solid #bf6715;outline-offset:3px}
+.ui-spares .ui-table{overflow-x:auto;max-width:100%;margin:18px 0;border:1px solid #d6dfe5;border-radius:8px}
+.ui-spares table{width:100%;border-collapse:collapse;font-size:14px}
+.ui-spares th, .ui-spares td{text-align:left;vertical-align:top;border-bottom:1px solid #d6dfe5;padding:11px 12px}
+.ui-spares th{background:#e9f0f4;color:#17384d}
+.ui-spares tr:nth-child(even) td{background:#f8fafb}
+.ui-spares table.ui-wide{min-width:540px}
+.ui-spares .ui-links{display:flex;flex-wrap:wrap;gap:9px 18px;padding:0;list-style:none}
+.ui-spares .ui-gallery{display:flex;flex-wrap:wrap;gap:22px;margin:20px 0}
+.ui-spares figure{margin:0;max-width:430px;flex:1 1 240px}
+.ui-spares figure img{max-width:100%;height:auto;object-fit:contain;display:block;max-height:290px}
+.ui-spares figcaption{font-size:12px;line-height:1.5;color:#586e7b;margin:8px 0}
+.ui-spares .ui-cta{border-left:4px solid #b76012;background:#f3f6f8;padding:22px;margin:26px 0}
+.ui-spares .ui-cta h2{margin:0 0 10px;font-size:22px}
+.ui-spares .ui-button{display:inline-block;background:#19475f;color:white;padding:11px 18px;border-radius:5px;font-weight:bold;text-decoration:none}
+.ui-spares .ui-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+.ui-spares .ui-source{font-size:13px;color:#536b78}
+.ui-spares .ui-breadcrumbs{font-size:13px;color:#637886;margin:10px 0}
+.ui-spares ul{padding-left:22px}
+.ui-spares li{margin-bottom:7px}
+.ui-spares .ui-question{border-top:1px solid #dbe3e7;padding-top:6px}
+.ui-spares .ui-related{border-top:2px solid #dbe3e7;margin-top:32px;padding-top:8px}
+@media(max-width:600px){.ui-spares{font-size:15px}.ui-spares h2{font-size:22px}.ui-spares .ui-cta{padding:16px}.ui-spares figure{max-width:100%;min-width:0}.ui-spares th, .ui-spares td{padding:8px}.ui-spares .ui-button{width:100%;text-align:center}}
+.ui-spares{--ui-green:#258749;--ui-ink:#15333f;--ui-muted:#64777c;font-family:Arial,sans-serif;color:var(--ui-ink)}
+.ui-spares a{color:#206544}
+.ui-spares h1{font-size:clamp(29px,3.2vw,42px);max-width:940px;letter-spacing:-.7px;line-height:1.16;margin:22px 0}
+.ui-spares .ui-button{background:var(--ui-green);border-radius:7px;padding:12px 22px}
+.ui-spares .ui-cta{border:1px solid #dce7df;border-left:4px solid var(--ui-green);border-radius:10px;background:#f4f8f5}
+.ui-spares th{background:#eff5f0}
+.ui-spares .ui-breadcrumbs{font-size:12px;line-height:1.5;margin:2px 0 22px}
+.ui-spares .ui-kicker{font-size:11px;font-weight:700;letter-spacing:1.8px;color:#29864c;margin:0 0 11px;text-transform:uppercase}
+.ui-spares .ui-home-head{padding:28px 32px 30px;border:1px solid #e0e9e3;border-radius:14px;background:linear-gradient(115deg,#f1f7f3,#fff);margin:0 0 24px;position:relative;overflow:hidden}
+.ui-spares .ui-home-head:after{content:'';position:absolute;right:-30px;top:-100px;width:340px;height:340px;border:35px solid #25874908;border-radius:50%;pointer-events:none}
+.ui-spares .ui-home-head h1{margin:0 0 16px;max-width:840px}
+.ui-spares .ui-home-head p{max-width:770px;color:#53686d;font-size:16px;line-height:1.65;margin-bottom:22px}
+.ui-spares .ui-home-head .ui-actions{position:relative;z-index:1}
+.ui-spares .ui-quiet-link{font-weight:600;text-decoration:none;font-size:14px}
+.ui-spares .ui-quicknav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px;align-items:center}
+.ui-spares .ui-quicknav a{padding:8px 13px;border:1px solid #dce6df;border-radius:7px;text-decoration:none;font-size:13px;background:white}
+.ui-spares .ui-quicknav a:hover{background:#edf6ef;border-color:#8bbb98}
+.ui-spares .ui-catalog-group{scroll-margin-top:140px;margin:0 0 32px}
+.ui-spares .ui-group-heading{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:14px}
+.ui-spares .ui-group-heading h2{margin:0 0 3px;font-size:23px}
+.ui-spares .ui-group-heading p{color:var(--ui-muted);font-size:13px;margin:0}
+.ui-spares .ui-group-number{color:#a3b4a9;font-size:27px;font-weight:400;letter-spacing:-1px}
+.ui-spares .ui-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ui-spares .ui-category-grid.ui-four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ui-spares .ui-category-card{position:relative;display:flex;align-items:flex-start;gap:15px;padding:21px 24px 21px 18px;background:white;border:1px solid #dce5df;border-radius:10px;min-width:0;text-decoration:none;transition:background .16s,border-color .16s,transform .16s}
+.ui-spares .ui-category-card:hover{background:#f4f9f5;border-color:#75ab85;transform:translateY(-2px)}
+.ui-spares .ui-card-copy{min-width:0}
+.ui-spares .ui-category-card h3{font-size:16px;color:#173d2a;line-height:1.35;margin:0 0 6px;font-weight:700;white-space:normal}
+.ui-spares .ui-category-card p{font-size:12px;line-height:1.5;color:#667a70;margin:0}
+.ui-spares .ui-four .ui-category-card{flex-direction:column;gap:12px}
+.ui-spares .ui-card-arrow{font-size:16px;color:#6ca17a;position:absolute;right:10px;top:9px}
+.ui-spares .ui-help-strip{display:grid;grid-template-columns:1fr 1.8fr;gap:24px;background:#f2f6f3;border-radius:12px;padding:25px 28px;margin:38px 0}
+.ui-spares .ui-help-strip h2{margin:0 0 7px;font-size:23px}
+.ui-spares .ui-help-strip p{font-size:13px;color:#64756b;margin:0}
+.ui-spares .ui-help-links{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;font-size:14px}
+.ui-spares .ui-help-links a{text-decoration:none}
+.ui-spares .ui-help-links a:hover{text-decoration:underline}
+.ui-spares .ui-faq{margin-top:30px}
+.ui-spares .ui-home-tail p{max-width:960px;font-size:15px;color:#50676a}
+@media(max-width:960px){.ui-spares .ui-category-grid.ui-four{grid-template-columns:repeat(2,minmax(0,1fr))}.ui-spares .ui-four .ui-category-card{flex-direction:row}.ui-spares .ui-category-card{padding:18px 14px;gap:11px}.ui-spares .ui-category-card h3{font-size:15px}}
+@media(max-width:680px){.ui-spares .ui-home-head{padding:22px 19px;border-radius:10px}.ui-spares .ui-home-head h1{font-size:29px;letter-spacing:-.4px}.ui-spares .ui-home-head p{font-size:14px}.ui-spares .ui-category-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ui-spares .ui-category-card, .ui-spares .ui-four .ui-category-card{flex-direction:column;gap:11px;padding:16px 12px}.ui-spares .ui-category-card h3{font-size:14px}.ui-spares .ui-category-card p{font-size:11px}.ui-spares .ui-group-heading h2{font-size:22px}.ui-spares .ui-quicknav{gap:6px}.ui-spares .ui-quicknav a{font-size:12px;padding:7px 10px}.ui-spares .ui-help-strip{grid-template-columns:1fr;gap:17px;padding:22px 18px}.ui-spares .ui-help-links{grid-template-columns:1fr}.ui-spares .ui-home-head .ui-actions{gap:13px}.ui-spares .ui-home-head .ui-quiet-link{font-size:13px}.ui-spares .ui-group-heading p{font-size:12px}}
+/* Category photographs */
+.ui-spares .ui-category-grid{gap:18px}
+.ui-spares .ui-category-card, .ui-spares .ui-four .ui-category-card{display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;border-radius:8px;background:#fff;box-shadow:0 3px 12px #173d2a04}
+.ui-spares .ui-category-card:hover{background:#fff;border-color:#77a98a;box-shadow:0 8px 24px #173d2a0d}
+.ui-spares .ui-card-photo{height:222px;display:flex;align-items:center;justify-content:center;padding:15px 18px 8px;background:#fff;overflow:hidden}
+.ui-spares .ui-card-photo img{display:block;width:100%;height:100%;max-height:none;object-fit:contain;margin:0;border:0;border-radius:0;mix-blend-mode:multiply}
+.ui-spares .ui-four .ui-card-photo{height:184px;padding:14px 12px 7px}
+.ui-spares .ui-card-copy{padding:15px 21px 18px;flex:1}
+.ui-spares .ui-category-card h3{font-size:19px;line-height:1.3;margin:0 0 9px}
+.ui-spares .ui-category-card p{font-size:13px;line-height:1.55;color:#63746b;margin:0}
+.ui-spares .ui-four .ui-category-card h3{font-size:18px}
+.ui-spares .ui-card-more{display:flex;justify-content:space-between;align-items:center;margin:0 21px;padding:13px 0 16px;border-top:1px solid #e7eee9;color:#287d46;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.ui-spares .ui-card-more span{font-size:20px;line-height:1}
+.ui-spares .ui-catalog-group{margin-bottom:40px}
+@media(max-width:1000px){.ui-spares .ui-card-photo{height:190px}.ui-spares .ui-card-copy{padding:15px 16px}.ui-spares .ui-card-more{margin:0 16px}.ui-spares .ui-category-card h3{font-size:17px}}
+@media(max-width:760px){.ui-spares .ui-category-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ui-spares .ui-card-photo, .ui-spares .ui-four .ui-card-photo{height:175px}.ui-spares .ui-category-card h3, .ui-spares .ui-four .ui-category-card h3{font-size:16px}}
+@media(max-width:480px){.ui-spares .ui-category-grid{gap:10px}.ui-spares .ui-card-photo, .ui-spares .ui-four .ui-card-photo{height:126px;padding:10px 8px 3px}.ui-spares .ui-card-copy{padding:11px 12px 14px}.ui-spares .ui-category-card h3, .ui-spares .ui-four .ui-category-card h3{font-size:14px;line-height:1.35;overflow-wrap:anywhere;hyphens:auto}.ui-spares .ui-category-card p{font-size:11px;line-height:1.5}.ui-spares .ui-card-more{font-size:9px;margin:0 12px;padding:10px 0 12px;letter-spacing:.7px}.ui-spares .ui-card-more span{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.ui-spares .ui-category-card{transition:none;transform:none}}
+.ui-spares .ui-group-number{white-space:nowrap;flex:0 0 auto;align-self:flex-start}
+.ui-spares-scope .v9-demo{background:#eaf1f4;color:#284654;font:13px/1.5 Arial,sans-serif;border-bottom:1px solid #d5e2e8}
+.ui-spares-scope .v9-demo>div{max-width:1230px;margin:auto;padding:10px 24px;display:flex;gap:12px 22px;align-items:center;flex-wrap:wrap}
+.ui-spares-scope .v9-demo a{color:#1f5e78}
+.ui-spares-scope .v9-demo button{margin-left:auto;background:#19475f;color:#fff;border:0;padding:8px 15px;border-radius:5px;cursor:pointer;font:600 13px Arial}
+.ui-spares-scope .v9-demo button span{display:inline-block;margin-left:8px;min-width:20px}
+.ui-spares h1{text-transform:none!important;letter-spacing:0!important}
+.ui-spares .ui-button{color:white!important;cursor:pointer;border:0;font:600 14px/1.5 Arial}
+.ui-spares .ui-home-head{background:#f1f6f4}
+.ui-spares .ui-home-head p{max-width:920px}
+.ui-spares .ui-category-card h3{font-size:18px}
+.ui-spares .ui-card-photo{height:205px}
+.ui-spares-scope .v9-quiet{background:none;border:0;font:600 14px Arial;color:#1f6040;cursor:pointer;padding:8px}
+.ui-spares-scope .v9-search{border:1px solid #dce5e9;border-radius:10px;padding:20px;margin:24px 0;background:#f7f9fa}
+.ui-spares-scope .v9-search-line{display:grid;grid-template-columns:1fr 260px auto;gap:14px;align-items:end}
+.ui-spares-scope .v9-search label{font-size:12px;font-weight:600;display:block;margin-bottom:6px;color:#536b76}
+.ui-spares-scope .v9-search input, .ui-spares-scope .v9-search select{width:100%;height:46px;border:1px solid #b9ccd5;border-radius:5px;background:#fff;color:#203442;padding:10px 12px;font:15px Arial}
+.ui-spares-scope .v9-search input:focus, .ui-spares-scope .v9-search select:focus{outline:2px solid #287d46;outline-offset:1px}
+.ui-spares-scope .v9-toggle{height:46px;border:1px solid #a8c3b1;color:#235c38;background:#fff;border-radius:5px;cursor:pointer;font:600 13px Arial;padding:0 14px}
+.ui-spares-scope .v9-toggle[aria-pressed=true]{color:#fff;background:#287d46}
+.ui-spares-scope .v9-toggle span{padding-left:7px}
+.ui-spares-scope .v9-search-meta{display:flex;gap:18px;align-items:center;font-size:12px;color:#5b6e76;padding-top:12px}
+.ui-spares-scope .v9-search-meta a{margin-left:auto}
+.ui-spares-scope .v9-search-meta button{border:0;background:transparent;color:#536d79;cursor:pointer;font-size:12px;text-decoration:underline}
+.ui-spares-scope .v9-new{display:inline-block;font:600 10px/1.5 Arial;letter-spacing:.15px;padding:3px 7px;background:#e7f3eb;color:#276743;border-radius:3px;margin-bottom:9px}
+.ui-spares .ui-category-card .v9-new{margin-bottom:8px}
+.ui-spares-scope .v9-category-hero{display:grid;grid-template-columns:1.5fr 1fr;gap:40px;align-items:center;margin:24px 0 30px}
+.ui-spares-scope .v9-category-hero figure{width:100%;max-width:100%;background:#fff}
+.ui-spares-scope .v9-category-hero figure img{display:block;width:100%;height:280px;object-fit:contain}
+.ui-spares-scope .v9-category-hero figcaption{color:#647782;font-size:12px;line-height:1.5;margin-top:12px}
+.ui-spares-scope .v9-caption{font-size:13px;color:#627982}
+.ui-spares-scope .v9-item{border:1px solid #dce5e9;border-radius:6px;margin:9px 0;background:#fff;scroll-margin-top:25px}
+.ui-spares-scope .v9-item>summary{list-style:none;cursor:pointer;padding:17px 18px;display:flex;gap:12px;align-items:center}
+.ui-spares-scope .v9-item>summary::-webkit-details-marker{display:none}
+.ui-spares-scope .v9-item>summary>span:first-child{flex:1;min-width:0}
+.ui-spares-scope .v9-item small{display:block;font-size:11px;color:#6f818b;margin-bottom:4px}
+.ui-spares-scope .v9-item strong{display:block;color:#203f50;font-size:16px;font-weight:600;line-height:1.4}
+.ui-spares-scope .v9-item .v9-new{margin-bottom:0;flex-shrink:0}
+.ui-spares-scope .v9-item[open]{border-color:#8dafbd;background:#fbfcfd}
+.ui-spares-scope .v9-item[open]>summary{border-bottom:1px solid #e0e9ed}
+.ui-spares-scope .v9-plus{font-size:22px;color:#4e7775}
+.ui-spares-scope .v9-item[open] .v9-plus{transform:rotate(45deg)}
+.ui-spares-scope .v9-item-body{padding:20px}
+.ui-spares-scope .v9-item dl{margin:0;display:grid;grid-template-columns:135px 1fr;gap:12px 18px;font-size:14px;line-height:1.65}
+.ui-spares-scope .v9-item dt{color:#607580}
+.ui-spares-scope .v9-item dd{margin:0}
+.ui-spares-scope .v9-chinese{font-size:12px;color:#6d838c;margin:18px 0!important}
+.ui-spares-scope .v9-item .ui-actions{font-size:12px}
+.ui-spares-scope .v9-add{font:600 13px/1.4 Arial;padding:10px 18px;border:1px solid #225a70;background:#225a70;color:#fff;border-radius:4px;cursor:pointer}
+.ui-spares-scope .v9-add[aria-pressed=true]{background:#eaf3ed;color:#23663c;border-color:#a9c5b2}
+.ui-spares-scope .v9-jump{font-size:13px}
+.ui-spares-scope .v9-callout{background:#f2f7f4;border-left:3px solid #4c9163;padding:20px;margin:20px 0}
+.ui-spares-scope .v9-callout h2{margin:0 0 10px;font-size:22px}
+.ui-spares [hidden]{display:none!important}
+.ui-spares-scope #request-dialog{max-width:740px;width:calc(100% - 32px);max-height:85vh;overflow:auto;border:1px solid #c4d6dc;border-radius:10px;padding:26px;color:#203442;box-shadow:0 20px 70px #102a4740;font:14px/1.6 Arial}
+.ui-spares-scope #request-dialog::backdrop{background:#142f4580}
+.ui-spares-scope .v9-dialog-top{display:flex;gap:15px;align-items:start}
+.ui-spares-scope .v9-dialog-top h2{font-size:23px;line-height:1.3;margin:0 0 14px}
+.ui-spares-scope .v9-dialog-top button{margin-left:auto;font-size:27px;border:0;background:transparent;cursor:pointer;color:#536d7b}
+.ui-spares-scope #request-dialog label{display:block;font-size:13px;font-weight:600;margin:16px 0 5px}
+.ui-spares-scope #request-note{box-sizing:border-box;width:100%;padding:10px;border:1px solid #a9bfca;border-radius:4px;font:14px/1.5 Arial}
+.ui-spares-scope #request-items .v9-request-row{display:grid;grid-template-columns:1fr 75px 28px;gap:12px;align-items:center;border-bottom:1px solid #e0e9ed;padding:12px 0}
+.ui-spares-scope #request-items input{width:100%;box-sizing:border-box;border:1px solid #b7cbd5;padding:7px;font:14px Arial}
+.ui-spares-scope #request-items button{border:0;background:transparent;color:#8b3e2f;font-size:20px;cursor:pointer}
+.ui-spares-scope .v9-dialog-actions{display:flex;gap:22px;align-items:center;margin:18px 0}
+.ui-spares-scope .v9-dialog-actions a{color:#1f5e78}
+.ui-spares-scope #request-status{color:#376846}
+.ui-spares-scope .v9-demo button:focus-visible, .ui-spares-scope .v9-item summary:focus-visible, .ui-spares-scope button:focus-visible{outline:3px solid #ba6a26;outline-offset:3px}
+@media(max-width:800px){.ui-spares-scope .v9-search-line{grid-template-columns:1fr 1fr}.ui-spares-scope .v9-input{grid-column:1/-1}.ui-spares-scope .v9-category-hero{grid-template-columns:1fr;gap:15px}.ui-spares-scope .v9-category-hero figure{max-width:430px;margin:auto}.ui-spares-scope .v9-category-hero figure img{height:240px}.ui-spares-scope .v9-demo>div{gap:8px 14px}.ui-spares-scope .v9-demo>div>span{display:none}}
+@media(max-width:600px){.ui-spares-scope .v9-demo>div{padding:9px 16px}.ui-spares-scope .v9-demo strong{font-size:12px}.ui-spares-scope .v9-demo a{font-size:12px}.ui-spares-scope .v9-search{padding:14px}.ui-spares-scope .v9-search-line{gap:10px;grid-template-columns:1fr}.ui-spares-scope .v9-input{grid-column:auto}.ui-spares-scope .v9-search-meta{flex-wrap:wrap;gap:10px}.ui-spares-scope .v9-search-meta a{margin-left:0}.ui-spares-scope .v9-item>summary{padding:13px;gap:8px}.ui-spares-scope .v9-item strong{font-size:14px}.ui-spares-scope .v9-item small{font-size:10px}.ui-spares-scope .v9-item-body{padding:14px}.ui-spares-scope .v9-item dl{display:block;font-size:13px}.ui-spares-scope .v9-item dt{font-weight:600;margin-top:12px}.ui-spares-scope .v9-item dd{margin-top:2px}.ui-spares-scope .v9-item .v9-new{font-size:9px}.ui-spares .ui-category-card h3{font-size:14px}.ui-spares .ui-card-photo{height:140px}.ui-spares-scope #request-dialog{padding:18px}.ui-spares-scope .v9-dialog-top h2{font-size:21px}.ui-spares-scope .v9-dialog-actions{gap:14px;flex-wrap:wrap}}
+.ui-spares-scope .v9-item-spec{display:block;font-size:12px;line-height:1.5;color:#536d79;margin-top:6px}
+.ui-spares-scope .v9-table-scroll{overflow-x:auto;margin:22px 0;max-width:100%}
+.ui-spares-scope .v9-table-scroll table{width:100%;border-collapse:collapse;min-width:560px}
+.ui-spares-scope .v9-table-scroll th, .ui-spares-scope .v9-table-scroll td{padding:14px 18px;border-bottom:1px solid #dde5df;text-align:left}
+.ui-spares-scope .v9-table-scroll thead{background:#edf3ef}
+.ui-spares-scope .v9-table-scroll tbody tr:nth-child(even){background:#f7f9f7}
+.ui-spares-scope .v9-table-scroll tbody th{font-weight:600}
+.ui-spares-scope .v9-table-scroll a{white-space:nowrap}
+.ui-spares-scope .v9-dimension-drawings{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 0}
+.ui-spares-scope .v9-dimension-drawings figure{margin:0;min-width:0}
+.ui-spares-scope .v9-dimension-drawings img{display:block;width:100%;height:auto}
+.ui-spares-scope .v9-dimension-drawings figcaption{font-size:12px;line-height:1.5;color:#627982;margin-top:10px}
+.ui-spares-scope .v9-reducer-dimensions{scroll-margin-top:130px}
+.ui-spares-scope .v9-reducer-dimensions .v9-table-scroll table{min-width:760px}
+.ui-spares-scope .v9-reducer-dimensions td{text-align:right}
+.ui-spares-scope .v9-reducer-dimensions th{white-space:nowrap}
+@media(max-width:650px){.ui-spares-scope .v9-dimension-drawings{grid-template-columns:1fr;gap:20px}}
+.ui-spares-scope .v10-request-toggle{position:fixed;bottom:20px;right:20px;z-index:900;border:0;border-radius:7px;background:#17374c;color:#fff;padding:13px 20px;font:600 16px Arial;box-shadow:0 3px 12px #0003;cursor:pointer}
+.ui-spares-scope .v10-request-toggle:focus-visible{outline:3px solid #b76012;outline-offset:3px}
+
+
+/* ============================================================
+   ЕДИНЫЙ СТИЛЬ С РАЗДЕЛОМ ЗАПЧАСТЕЙ ДРОБЕМЁТОВ
+   Пакет V10 приходит со своей палитрой, не задаёт фон и делает
+   «мягкую» светло-зелёную шапку. Ниже раздел приводится к языку
+   /css/zapchasti-catalog.css (.zp): белый фон во всю ширину,
+   тёмный hero-блок с крошками, плитки-карточки, панель фильтров,
+   табличная типографика и кнопки.
+   ============================================================ */
+.ui-spares-scope{
+  --green:#4fab3a; --green-dark:#348c26; --ink:#142a32; --dark:#102329;
+  --muted:#65747b; --line:#e0e6e6; --soft:#f4f7f6;
+  --ui-green:#4fab3a; --ui-ink:#142a32; --ui-muted:#65747b;
+  background:#fff; color:var(--ink);
+  font-family:Inter,Arial,Helvetica,sans-serif;
+  font-size:15px; line-height:1.55;
+}
+
+/* --- Hero-полоса: тёмная, во всю ширину, как .zp .section-hero --- */
+.ui-spares-scope .ui-hero-band{
+  background:var(--dark); color:#fff; padding:26px 0 40px; margin:0 0 6px;
+}
+.ui-spares-scope .ui-hero-band__in{
+  width:min(1280px,calc(100% - 64px)); margin:0 auto;
+}
+.ui-spares-scope .ui-hero-band .ui-breadcrumbs{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  font-size:12px; color:#8ea3a8; margin:0 0 22px;
+}
+.ui-spares-scope .ui-hero-band .ui-breadcrumbs a{ color:#c6d3d6; text-decoration:none }
+.ui-spares-scope .ui-hero-band .ui-breadcrumbs a:hover{ color:#fff; text-decoration:underline }
+.ui-spares-scope .ui-hero-band h1{
+  font-size:42px; line-height:1.15; letter-spacing:-.02em;
+  margin:0 0 18px; color:#fff; max-width:19ch;
+}
+.ui-spares-scope .ui-hero-band>.ui-hero-band__in>p,
+.ui-spares-scope .ui-hero-band .ui-home-head p{
+  max-width:850px; color:#c3ced2; font-size:15px; line-height:1.65; margin:0 0 14px;
+}
+.ui-spares-scope .ui-hero-band .v9-jump{ font-size:13px; color:#a9bbc0 }
+.ui-spares-scope .ui-hero-band .v9-jump a{ color:#8fd07c; text-decoration:none }
+.ui-spares-scope .ui-hero-band .v9-jump a:hover{ text-decoration:underline }
+.ui-spares-scope .ui-hero-band .ui-kicker{
+  font-size:11px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
+  color:#8fd07c; margin:0 0 12px;
+}
+/* шапка хаба внутри полосы — без своей подложки и рамки */
+.ui-spares-scope .ui-hero-band .ui-home-head{
+  background:none; border:0; border-radius:0; padding:0; margin:0; overflow:visible;
+}
+.ui-spares-scope .ui-hero-band .ui-home-head:after{ display:none }
+.ui-spares-scope .ui-hero-band .ui-home-head h1{ max-width:840px; margin-bottom:16px }
+.ui-spares-scope .ui-hero-band .ui-actions{ margin-top:22px; gap:12px }
+.ui-spares-scope .ui-hero-band .v9-quiet{
+  border:1px solid #6d8286; border-radius:6px; background:transparent; color:#fff;
+  padding:14px 21px; font:650 14px/1.4 Inter,Arial,sans-serif;
+}
+.ui-spares-scope .ui-hero-band .v9-quiet:hover{ background:#243b41 }
+
+/* Hero-полоса в два столбца (страницы с фото) */
+.ui-spares-scope .ui-hero-band .v9-category-hero{
+  display:grid; grid-template-columns:1.35fr 1fr; gap:44px; align-items:center; margin:0;
+}
+.ui-spares-scope .ui-hero-band .v9-category-hero h1{ font-size:36px; max-width:none }
+.ui-spares-scope .ui-hero-band .v9-category-hero p{ color:#c3ced2; margin:0 0 20px }
+.ui-spares-scope .ui-hero-band .v9-category-hero figure{
+  margin:0; background:#fff; border-radius:10px; padding:18px;
+}
+.ui-spares-scope .ui-hero-band .v9-category-hero figure img{
+  display:block; width:100%; height:260px; object-fit:contain;
+}
+.ui-spares-scope .ui-hero-band .v9-category-hero figcaption{
+  color:var(--muted); font-size:12px; line-height:1.5; margin-top:12px;
+}
+.ui-spares-scope .ui-hero-band .v9-new{
+  background:#1d3b41; color:#8fd07c; font:600 10px/1.5 Arial; letter-spacing:.4px;
+  padding:4px 8px; border-radius:3px; margin-bottom:12px; display:inline-block;
+}
+
+/* --- Контейнер контента --- */
+.ui-spares-scope .ui-spares{
+  max-width:none; width:min(1280px,calc(100% - 64px)); margin:0 auto;
+  padding:34px 0 72px; background:#fff; color:var(--ink);
+  font-family:Inter,Arial,Helvetica,sans-serif; font-size:15px;
+}
+.ui-spares-scope .ui-spares>h2{
+  font-size:28px; line-height:1.2; letter-spacing:-.02em; margin:34px 0 12px; color:var(--ink);
+}
+.ui-spares-scope .ui-spares h3{ font-size:17px; font-weight:650; color:var(--ink) }
+.ui-spares-scope .ui-spares p{ color:#3d5259 }
+.ui-spares-scope .ui-spares a{ color:var(--green-dark) }
+
+/* --- Кнопки как в .zp --- */
+.ui-spares-scope .ui-button,
+.ui-spares-scope .v9-add{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  border:1px solid transparent; border-radius:6px; padding:14px 21px;
+  font:650 14px/1.4 Inter,Arial,sans-serif; background:var(--green); color:#fff;
+  text-decoration:none; cursor:pointer; transition:background .15s;
+}
+.ui-spares-scope .ui-button:hover,
+.ui-spares-scope .v9-add:hover{ background:var(--green-dark) }
+.ui-spares-scope .v9-add[aria-pressed=true]{
+  background:#eef6ec; color:var(--green-dark); border-color:#c3d2cc;
+}
+.ui-spares-scope .ui-spares .v9-quiet{
+  border:1px solid #c3d2cc; border-radius:6px; background:transparent; color:var(--ink);
+  padding:13px 20px; font:650 14px/1.4 Inter,Arial,sans-serif;
+}
+.ui-spares-scope .ui-spares .v9-quiet:hover{ background:#eef6ec }
+
+/* --- Панель поиска = .zp .filters --- */
+.ui-spares-scope .v9-search{
+  border:1px solid var(--line); border-radius:9px; background:#fff; padding:21px; margin:0 0 30px;
+}
+.ui-spares-scope .v9-search label{ font-size:12px; font-weight:700; color:var(--muted) }
+.ui-spares-scope .v9-search input,
+.ui-spares-scope .v9-search select{
+  border:1px solid #d7e0dc; border-radius:5px; color:var(--ink); font:14px Inter,Arial,sans-serif;
+}
+.ui-spares-scope .v9-search input:focus,
+.ui-spares-scope .v9-search select:focus{ outline:2px solid var(--green); outline-offset:1px }
+.ui-spares-scope .v9-toggle{
+  border:1px solid #d7e0d5; color:var(--ink); background:#fff; border-radius:5px;
+  font:600 13px Inter,Arial,sans-serif;
+}
+.ui-spares-scope .v9-toggle[aria-pressed=true]{ background:var(--green); border-color:var(--green); color:#fff }
+.ui-spares-scope .v9-search-meta{ color:var(--muted); border-top:1px solid var(--line); margin-top:14px }
+
+/* --- Быстрая навигация = .zp .model-chip --- */
+.ui-spares-scope .ui-quicknav a{
+  border:1px solid #d7e0d5; background:#fff; color:var(--ink);
+  padding:8px 18px; border-radius:5px; font-size:13px; font-weight:600;
+}
+.ui-spares-scope .ui-quicknav a:hover{ border-color:var(--green); color:var(--green-dark); background:#edf6e9 }
+
+/* --- Заголовки групп каталога --- */
+.ui-spares-scope .ui-catalog-group{ margin:0 0 38px }
+.ui-spares-scope .ui-group-heading{
+  align-items:baseline; gap:13px; margin:0 0 20px;
+  padding-bottom:12px; border-bottom:1px solid var(--line);
+}
+.ui-spares-scope .ui-group-heading h2{
+  font-size:28px; line-height:1.2; letter-spacing:-.02em; color:var(--ink); margin:0;
+}
+.ui-spares-scope .ui-group-heading p{ color:var(--muted); font-size:13px }
+.ui-spares-scope .ui-group-number{ color:var(--muted) }
+
+/* --- Плитки категорий = .zp .category-tile --- */
+.ui-spares-scope .ui-category-grid{ gap:14px }
+.ui-spares-scope .ui-category-card,
+.ui-spares-scope .ui-four .ui-category-card{
+  border:1px solid var(--line); border-radius:8px; background:#fff; box-shadow:none;
+  transition:box-shadow .2s,transform .2s,border-color .2s;
+}
+.ui-spares-scope .ui-category-card:hover,
+.ui-spares-scope .ui-four .ui-category-card:hover{
+  background:#fff; border-color:#a8c79c; box-shadow:0 9px 24px #17321c10; transform:translateY(-2px);
+}
+.ui-spares-scope .ui-card-photo{ background:var(--soft); border-bottom:1px solid var(--line) }
+.ui-spares-scope .ui-card-copy{ padding:16px 18px 18px }
+.ui-spares-scope .ui-category-card h3{ font-size:16px; font-weight:650; line-height:1.4; color:var(--ink); margin:0 0 7px }
+.ui-spares-scope .ui-category-card p{ font-size:12.5px; line-height:1.55; color:var(--muted) }
+.ui-spares-scope .ui-category-card .v9-new{ background:#edf6e9; color:var(--green-dark) }
+.ui-spares-scope .ui-card-arrow{ color:#799683 }
+
+/* --- Позиции номенклатуры = .zp .product-card --- */
+.ui-spares-scope .v9-item{
+  border:1px solid var(--line); border-radius:8px; margin:10px 0;
+  transition:box-shadow .2s,border-color .2s;
+}
+.ui-spares-scope .v9-item:hover{ border-color:#c5d4bd; box-shadow:0 9px 24px #17321c10 }
+.ui-spares-scope .v9-item strong{ color:var(--ink); font-size:15px; font-weight:650 }
+.ui-spares-scope .v9-item small{ color:var(--muted) }
+.ui-spares-scope .v9-item[open]{ border-color:#a8c79c; background:#fff }
+.ui-spares-scope .v9-item[open]>summary{ border-bottom:1px solid var(--line); background:var(--soft) }
+.ui-spares-scope .v9-item dt{ color:var(--muted) }
+.ui-spares-scope .v9-item .v9-new{ background:#edf6e9; color:var(--green-dark) }
+
+/* --- Таблицы = .zp .spec-table --- */
+.ui-spares-scope .ui-table{ border:1px solid var(--line); border-radius:8px; margin:20px 0 }
+.ui-spares-scope .ui-spares table{ font-size:13px }
+.ui-spares-scope .ui-spares th,
+.ui-spares-scope .ui-spares td{ padding:12px 15px; border-bottom:1px solid #e7ece8; vertical-align:top }
+.ui-spares-scope .ui-spares th{ font-weight:600; color:#6e8180; background:var(--soft) }
+.ui-spares-scope .ui-spares tr:nth-child(even) td{ background:#fbfcfa }
+
+/* --- Фото, врезки, FAQ, CTA --- */
+.ui-spares-scope .ui-gallery figure{ border:1px solid var(--line); border-radius:8px; padding:14px; background:#fff }
+.ui-spares-scope .ui-gallery figcaption{ color:var(--muted); font-size:12px }
+.ui-spares-scope .v9-callout{
+  background:var(--soft); border:1px solid var(--line); border-left:3px solid var(--green);
+  border-radius:8px; padding:22px 24px;
+}
+.ui-spares-scope .v9-callout h2{ font-size:22px; color:var(--ink) }
+.ui-spares-scope .ui-faq .ui-question{ border-top:1px solid var(--line); padding-top:14px; margin-top:14px }
+.ui-spares-scope .ui-cta{
+  border:1px solid var(--line); border-left:4px solid var(--green); border-radius:10px;
+  background:var(--soft); padding:26px 28px; margin:34px 0;
+}
+.ui-spares-scope .ui-cta h2{ font-size:24px; color:var(--ink) }
+.ui-spares-scope .ui-source{ color:var(--muted); font-size:12px }
+.ui-spares-scope .ui-related{ border-top:1px solid var(--line); margin-top:40px; padding-top:18px }
+.ui-spares-scope .ui-links a,
+.ui-spares-scope .ui-related a{ color:var(--green-dark) }
+.ui-spares-scope .v10-request-toggle{ background:var(--green); font:650 15px Inter,Arial,sans-serif; border-radius:6px }
+.ui-spares-scope .v10-request-toggle:hover{ background:var(--green-dark) }
+
+/* --- Адаптив --- */
+@media(max-width:1024px){
+  .ui-spares-scope .ui-hero-band__in,
+  .ui-spares-scope .ui-spares{ width:min(1280px,calc(100% - 40px)) }
+  .ui-spares-scope .ui-hero-band h1{ font-size:34px }
+  .ui-spares-scope .ui-hero-band .v9-category-hero{ grid-template-columns:1fr; gap:26px }
+  .ui-spares-scope .ui-hero-band .v9-category-hero figure img{ height:220px }
+}
+@media(max-width:768px){
+  .ui-spares-scope .ui-hero-band{ padding:20px 0 30px }
+  .ui-spares-scope .ui-hero-band__in,
+  .ui-spares-scope .ui-spares{ width:calc(100% - 32px) }
+  .ui-spares-scope .ui-hero-band h1{ font-size:27px; max-width:none }
+  .ui-spares-scope .ui-hero-band .v9-category-hero h1{ font-size:27px }
+  .ui-spares-scope .ui-spares{ padding:24px 0 54px }
+  .ui-spares-scope .ui-spares>h2,
+  .ui-spares-scope .ui-group-heading h2{ font-size:22px }
+  .ui-spares-scope .ui-category-grid,
+  .ui-spares-scope .ui-category-grid.ui-four{ grid-template-columns:1fr }
+  .ui-spares-scope .ui-hero-band .ui-actions,
+  .ui-spares-scope .ui-hero-band .ui-actions .ui-button,
+  .ui-spares-scope .ui-hero-band .ui-actions .v9-quiet{ width:100% }
+  .ui-spares-scope .v9-search-line{ grid-template-columns:1fr }
+}
+
+/* ============================================================
+   Справочные блоки пакета внутри каталожного оформления (.zp):
+   раздел живёт в разметке дробемётных запчастей, а таблицы,
+   галереи и врезки V10 встраиваются в .container как есть.
+   ============================================================ */
+.zp .ui-spares-scope{background:transparent;padding:0;font-size:15px}
+.zp .ui-spares-scope .ui-spares{width:100%;max-width:none;margin:0;padding:0}
+.zp .ui-spares-scope .ui-spares>h2:first-child{margin-top:0}
+.zp .ui-spares-scope .ui-hero-band{display:none}

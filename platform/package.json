@@ -1,0 +1,36 @@
+{
+  "name": "mtpk-platform",
+  "private": true,
+  "type": "module",
+  "description": "uralinduktor.ru на Next.js + микросервисы (content, media, leads, search)",
+  "workspaces": [
+    "packages/*",
+    "services/*",
+    "apps/*",
+    "tools/*"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "infra:up": "docker compose -f docker-compose.dev.yml up -d --wait",
+    "infra:down": "docker compose -f docker-compose.dev.yml down",
+    "infra:reset": "docker compose -f docker-compose.dev.yml down -v",
+    "db:generate": "npm run generate -w @mtpk/db",
+    "db:migrate": "npm run migrate -w @mtpk/db",
+    "import": "npm run start -w @mtpk/importer --",
+    "dev": "node scripts/dev.mjs",
+    "build:services": "node scripts/build-services.mjs",
+    "build:web": "npm run build -w @mtpk/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "parity": "npm run start -w @mtpk/parity --",
+    "clean": "node scripts/clean.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "esbuild": "~0.28.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3"
+  }
+}

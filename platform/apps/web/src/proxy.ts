@@ -1,0 +1,86 @@
+import { NextResponse, type NextRequest } from 'next/server';
+import type { PageListItem, RedirectDto } from '@mtpk/shared/contracts';
+
+const CONTENT = process.env.CONTENT_URL ?? 'http://127.0.0.1:4101';
+const SITE = (process.env.SITE_URL ?? 'https://uralinduktor.ru').replace(/\/$/, '');
+const TTL_MS = 60_000;
+
+/**
+ * Карта редиректов и список адресов страниц — в памяти процесса, обновляются
+ * раз в минуту. Если контент-сервис недоступен, работаем по последней копии.
+ */
+let state: { at: number; redirects: Map<string, RedirectDto>; paths: Set<string> } | null = null;
+let loading: Promise<void> | null = null;
+
+async function refresh(): Promise<void> {
+  const [r, p] = await Promise.all([
+    fetch(`${CONTENT}/v1/redirects`, { cache: 'no-store' }),
+    fetch(`${CONTENT}/v1/pages`, { cache: 'no-store' }),
+  ]);
+  if (!r.ok || !p.ok) throw new Error('контент-сервис недоступен');
+  const redirects = (await r.json()) as RedirectDto[];
+  const pages = (await p.json()) as PageListItem[];
+  state = {
+    at: Date.now(),
+    redirects: new Map(redirects.map((x) => [x.from, x])),
+    paths: new Set(pages.map((x) => x.path)),
+  };
+}
+
+async function getState() {
+  if (!state || Date.now() - state.at > TTL_MS) {
+    loading ??= refresh()
+      .catch(() => {
+        if (state) state.at = Date.now() - TTL_MS + 10_000; // повторить через 10 с
+      })
+      .finally(() => {
+        loading = null;
+      });
+    if (!state) await loading;
+  }
+  return state;
+}
+
+function redirect(location: string, req: NextRequest, code = 301) {
+  // В продакшне сайт стоит за шлюзом: абсолютный адрес строим от канонического
+  // домена (как nginx), а не от внутреннего имени контейнера.
+  const base = process.env.NODE_ENV === 'production' ? SITE : req.nextUrl.origin;
+  const url = location.startsWith('http') ? location : new URL(location, base).toString();
+  return NextResponse.redirect(url, code);
+}
+
+/**
+ * Редиректы — как nginx старого сайта (порядок тот же):
+ *  1. легаси-карта WordPress → новые адреса (точное совпадение пути, 301, без query);
+ *  2. /index.html и …/index.html → адрес каталога;
+ *  3. /sitemap.xml → /sitemap-index.xml;
+ *  4. адрес без слеша на конце → со слешем, если такая страница есть.
+ */
+export async function proxy(req: NextRequest) {
+  const { pathname, search } = req.nextUrl;
+  let decoded = pathname;
+  try {
+    decoded = decodeURIComponent(pathname);
+  } catch {
+    /* битая кодировка — сравниваем как есть */
+  }
+
+  const s = await getState();
+  const legacy = s?.redirects.get(decoded);
+  if (legacy) return redirect(legacy.to, req, legacy.code);
+
+  const index = pathname.match(/^(.*\/)index\.html$/);
+  if (index) return redirect(`${index[1]}${search}`, req);
+
+  if (pathname === '/sitemap.xml') return redirect(`${SITE}/sitemap-index.xml`, req);
+
+  if (!pathname.endsWith('/') && !/\.[a-z0-9]+$/i.test(pathname) && s?.paths.has(`${decoded}/`)) {
+    return redirect(`${pathname}/${search}`, req);
+  }
+  return NextResponse.next();
+}
+
+export const config = {
+  // Статика и сервисные адреса мимо прокси (у них своих легаси-адресов нет)
+  matcher: ['/((?!_next/|img/|files/|docs/|og/|css/|js/|fonts/|brand/|_astro/|data/|api/).*)'],
+};

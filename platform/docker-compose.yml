@@ -1,0 +1,297 @@
+# ============================================================================
+# Продакшн-стек uralinduktor.ru (VPS). Запуск — см. docs/deploy.md:
+#   cp .env.example .env  (заполнить секреты)
+#   docker compose build
+#   docker compose run --rm migrate
+#   docker compose --profile tools run --rm importer      # первичный перенос контента
+#   docker compose up -d
+#
+# Снаружи доступен только шлюз (gateway) на 127.0.0.1:${GATEWAY_PORT:-8080}:
+# TLS и домен остаются на системном nginx сервера (proxy_pass на этот порт).
+# MinIO включается профилем minio; после переезда на Wasabi профиль не нужен —
+# достаточно поменять S3_* в .env.
+# ============================================================================
+name: mtpk
+
+x-node-env: &node-env
+  NODE_ENV: production
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  SITE_URL: ${SITE_URL:-https://uralinduktor.ru}
+  DATABASE_URL: postgres://${POSTGRES_USER:-mtpk}:${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mtpk}
+  REDIS_URL: redis://redis:6379
+  S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
+  S3_REGION: ${S3_REGION:-us-east-1}
+  S3_ACCESS_KEY: ${S3_ACCESS_KEY:?задайте S3_ACCESS_KEY}
+  S3_SECRET_KEY: ${S3_SECRET_KEY:?задайте S3_SECRET_KEY}
+  S3_FORCE_PATH_STYLE: ${S3_FORCE_PATH_STYLE:-true}
+  S3_BUCKET_ASSETS: ${S3_BUCKET_ASSETS:-mtpk-assets}
+  S3_BUCKET_PRIVATE: ${S3_BUCKET_PRIVATE:-mtpk-private}
+  ADMIN_TOKEN: ${ADMIN_TOKEN:?задайте ADMIN_TOKEN}
+  CONTENT_URL: http://content:4101
+  SEARCH_URL: http://search:4103
+  MEDIA_URL: http://media:4104
+  LEADS_URL: http://leads:4102
+  WEB_URL: http://web:3000
+  REVALIDATE_SECRET: ${REVALIDATE_SECRET:?задайте REVALIDATE_SECRET}
+
+x-service: &service
+  restart: unless-stopped
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: [ALL]
+  read_only: true
+  tmpfs: ["/tmp"]
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "5" }
+
+x-healthcheck: &node-health
+  interval: 15s
+  timeout: 5s
+  retries: 5
+  start_period: 20s
+
+services:
+  # ── Шлюз: маршрутизация, кеш картинок, заголовки безопасности ─────────────
+  gateway:
+    image: ${NGINX_IMAGE:-nginx:1.27-alpine}
+    <<: *service
+    read_only: false
+    cap_add: [CHOWN, SETGID, SETUID, NET_BIND_SERVICE]
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT:-8080}:80"
+    volumes:
+      - ./infra/gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/gateway/security-headers.conf:/etc/nginx/security-headers.conf:ro
+      - gateway_cache:/var/cache/nginx
+    depends_on:
+      web: { condition: service_healthy }
+      media: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/__gateway_health"]
+      <<: *node-health
+    deploy:
+      resources: { limits: { cpus: "1", memory: 256M } }
+
+  # ── Сайт (Next.js) ────────────────────────────────────────────────────────
+  web:
+    build: { context: ., dockerfile: infra/docker/web.Dockerfile }
+    image: mtpk/web:${IMAGE_TAG:-latest}
+    <<: *service
+    read_only: false # ISR-кеш Next.js пишется в .next/cache
+    environment:
+      <<: *node-env
+    depends_on:
+      content: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/api/health"]
+      <<: *node-health
+    deploy:
+      resources: { limits: { cpus: "1.5", memory: 768M } }
+
+  # ── Контент: страницы, стили, редиректы, склад, сравнение ─────────────────
+  content:
+    build:
+      context: .
+      dockerfile: infra/docker/service.Dockerfile
+      args: { WORKSPACE: services/content }
+    image: mtpk/content:${IMAGE_TAG:-latest}
+    <<: *service
+    environment:
+      <<: *node-env
+      CONTENT_PORT: 4101
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4101/ready"]
+      <<: *node-health
+    deploy:
+      resources: { limits: { cpus: "1", memory: 512M } }
+
+  # ── Медиа: файлы из S3 (MinIO/Wasabi) с WebP по Accept ────────────────────
+  media:
+    build:
+      context: .
+      dockerfile: infra/docker/service.Dockerfile
+      args: { WORKSPACE: services/media }
+    image: mtpk/media:${IMAGE_TAG:-latest}
+    <<: *service
+    environment:
+      <<: *node-env
+      MEDIA_PORT: 4104
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4104/health"]
+      <<: *node-health
+    deploy:
+      resources: { limits: { cpus: "1", memory: 384M } }
+
+  # ── Поиск: PostgreSQL full-text (русская морфология) ──────────────────────
+  search:
+    build:
+      context: .
+      dockerfile: infra/docker/service.Dockerfile
+      args: { WORKSPACE: services/search }
+    image: mtpk/search:${IMAGE_TAG:-latest}
+    <<: *service
+    environment:
+      <<: *node-env
+      SEARCH_PORT: 4103
+    depends_on:
+      content: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4103/ready"]
+      <<: *node-health
+    deploy:
+      resources: { limits: { cpus: "0.5", memory: 256M } }
+
+  # ── Заявки: приём форм (замена send.php) и воркер доставки ────────────────
+  leads:
+    build:
+      context: .
+      dockerfile: infra/docker/service.Dockerfile
+      args: { WORKSPACE: services/leads }
+    image: mtpk/leads:${IMAGE_TAG:-latest}
+    <<: *service
+    environment: &leads-env
+      <<: *node-env
+      LEADS_PORT: 4102
+      LEADS_ALLOWED_HOSTS: ${LEADS_ALLOWED_HOSTS:-uralinduktor.ru,new.uralinduktor.ru}
+      LEADS_TRUST_PROXY: "true"
+      MAIL_TRANSPORT: ${MAIL_TRANSPORT:-smtp}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-ssl}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_TO: ${MAIL_TO:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      B24_WEBHOOK: ${B24_WEBHOOK:-}
+      B24_YM_UID_FIELD: ${B24_YM_UID_FIELD:-UF_CRM_YA_CID}
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4102/ready"]
+      <<: *node-health
+    deploy:
+      resources: { limits: { cpus: "0.5", memory: 256M } }
+
+  leads-worker:
+    build:
+      context: .
+      dockerfile: infra/docker/service.Dockerfile
+      args: { WORKSPACE: services/leads, ENTRY: dist/worker.js }
+    image: mtpk/leads-worker:${IMAGE_TAG:-latest}
+    <<: *service
+    environment: *leads-env
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    deploy:
+      resources: { limits: { cpus: "0.5", memory: 256M } }
+
+  # ── Хранилища ─────────────────────────────────────────────────────────────
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:17-alpine}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mtpk}
+      POSTGRES_USER: ${POSTGRES_USER:-mtpk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources: { limits: { cpus: "1", memory: 512M } }
+
+  redis:
+    image: ${REDIS_IMAGE:-redis:7-alpine}
+    restart: unless-stopped
+    # AOF: очередь заявок (BullMQ) переживает рестарт; noeviction — требование BullMQ
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources: { limits: { cpus: "0.5", memory: 320M } }
+
+  # S3 на своём сервере (до переезда на Wasabi): docker compose --profile minio up -d
+  minio:
+    image: ${MINIO_IMAGE:-minio/minio:latest}
+    profiles: [minio]
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    ports:
+      - "127.0.0.1:9001:9001" # консоль MinIO — только через SSH-туннель
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio-init:
+    image: ${MC_IMAGE:-minio/mc:latest}
+    profiles: [minio]
+    depends_on:
+      minio: { condition: service_healthy }
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $${S3_ACCESS_KEY} $${S3_SECRET_KEY} &&
+      mc mb --ignore-existing local/$${S3_BUCKET_ASSETS} &&
+      mc mb --ignore-existing local/$${S3_BUCKET_PRIVATE} &&
+      mc ilm rule add --expire-days 30 local/$${S3_BUCKET_PRIVATE} || true
+      "
+    environment:
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_BUCKET_ASSETS: ${S3_BUCKET_ASSETS:-mtpk-assets}
+      S3_BUCKET_PRIVATE: ${S3_BUCKET_PRIVATE:-mtpk-private}
+    restart: "no"
+
+  # ── Служебные задачи ──────────────────────────────────────────────────────
+  migrate:
+    build: { context: ., dockerfile: infra/docker/tools.Dockerfile }
+    image: mtpk/tools:${IMAGE_TAG:-latest}
+    environment:
+      <<: *node-env
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+
+  # Перенос/синхронизация контента из Astro-проекта (репозиторий на сервере):
+  #   CONTENT_REPO_DIR=/srv/mtpk-site docker compose --profile tools run --rm importer
+  importer:
+    image: mtpk/tools:${IMAGE_TAG:-latest}
+    profiles: [tools]
+    command: ["node", "tools/importer/dist/index.js"]
+    environment:
+      <<: *node-env
+      CONTENT_SOURCE_DIR: /source/astro
+      REDIRECTS_MAP_FILE: /source/server/redirects-legacy.map
+    volumes:
+      - ${CONTENT_REPO_DIR:-../}:/source:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    restart: "no"
+
+volumes:
+  pg_data:
+  redis_data:
+  minio_data:
+  gateway_cache:

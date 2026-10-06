@@ -1,0 +1,15 @@
+{
+  "name": "@mtpk/importer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@mtpk/content-kit": "*",
+    "@mtpk/db": "*",
+    "@mtpk/shared": "*"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@mtpk/content-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./page-meta": "./src/page-meta.ts",
+    "./compare": "./src/compare.ts",
+    "./html": "./src/html.ts",
+    "./features": "./src/features.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "tsx --test \"src/**/*.test.ts\""
+  }
+}

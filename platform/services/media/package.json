@@ -1,0 +1,16 @@
+{
+  "name": "@mtpk/media-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@mtpk/shared": "*",
+    "@mtpk/db": "*",
+    "fastify": "^5.12.5"
+  }
+}

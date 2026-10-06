@@ -1,0 +1,93 @@
+/* Пункт «Практикум» выглядит как остальные пункты меню. Раньше у него были
+   зелёная рамка и заливка на ховере — раздел выделялся из общего ряда
+   (замечание Евгения, 05.10.2026). Класс .nav__link--praktikum остался в
+   разметке страниц самого раздела (их шапку синхронизирует
+   scripts/sync-praktikum-chrome.py) и теперь ни на что не влияет. */
+.nav__link--praktikum { white-space: nowrap; }
+/* Постраничный CSS раздела красит подложку в #e9eeef и рисует белую
+   карточку поверх. На остальных страницах сайта фон белый — убираем
+   рамку, чтобы раздел не выделялся (замечание Евгения, 02.10.2026). */
+.praktikum-content.praktikum-content { min-width: 0; background: #fff; color: #142b31; }
+@media (min-width: 1025px) and (max-width: 1180px) {
+  .header__inner { gap: 8px; }
+  .nav__link { padding-left: 4px; padding-right: 4px; font-size: 12px; }
+  .header__brand img { max-height: 34px; }
+  .header-quick-form__input { width: 105px; }
+}
+.praktikum-content > .ui-education {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+/* Крошки раздела — те же, что на всём сайте: типографику и цвета даёт
+   .breadcrumb из site.css, здесь только ширина контейнера и отступы
+   (повторяют .breadcrumb--light: sp-6 сверху, sp-5 снизу). */
+.praktikum-breadcrumbs.praktikum-breadcrumbs,
+.praktikum-course-nav.praktikum-course-nav {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px 32px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2, 8px);
+  font-size: var(--fs-caption, 14px);
+  color: var(--text-tertiary, #6b7280);
+}
+.praktikum-breadcrumbs.praktikum-breadcrumbs a { color: var(--text-secondary, #3f4a52); text-decoration: none; }
+.praktikum-breadcrumbs.praktikum-breadcrumbs a:hover { color: var(--text-brand, #15607a); }
+.praktikum-breadcrumbs.praktikum-breadcrumbs .breadcrumb__sep { color: var(--border-default, #d6dade); }
+.praktikum-course-nav.praktikum-course-nav a { color: var(--text-secondary, #3f4a52); }
+.praktikum-course-nav [aria-current="page"] { font-weight: 700; color: #101f26; }
+@media print {
+  .header-shell, .nav-drawer, .praktikum-breadcrumbs.praktikum-breadcrumbs, .praktikum-course-nav,
+  body > footer, .cookie-consent { display: none !important; }
+}
+
+/* ============================================================
+   Ширина раздела «Практикум» — как на остальных страницах сайта
+   (замечание Евгения, 02.10.2026).
+
+   Было: хаб 1160 px, статья 1080 px, уроки 980 px — раздел выглядел
+   у́же каталога и услуг. Стало: тот же контейнер, что у .container
+   на всём сайте — 1440 px с боковыми полями 32 px (20 px на мобильном).
+
+   Текст статьи при этом держим в читаемой колонке 1068 px: столько же
+   занимают текстовые панели на страницах каталога и решений. Картинки,
+   таблицы и широкие блоки идут во всю ширину карточки.
+   ============================================================ */
+.praktikum-content .ui-praktikum-hub.ui-praktikum-hub,
+.praktikum-content .ui-article.ui-article,
+.praktikum-content > .ui-education.ui-education,
+.praktikum-breadcrumbs.praktikum-breadcrumbs,
+.praktikum-course-nav.praktikum-course-nav {
+  max-width: 1440px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+/* Все блоки статьи — в одной колонке 1068 px: столько же занимает
+   текстовая панель на страницах каталога и решений. Текст, иллюстрации,
+   таблицы и врезки идут по одной сетке, от левого края контейнера. */
+.praktikum-content .ui-article.ui-article > *,
+.praktikum-content > .ui-education.ui-education > * {
+  max-width: 1068px;
+}
+
+@media (max-width: 768px) {
+  .praktikum-content .ui-praktikum-hub.ui-praktikum-hub,
+  .praktikum-content .ui-article.ui-article,
+  .praktikum-content > .ui-education.ui-education,
+  .praktikum-breadcrumbs.praktikum-breadcrumbs,
+  .praktikum-course-nav.praktikum-course-nav {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* Портретные снимки и схемы держим у́же колонки: у них object-fit: contain,
+   и на всю ширину по бокам остаются широкие поля подложки. */
+.praktikum-content .ui-article.ui-article > .hero-photo,
+.praktikum-content .ui-article.ui-article > .portrait-photo {
+  max-width: 720px;
+}
