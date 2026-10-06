@@ -13,7 +13,7 @@ const { db, pool, close } = createDb(env.DATABASE_URL, { max: 10, appName: 'cont
 const redis = createRedis(env.REDIS_URL);
 // Версия формата PageDto в префиксе ключей: после смены контракта старые записи
 // кеша просто не читаются (поднимать при изменении packages/shared/src/contracts.ts).
-const CACHE_PREFIX = 'content:dto2';
+const CACHE_PREFIX = 'content:dto3';
 const cache = new JsonCache(redis, CACHE_PREFIX, (err) => log.warn({ err }, 'redis недоступен — работаем без кеша'));
 const store = new ContentStore(db, cache, env.SITE_URL, env.CONTENT_CACHE_TTL, log);
 
@@ -35,6 +35,7 @@ async function notifyWeb(paths: string[] | 'all'): Promise<void> {
 const abort = new AbortController();
 await startService({
   name: 'content',
+  description: 'Страницы (блоки), настройки сайта, редиректы, наличие, сравнение. Публичное API /v1 — для сайта и поиска; служебное /admin/v1 — для админки (заголовок X-Admin-Token).',
   port: env.CONTENT_PORT,
   logger: log,
   bodyLimit: 20 * 1024 * 1024, // страницы с крупными стилями весят сотни КБ

@@ -1,0 +1,29 @@
+{
+  "name": "@mtpk/admin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Админка сайта: страницы и блоки, настройки, медиатека, редиректы, наличие, заявки, пользователи, API.",
+  "scripts": {
+    "dev": "next dev --port 3300 --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --port 3300",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "create-user": "tsx scripts/create-user.ts"
+  },
+  "dependencies": {
+    "@mtpk/content-model": "*",
+    "@mtpk/db": "*",
+    "@mtpk/shared": "*",
+    "next": "16.3.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.3"
+  }
+}

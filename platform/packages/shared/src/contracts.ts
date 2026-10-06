@@ -3,7 +3,7 @@
  * импортировать откуда угодно (в том числе из Next.js) без серверных зависимостей.
  */
 
-/** Страница, готовая к выводу: блоки развёрнуты, комментарии вырезаны. */
+/** Страница, готовая к выводу. Содержимое — блоки (@mtpk/content-model), у документов — HTML. */
 export interface PageDto {
   path: string;
   /** page — страница сайта в общем каркасе; document — готовый HTML-документ целиком (Практикум) */
@@ -12,8 +12,10 @@ export interface PageDto {
   title: string;
   description: string | null;
   noindex: boolean;
-  /** Готовый HTML содержимого <main> (для document — весь документ). */
-  bodyHtml: string;
+  /** Содержимое страницы: блоки (тип Block из @mtpk/content-model). */
+  blocks: unknown[];
+  /** Только для kind=document: готовый HTML-документ целиком. */
+  bodyHtml?: string;
   /** Общие шаблонные CSS (/css/tpl/*.css), подключаются <link> в порядке массива. */
   cssTemplates: string[];
   /** Крупные page-специфичные стили, вынесенные во внешние файлы. */
@@ -25,8 +27,9 @@ export interface PageDto {
   /** JSON-LD (строки JSON) в порядке вывода: BreadcrumbList, FAQPage, Product, Article. */
   jsonLd: string[];
   /**
-   * Поведение, которое нужно странице (галерея, фильтр каталога, сравнение…):
-   * имена клиентских скриптов — правила PAGE_SCRIPTS из Astro-сборки.
+   * Клиентские скрипты для блоков «HTML как есть» (галерея, фильтр, проекты…)
+   * — правила PAGE_SCRIPTS из Astro-сборки. У типизированных блоков поведение
+   * встроено в React-компоненты.
    */
   features: string[];
   searchable: boolean;
@@ -43,6 +46,13 @@ export interface PageListItem {
   template: string;
   noindex: boolean;
   lastmodAt: string;
+}
+
+/** Данные для блоков страницы: склад и разделы со сравнением. */
+export interface SiteDataDto {
+  /** slug товара → срок отгрузки (если задан) */
+  stock: Record<string, { shipping?: string }>;
+  compareSections: string[];
 }
 
 export interface RedirectDto {

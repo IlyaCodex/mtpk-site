@@ -1,2 +1,3 @@
-export { createDb, pages, redirects, stockItems, styleBlocks, sql, eq, asc, inArray, like } from '@mtpk/db';
+export { createDb, pages, redirects, settings, stockItems, styleBlocks, sql, eq, asc, desc, inArray, like, ilike, count, or } from '@mtpk/db';
+
 export type { Db, Page, StyleBlock } from '@mtpk/db';

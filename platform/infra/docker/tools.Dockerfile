@@ -11,15 +11,16 @@ COPY package.json package-lock.json .npmrc ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/db/package.json packages/db/
 COPY packages/content-kit/package.json packages/content-kit/
-COPY packages/blocks/package.json packages/blocks/
+COPY packages/content-model/package.json packages/content-model/
+COPY packages/ui/package.json packages/ui/
 COPY services/content/package.json services/content/
 COPY services/media/package.json services/media/
 COPY services/search/package.json services/search/
 COPY services/leads/package.json services/leads/
 COPY apps/web/package.json apps/web/
+COPY apps/admin/package.json apps/admin/
 COPY tools/importer/package.json tools/importer/
 COPY tools/parity/package.json tools/parity/
-COPY tools/codegen/package.json tools/codegen/
 
 FROM manifests AS build
 RUN --mount=type=cache,target=/root/.npm npm ci --ignore-scripts

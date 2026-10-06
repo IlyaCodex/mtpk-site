@@ -11,10 +11,12 @@ import {
   createLogger,
   createRedis,
   envParts,
+  isAuthorized,
   JsonCache,
   readEnv,
   startService,
   type SearchResponse,
+  type ZodTypeProvider,
 } from '@mtpk/shared';
 import { createDb, documents, eq, sql, notInArray } from '@mtpk/db';
 
@@ -23,6 +25,7 @@ const env = readEnv(
     ...envParts.base,
     ...envParts.db,
     ...envParts.redis,
+    ...envParts.admin,
     SEARCH_PORT: z.coerce.number().default(4103),
     CONTENT_URL: z.string().default('http://127.0.0.1:4101'),
   }),
@@ -144,18 +147,44 @@ async function search(q: string, limit: number): Promise<SearchResponse> {
 const abort = new AbortController();
 await startService({
   name: 'search',
+  description: 'Полнотекстовый поиск по сайту (PostgreSQL, русская морфология). Индекс обновляется по событиям контент-сервиса.',
   port: env.SEARCH_PORT,
   logger: log,
-  async setup(app) {
-    app.get('/api/search', async (req, reply) => {
-      const { q, limit } = z
-        .object({ q: z.string().max(200).default(''), limit: z.coerce.number().int().min(1).max(50).default(40) })
-        .parse(req.query);
+  async setup(base) {
+    const app = base.withTypeProvider<ZodTypeProvider>();
+    const searchQuery = z.object({
+      q: z.string().max(200).default('').describe('Запрос'),
+      limit: z.coerce.number().int().min(1).max(50).default(40),
+    });
+    app.get('/api/search', { schema: { tags: ['Поиск'], summary: 'Поиск по сайту', querystring: searchQuery } }, async (req, reply) => {
+      const { q, limit } = req.query;
       const key = crypto.createHash('sha1').update(`${q.trim().toLowerCase()}|${limit}`).digest('hex');
       reply.header('Cache-Control', 'no-store');
       return cache.wrap(`q:${key}`, 600, () => search(q, limit));
     });
-    app.post('/admin/v1/reindex', async () => ({ ok: true, documents: await reindexAll() }));
+    app.post(
+      '/admin/v1/reindex',
+      {
+        schema: { tags: ['Админка: поиск'], summary: 'Переиндексировать весь сайт', security: [{ adminToken: [] }] },
+        onRequest: async (req, reply) => {
+          if (!isAuthorized(req.headers as Record<string, unknown>, env.ADMIN_TOKEN)) return reply.code(401).send({ error: 'unauthorized' });
+        },
+      },
+      async () => ({ ok: true, documents: await reindexAll() }),
+    );
+    app.get(
+      '/admin/v1/stats',
+      {
+        schema: { tags: ['Админка: поиск'], summary: 'Сколько страниц в индексе', security: [{ adminToken: [] }] },
+        onRequest: async (req, reply) => {
+          if (!isAuthorized(req.headers as Record<string, unknown>, env.ADMIN_TOKEN)) return reply.code(401).send({ error: 'unauthorized' });
+        },
+      },
+      async () => {
+        const [row] = (await db.execute<{ n: number; updated: string | null }>(sql`select count(*)::int as n, max(updated_at) as updated from ${documents}`)).rows;
+        return { documents: row.n, updatedAt: row.updated };
+      },
+    );
   },
   async readiness() {
     await pool.query('select 1');

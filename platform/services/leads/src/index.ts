@@ -16,6 +16,7 @@ import { ALLOWED_HOSTS, env } from './env.ts';
 import { clean, isTooFast, originAllowed, pageUrlFrom, parseLead, validateLead, type Fields } from './fields.ts';
 import { ATTACH_MAX_BYTES, checkAttachment } from './attachment.ts';
 import { createQueue, type DeliveryResult } from './queue.ts';
+import { adminRoutes } from './admin.ts';
 
 const log = createLogger('leads');
 const { db, pool, close } = createDb(env.DATABASE_URL, { max: 5, appName: 'leads' });
@@ -228,6 +229,7 @@ async function handle(req: FastifyRequest, reply: FastifyReply) {
 
 await startService({
   name: 'leads',
+  description: 'Приём заявок с сайта (/api/send.php, /api/leads) и доставка в почту и Битрикс24 через очередь. Служебное /admin/v1 — список заявок, повторная доставка, статистика.',
   port: env.LEADS_PORT,
   logger: log,
   bodyLimit: ATTACH_MAX_BYTES + 2 * 1024 * 1024,
@@ -241,9 +243,11 @@ await startService({
       done(null, Object.fromEntries(new URLSearchParams(body as string)));
     });
     // Старый адрес формы и новый — один обработчик
-    app.post('/api/send.php', handle);
-    app.post('/api/leads', handle);
-    app.get('/api/send.php', (_req, reply) => respond(reply, 405, { ok: false, message: 'Метод не поддерживается' }));
+    const form = { schema: { tags: ['Заявки'], summary: 'Заявка с формы сайта (multipart/form-data или urlencoded)' } };
+    app.post('/api/send.php', { schema: { hide: true } }, handle);
+    app.post('/api/leads', form, handle);
+    app.get('/api/send.php', { schema: { hide: true } }, (_req, reply) => respond(reply, 405, { ok: false, message: 'Метод не поддерживается' }));
+    await app.register(adminRoutes, { db, queue, adminToken: env.ADMIN_TOKEN });
   },
   async readiness() {
     await pool.query('select 1');

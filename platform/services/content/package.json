@@ -9,12 +9,14 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@mtpk/blocks": "*",
     "@mtpk/content-kit": "*",
+    "@mtpk/content-model": "*",
     "@mtpk/db": "*",
     "@mtpk/shared": "*",
+    "@mtpk/ui": "*",
     "fastify": "^5.12.5",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
   }
 }

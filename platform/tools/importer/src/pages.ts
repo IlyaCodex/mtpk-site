@@ -11,6 +11,13 @@ import {
 } from '@mtpk/content-kit';
 import { pages, styleBlocks, sql, inArray, type Db, type NewPage } from '@mtpk/db';
 import type { Logger } from '@mtpk/shared';
+import { htmlToBlocks, newReport, type ConvertReport } from './blocks/to-blocks.ts';
+
+/**
+ * Версия конвертера «HTML → блоки». Входит в хеш исходника: после доработки
+ * парсеров повторный импорт пересоберёт блоки даже у неизменённых страниц.
+ */
+export const CONVERTER_VERSION = '2026-10-06.1';
 
 const KNOWN_META = new Set(['title', 'description', 'inline_styles', 'css_templates', 'preload_image', 'noindex']);
 
@@ -53,6 +60,8 @@ export interface PageImportStats {
   inserted: number;
   updated: number;
   unchanged: number;
+  /** правлены в админке — импорт их не трогает (кроме --force) */
+  edited: number;
   deleted: number;
   styles: number;
 }
@@ -62,6 +71,7 @@ function rawToRecord(
   raw: RawPage,
   dates: Map<string, { first: string; last: string }>,
   importTime: Date,
+  report: ConvertReport,
 ): { page: NewPage; styles: ReturnType<typeof classifyStyleBlock>[] } {
   const meta = raw.meta;
   // В 10 meta.json вместо массива стоит строка ' ' — Astro выводил её как пустой
@@ -83,6 +93,7 @@ function rawToRecord(
       template: detectTemplate(raw.path, raw.body),
       title: meta.title ?? '',
       description: meta.description ?? null,
+      blocks: htmlToBlocks(raw.body, raw.path, report),
       body: raw.body,
       cssTemplates,
       styleHashes: styles.map((s) => s.hash),
@@ -92,7 +103,7 @@ function rawToRecord(
       publishedAt: toDate(bodyDates?.first),
       modifiedAt: toDate(bodyDates?.last),
       lastmodAt: toDate(lastmod) ?? importTime,
-      sourceHash: sha1(`${raw.body}\u0000${raw.metaRaw}`),
+      sourceHash: sha1(`${CONVERTER_VERSION}\u0000${raw.body}\u0000${raw.metaRaw}`),
     },
   };
 }
@@ -151,7 +162,7 @@ export async function importPages(
   db: Db,
   sourceDir: string,
   log: Logger,
-  opts: { dryRun?: boolean } = {},
+  opts: { dryRun?: boolean; force?: boolean } = {},
 ): Promise<{ stats: PageImportStats; changed: string[]; deleted: string[] }> {
   const importTime = new Date();
   const rawRoot = path.join(sourceDir, 'src', 'raw-pages');
@@ -164,7 +175,11 @@ export async function importPages(
   const praktikumDates = readGitDates(prGit.log, prGit.prefix.replace(/praktikum\/$/, ''));
   log.info({ pages: rawPages.length, gitFiles: rawDates.size }, 'исходники прочитаны');
 
-  const records = rawPages.map((r) => rawToRecord(r, rawDates, importTime));
+  const report = newReport();
+  const records = rawPages.map((r) => rawToRecord(r, rawDates, importTime, report));
+  const typed = Object.values(report.typed).reduce((a, b) => a + b, 0);
+  const html = Object.values(report.fallback).reduce((a, b) => a + b, 0);
+  log.info({ typed, html, byType: report.typed }, 'секции → блоки');
   const docs = readPraktikum(publicDir, praktikumDates, importTime);
   const allPages: NewPage[] = [...records.map((r) => r.page), ...docs];
 
@@ -178,7 +193,8 @@ export async function importPages(
   const existingByPath = new Map(existing.map((e) => [e.path, e]));
   const incoming = new Set(allPages.map((p) => p.path));
 
-  const stats: PageImportStats = { total: allPages.length, inserted: 0, updated: 0, unchanged: 0, deleted: 0, styles: styleMap.size };
+  const stats: PageImportStats = { total: allPages.length, inserted: 0, updated: 0, unchanged: 0, edited: 0, deleted: 0, styles: styleMap.size };
+  const editedInAdmin = (e: { extraMeta: unknown }) => (e.extraMeta as Record<string, unknown>)?.source === 'admin';
   const changed: string[] = [];
   const toWrite: NewPage[] = [];
   for (const p of allPages) {
@@ -187,6 +203,8 @@ export async function importPages(
       stats.inserted++;
       changed.push(p.path);
       toWrite.push(p);
+    } else if (editedInAdmin(prev) && !opts.force) {
+      stats.edited++;
     } else if (prev.sourceHash !== p.sourceHash) {
       stats.updated++;
       changed.push(p.path);
@@ -221,6 +239,7 @@ export async function importPages(
             template: sql`excluded.template`,
             title: sql`excluded.title`,
             description: sql`excluded.description`,
+            blocks: sql`excluded.blocks`,
             body: sql`excluded.body`,
             cssTemplates: sql`excluded.css_templates`,
             styleHashes: sql`excluded.style_hashes`,

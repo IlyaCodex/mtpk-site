@@ -4,6 +4,7 @@
  *   npm run import                     — всё: страницы, стили, Практикум, редиректы, склад, файлы в S3
  *   npm run import -- --only=pages     — выборочно: pages | redirects | stock | assets
  *   npm run import -- --dry-run        — только посчитать, ничего не писать
+ *   npm run import -- --force          — перезаписать и страницы, правленные в админке
  *   npm run import -- --source=../astro
  *
  * Импорт идемпотентный: повторный запуск переносит только изменения
@@ -49,6 +50,7 @@ const args = new Map(
   }),
 );
 const dryRun = args.get('dry-run') === 'true';
+const force = args.get('force') === 'true';
 const only = new Set((args.get('only') ?? 'pages,redirects,stock,assets').split(',').map((s) => s.trim()));
 
 // Относительные пути из .env — от корня platform/ (tools/importer/src → ../../..).
@@ -66,7 +68,7 @@ try {
   log.info({ sourceDir, only: [...only], dryRun }, 'импорт начат');
 
   if (only.has('pages')) {
-    const res = await importPages(db, sourceDir, log, { dryRun });
+    const res = await importPages(db, sourceDir, log, { dryRun, force });
     changedPaths = [...res.changed, ...res.deleted];
     anyChange ||= changedPaths.length > 0;
     log.info(res.stats, 'страницы');

@@ -10,6 +10,9 @@
   "dependencies": {
     "@mtpk/content-kit": "*",
     "@mtpk/db": "*",
-    "@mtpk/shared": "*"
+    "@mtpk/shared": "*",
+    "@mtpk/ui": "*",
+    "@mtpk/content-model": "*",
+    "parse5": "^8.0.1"
   }
 }

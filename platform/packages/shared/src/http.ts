@@ -1,8 +1,20 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from 'fastify';
+import swagger from '@fastify/swagger';
+import {
+  hasZodFastifySchemaValidationErrors,
+  jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+  type ZodTypeProvider,
+} from 'fastify-type-provider-zod';
 import type { Logger } from './logger.ts';
+
+export type { ZodTypeProvider };
 
 export interface ServiceOptions {
   name: string;
+  /** Описание сервиса — в OpenAPI (/openapi.json). */
+  description?: string;
   port: number;
   host?: string;
   logger: Logger;
@@ -18,7 +30,8 @@ export interface ServiceOptions {
 
 /**
  * Единый каркас HTTP-сервиса: логгер, /health (жив ли процесс),
- * /ready (доступны ли зависимости), корректная остановка по SIGTERM —
+ * /ready (доступны ли зависимости), OpenAPI-описание /openapi.json
+ * (из zod-схем маршрутов), корректная остановка по SIGTERM —
  * Docker даёт контейнеру время закрыть соединения.
  */
 export async function startService(opts: ServiceOptions): Promise<FastifyInstance> {
@@ -29,8 +42,25 @@ export async function startService(opts: ServiceOptions): Promise<FastifyInstanc
     ...opts.fastify,
   });
 
-  // Ошибки валидации входа (zod) — 400 с перечнем полей, а не 500.
+  // Схемы маршрутов — zod: проверка входа и описание API из одного источника.
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
+  await app.register(swagger, {
+    openapi: {
+      info: { title: `МТПК · ${opts.name}`, version: '1.0.0', description: opts.description },
+      components: {
+        securitySchemes: { adminToken: { type: 'apiKey', in: 'header', name: 'x-admin-token' } },
+      },
+    },
+    transform: jsonSchemaTransform,
+  });
+
+  // Ошибки валидации входа — 400 с перечнем полей, а не 500.
   app.setErrorHandler((err: Error & { statusCode?: number; issues?: unknown }, req, reply) => {
+    if (hasZodFastifySchemaValidationErrors(err)) {
+      reply.code(400).send({ error: 'bad_request', issues: err.validation });
+      return;
+    }
     if (err.name === 'ZodError') {
       reply.code(400).send({ error: 'bad_request', issues: err.issues });
       return;
@@ -40,8 +70,9 @@ export async function startService(opts: ServiceOptions): Promise<FastifyInstanc
     reply.code(status).send({ error: status >= 500 ? 'internal_error' : err.message });
   });
 
-  app.get('/health', async () => ({ ok: true, service: opts.name }));
-  app.get('/ready', async (_req, reply) => {
+  const hidden = { schema: { hide: true } };
+  app.get('/health', hidden, async () => ({ ok: true, service: opts.name }));
+  app.get('/ready', hidden, async (_req, reply) => {
     try {
       await opts.readiness?.();
       return { ok: true, service: opts.name };
@@ -52,6 +83,8 @@ export async function startService(opts: ServiceOptions): Promise<FastifyInstanc
   });
 
   await opts.setup(app);
+  app.get('/openapi.json', hidden, async () => app.swagger());
+
   // В разработке — только localhost (не светить сервисы в LAN/VPN), в контейнере — все интерфейсы.
   const host = opts.host ?? process.env.HOST ?? (process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1');
   await app.listen({ port: opts.port, host });
@@ -85,3 +118,4 @@ export function isAuthorized(headers: Record<string, unknown>, token: string): b
   for (let i = 0; i < token.length; i++) diff |= given.charCodeAt(i) ^ token.charCodeAt(i);
   return diff === 0;
 }
+

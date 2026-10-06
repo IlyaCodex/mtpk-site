@@ -1,16 +1,32 @@
 import { notFound } from 'next/navigation';
-import { getPage } from '@/lib/content';
+import { pageHasLeadgen, type Block } from '@mtpk/content-model';
+import { Blocks, CompareBar, PageEnhancements, type RenderContext } from '@mtpk/ui';
+import { getPage, getSiteData } from '@/lib/content';
 import { slugToPath } from '@/lib/site';
 
 /**
- * Любая страница сайта: содержимое <main> приходит из контент-сервиса готовым
- * HTML (блоки-шорткоды уже развёрнуты React-компонентами @mtpk/blocks).
+ * Любая страница сайта: содержимое — список блоков из контент-сервиса,
+ * каждый блок рендерит свой React-компонент (@mtpk/ui/src/blocks).
  */
 export default async function Page({ params }: { params: Promise<{ slug?: string[] }> }) {
   const path = slugToPath((await params).slug);
-  const page = await getPage(path);
+  const [page, site] = await Promise.all([getPage(path), getSiteData()]);
   if (!page || page.kind !== 'page') notFound();
-  // suppressHydrationWarning: сырой HTML контента браузер нормализует (например
-  // <style is:global> → is:global=""), сверять его при гидратации бессмысленно
-  return <main suppressHydrationWarning dangerouslySetInnerHTML={{ __html: page.bodyHtml }} />;
+
+  const blocks = page.blocks as Block[];
+  const ctx: RenderContext = {
+    path,
+    stock: site.stock,
+    compareSections: site.compareSections,
+    hasLeadgenBlock: pageHasLeadgen(blocks),
+  };
+  return (
+    <>
+      <main>
+        <Blocks blocks={blocks} ctx={ctx} />
+      </main>
+      <PageEnhancements compareSections={site.compareSections} />
+      <CompareBar />
+    </>
+  );
 }

@@ -18,7 +18,7 @@ const cache = (value: string) => [{ key: 'Cache-Control', value }];
 const nextConfig: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: path.resolve(process.cwd(), '../..'),
-  transpilePackages: ['@mtpk/content-kit', '@mtpk/shared'],
+  transpilePackages: ['@mtpk/content-kit', '@mtpk/content-model', '@mtpk/shared', '@mtpk/ui'],
   poweredByHeader: false,
   // индикатор Next.js Dev Tools в углу экрана — мешает попиксельной сверке со старым сайтом
   devIndicators: false,
@@ -64,7 +64,8 @@ const nextConfig: NextConfig = {
       { source: '/css/:path*', headers: cache('public, max-age=604800') },
       { source: '/_astro/:path*', headers: cache('public, max-age=604800') },
       { source: '/js/:path*', headers: cache('public, max-age=604800') },
-      { source: '/fonts/:path*', headers: cache('public, max-age=2592000') },
+      // шрифты разрешены и другим источникам: их подгружает предпросмотр в админке
+      { source: '/fonts/:path*', headers: [...cache('public, max-age=2592000'), { key: 'Access-Control-Allow-Origin', value: '*' }] },
       { source: '/brand/:path*', headers: cache('public, max-age=2592000') },
     ];
   },

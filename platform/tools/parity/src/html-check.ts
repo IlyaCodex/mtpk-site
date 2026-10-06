@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parse, serialize, serializeOuter, type DefaultTreeAdapterMap } from 'parse5';
+import { canonHtml } from '@mtpk/content-kit/canon';
 
 type Node = DefaultTreeAdapterMap['node'];
 type Element = DefaultTreeAdapterMap['element'];
@@ -21,8 +22,34 @@ function* walk(nodes: Node[]): Generator<Element> {
   }
 }
 
+/**
+ * Флекс-контейнеры каркаса (по site.css): текст внутри flex — отдельный
+ * элемент, пробелы по краям их содержимого не отображаются. Старая вёрстка
+ * их писала, новая — нет; для сверки срезаем с обеих сторон.
+ */
+const FLEX_CLASSES = new Set(['contact-hours', 'contact-link', 'nav__link']);
+const FLEX_PARENTS = new Set(['footer__contact', 'nav-drawer__contacts']);
+
+function trimFlexEdges(nodes: Node[], parentClasses: string[] = []) {
+  for (const n of nodes) {
+    if (!isEl(n)) continue;
+    const cls = (attr(n, 'class') ?? '').split(/\s+/);
+    if (cls.some((c) => FLEX_CLASSES.has(c)) || (n.tagName === 'a' && parentClasses.some((c) => FLEX_PARENTS.has(c)))) {
+      const kids = n.childNodes as Node[];
+      const first = kids[0] as { nodeName: string; value?: string } | undefined;
+      const last = kids[kids.length - 1] as { nodeName: string; value?: string } | undefined;
+      if (first?.nodeName === '#text') first.value = first.value!.replace(/^\s+/, '');
+      if (last?.nodeName === '#text') last.value = last.value!.replace(/\s+$/, '');
+      // между иконкой и текстом — тоже флекс-зазор, а не пробел
+      for (const k of kids) if (k.nodeName === '#text') (k as { value: string }).value = (k as { value: string }).value.replace(/^\s+/, '');
+    }
+    trimFlexEdges(n.childNodes as Node[], cls);
+  }
+}
+
 /** Канон DOM: атрибуты по алфавиту, style без лишних пробелов, пробелы схлопнуты. */
 function canonNodes(nodes: Node[]) {
+  trimFlexEdges(nodes);
   for (const el of walk(nodes)) {
     // служебный span Pagefind (в новой версии поиска не нужен) — выкидываем
     el.childNodes = el.childNodes.filter((c) => !(isEl(c) && c.tagName === 'span' && attr(c, 'data-pagefind-meta') !== undefined));
@@ -36,15 +63,25 @@ function canonNodes(nodes: Node[]) {
   }
 }
 
+/**
+ * Канон элемента. Серверные «усиления» (бейджи, кнопки сравнения, карусель),
+ * которые старый сайт дорисовывал скриптами после загрузки, убираются с обеих
+ * сторон — см. content-kit/canon.
+ */
 function canon(el: Element | undefined): string {
   if (!el) return '';
   canonNodes([el]);
-  return serializeOuter(el)
-    .replace(/<span data-pagefind-meta[^>]*><\/span>/g, '')
-    .replace(/\s+/g, ' ')
-    .replace(/> </g, '><')
-    .trim();
+  return canonHtml(serializeOuter(el), { stripEnhancements: true });
 }
+
+/**
+ * Скрипты, чьё поведение перенесено в React-компоненты: меню, маска
+ * телефона, формы, скролл к форме, «Запросить цену», сравнение, галерея,
+ * бейджи, оглавление, фильтр каталога. Блокам «HTML как есть» нужные из них
+ * по-прежнему подключаются — это проверяет функциональная сверка.
+ */
+const REPLACED_SCRIPTS =
+  /\/js\/(mobile-nav|phone-mask|forms|scroll-to-form|quote-form|compare|phero-gallery|stock-product|stock-badges|made-badges|spec-tabs|catalog-filter)\.js/;
 
 export interface PageFacts {
   title: string;
@@ -92,7 +129,7 @@ export function facts(html: string): PageFacts {
   const scripts = all
     .filter((e) => e.tagName === 'script' && attr(e, 'src'))
     .map((e) => attr(e, 'src')!)
-    .filter((s) => !s.startsWith('/_next/') && !s.includes('_pagefind'));
+    .filter((s) => !s.startsWith('/_next/') && !s.includes('_pagefind') && !REPLACED_SCRIPTS.test(s));
 
   const og = all
     .filter((e) => e.tagName === 'meta' && /^(og:|twitter:)/.test(attr(e, 'property') ?? attr(e, 'name') ?? ''))

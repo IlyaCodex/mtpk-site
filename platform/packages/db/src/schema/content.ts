@@ -35,7 +35,13 @@ export const pages = contentSchema.table(
     template: text('template').notNull().default('page'),
     title: text('title').notNull(),
     description: text('description'),
-    body: text('body').notNull(),
+    /** Содержимое страницы: блоки (@mtpk/content-model). Для документов — пусто. */
+    blocks: jsonb('blocks').$type<unknown[]>().notNull().default([]),
+    /**
+     * Готовый HTML-документ (только kind=document — статьи Практикума).
+     * У обычных страниц — исходник, из которого блоки были получены при переносе (архив).
+     */
+    body: text('body'),
     /** Общие шаблонные CSS, порядок важен (каскад). */
     cssTemplates: text('css_templates').array().notNull().default(sql`'{}'::text[]`),
     /** Ссылки на style_blocks в порядке meta.inline_styles. */
@@ -102,6 +108,18 @@ export const stockItems = contentSchema.table('stock_items', {
   ...timestamps,
 });
 
+/**
+ * Настройки сайта (ключ → JSON): 'site' — контакты, реквизиты, меню шапки,
+ * мобильное меню и подвал (схема — @mtpk/content-model, siteSettings).
+ */
+export const settings = contentSchema.table('settings', {
+  key: text('key').primaryKey(),
+  value: jsonb('value').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  /** кто изменил (e-mail пользователя админки) */
+  updatedBy: text('updated_by'),
+});
+
 /** Каталог объектов в S3-бакете ассетов (картинки, файлы, ассеты Практикума). */
 export const assets = contentSchema.table('assets', {
   key: text('key').primaryKey(),
@@ -117,3 +135,4 @@ export type StyleBlock = typeof styleBlocks.$inferSelect;
 export type Redirect = typeof redirects.$inferSelect;
 export type StockItem = typeof stockItems.$inferSelect;
 export type Asset = typeof assets.$inferSelect;
+export type Setting = typeof settings.$inferSelect;

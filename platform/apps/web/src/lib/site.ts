@@ -11,14 +11,14 @@ export const ASSET_VERSIONS = {
   auditFixesCss: '20261005c',
   /** общая версия /css/tpl/*.css */
   tplCss: '20260928a',
-  mobileNavJs: '20261003-a11y1',
-  phoneMaskJs: '20260601',
-  formsJs: '20261002-delivery1',
-  scrollToFormJs: '20261002-fix1',
 } as const;
 
-/** Скрипты отдельных страниц: имя → версия (какие нужны — решает content-kit/features). */
+/**
+ * Скрипты для блоков «HTML как есть»: имя → версия (какие нужны странице —
+ * решает контент-сервис по содержимому этих блоков, content-kit/features).
+ */
 export const PAGE_SCRIPT_VERSIONS: Record<string, string> = {
+  forms: '20261002-delivery1',
   'phero-gallery': '20260914',
   'stock-product': '20261003-a11y1',
   'quote-form': '20260607',

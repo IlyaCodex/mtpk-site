@@ -16,8 +16,9 @@ const PROCS = {
   'leads-worker': ['npm', ['run', 'dev:worker', '-w', '@mtpk/leads-service']],
   search: ['npm', ['run', 'dev', '-w', '@mtpk/search-service']],
   web: ['npm', ['run', 'dev', '-w', '@mtpk/web']],
+  admin: ['npm', ['run', 'dev', '-w', '@mtpk/admin']],
 };
-const COLORS = [36, 33, 35, 32, 34, 31];
+const COLORS = [36, 33, 35, 32, 34, 31, 96];
 
 const only = process.argv.slice(2);
 const names = only.length ? only : Object.keys(PROCS);

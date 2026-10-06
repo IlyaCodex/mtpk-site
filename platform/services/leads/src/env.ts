@@ -7,6 +7,7 @@ export const env = readEnv(
     ...envParts.db,
     ...envParts.redis,
     ...envParts.s3,
+    ...envParts.admin,
     LEADS_PORT: z.coerce.number().default(4102),
     /** Хосты, с которых принимаются формы (Origin/Referer) */
     LEADS_ALLOWED_HOSTS: z.string().default('uralinduktor.ru,new.uralinduktor.ru'),

@@ -10,10 +10,12 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@mtpk/content-kit": "*",
+    "@mtpk/content-model": "*",
+    "@mtpk/ui": "*",
     "next": "16.3.8",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "@mtpk/content-kit": "*"
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
     "@mtpk/shared": "*",

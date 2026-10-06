@@ -1,7 +1,9 @@
 import { buildCompareIndex, resolveStock, type StockConfigItem } from '@mtpk/content-kit';
-import { asc, eq, inArray, like, pages, redirects, stockItems, styleBlocks, type Db, type Page, type StyleBlock } from './db.ts';
+import { DEFAULT_SETTINGS, siteSettings, type SiteSettings } from '@mtpk/content-model';
+import { asc, eq, inArray, like, pages, redirects, settings, stockItems, styleBlocks, type Db, type Page, type StyleBlock } from './db.ts';
 import type { JsonCache, Logger, PageDto, PageListItem, RedirectDto } from '@mtpk/shared';
-import { renderPage, toSearchDoc, type SearchDoc } from './render.ts';
+import { renderPage, seoHtml, toSearchDoc, type SearchDoc } from './render.ts';
+import type { SiteDataDto } from '@mtpk/shared';
 
 const MISSING = { missing: true } as const;
 type Cached<T> = T | typeof MISSING;
@@ -99,9 +101,10 @@ export class ContentStore {
         if (parts.length >= 3) wanted.add(`/${parts.slice(0, -1).join('/')}/`);
       }
       const rows = wanted.size
-        ? await this.db.select({ path: pages.path, body: pages.body, title: pages.title }).from(pages).where(inArray(pages.path, [...wanted]))
+        ? await this.db.select({ path: pages.path, blocks: pages.blocks, title: pages.title }).from(pages).where(inArray(pages.path, [...wanted]))
         : [];
-      const byPath = new Map(rows.map((r) => [r.path, r]));
+      // разметка страниц — серверный рендер тех же блоков, что видит посетитель
+      const byPath = new Map(rows.map((r) => [r.path, { body: seoHtml(r), title: r.title }]));
       const { items: resolved, warnings } = resolveStock(config, (p) => byPath.get(p));
       for (const w of warnings) this.log.warn({ stock: w }, 'склад');
       return {
@@ -116,12 +119,36 @@ export class ContentStore {
   async compare(): Promise<{ index: unknown; sections: string[] }> {
     return this.cache.wrap('compare', this.ttl * 24, async () => {
       const rows = await this.db
-        .select({ path: pages.path, body: pages.body })
+        .select({ path: pages.path, blocks: pages.blocks })
         .from(pages)
         .where(like(pages.path, '/products/%'));
-      const { index, sections, report } = buildCompareIndex(rows);
+      const { index, sections, report } = buildCompareIndex(rows.map((r) => ({ path: r.path, body: seoHtml(r) })));
       this.log.info({ sections: sections.length, scanned: report.scanned }, 'индекс сравнения пересобран');
       return { index, sections };
+    });
+  }
+
+  /** Данные для рендера блоков на сайте: склад (slug → срок) и разделы со сравнением. */
+  async siteData(): Promise<SiteDataDto> {
+    return this.cache.wrap('site-data', this.ttl, async () => {
+      const stock = (await this.stock()) as { items?: { slug?: string; shipping?: string }[] };
+      const map: SiteDataDto['stock'] = {};
+      for (const it of stock.items ?? []) {
+        if (it.slug) map[String(it.slug).replace(/^\/+|\/+$/g, '')] = it.shipping ? { shipping: it.shipping } : {};
+      }
+      return { stock: map, compareSections: (await this.compare()).sections };
+    });
+  }
+
+  /** Настройки сайта (контакты, меню, подвал). Нет записи или она битая — значения по умолчанию. */
+  async settings(): Promise<SiteSettings> {
+    return this.cache.wrap('settings', this.ttl, async () => {
+      const [row] = await this.db.select().from(settings).where(eq(settings.key, 'site')).limit(1);
+      if (!row) return DEFAULT_SETTINGS;
+      const parsed = siteSettings.safeParse(row.value);
+      if (parsed.success) return parsed.data;
+      this.log.error({ issues: parsed.error.issues.slice(0, 5) }, 'настройки сайта не прошли проверку — отдаём значения по умолчанию');
+      return DEFAULT_SETTINGS;
     });
   }
 
@@ -153,7 +180,7 @@ export class ContentStore {
   async purge(paths?: string[]): Promise<number> {
     this.styles = null;
     if (!paths || !paths.length) return this.cache.clear();
-    await this.cache.del(...paths.map((p) => `page:${p}`), 'pages:list', 'redirects', 'stock');
+    await this.cache.del(...paths.map((p) => `page:${p}`), 'pages:list', 'redirects', 'stock', 'site-data');
     if (paths.some((p) => p.startsWith('/products/'))) await this.cache.del('compare');
     return paths.length;
   }

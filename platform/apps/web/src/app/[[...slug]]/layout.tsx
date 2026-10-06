@@ -8,7 +8,7 @@ import { CookieConsent } from '@/components/CookieConsent';
 import { SearchModal } from '@/components/SearchModal';
 import { Analytics, AnalyticsNoscript } from '@/components/Analytics';
 import { PageHead } from '@/components/PageHead';
-import { getPage } from '@/lib/content';
+import { getPage, getSettings } from '@/lib/content';
 import { FONTS_CRITICAL_CSS, MOBILE_FIXES_CSS, STOCK_CSS, TOKENS_CSS } from '@/lib/legacy-css';
 import { NOT_FOUND_PAGE, ORGANIZATION_SCHEMA, WEBSITE_SCHEMA, jsonLdHtml, pageMetadata } from '@/lib/seo';
 import { ASSET_VERSIONS, MANGO_SCRIPT, PAGE_SCRIPT_VERSIONS, slugToPath } from '@/lib/site';
@@ -28,10 +28,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const page = await getPage(path);
   return pageMetadata(page ?? NOT_FOUND_PAGE);
 }
-
-/** Плавное «прилипание» шапки (T-PERF-9): класс is-scrolled в кадре requestAnimationFrame. */
-const HEADER_SCROLL_JS =
-  '(function(){const s=document.querySelector(".header-shell");if(!s)return;let e=!1;const t=()=>{s.classList.toggle("is-scrolled",window.scrollY>8),e=!1};window.addEventListener("scroll",()=>{e||(requestAnimationFrame(t),e=!0)},{passive:!0}),t()})();';
 
 /**
  * Расширенные начертания шрифтов — асинхронно (T-PERF-10): та же механика, что
@@ -61,6 +57,7 @@ export default async function RootLayout({ children, params }: Params & { childr
   const isPage = page?.kind === 'page';
   const activeNav = isPage ? activeNavFor(path) : undefined;
   const home = isPage && path === '/' ? page : await getPage('/');
+  const settings = await getSettings();
 
   return (
     // suppressHydrationWarning: коллтрекинг Mango ставит data-атрибут на <html> до гидратации
@@ -95,21 +92,16 @@ export default async function RootLayout({ children, params }: Params & { childr
         <link rel="stylesheet" href="/css/base-layout.css" />
       </head>
       <body>
-        <Header activeNav={activeNav} />
+        <Header settings={settings} activeNav={activeNav} />
         {children}
-        <Footer />
-        <Drawer />
+        <Footer settings={settings} />
+        <Drawer items={settings.drawer} contacts={settings.contacts} />
         <CookieConsent />
-        {/* Общие для всех страниц: меню, маска телефона, отправка заявок, скролл к форме */}
-        <script src={`/js/mobile-nav.js?v=${ASSET_VERSIONS.mobileNavJs}`} defer />
-        <script src={`/js/phone-mask.js?v=${ASSET_VERSIONS.phoneMaskJs}`} defer />
-        <script src={`/js/forms.js?v=${ASSET_VERSIONS.formsJs}`} defer />
-        <script src={`/js/scroll-to-form.js?v=${ASSET_VERSIONS.scrollToFormJs}`} defer />
-        {/* Скрипты, нужные именно этой странице (галерея, фильтр, сравнение…) */}
+        {/* Скрипты для блоков «HTML как есть» (старые формы, каталог запчастей…):
+            поведение типизированных блоков встроено в их React-компоненты */}
         {(isPage ? page.features : []).map((name) => (
           <script key={name} src={`/js/${name}.js?v=${PAGE_SCRIPT_VERSIONS[name] ?? '1'}`} defer />
         ))}
-        <script dangerouslySetInnerHTML={{ __html: HEADER_SCROLL_JS }} />
         <SearchModal />
         <Analytics />
         <AnalyticsNoscript />

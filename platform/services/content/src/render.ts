@@ -2,23 +2,52 @@ import {
   buildPageJsonLd,
   detectPageFeatures,
   externalStyleUrl,
-  styleBlockCss,
   htmlToText,
   isSearchable,
   pickSearchImage,
   searchWeight,
   stripHtmlComments,
+  styleBlockCss,
 } from '@mtpk/content-kit';
-import { renderPageBody } from '@mtpk/blocks/render';
+import { walkBlocks, type Block } from '@mtpk/content-model';
+import { renderBlocksToHtml } from '@mtpk/ui/server';
 import type { Page, StyleBlock } from '@mtpk/db';
 import type { PageDto } from '@mtpk/shared';
 
 const iso = (d: Date | null | undefined) => (d ? d.toISOString() : null);
 
+/** Блоки, повторяющиеся на сотнях страниц (формы, преимущества) — не контент страницы. */
+const SHARED_BLOCKS = new Set(['leadgen', 'bestOffer', 'catalogCta', 'partner', 'adv', 'whyUs', 'lightbox']);
+
 /**
- * Запись БД → страница для вывода. Делает ровно то, что делал [...slug].astro:
- * развёртка блоков, разделение стилей на внешние/inline, JSON-LD, картинка поиска.
+ * HTML страницы для SEO-вычислений (JSON-LD, картинка и текст для поиска,
+ * склад, сравнение): те же React-компоненты, что видит посетитель, без
+ * клиентских добавок (бейджей склада, кнопок сравнения).
  */
+export function seoHtml(page: Pick<Page, 'path' | 'blocks'>, opts: { contentOnly?: boolean } = {}): string {
+  let blocks = page.blocks as Block[];
+  if (opts.contentOnly) blocks = blocks.filter((b) => !SHARED_BLOCKS.has(b.type));
+  return renderBlocksToHtml(blocks, { path: page.path });
+}
+
+/**
+ * Клиентские скрипты нужны только блокам «HTML как есть»: у типизированных
+ * блоков поведение встроено в React. «Запросить цену» и «Сравнение» на
+ * React работают для всей страницы, их старые скрипты не грузим.
+ */
+const REPLACED_BY_REACT = new Set(['quote-form', 'compare']);
+export function legacyFeatures(blocks: Block[]): string[] {
+  const html = [...walkBlocks(blocks)]
+    .filter((b): b is Extract<Block, { type: 'html' }> => b.type === 'html')
+    .map((b) => b.html)
+    .join('\n');
+  if (!html) return [];
+  const features = detectPageFeatures(html).filter((f) => !REPLACED_BY_REACT.has(f));
+  // старые формы заявок (js-lead-form) отправляет public/js/forms.js
+  return /\bjs-lead-form\b/.test(html) ? ['forms', ...features] : features;
+}
+
+/** Запись БД → страница для вывода. */
 export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: string): PageDto {
   const base = {
     path: page.path,
@@ -37,7 +66,8 @@ export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: st
     // Практикум: готовый документ, при сборке у него тоже вырезались комментарии.
     return {
       ...base,
-      bodyHtml: stripHtmlComments(page.body),
+      blocks: [],
+      bodyHtml: stripHtmlComments(page.body ?? ''),
       cssTemplates: [],
       externalStyles: [],
       inlineStyles: [],
@@ -58,14 +88,16 @@ export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: st
     else inline.push(styleBlockCss(block.css));
   }
 
+  const blocks = page.blocks as Block[];
+  const html = seoHtml(page);
   return {
     ...base,
-    bodyHtml: renderPageBody(page.body),
+    blocks,
     cssTemplates: page.cssTemplates,
     externalStyles,
     inlineStyles: inline,
     jsonLd: buildPageJsonLd(
-      page.body,
+      html,
       {
         path: page.path,
         title: page.title,
@@ -75,10 +107,10 @@ export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: st
       },
       site,
     ),
-    features: detectPageFeatures(page.body),
+    features: legacyFeatures(blocks),
     searchable: isSearchable(page.path),
-    searchWeight: searchWeight(page.path, page.body),
-    searchImage: pickSearchImage(page.body, page.preloadImage),
+    searchWeight: searchWeight(page.path, html),
+    searchImage: pickSearchImage(html, page.preloadImage),
   };
 }
 
@@ -92,7 +124,7 @@ export interface SearchDoc {
 
 function stripCrumbs(html: string): string {
   return html
-    .replace(/<nav\s+class="(?:breadcrumb|tr-crumbs)[^"]*"[^>]*>[\s\S]*?<\/nav>/g, ' ')
+    .replace(/<nav\s+[^>]*class="(?:breadcrumb|tr-crumbs)[^"]*"[^>]*>[\s\S]*?<\/nav>/g, ' ')
     .replace(/<div\s+class="(?:breadcrumbs|ui-crumb)"[^>]*>[\s\S]*?<\/div>/g, ' ');
 }
 
@@ -111,17 +143,16 @@ function pagefindRegion(html: string): string {
   return html.slice(open, close > open ? close : undefined);
 }
 
+/** Неразрывный дефис (УИД\u2011376) → обычный: иначе поиск по коду модели не совпадает. */
+const hyphens = (t: string) => t.replace(/[\u2010\u2011\u2012]/g, '-');
+
 /**
- * Документ для поискового индекса. Индексируется собственный текст страницы
- * (без повторяющихся на сотнях страниц блоков заявки и преимуществ) — иначе
- * слова из формы находились бы на каждой второй странице.
+ * Документ для поискового индекса: собственный текст страницы (без общих
+ * блоков форм и преимуществ — иначе их слова находились бы на каждой странице).
  */
 export function toSearchDoc(page: Page, dto: PageDto): SearchDoc | null {
   if (!dto.searchable || page.noindex || page.status !== 'published') return null;
-  // Хлебные крошки в индекс не идут: иначе фрагмент в выдаче начинается с «Главная / Каталог…»
-  const source = stripCrumbs(page.kind === 'document' ? pagefindRegion(page.body) : page.body);
-  // неразрывный дефис (УИД\u2011376) → обычный: иначе поиск по коду модели не совпадает
-  const hyphens = (t: string) => t.replace(/[\u2010\u2011\u2012]/g, '-');
+  const source = stripCrumbs(page.kind === 'document' ? pagefindRegion(page.body ?? '') : seoHtml(page, { contentOnly: true }));
   const title = hyphens(firstH1(source) || page.title.split('|')[0].trim());
   return {
     path: page.path,

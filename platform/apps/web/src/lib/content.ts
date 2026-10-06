@@ -1,5 +1,6 @@
 import { cache } from 'react';
-import type { PageDto, PageListItem, RedirectDto } from '@mtpk/shared/contracts';
+import { DEFAULT_SETTINGS, type SiteSettings } from '@mtpk/content-model';
+import type { PageDto, PageListItem, RedirectDto, SiteDataDto } from '@mtpk/shared/contracts';
 
 const CONTENT = process.env.CONTENT_URL ?? 'http://127.0.0.1:4101';
 
@@ -25,3 +26,17 @@ export async function listPages(): Promise<PageListItem[]> {
 export async function listRedirects(): Promise<RedirectDto[]> {
   return (await getJson<RedirectDto[]>(`${CONTENT}/v1/redirects`, ['redirects'])) ?? [];
 }
+
+/** Настройки сайта (контакты, меню, подвал); контент-сервис недоступен — значения по умолчанию. */
+export const getSettings = cache(async (): Promise<SiteSettings> => {
+  try {
+    return (await getJson<SiteSettings>(`${CONTENT}/v1/settings`, ['pages', 'settings'])) ?? DEFAULT_SETTINGS;
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+});
+
+/** Данные для блоков: наличие на складе и разделы со сравнением. */
+export const getSiteData = cache(async (): Promise<SiteDataDto> => {
+  return (await getJson<SiteDataDto>(`${CONTENT}/v1/site-data`, ['pages', 'site-data'])) ?? { stock: {}, compareSections: [] };
+});

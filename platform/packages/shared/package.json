@@ -5,14 +5,18 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./contracts": "./src/contracts.ts"
+    "./contracts": "./src/contracts.ts",
+    "./redis": "./src/redis.ts",
+    "./logger": "./src/logger.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1146.0",
+    "@fastify/swagger": "^9.9.1",
     "fastify": "^5.12.5",
+    "fastify-type-provider-zod": "^7.0.0",
     "ioredis": "^5.11.1",
     "pino": "^10.4.0",
     "zod": "^4.6.5"

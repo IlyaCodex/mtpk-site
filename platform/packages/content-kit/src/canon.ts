@@ -1,0 +1,133 @@
+/**
+ * Каноническая форма HTML для сверок «старая вёрстка ↔ React-компоненты».
+ *
+ * Приводит к одному виду то, что не влияет на страницу: порядок атрибутов,
+ * пробелы между тегами, запись style, сущности. Опционально убирает то, что
+ * в старом сайте дорисовывали скрипты ПОСЛЕ загрузки, а теперь рендерит
+ * сервер (бейджи «В наличии» / «Сделано в России», кнопки сравнения, карусель
+ * галереи, подсветка оглавления), и JS-хуки, которые больше не нужны.
+ */
+import { parseFragment, serialize, type DefaultTreeAdapterMap } from 'parse5';
+
+type Node = DefaultTreeAdapterMap['node'];
+type El = DefaultTreeAdapterMap['element'];
+const isEl = (n: Node): n is El => 'tagName' in n;
+const getAttr = (el: El, name: string) => el.attrs.find((a) => a.name === name)?.value;
+const classes = (el: El) => (getAttr(el, 'class') ?? '').split(/\s+/).filter(Boolean);
+
+export interface CanonOptions {
+  /** убрать серверные «усиления», которых не было в исходном SSR старого сайта */
+  stripEnhancements?: boolean;
+}
+
+/**
+ * Элементы, у которых пробелы в начале и в конце содержимого не отображаются
+ * (блочный контекст: CSS white-space: normal схлопывает их).
+ */
+const BLOCKISH = new Set([
+  'address', 'article', 'aside', 'blockquote', 'body', 'button', 'caption', 'dd', 'details', 'div', 'dl', 'dt',
+  'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'li', 'main',
+  'nav', 'ol', 'p', 'section', 'summary', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul', 'select', 'option',
+]);
+
+function trimEdges(el: El) {
+  if (!BLOCKISH.has(el.tagName)) return;
+  const nodes = el.childNodes as Node[];
+  const first = nodes[0];
+  const last = nodes[nodes.length - 1];
+  if (first && first.nodeName === '#text') {
+    const t = first as DefaultTreeAdapterMap['textNode'];
+    t.value = t.value.replace(/^\s+/, '');
+  }
+  if (last && last.nodeName === '#text') {
+    const t = last as DefaultTreeAdapterMap['textNode'];
+    t.value = t.value.replace(/\s+$/, '');
+  }
+}
+
+/** Классы-хуки скриптов, не влияющие на оформление. */
+const HOOK_CLASSES = new Set(['js-lead-form']);
+/** Атрибуты-хуки скриптов. */
+const HOOK_ATTRS = new Set(['onsubmit', 'onclick', 'data-filter-form']);
+
+function normalize(nodes: Node[], opts: CanonOptions): Node[] {
+  const out: Node[] = [];
+  for (const n of nodes) {
+    if (n.nodeName === '#comment') continue;
+    if (!isEl(n)) {
+      out.push(n);
+      continue;
+    }
+    const cls = classes(n);
+    if (opts.stripEnhancements) {
+      // элементы, которые раньше добавлял JS после загрузки
+      if (cls.includes('made-badge') || cls.includes('pcard__stock-badge') || cls.includes('cmp-btn')) continue;
+      if (cls.includes('phero__nav') || cls.includes('phero__counter')) continue;
+      if (cls.includes('catalog-filter__count')) continue;
+      // inline-скрипты, чьё поведение перенесено в React-компоненты
+      if (n.tagName === 'script' && !getAttr(n, 'src') && !getAttr(n, 'type')) continue;
+      // React 19 сам добавляет preload для картинок первого экрана
+      if (n.tagName === 'link' && getAttr(n, 'rel') === 'preload') continue;
+      // обёртки галереи и бейджа склада — раскрываем
+      if (n.tagName === 'div' && (cls.includes('phero__stage') || cls.includes('audit-stock-cover'))) {
+        out.push(...normalize(n.childNodes as Node[], opts));
+        continue;
+      }
+    }
+    n.attrs = n.attrs
+      .filter((a) => !HOOK_ATTRS.has(a.name))
+      .filter((a) => !(a.name === 'src' && a.value === ''))
+      .filter((a) => !(opts.stripEnhancements && a.name === 'data-stock'))
+      .map((a) => {
+        if (a.name === 'class') {
+          let list = a.value.split(/\s+/).filter((c) => c && !HOOK_CLASSES.has(c));
+          if (opts.stripEnhancements) {
+            list = list.filter((c) => c !== 'is-carousel');
+            if (list.includes('spec__nav-link')) list = list.filter((c) => c !== 'is-active');
+          }
+          return { ...a, value: list.join(' ') };
+        }
+        if (a.name === 'style') {
+          return {
+            ...a,
+            value: a.value
+              .split(';')
+              .map((d) => d.trim())
+              .filter(Boolean)
+              .map((d) => d.replace(/\s*:\s*/, ':'))
+              .join(';'),
+          };
+        }
+        return a;
+      })
+      .filter((a) => !(a.name === 'class' && a.value === ''))
+      .sort((x, y) => (x.name < y.name ? -1 : x.name > y.name ? 1 : 0));
+    n.childNodes = normalize(n.childNodes as Node[], opts) as typeof n.childNodes;
+    trimEdges(n);
+    if (n.tagName === 'template') {
+      const content = (n as unknown as { content: { childNodes: Node[] } }).content;
+      content.childNodes = normalize(content.childNodes, opts);
+    }
+    out.push(n);
+  }
+  return out;
+}
+
+/** HTML → каноническая строка. */
+export function canonHtml(html: string, opts: CanonOptions = {}): string {
+  const frag = parseFragment(html);
+  frag.childNodes = normalize(frag.childNodes as Node[], opts) as typeof frag.childNodes;
+  return serialize(frag)
+    .replace(/\s+/g, ' ')
+    .replace(/> </g, '><')
+    .trim();
+}
+
+/** Первое расхождение двух строк — для отчёта. */
+export function firstDifference(a: string, b: string, context = 80): { at: number; a: string; b: string } | null {
+  if (a === b) return null;
+  let i = 0;
+  while (i < a.length && a[i] === b[i]) i++;
+  const from = Math.max(0, i - context);
+  return { at: i, a: a.slice(from, i + context * 2), b: b.slice(from, i + context * 2) };
+}
