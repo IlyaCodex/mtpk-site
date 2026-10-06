@@ -1,5 +1,5 @@
 import type { PageDto } from '@mtpk/shared/contracts';
-import { FONTS_CRITICAL_CSS, MOBILE_FIXES_CSS, STOCK_CSS, TOKENS_CSS } from '@/lib/legacy-css';
+import { clientModuleUrl } from '@/lib/assets';
 import { jsonLdHtml, ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/lib/seo';
 import { ASSET_VERSIONS, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE } from '@/lib/site';
 
@@ -9,21 +9,17 @@ export type HeadPage = Pick<
 >;
 
 /**
- * Расширенные начертания шрифтов — асинхронно (T-PERF-10): файл качается как
- * preload и применяется только после загрузки.
- */
-const FONTS_EXTENDED_JS =
-  "(function(){var l=document.createElement('link');l.rel='preload';l.as='style';l.href='/fonts/fonts-extended.css';l.onload=function(){l.onload=null;l.rel='stylesheet';};document.head.appendChild(l);})();";
-
-/**
- * <head> страницы. Порядок стилей повторяет прежний сайт — от него зависит
- * каскад: ядро (site.css) → шаблонные стили страницы → её собственные →
- * мобильные правки. Мелкий критический CSS встроен, крупный — файлами.
+ * <head> страницы. Все стили — внешние файлы (кешируются браузером, в коде
+ * страницы <style> нет). Порядок — каскад прежнего сайта: общее ядро
+ * (core.css) → шаблонные стили страницы → её собственные → мобильные правки
+ * и компоненты (core-end.css).
  */
 export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage; home?: boolean; modules?: string[] }) {
   const canonical = `${SITE}${page.path}`;
   const ogDescription = page.description ?? DEFAULT_DESCRIPTION;
   const image = `${SITE}${DEFAULT_OG_IMAGE}`;
+  const core = clientModuleUrl('core.css');
+  const coreEnd = clientModuleUrl('core-end.css');
   return (
     <>
       <title>{page.title}</title>
@@ -60,16 +56,7 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
       {modules.map((src) => (
         <link key={src} rel="modulepreload" href={src} />
       ))}
-      <style dangerouslySetInnerHTML={{ __html: FONTS_CRITICAL_CSS }} />
-      <style dangerouslySetInnerHTML={{ __html: TOKENS_CSS }} />
-      <script dangerouslySetInnerHTML={{ __html: FONTS_EXTENDED_JS }} />
-      <noscript>
-        <link rel="stylesheet" href="/fonts/fonts-extended.css" />
-      </noscript>
-      {/* Общее CSS-ядро до стилей страницы: дельты страницы переопределяют ядро */}
-      <link rel="stylesheet" href={`/css/site.css?v=${ASSET_VERSIONS.siteCss}`} />
-      <link rel="stylesheet" href={`/css/praktikum-nav-v26.css?v=${ASSET_VERSIONS.praktikumNavCss}`} />
-      <link rel="stylesheet" href={`/css/audit-fixes-20261002.css?v=${ASSET_VERSIONS.auditFixesCss}`} />
+      {core && <link rel="stylesheet" href={core} />}
       {page.preloadImage && <link rel="preload" as="image" href={page.preloadImage} fetchPriority="high" />}
       {page.jsonLd.map((json, i) => (
         <script key={`ld${i}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(json) }} />
@@ -80,12 +67,7 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
       {page.externalStyles.map((href) => (
         <link key={href} rel="stylesheet" href={href} />
       ))}
-      {page.inlineStyles.map((css, i) => (
-        <style key={`st${i}`} dangerouslySetInnerHTML={{ __html: css }} />
-      ))}
-      <style dangerouslySetInnerHTML={{ __html: MOBILE_FIXES_CSS }} />
-      <style dangerouslySetInnerHTML={{ __html: STOCK_CSS }} />
-      <link rel="stylesheet" href="/css/base-layout.css" />
+      {coreEnd && <link rel="stylesheet" href={coreEnd} />}
     </>
   );
 }

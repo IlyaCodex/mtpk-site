@@ -1,11 +1,11 @@
 import crypto from 'node:crypto';
 
 /**
- * Page-специфичные стили (meta.inline_styles). Правило T-PERF-4 из
- * [...slug].astro: блоки < 20 000 символов остаются inline, крупные
- * выносятся во внешний файл /css/inline-extracted/inline-<md5:12>.css.
- * Хеш считается тем же способом, что в Astro, поэтому адреса файлов
- * совпадают со старой сборкой (браузерный кеш посетителей остаётся валидным).
+ * Стили страниц (бывший meta.inline_styles и <style> в теле страниц).
+ * Все они отдаются внешними файлами /css/inline-extracted/inline-<хеш>.css —
+ * в исходном коде страниц <style> нет, а файлы кешируются браузером.
+ * Блоки от 20 000 символов адресуются тем же хешем, что в Astro-сборке
+ * (адреса совпадают со старыми), мелкие — хешем с префиксом «i».
  */
 export const INLINE_LIMIT = 20000;
 
@@ -20,19 +20,44 @@ export function md5_12(s: string): string {
   return crypto.createHash('md5').update(s).digest('hex').slice(0, 12);
 }
 
+/**
+ * Относительные url() ломаются после переноса CSS в /css/inline-extracted/ —
+ * переписываем на абсолютные, как это делала сборка.
+ */
+function absolutizeUrls(css: string): string {
+  return css
+    .replace(/url\((['"]?)\.\/img\//g, 'url($1/img/')
+    .replace(/url\((['"]?)\.\/brand\//g, 'url($1/brand/')
+    .replace(/url\((['"]?)\.\.\/img\//g, 'url($1/img/')
+    .replace(/url\((['"]?)\.\.\/brand\//g, 'url($1/brand/');
+}
+
+/** Содержимое <style>…</style> без самого тега. */
+export function styleBlockCssText(block: string): string {
+  return block.replace(/^\s*<style[^>]*>/, '').replace(/<\/style>\s*$/, '');
+}
+
 export function classifyStyleBlock(block: string): StyleBlockRecord {
   if (block.length < INLINE_LIMIT) {
-    // inline-блоки адресуем хешем с префиксом, чтобы не пересечься с external
+    // мелкие блоки адресуем хешем с префиксом, чтобы не пересечься с крупными
     return { hash: `i${md5_12(block)}`, mode: 'inline', css: block, bytes: Buffer.byteLength(block) };
   }
-  let css = block.replace(/^\s*<style[^>]*>/, '').replace(/<\/style>\s*$/, '');
-  // Относительные url() ломаются после переноса CSS в /css/inline-extracted/ —
-  // переписываем на абсолютные, как это делала сборка.
-  css = css.replace(/url\((['"]?)\.\/img\//g, 'url($1/img/');
-  css = css.replace(/url\((['"]?)\.\/brand\//g, 'url($1/brand/');
-  css = css.replace(/url\((['"]?)\.\.\/img\//g, 'url($1/img/');
-  css = css.replace(/url\((['"]?)\.\.\/brand\//g, 'url($1/brand/');
+  const css = absolutizeUrls(styleBlockCssText(block));
   return { hash: md5_12(css), mode: 'external', css, bytes: Buffer.byteLength(css) };
+}
+
+/**
+ * CSS блока «Стили» в содержимом страницы → файл: страница подключает его
+ * ссылкой, а не вставляет <style> в свой код.
+ */
+export function cssFileRecord(css: string): StyleBlockRecord {
+  const clean = absolutizeUrls(css.trim());
+  return { hash: md5_12(clean), mode: 'external', css: clean, bytes: Buffer.byteLength(clean) };
+}
+
+/** Текст CSS-файла для записи любого вида (у мелких блоков хранится вместе с тегом <style>). */
+export function styleFileCss(record: { mode: string; css: string }): string {
+  return record.mode === 'external' ? record.css : absolutizeUrls(styleBlockCssText(record.css));
 }
 
 export function externalStyleUrl(hash: string): string {

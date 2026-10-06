@@ -13,15 +13,6 @@ export const config = { unstable_runtimeJS: false };
 
 type Props = DocumentProps & { settings: SiteSettings };
 
-/** Стили страницы 404 — на токенах дизайн-системы (tokens.css). */
-const CSS = `.nf{background:var(--surface-page);padding:clamp(56px,12vw,140px) 0}
-.nf .container{max-width:560px;text-align:center}
-.nf__code{font-family:var(--font-display);font-size:clamp(96px,20vw,200px);line-height:1;font-weight:800;letter-spacing:-.04em;color:var(--teal-600);opacity:.14}
-.nf__title{margin:clamp(4px,1.5vw,12px) 0 0;font-family:var(--font-display);font-size:clamp(24px,4.5vw,38px);line-height:1.1;font-weight:700;color:var(--text-primary)}
-.nf__text{margin:14px auto 0;max-width:44ch;font-size:var(--fs-lead,18px);line-height:1.5;color:var(--text-secondary)}
-.nf__actions{margin-top:clamp(24px,4vw,36px);display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-4,16px)}
-.nf__actions .btn{cursor:pointer}`;
-
 // Каркас страницы 404 — стили главной (как в 404.astro), без её LCP-картинки и разметки.
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const [home, settings] = await Promise.all([getPage('/').catch(() => null), getSettings()]);
@@ -35,7 +26,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
         jsonLd: [],
         cssTemplates: [],
         externalStyles: home?.externalStyles ?? [],
-        inlineStyles: [...(home?.inlineStyles ?? []), CSS],
+        inlineStyles: [],
       },
       modules: pageModules([]),
       legacy: [],

@@ -51,6 +51,29 @@ function note(report: ConvertReport, key: string, reason: string) {
   if (list.length < 6) list.push(reason);
 }
 
+/** Текст <style> (CSS без тега). */
+const styleText = (el: El) => (el.childNodes as Node[]).map((c) => textOf(c)).join('');
+
+/**
+ * Вложенные в секцию <style> — вынимаются из её разметки: стили страницы
+ * подключаются файлами, а не тегами в коде (блок «Стили» ставится перед секцией).
+ */
+function extractStyles(el: El): string[] {
+  const found: string[] = [];
+  const walk = (node: El) => {
+    node.childNodes = (node.childNodes as Node[]).filter((c) => {
+      if (isEl(c) && c.tagName === 'style') {
+        found.push(styleText(c));
+        return false;
+      }
+      if (isEl(c)) walk(c);
+      return true;
+    }) as typeof node.childNodes;
+  };
+  walk(el);
+  return found;
+}
+
 function convertNodes(nodes: Node[], path: string, report: ConvertReport, verify: boolean): Block[] {
   const blocks: Block[] = [];
   for (const n of nodes) {
@@ -65,7 +88,12 @@ function convertNodes(nodes: Node[], path: string, report: ConvertReport, verify
       if (t.trim()) blocks.push({ type: 'text', text: t });
       continue;
     }
-    // Скрипт лайтбокса сразу после блока lightbox — поведение теперь в компоненте
+    if (n.tagName === 'style') {
+      blocks.push({ type: 'style', css: styleText(n) });
+      report.typed.style = (report.typed.style ?? 0) + 1;
+      continue;
+    }
+    // Скрипт лайтбокса сразу после блока лайтбокса — поведение теперь в модуле сайта
     const prev = blocks[blocks.length - 1];
     if (n.tagName === 'script' && prev?.type === 'lightbox' && /lightbox/.test(outer(n))) continue;
 
@@ -81,6 +109,7 @@ function convertNodes(nodes: Node[], path: string, report: ConvertReport, verify
     const key = keyOf(n);
     const parser = PARSERS[key];
     if (!parser) {
+      for (const css of extractStyles(n)) blocks.push({ type: 'style', css });
       blocks.push({ type: 'html', html: outer(n) });
       report.fallback[key] = (report.fallback[key] ?? 0) + 1;
       continue;

@@ -52,6 +52,22 @@ const HOOK_ATTRS = new Set(['onsubmit', 'onclick', 'data-filter-form', 'data-cf-
 /** Подсказки браузеру, как грузить картинку. */
 const LOADING_HINTS = new Set(['loading', 'fetchpriority', 'decoding', 'srcset', 'sizes']);
 
+/**
+ * Классы, заменившие атрибуты style="" прежней вёрстки: стили теперь в
+ * CSS-файлах (apps/web/src/styles/components.css и стили страниц — классы
+ * s-<хеш>). Разметку сверяем без style="", этих классов и hidden (так стала
+ * скрываться строка статуса формы); совпадение вида проверяют скриншоты.
+ */
+const STYLE_CLASSES = new Set(['adv__accent', 'best-offer__title', 'best-offer__lead', 'best-offer__submit', 'ui-pixel']);
+const isStyleClass = (c: string) => STYLE_CLASSES.has(c) || /^phero__thumbs--cols-\d+$/.test(c) || /^s-[0-9a-f]{8}$/.test(c);
+
+function styleAttrsToCanon(n: El, cls: string[]): void {
+  if (cls.some(isStyleClass)) {
+    n.attrs = n.attrs.map((a) => (a.name === 'class' ? { ...a, value: a.value.split(/\s+/).filter((c) => !isStyleClass(c)).join(' ') } : a));
+  }
+  n.attrs = n.attrs.filter((a) => a.name !== 'style' && a.name !== 'hidden');
+}
+
 function normalize(nodes: Node[], opts: CanonOptions): Node[] {
   const out: Node[] = [];
   for (const n of nodes) {
@@ -79,6 +95,9 @@ function normalize(nodes: Node[], opts: CanonOptions): Node[] {
         out.push(...normalize(n.childNodes as Node[], opts));
         continue;
       }
+      // стили страницы: были <style> в коде, стали подключаемыми файлами
+      if (n.tagName === 'style' || (n.tagName === 'link' && getAttr(n, 'rel') === 'stylesheet')) continue;
+      styleAttrsToCanon(n, cls);
     }
     n.attrs = n.attrs
       .filter((a) => !HOOK_ATTRS.has(a.name))

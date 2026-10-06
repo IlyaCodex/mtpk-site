@@ -83,10 +83,7 @@ export function ProductMedia({ media, madeInRussia, inStock }: { media: ProductG
     <div className="phero__media">
       {stage}
       {carousel && (
-        <div
-          className={`${THUMBS_CLASS[media.thumbs]} is-carousel`}
-          style={media.thumbs === 'row' ? { gridTemplateColumns: `repeat(${media.photos.length}, 1fr)` } : undefined}
-        >
+        <div className={`${THUMBS_CLASS[media.thumbs]}${media.thumbs === 'row' ? ` phero__thumbs--cols-${media.photos.length}` : ''} is-carousel`}>
           {media.photos.map((p, i) => (
             <button key={i} className={i === 0 ? 'phero__thumb is-active' : 'phero__thumb'} type="button" aria-label={`Фото ${i + 1}`} data-lightbox-index={String(i)}>
               <img src={p.thumb ?? p.src} alt={p.alt} loading={i === 0 ? undefined : 'lazy'} data-full={p.thumb ? p.src : undefined} />

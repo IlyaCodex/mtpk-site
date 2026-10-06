@@ -1,8 +1,18 @@
-import type { ContainerBlockData, FaqBlock, StatsBlock, TextBlock } from '@mtpk/content-model';
+import type { ContainerBlockData, FaqBlock, StatsBlock, StyleBlock, TextBlock } from '@mtpk/content-model';
+import { cssFileRecord, externalStyleUrl } from '@mtpk/content-kit/styles';
 import { createElement, type ReactNode } from 'react';
 import { extra, Inline, RawElement } from '../primitives/Html.tsx';
 import { SectionHead } from '../primitives/common.tsx';
 import { toProps } from '../primitives/attrs.ts';
+
+/**
+ * Стили секций страницы: подключаемый CSS-файл (адрес — хеш содержимого,
+ * файл отдаёт контент-сервис), а не <style> в коде страницы. Стоит там же,
+ * где стоял <style>, — порядок каскада не меняется.
+ */
+export function StyleLink({ block }: { block: StyleBlock }) {
+  return <link rel="stylesheet" href={externalStyleUrl(cssFileRecord(block.css).hash)} />;
+}
 
 /** Частые вопросы: раскрывающиеся <details>, ответы — в разметке FAQPage (JSON-LD). */
 export function Faq({ block }: { block: FaqBlock }) {

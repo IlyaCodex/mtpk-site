@@ -3,8 +3,10 @@
  * Сравнивается то, что видят посетитель и поисковики: заголовок, мета, canonical,
  * JSON-LD, порядок стилей (каскад!), скрипты, шапка/подвал/меню и <main>.
  */
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parse, serialize, serializeOuter, type DefaultTreeAdapterMap } from 'parse5';
 import { canonHtml } from '@mtpk/content-kit/canon';
 
@@ -118,10 +120,12 @@ export function facts(html: string): PageFacts {
     .sort();
 
   // Порядок каскада: внешние стили и inline-блоки в <head> (служебные Next/шрифты — мимо)
+  // Стили страницы по порядку: встроенный CSS — отпечатком содержимого, файлы —
+  // адресом (содержимое файлов страницы подставит checkHtml, см. resolveStyles)
   const styles = headEls
     .filter((e) => (e.tagName === 'link' && attr(e, 'rel') === 'stylesheet') || e.tagName === 'style')
     .map((e) => {
-      if (e.tagName === 'style') return `inline:${serialize(e).trim().length}`;
+      if (e.tagName === 'style') return serialize(e).trim() ? cssPrint(serialize(e)) : 'inline:0';
       // ?v= — только сброс кеша браузера, на каскад не влияет
       return (attr(e, 'href') ?? '').replace('/_astro/BaseLayout.CK1KI5ak.css', '/css/base-layout.css').replace(/\?v=[\w.-]+$/, '');
     })
@@ -160,6 +164,52 @@ export function facts(html: string): PageFacts {
   };
 }
 
+/**
+ * Отпечаток CSS: без комментариев и лишних пробелов, url() — от корня сайта.
+ * Одинаковый у встроенного <style> старой страницы и вынесенного файла новой.
+ */
+function cssPrint(css: string): string {
+  const norm = css
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/url\((['"]?)\.\.?\//g, 'url($1/')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return `css:${crypto.createHash('md5').update(norm).digest('hex').slice(0, 10)}`;
+}
+
+/**
+ * Общие стили сайта (ядро) — в старой версии отдельными файлами и <style>,
+ * в новой — двумя собранными файлами /assets/core*.css. Порядок ядра
+ * относительно стилей страницы проверяется скриншотами; здесь сравниваем
+ * стили самой страницы: шаблонные и собственные, по содержимому и порядку.
+ */
+const PUBLIC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../apps/web/public');
+const CORE = new Set([
+  ...['fonts/fonts-critical.css', 'tokens.css', 'css/mobile-fixes.css', 'css/stock.css'].map((f) => cssPrint(fs.readFileSync(path.join(PUBLIC, f), 'utf8'))),
+  '/css/site.css',
+  '/css/praktikum-nav-v26.css',
+  '/css/audit-fixes-20261002.css',
+  '/css/base-layout.css',
+]);
+const cssCache = new Map<string, Promise<string>>();
+
+/** Файлы стилей страницы → отпечатки содержимого; ядро и CSS классов s-… (бывшие style="") — мимо. */
+async function resolveStyles(list: string[], load: (href: string) => Promise<string>): Promise<string[]> {
+  const out: string[] = [];
+  for (const item of list) {
+    if (CORE.has(item) || item.startsWith('/assets/core')) continue;
+    if (!item.startsWith('/css/inline-extracted/')) {
+      out.push(item);
+      continue;
+    }
+    if (!cssCache.has(item)) cssCache.set(item, load(item));
+    const css = await cssCache.get(item)!;
+    if (/^\s*\.s-[0-9a-f]{8}\.s-/.test(css)) continue;
+    out.push(cssPrint(css));
+  }
+  return out;
+}
+
 export interface Diff {
   path: string;
   field: keyof PageFacts | 'status';
@@ -195,6 +245,8 @@ export async function checkHtml(opts: {
       } else {
         const a = facts(oldHtml);
         const b = facts(await res.text());
+        a.styles = await resolveStyles(a.styles, async (href) => fs.readFileSync(path.join(opts.distDir, href), 'utf8'));
+        b.styles = await resolveStyles(b.styles, async (href) => (await fetch(`${opts.newBase}${href}`)).text());
         for (const k of Object.keys(a) as (keyof PageFacts)[]) {
           const av = Array.isArray(a[k]) ? (a[k] as string[]).join('\n') : (a[k] as string);
           const bv = Array.isArray(b[k]) ? (b[k] as string[]).join('\n') : (b[k] as string);

@@ -7,17 +7,17 @@ export function AnalyticsNoscript() {
     <>
       <noscript>
         <div>
-          <img src="https://mc.yandex.ru/watch/25228307" style={{ position: 'absolute', left: '-9999px' }} alt="" />
+          <img src="https://mc.yandex.ru/watch/25228307" className="ui-pixel" alt="" />
         </div>
       </noscript>
       <noscript>
         <div>
-          <img src="https://mc.yandex.ru/watch/112991420" style={{ position: 'absolute', left: '-9999px' }} alt="" />
+          <img src="https://mc.yandex.ru/watch/112991420" className="ui-pixel" alt="" />
         </div>
       </noscript>
       <noscript>
         <div>
-          <img src="https://top-fwz1.mail.ru/counter?id=3784620;js=na" style={{ position: 'absolute', left: '-9999px' }} alt="Top.Mail.Ru" />
+          <img src="https://top-fwz1.mail.ru/counter?id=3784620;js=na" className="ui-pixel" alt="Top.Mail.Ru" />
         </div>
       </noscript>
     </>

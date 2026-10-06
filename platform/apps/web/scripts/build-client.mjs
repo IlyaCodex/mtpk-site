@@ -1,17 +1,20 @@
 #!/usr/bin/env node
 /**
- * Сборка клиентских модулей сайта (src/client/*.ts) в public/assets/:
- * минифицированные ES-модули с хешем в имени (кешируются навсегда) и
- * manifest.json «модуль → файл», по которому страница подключает только
- * нужные ей модули. Общий код выносится в отдельные чанки.
+ * Сборка статики сайта в public/assets/ (имена с хешем — кешируются навсегда):
+ *  - клиентские модули (src/client/*.ts): минифицированные ES-модули, общий
+ *    код — в отдельных чанках;
+ *  - общие стили: два файла по месту в каскаде — core.css (до стилей
+ *    страницы) и core-end.css (после них). В коде страниц <style> нет.
+ * manifest.json «имя → файл» читает сервер (src/lib/assets.ts).
  *
  *   node scripts/build-client.mjs           — сборка (перед next build)
  *   node scripts/build-client.mjs --watch   — разработка
  */
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { build, context } from 'esbuild';
+import { build, context, transform } from 'esbuild';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'public/assets');
@@ -26,14 +29,45 @@ const ENTRIES = {
   'catalog-filter': 'src/client/catalog-filter.ts',
 };
 
+/**
+ * Общие стили в порядке каскада. Между core и core-end страница подключает
+ * свои: шаблонные (/css/tpl) и собственные (/css/inline-extracted).
+ */
+const CSS_BUNDLES = {
+  core: [
+    'public/fonts/fonts-critical.css',
+    'public/fonts/fonts-extended.css',
+    'public/tokens.css',
+    'public/css/site.css',
+    'public/css/praktikum-nav-v26.css',
+    'public/css/audit-fixes-20261002.css',
+  ],
+  'core-end': ['public/css/mobile-fixes.css', 'public/css/stock.css', 'public/css/base-layout.css', 'src/styles/components.css'],
+};
+
+const hash = (s) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
+
+async function buildCss() {
+  const out = {};
+  for (const [name, files] of Object.entries(CSS_BUNDLES)) {
+    const source = files.map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+    const { code } = await transform(source, { loader: 'css', minify: !watch, legalComments: 'none' });
+    const file = `${name}-${hash(code)}.css`;
+    fs.writeFileSync(path.join(OUT, file), code);
+    out[`${name}.css`] = `/assets/${file}`;
+  }
+  return out;
+}
+
 const writeManifest = {
   name: 'manifest',
   setup(b) {
     b.onStart(() => {
       fs.rmSync(OUT, { recursive: true, force: true });
     });
-    b.onEnd((result) => {
+    b.onEnd(async (result) => {
       if (result.errors.length || !result.metafile) return;
+      fs.mkdirSync(OUT, { recursive: true });
       const manifest = {};
       let bytes = 0;
       for (const [file, meta] of Object.entries(result.metafile.outputs)) {
@@ -42,8 +76,9 @@ const writeManifest = {
         const name = Object.entries(ENTRIES).find(([, src]) => path.resolve(ROOT, src) === path.resolve(ROOT, meta.entryPoint))?.[0];
         if (name) manifest[name] = `/${path.relative(path.join(ROOT, 'public'), path.resolve(ROOT, file)).split(path.sep).join('/')}`;
       }
+      Object.assign(manifest, await buildCss());
       fs.writeFileSync(path.join(OUT, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-      console.log(`клиентские модули: ${Object.keys(manifest).length}, всего ${(bytes / 1024).toFixed(1)} КБ (до сжатия)`);
+      console.log(`статика сайта: модулей ${Object.keys(ENTRIES).length}, JS ${(bytes / 1024).toFixed(1)} КБ, стили ${Object.keys(CSS_BUNDLES).length} файла`);
     });
   },
 };
@@ -70,7 +105,8 @@ const options = {
 if (watch) {
   const ctx = await context(options);
   await ctx.watch();
-  console.log('клиентские модули: слежу за изменениями…');
+  // стили пересобираются вместе с модулями; правка только CSS — перезапуск сборщика
+  console.log('статика сайта: слежу за изменениями…');
 } else {
   await build(options);
 }

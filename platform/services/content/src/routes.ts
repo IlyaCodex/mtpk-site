@@ -2,6 +2,8 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { CONTENT_STREAM, isAuthorized, publishEvent, type Logger, type Redis, type ZodTypeProvider } from '@mtpk/shared';
 import { classifyStyleBlock, detectTemplate, normalizePath } from '@mtpk/content-kit';
+import { cssFileRecord } from '@mtpk/content-kit/styles';
+import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
 import { renderBlocksToHtml } from '@mtpk/ui/server';
 import { asc, count, desc, eq, ilike, inArray, or, pages, redirects, settings, sql, stockItems, styleBlocks, type Db } from './db.ts';
@@ -55,7 +57,7 @@ export async function publicRoutes(base: FastifyInstance, { store }: Deps) {
     '/v1/styles/:file',
     { schema: { tags: ['Сайт'], summary: 'Крупный CSS страницы', params: z.object({ file: z.string() }) } },
     async (req, reply) => {
-      const m = req.params.file.match(/^inline-([a-f0-9]{12})\.css$/);
+      const m = req.params.file.match(/^inline-(i?[a-f0-9]{12})\.css$/);
       const css = m ? await store.styleCss(m[1]) : null;
       if (!css) return reply.code(404).type('text/plain').send('not found');
       reply.header('Cache-Control', 'public, max-age=31536000, immutable');
@@ -258,7 +260,12 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     const styleRows = input.inlineStyles
       .filter((b) => b.trim())
       .map((css) => classifyStyleBlock(css.trim().startsWith('<style') ? css : `<style>${css}</style>`));
-    if (styleRows.length) await db.insert(styleBlocks).values(styleRows).onConflictDoNothing();
+    // style="" в HTML-блоках → классы, их CSS — файлом стилей страницы (последним)
+    const { blocks, rules } = extractBlocksInlineStyles(input.blocks);
+    if (rules.size) styleRows.push(classifyStyleBlock(`<style>${rulesToCss(rules)}</style>`));
+    // CSS блоков «Стили» — тоже файлами (сайт подключает их ссылкой по хешу)
+    const blockCss = [...walkBlocks(blocks)].flatMap((b) => (b.type === 'style' ? [cssFileRecord(b.css)] : []));
+    if (styleRows.length || blockCss.length) await db.insert(styleBlocks).values([...styleRows, ...blockCss]).onConflictDoNothing();
     const now = new Date();
     const values = {
       path,
@@ -266,7 +273,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       template: input.template ?? detectTemplate(path, ''),
       title: input.title,
       description: input.description ?? null,
-      blocks: input.blocks,
+      blocks,
       cssTemplates: input.cssTemplates,
       styleHashes: styleRows.map((s) => s.hash),
       preloadImage: input.preloadImage ?? null,

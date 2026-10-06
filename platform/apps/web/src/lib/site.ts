@@ -2,13 +2,11 @@
 export const SITE = (process.env.SITE_URL ?? 'https://uralinduktor.ru').replace(/\/$/, '');
 
 /**
- * Версии статики (сброс кеша браузера, nginx/шлюз кешируют css/js 7 дней).
- * При правке файла в public/ поднимай его версию здесь.
+ * Версии статики, которую страницы подключают по прямому адресу (сброс кеша
+ * браузера: шлюз и браузеры кешируют /css и /js). Общие стили сайта
+ * собираются в /assets с хешем в имени — им версия не нужна.
  */
 export const ASSET_VERSIONS = {
-  siteCss: '20261005b',
-  praktikumNavCss: '20261007a',
-  auditFixesCss: '20261005c',
   /** общая версия /css/tpl/*.css */
   tplCss: '20260928a',
 } as const;

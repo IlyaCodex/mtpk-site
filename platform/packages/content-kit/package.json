@@ -9,7 +9,9 @@
     "./compare": "./src/compare.ts",
     "./html": "./src/html.ts",
     "./features": "./src/features.ts",
-    "./canon": "./src/canon.ts"
+    "./canon": "./src/canon.ts",
+    "./styles": "./src/styles.ts",
+    "./inline-styles": "./src/inline-styles.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

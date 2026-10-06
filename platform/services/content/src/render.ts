@@ -7,7 +7,6 @@ import {
   pickSearchImage,
   searchWeight,
   stripHtmlComments,
-  styleBlockCss,
 } from '@mtpk/content-kit';
 import { walkBlocks, type Block } from '@mtpk/content-model';
 import { renderBlocksToHtml } from '@mtpk/ui/server';
@@ -77,14 +76,12 @@ export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: st
     };
   }
 
-  const externalStyles: string[] = [];
-  const inline: string[] = [];
-  for (const hash of page.styleHashes) {
-    const block = styles.get(hash);
-    if (!block) continue;
-    if (block.mode === 'external') externalStyles.push(externalStyleUrl(block.hash));
-    else inline.push(styleBlockCss(block.css));
-  }
+  // Все стили страницы — внешние файлы (в коде страницы <style> нет). Порядок
+  // каскада прежний: сначала крупные блоки, затем мелкие.
+  const known = page.styleHashes.map((h) => styles.get(h)).filter((b) => b !== undefined);
+  const externalStyles = [...known.filter((b) => b.mode === 'external'), ...known.filter((b) => b.mode !== 'external')].map((b) =>
+    externalStyleUrl(b.hash),
+  );
 
   const blocks = page.blocks as Block[];
   const html = seoHtml(page);
@@ -93,7 +90,7 @@ export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: st
     blocks,
     cssTemplates: page.cssTemplates,
     externalStyles,
-    inlineStyles: inline,
+    inlineStyles: [],
     jsonLd: buildPageJsonLd(
       html,
       {

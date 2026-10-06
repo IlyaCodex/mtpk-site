@@ -17,7 +17,7 @@ export function Adv({ warranty = '18\u00A0месяцев' }: { warranty?: string
           {" "}
           <h2 className="adv__title">
             {"Высочайший контроль качества и\u00A0"}
-            <em style={{ fontStyle: "normal", color: "var(--text-brand)" }}>
+            <em className="adv__accent">
               {`расширенная гарантия ${warranty}`}
             </em>
           </h2>

@@ -24,9 +24,9 @@ export function SubmitButton({ html, ...rest }: ComponentPropsWithoutRef<'button
   return <button type="submit" {...rest} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-/** Строка статуса отправки (role=status — читается скринридером). Заполняет модуль forms. */
+/** Строка статуса отправки (role=status — читается скринридером). Скрыта, пока модуль forms её не заполнит. */
 export function FormStatus({ as: Tag = 'div' }: { as?: 'div' | 'span' }) {
-  return <Tag className="js-form-status" style={{ display: 'none' }} role="status" aria-live="polite" />;
+  return <Tag className="js-form-status" hidden role="status" aria-live="polite" />;
 }
 
 /** Телефон; маску +7 (___) ___-__-__ накладывает клиентский модуль. */

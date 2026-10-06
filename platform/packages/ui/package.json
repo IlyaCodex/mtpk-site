@@ -16,7 +16,8 @@
   "dependencies": {
     "@mtpk/content-model": "*",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "@mtpk/content-kit": "*"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

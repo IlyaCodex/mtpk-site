@@ -10,6 +10,9 @@ import {
   type RawPage,
 } from '@mtpk/content-kit';
 import { pages, styleBlocks, sql, inArray, type Db, type NewPage } from '@mtpk/db';
+import { walkBlocks } from '@mtpk/content-model';
+import { cssFileRecord } from '@mtpk/content-kit/styles';
+import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import type { Logger } from '@mtpk/shared';
 import { htmlToBlocks, newReport, type ConvertReport } from './blocks/to-blocks.ts';
 
@@ -17,7 +20,7 @@ import { htmlToBlocks, newReport, type ConvertReport } from './blocks/to-blocks.
  * Версия конвертера «HTML → блоки». Входит в хеш исходника: после доработки
  * парсеров повторный импорт пересоберёт блоки даже у неизменённых страниц.
  */
-export const CONVERTER_VERSION = '2026-10-07.2';
+export const CONVERTER_VERSION = '2026-10-07.4';
 
 const KNOWN_META = new Set(['title', 'description', 'inline_styles', 'css_templates', 'preload_image', 'noindex']);
 
@@ -78,8 +81,14 @@ function rawToRecord(
   // inline-блок. Пустые блоки ничего не стилизуют, поэтому отбрасываем.
   const toList = (v: unknown): string[] =>
     (Array.isArray(v) ? v : typeof v === 'string' ? [v] : []).filter((s): s is string => typeof s === 'string');
-  const styles = toList(meta.inline_styles).filter((b) => b.trim()).map(classifyStyleBlock);
+  const headStyles = toList(meta.inline_styles).filter((b) => b.trim()).map(classifyStyleBlock);
   const cssTemplates = toList(meta.css_templates);
+  const { blocks, rules } = extractBlocksInlineStyles(htmlToBlocks(raw.body, raw.path, report));
+  // style="" из HTML-блоков → классы; их CSS — последним файлом стилей страницы
+  if (rules.size) headStyles.push(classifyStyleBlock(`<style>${rulesToCss(rules)}</style>`));
+  // CSS блоков «Стили» из тела страницы — тоже файлами
+  const bodyStyles = [...walkBlocks(blocks)].flatMap((b) => (b.type === 'style' ? [cssFileRecord(b.css)] : []));
+  const styles = [...headStyles, ...bodyStyles];
   const bodyDates = dates.get(raw.relBody);
   const metaDates = dates.get(raw.relMeta);
   const lastmod = laterOf(bodyDates?.last, metaDates?.last);
@@ -93,10 +102,10 @@ function rawToRecord(
       template: detectTemplate(raw.path, raw.body),
       title: meta.title ?? '',
       description: meta.description ?? null,
-      blocks: htmlToBlocks(raw.body, raw.path, report),
+      blocks,
       body: raw.body,
       cssTemplates,
-      styleHashes: styles.map((s) => s.hash),
+      styleHashes: headStyles.map((s) => s.hash),
       preloadImage: meta.preload_image ?? null,
       noindex: meta.noindex === true,
       extraMeta,

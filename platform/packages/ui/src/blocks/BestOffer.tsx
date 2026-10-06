@@ -169,14 +169,14 @@ export function BestOffer({ anchorId = 'leadgen' }: { anchorId?: string }) {
               {"Сравним и\u00A0улучшим"}
             </div>
             {" "}
-            <h2 className="s-title" style={{ marginBottom: "var(--sp-3)" }}>
+            <h2 className="s-title best-offer__title">
               {"Подготовим "}
               <em>
                 лучшее предложение
               </em>
             </h2>
             {" "}
-            <p className="s-lead" style={{ marginBottom: "var(--sp-2)" }}>
+            <p className="s-lead best-offer__lead">
               {"Пришлите коммерческое предложение от\u00A0другой компании — рассчитаем более выгодную стоимость с\u00A0учётом нашей складской базы и\u00A0собственного производства."}
             </p>
             {" "}
@@ -222,7 +222,7 @@ export function BestOffer({ anchorId = 'leadgen' }: { anchorId?: string }) {
                 {" "}
               </label>
               {" "}
-              <SubmitButton className="btn btn--primary" style={{ alignSelf: "flex-start" }} html={"Получить лучшее предложение " + ARROW} />
+              <SubmitButton className="btn btn--primary best-offer__submit" html={"Получить лучшее предложение " + ARROW} />
               {" "}
               <FormStatus />
               {" "}

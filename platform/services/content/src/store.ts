@@ -1,4 +1,5 @@
 import { buildCompareIndex, resolveStock, type StockConfigItem } from '@mtpk/content-kit';
+import { styleFileCss } from '@mtpk/content-kit/styles';
 import { DEFAULT_SETTINGS, siteSettings, type SiteSettings } from '@mtpk/content-model';
 import { asc, eq, inArray, like, pages, redirects, settings, stockItems, styleBlocks, type Db, type Page, type StyleBlock } from './db.ts';
 import type { JsonCache, Logger, PageDto, PageListItem, RedirectDto } from '@mtpk/shared';
@@ -69,9 +70,10 @@ export class ContentStore {
     });
   }
 
+  /** CSS-файл стилей страницы по хешу (/css/inline-extracted/inline-<хеш>.css). */
   async styleCss(hash: string): Promise<string | null> {
     const block = (await this.styleMap()).get(hash);
-    return block && block.mode === 'external' ? block.css : null;
+    return block ? styleFileCss(block) : null;
   }
 
   /** /data/stock.json — тот же формат, что писал build-stock.mjs. */

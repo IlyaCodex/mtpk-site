@@ -36,6 +36,12 @@ export const htmlBlock = z
 
 export const textBlock = z.object({ type: z.literal('text'), text: text('Текст') }).describe('Текст');
 
+/**
+ * Стили секций страницы (CSS). На сайте — подключаемый файл (кешируется
+ * браузером), а не <style> в исходном коде страницы.
+ */
+export const styleBlock = z.object({ type: z.literal('style'), css: element('CSS') }).describe('Стили (CSS)');
+
 export type ContainerBlockData = {
   type: 'container';
   tag: string;
@@ -273,6 +279,7 @@ export const block: z.ZodType<Block> = z.lazy(() =>
   z.union([
     htmlBlock,
     textBlock,
+    styleBlock,
     containerBlock,
     leadgenBlock,
     bestOfferBlock,
@@ -292,6 +299,7 @@ export const block: z.ZodType<Block> = z.lazy(() =>
 
 export type HtmlBlock = z.infer<typeof htmlBlock>;
 export type TextBlock = z.infer<typeof textBlock>;
+export type StyleBlock = z.infer<typeof styleBlock>;
 export type LeadgenBlock = z.infer<typeof leadgenBlock>;
 export type BestOfferBlock = z.infer<typeof bestOfferBlock>;
 export type CatalogCtaBlock = z.infer<typeof catalogCtaBlock>;
@@ -309,6 +317,7 @@ export type StatsBlock = z.infer<typeof statsBlock>;
 export type Block =
   | HtmlBlock
   | TextBlock
+  | StyleBlock
   | ContainerBlockData
   | LeadgenBlock
   | BestOfferBlock
@@ -330,6 +339,7 @@ export type BlockType = Block['type'];
 export const BLOCK_SCHEMAS: Record<BlockType, z.ZodType> = {
   html: htmlBlock,
   text: textBlock,
+  style: styleBlock,
   container: containerBlock,
   leadgen: leadgenBlock,
   bestOffer: bestOfferBlock,
@@ -350,6 +360,7 @@ export const BLOCK_SCHEMAS: Record<BlockType, z.ZodType> = {
 export const BLOCK_LABELS: Record<BlockType, string> = {
   html: 'HTML как есть',
   text: 'Текст',
+  style: 'Стили (CSS)',
   container: 'Контейнер',
   leadgen: 'Форма «Подбор и расчёт»',
   bestOffer: 'Лучшее предложение',
