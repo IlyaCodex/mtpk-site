@@ -16,9 +16,11 @@ const PROCS = {
   'leads-worker': ['npm', ['run', 'dev:worker', '-w', '@mtpk/leads-service']],
   search: ['npm', ['run', 'dev', '-w', '@mtpk/search-service']],
   web: ['npm', ['run', 'dev', '-w', '@mtpk/web']],
+  // клиентские модули сайта (src/client → public/assets), пересборка при изменениях
+  'web-client': ['npm', ['run', 'dev:client', '-w', '@mtpk/web']],
   admin: ['npm', ['run', 'dev', '-w', '@mtpk/admin']],
 };
-const COLORS = [36, 33, 35, 32, 34, 31, 96];
+const COLORS = [36, 33, 35, 32, 34, 31, 96, 93];
 
 const only = process.argv.slice(2);
 const names = only.length ? only : Object.keys(PROCS);

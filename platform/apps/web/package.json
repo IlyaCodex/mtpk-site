@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3200 --hostname 127.0.0.1",
-    "build": "next build",
+    "dev:client": "node scripts/build-client.mjs --watch",
+    "build": "node scripts/build-client.mjs && next build",
     "start": "next start --port 3200",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -19,9 +20,8 @@
   },
   "devDependencies": {
     "@mtpk/shared": "*",
-    "@tailwindcss/postcss": "^4.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "tailwindcss": "^4.3.3"
+    "esbuild": "*"
   }
 }

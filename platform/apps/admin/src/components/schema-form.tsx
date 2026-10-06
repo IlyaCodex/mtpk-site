@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
+import { GalleryField, type Photo } from './gallery-field';
 import { MediaInput } from './media';
 import { Button, cx } from './ui';
 
@@ -22,7 +23,9 @@ export type JsonSchema = {
   default?: unknown;
   description?: string;
   title?: string;
-  editor?: 'inline' | 'rich' | 'code' | 'link' | 'media' | 'attrs';
+  editor?: 'inline' | 'rich' | 'code' | 'link' | 'media' | 'attrs' | 'gallery';
+  /** подписи вариантов выбора (.meta({ enumLabels }) в модели) */
+  enumLabels?: Record<string, string>;
   anyOf?: JsonSchema[];
   oneOf?: JsonSchema[];
   $ref?: string;
@@ -140,7 +143,7 @@ export function SchemaField({
           {!required && <option value="">—</option>}
           {schema.enum.map((o) => (
             <option key={String(o)} value={String(o)}>
-              {String(o)}
+              {schema.enumLabels?.[String(o)] ?? String(o)}
             </option>
           ))}
         </select>
@@ -217,6 +220,9 @@ export function SchemaField({
   }
 
   if (type === 'array') {
+    if (schema.editor === 'gallery') {
+      return <GalleryField label={text} value={(Array.isArray(value) ? value : []) as Photo[]} onChange={onChange} />;
+    }
     if (schema.prefixItems) {
       const tuple = Array.isArray(value) ? value : [];
       return (

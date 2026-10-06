@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "React-компоненты сайта: блоки страниц, каталог, формы, каркас. Рендерятся сайтом, админкой (предпросмотр) и контент-сервисом (SEO).",
+  "description": "React-компоненты сайта (только серверный рендер): блоки страниц, каталог, формы. browser/* — общая логика клиентских модулей (метки рекламы, маска телефона, сравнение, «Запросить цену»).",
   "exports": {
     ".": "./src/index.ts",
-    "./server": "./src/server.ts"
+    "./server": "./src/server.ts",
+    "./rules": "./src/catalog/rules.ts",
+    "./browser/*": "./src/browser/*.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

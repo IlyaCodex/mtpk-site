@@ -27,8 +27,6 @@ const nextConfig: NextConfig = {
   // делает src/proxy.ts кодом 301, как nginx (у Next по умолчанию 308).
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
-  // Мета-теги всегда в <head> (без потоковой вставки) — для всех поисковиков.
-  htmlLimitedBots: /.*/,
   // Картинки отдаёт медиасервис из S3; оптимизатор Next не нужен и не пишет кеш на диск.
   images: { unoptimized: true },
   experimental: {
@@ -47,8 +45,12 @@ const nextConfig: NextConfig = {
         { source: '/files/:path*', destination: `${MEDIA}/files/:path*` },
         { source: '/docs/:path*', destination: `${MEDIA}/docs/:path*` },
         { source: '/og/:path*', destination: `${MEDIA}/og/:path*` },
-        // ассеты Практикума (страницы-документы отдаёт app/praktikum)
+        // ассеты Практикума — из медиасервиса, сами статьи (HTML-документы) — API-маршрут
         { source: '/praktikum/:path(.+\\.(?:css|js|webp|png|jpe?g|svg|gif|avif|woff2?|pdf))', destination: `${MEDIA}/praktikum/:path` },
+        { source: '/praktikum', destination: '/api/praktikum' },
+        { source: '/praktikum/:path*', destination: '/api/praktikum/:path*' },
+        { source: '/sitemap-index.xml', destination: '/api/sitemap?part=index' },
+        { source: '/sitemap-0.xml', destination: '/api/sitemap' },
         { source: '/css/inline-extracted/:file', destination: `${CONTENT}/v1/styles/:file` },
         { source: '/data/:file(stock\\.json|compare-index\\.json|compare-sections\\.json)', destination: `${CONTENT}/v1/data/:file` },
         { source: '/api/send.php', destination: `${LEADS}/api/send.php` },
@@ -62,7 +64,8 @@ const nextConfig: NextConfig = {
     // шрифты и логотипы 30 дней.
     return [
       { source: '/css/:path*', headers: cache('public, max-age=604800') },
-      { source: '/_astro/:path*', headers: cache('public, max-age=604800') },
+      // клиентские модули: имя файла содержит хеш содержимого — кеш навсегда
+      { source: '/assets/:path*', headers: cache('public, max-age=31536000, immutable') },
       { source: '/js/:path*', headers: cache('public, max-age=604800') },
       // шрифты разрешены и другим источникам: их подгружает предпросмотр в админке
       { source: '/fonts/:path*', headers: [...cache('public, max-age=2592000'), { key: 'Access-Control-Allow-Origin', value: '*' }] },

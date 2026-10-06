@@ -74,25 +74,43 @@ export const whyUsBlock = z
 
 // ── Товар ─────────────────────────────────────────────────────────────────
 
+/** Фотография товара. */
+export const productPhoto = z.object({
+  src: z.string().describe('Фото').meta({ editor: 'media' }),
+  alt: z.string().default('').describe('Что на фото (alt)'),
+  /** уменьшенная копия для ленты миниатюр — у старых фото; новым не нужна */
+  thumb: z.string().optional().describe('Отдельная миниатюра').meta({ editor: 'media' }),
+});
+export type ProductPhoto = z.infer<typeof productPhoto>;
+
+/**
+ * Галерея товара: первое фото — главное, при двух и больше под ним лента
+ * миниатюр с перелистыванием. Разметка (кнопки, номера кадров, лайтбокс)
+ * строится из списка автоматически.
+ */
+export const productGallery = z
+  .object({
+    photos: z.array(productPhoto).min(1).describe('Фотографии (первая — главная)').meta({ editor: 'gallery' }),
+    banner: inline('Плашка на фото').optional(),
+    mainAlt: text('Описание главного фото, если отличается').optional(),
+    /** у фото без просмотра на весь экран — своя подпись кнопки для скринридеров */
+    mainLabel: text('Подпись главного фото для скринридеров').optional(),
+    caption: inline('Подпись под фото').optional(),
+    thumbs: z
+      .enum(['grid', 'row', 'scroll'])
+      .default('grid')
+      .describe('Миниатюры под фото')
+      .meta({ enumLabels: { grid: 'Сеткой', row: 'В один ряд во всю ширину', scroll: 'Лентой с прокруткой' } }),
+    zoom: z.boolean().default(true).describe('Открывать фото на весь экран'),
+  })
+  .describe('Фото');
+export type ProductGallery = z.infer<typeof productGallery>;
+
 export const productHeroBlock = z
   .object({
     type: z.literal('productHero'),
     breadcrumbs: z.array(crumb).describe('Хлебные крошки'),
-    media: z.object({
-      /** <button> — фото открывается в лайтбоксе; <div> — без лайтбокса */
-      mainTag: z.enum(['button', 'div']).default('button').describe('Главное фото: button — открывается на весь экран, div — без просмотра'),
-      mainAttrs: attrs(),
-      banner: inline('Плашка на фото').optional(),
-      image: image('Главное фото'),
-      thumbs: z
-        .array(z.object({ image: image('Миниатюра'), active: z.boolean().default(false).describe('Выбрана при открытии'), attrs: attrs() }))
-        .describe('Миниатюры галереи')
-        .optional(),
-      /** phero__thumbs или «phero__thumbs phero__thumbs--scroll» (лента с прокруткой) */
-      thumbsClass: text('Классы ленты миниатюр').optional(),
-      thumbsAttrs: attrs(),
-      caption: inline('Подпись под фото').optional(),
-    }),
+    media: productGallery,
     origin: inline('Происхождение (над заголовком)').optional(),
     title: inline('Название (H1)'),
     status: inline('Статус / срок').optional(),

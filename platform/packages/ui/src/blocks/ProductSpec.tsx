@@ -27,19 +27,14 @@ function Content({ item }: { item: SpecContent }) {
 
 /**
  * Характеристики и описание товара: оглавление слева (подсветка текущего
- * раздела — клиентский скрипт spec-tabs), разделы справа.
+ * раздела — клиентский модуль spec-nav), разделы справа.
  */
 export function ProductSpec({ block }: { block: ProductSpecBlock }) {
   return (
     <section className="spec" aria-label={block.ariaLabel}>
       <div className="container">
         <div className="spec__layout">
-          <SpecNav
-            ariaLabel={block.navAriaLabel}
-            eyebrow={block.navEyebrow}
-            items={block.nav}
-            panelIds={block.panels.map((p) => p.id)}
-          />
+          <SpecNav ariaLabel={block.navAriaLabel} eyebrow={block.navEyebrow} items={block.nav} />
           <div className="spec__body">
             {block.panels.map((p) => (
               <div className="spec__panel" id={p.id} key={p.id}>

@@ -41,7 +41,7 @@
 .praktikum-course-nav [aria-current="page"] { font-weight: 700; color: #101f26; }
 @media print {
   .header-shell, .nav-drawer, .praktikum-breadcrumbs.praktikum-breadcrumbs, .praktikum-course-nav,
-  body > footer, .cookie-consent { display: none !important; }
+  body > footer, #__next > footer, .cookie-consent { display: none !important; }
 }
 
 /* ============================================================

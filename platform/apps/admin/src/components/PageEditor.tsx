@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/client-api';
 import { BlockList, type BlockData, type BlockSchemas } from './BlockList';
+import { EditorContext } from './editor-context';
 import { toast } from './toast';
 import { Badge, Button, cx, Field, formatDate } from './ui';
 
@@ -156,7 +157,9 @@ export function PageEditor({ initial, schemas, siteUrl }: { initial: EditablePag
                   {htmlBlocks} из {page.blocks.length} блоков — «HTML как есть» (перенесены со старого сайта без разбора на поля).
                 </p>
               )}
-              <BlockList blocks={page.blocks} schemas={schemas} onChange={(blocks) => update({ blocks })} />
+              <EditorContext.Provider value={{ pagePath: page.path }}>
+                <BlockList blocks={page.blocks} schemas={schemas} onChange={(blocks) => update({ blocks })} />
+              </EditorContext.Provider>
             </>
           )}
 

@@ -17,7 +17,7 @@ import { htmlToBlocks, newReport, type ConvertReport } from './blocks/to-blocks.
  * Версия конвертера «HTML → блоки». Входит в хеш исходника: после доработки
  * парсеров повторный импорт пересоберёт блоки даже у неизменённых страниц.
  */
-export const CONVERTER_VERSION = '2026-10-06.1';
+export const CONVERTER_VERSION = '2026-10-07.2';
 
 const KNOWN_META = new Set(['title', 'description', 'inline_styles', 'css_templates', 'preload_image', 'noindex']);
 

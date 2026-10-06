@@ -2,8 +2,6 @@ import { Fragment } from 'react';
 import type { NavItem, SiteSettings } from '@mtpk/content-model';
 import { ContactLink } from './ContactLink';
 import { HeaderQuickForm } from './HeaderQuickForm';
-import { HeaderShell } from './HeaderShell';
-import { NavToggle } from './NavToggle';
 import { ClockIcon, MAIL_SVG, MaxLogo, MenuIcon, PHONE_SVG, SearchIcon, TelegramLogo } from './icons';
 
 /**
@@ -14,7 +12,8 @@ import { ClockIcon, MAIL_SVG, MaxLogo, MenuIcon, PHONE_SVG, SearchIcon, Telegram
 export function Header({ settings, activeNav }: { settings: SiteSettings; activeNav?: string }) {
   const { contacts } = settings;
   return (
-    <HeaderShell>
+    // класс is-scrolled при прокрутке ставит клиентский модуль (header.ts)
+    <div className="header-shell">
       <div className="header-top">
         <div className="container header-top__inner">
           <span className="contact-hours" aria-label="Режим работы">
@@ -65,7 +64,11 @@ export function Header({ settings, activeNav }: { settings: SiteSettings; active
             ))}
           </nav>
           <div className="header__actions">
-            <NavToggle />
+            <button className="nav-toggle" aria-label="Открыть меню" aria-expanded="false" data-nav-toggle="">
+              <span className="nav-toggle__bar" />
+              <span className="nav-toggle__bar" />
+              <span className="nav-toggle__bar" />
+            </button>
             <button className="icon-btn" aria-label="Поиск" data-search-open="">
               <SearchIcon />
             </button>
@@ -73,7 +76,7 @@ export function Header({ settings, activeNav }: { settings: SiteSettings; active
           </div>
         </div>
       </header>
-    </HeaderShell>
+    </div>
   );
 }
 

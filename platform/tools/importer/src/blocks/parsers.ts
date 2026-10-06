@@ -9,6 +9,7 @@ import type {
   CategoryHeroBlock,
   FaqBlock,
   ProductCard,
+  ProductGallery,
   ProductHeroBlock,
   ProductSpecBlock,
   SectionHead,
@@ -64,6 +65,63 @@ function parseSectionHead(el: El): SectionHead {
 
 // ── Карточка товара ───────────────────────────────────────────────────────
 
+/**
+ * Фото карточки товара → список фотографий. Разметку кнопок, номера кадров и
+ * подписи компонент строит сам, поэтому здесь из неё берутся только адреса,
+ * описания, плашка, подпись и вид ленты миниатюр; совпадение итоговой
+ * разметки с исходной проверяет сверка в to-blocks.
+ */
+function parseProductGallery(mk: El[]): ProductGallery {
+  const mainEl = mk[0];
+  if (!mainEl || !hasClass(mainEl, 'phero__main') || classList(mainEl).length !== 1) fail('phero__main');
+  if (mainEl.tagName !== 'button') fail('phero__main: тег');
+  const mainKids = kids(mainEl);
+  let banner: string | undefined;
+  let j = 0;
+  if (hasClass(mainKids[j], 'phero__banner')) {
+    expect(mainKids[j], 'span', 'phero__banner');
+    onlyAttrs(mainKids[j], []);
+    banner = inner(mainKids[j++]);
+  }
+  const main = parseImage(mainKids[j++]);
+  if (mainKids[j]) fail('phero__main: лишнее');
+
+  let m = 1;
+  let photos: ProductGallery['photos'] = [{ src: main.src, alt: main.alt }];
+  let thumbs: ProductGallery['thumbs'] = 'grid';
+  if (mk[m] && hasClass(mk[m], 'phero__thumbs')) {
+    const strip = mk[m++];
+    expect(strip, 'div');
+    if (classList(strip).includes('phero__thumbs--scroll')) thumbs = 'scroll';
+    else if (/repeat\(\d+/.test(attr(strip, 'style') ?? '')) thumbs = 'row';
+    photos = kids(strip).map((t) => {
+      expect(t, 'button');
+      const [img, ...rest] = kids(t);
+      if (rest.length) fail('миниатюра: лишнее');
+      const image = parseImage(img);
+      const full = image.attrs?.['data-full'];
+      return full ? { src: full, thumb: image.src, alt: image.alt } : { src: image.src, alt: image.alt };
+    });
+    if (photos[0].src !== main.src) fail('главное фото не совпадает с первой миниатюрой');
+  }
+  let caption: string | undefined;
+  if (mk[m] && hasClass(mk[m], 'phero__caption')) {
+    expect(mk[m], 'p', 'phero__caption');
+    onlyAttrs(mk[m], []);
+    caption = inner(mk[m++]);
+  }
+  if (mk[m]) fail('phero__media: лишнее');
+  return {
+    photos,
+    banner,
+    mainAlt: main.alt !== photos[0].alt ? main.alt : undefined,
+    caption,
+    thumbs,
+    zoom: attr(mainEl, 'data-lightbox-index') !== undefined,
+    mainLabel: attr(mainEl, 'aria-label') !== 'Открыть фото на весь экран' ? attr(mainEl, 'aria-label') : undefined,
+  };
+}
+
 export function parseProductHero(el: El): ProductHeroBlock {
   expect(el, 'section', 'phero');
   onlyAttrs(el, []);
@@ -83,46 +141,7 @@ export function parseProductHero(el: El): ProductHeroBlock {
   expect(mediaEl, 'div', 'phero__media');
   onlyAttrs(mediaEl, []);
   const mk = kids(mediaEl);
-  const mainEl = mk[0];
-  if (!mainEl || !hasClass(mainEl, 'phero__main') || classList(mainEl).length !== 1) fail('phero__main');
-  if (mainEl.tagName !== 'button' && mainEl.tagName !== 'div') fail('phero__main: тег');
-  const mainKids = kids(mainEl);
-  let banner: string | undefined;
-  let j = 0;
-  if (hasClass(mainKids[j], 'phero__banner')) {
-    expect(mainKids[j], 'span', 'phero__banner');
-    onlyAttrs(mainKids[j], []);
-    banner = inner(mainKids[j++]);
-  }
-  const image = parseImage(mainKids[j++]);
-  if (mainKids[j]) fail('phero__main: лишнее');
-  const media: ProductHeroBlock['media'] = {
-    mainTag: mainEl.tagName as 'button' | 'div',
-    mainAttrs: restAttrs(mainEl),
-    banner,
-    image,
-  };
-  let m = 1;
-  if (mk[m] && hasClass(mk[m], 'phero__thumbs')) {
-    const strip = mk[m++];
-    expect(strip, 'div');
-    media.thumbsClass = attr(strip, 'class');
-    media.thumbsAttrs = restAttrs(strip);
-    media.thumbs = kids(strip).map((t) => {
-      expect(t, 'button');
-      const tc = classList(t);
-      if (!tc.includes('phero__thumb') || tc.some((c) => c !== 'phero__thumb' && c !== 'is-active')) fail('миниатюра: классы');
-      const [img, ...rest] = kids(t);
-      if (rest.length) fail('миниатюра: лишнее');
-      return { image: parseImage(img), active: tc.includes('is-active'), attrs: restAttrs(t) };
-    });
-  }
-  if (mk[m] && hasClass(mk[m], 'phero__caption')) {
-    expect(mk[m], 'p', 'phero__caption');
-    onlyAttrs(mk[m], []);
-    media.caption = inner(mk[m++]);
-  }
-  if (mk[m]) fail('phero__media: лишнее');
+  const media = parseProductGallery(mk);
 
   // описание
   expect(infoEl, 'div', 'phero__info');

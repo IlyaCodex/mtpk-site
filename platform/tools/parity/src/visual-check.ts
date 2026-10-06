@@ -61,11 +61,13 @@ async function prepare(page: Page, origin: string, url: string) {
     const step = window.innerHeight;
     for (let y = 0; y < document.body.scrollHeight; y += step) {
       window.scrollTo(0, y);
-      await new Promise((r) => setTimeout(r, 60));
+      await new Promise((r) => setTimeout(r, 120));
     }
     window.scrollTo(0, 0);
   });
   await page.waitForLoadState('networkidle');
+  // ленивые картинки должны успеть не только загрузиться, но и декодироваться
+  await page.waitForFunction(() => Array.from(document.images).every((i) => i.complete), null, { timeout: 8000 }).catch(() => {});
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(400);
 }

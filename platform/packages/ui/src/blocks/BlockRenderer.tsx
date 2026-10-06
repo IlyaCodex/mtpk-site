@@ -40,7 +40,7 @@ export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) 
     case 'productSpec':
       return <ProductSpec block={block} />;
     case 'lightbox':
-      return <Lightbox label={block.label} total={block.total} />;
+      return <Lightbox label={block.label} total={ctx.lightboxTotal ?? block.total} />;
     case 'catalogList':
       return <CatalogList block={block} ctx={ctx} />;
     case 'categoryHero':

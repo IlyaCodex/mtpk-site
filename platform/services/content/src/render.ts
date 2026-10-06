@@ -31,20 +31,18 @@ export function seoHtml(page: Pick<Page, 'path' | 'blocks'>, opts: { contentOnly
 }
 
 /**
- * Клиентские скрипты нужны только блокам «HTML как есть»: у типизированных
- * блоков поведение встроено в React. «Запросить цену» и «Сравнение» на
- * React работают для всей страницы, их старые скрипты не грузим.
+ * Старые клиентские скрипты нужны только блокам «HTML как есть» (каталог
+ * запчастей, проекты, бейджи в старых карточках…): у типизированных блоков
+ * поведение — в модулях сайта. Формы заявок, «Запросить цену» и сравнение
+ * модули сайта обслуживают на всей странице — их старые скрипты не нужны.
  */
-const REPLACED_BY_REACT = new Set(['quote-form', 'compare']);
+const REPLACED_BY_MODULES = new Set(['quote-form', 'compare', 'phero-gallery', 'stock-product', 'spec-tabs']);
 export function legacyFeatures(blocks: Block[]): string[] {
   const html = [...walkBlocks(blocks)]
     .filter((b): b is Extract<Block, { type: 'html' }> => b.type === 'html')
     .map((b) => b.html)
     .join('\n');
-  if (!html) return [];
-  const features = detectPageFeatures(html).filter((f) => !REPLACED_BY_REACT.has(f));
-  // старые формы заявок (js-lead-form) отправляет public/js/forms.js
-  return /\bjs-lead-form\b/.test(html) ? ['forms', ...features] : features;
+  return html ? detectPageFeatures(html).filter((f) => !REPLACED_BY_MODULES.has(f)) : [];
 }
 
 /** Запись БД → страница для вывода. */

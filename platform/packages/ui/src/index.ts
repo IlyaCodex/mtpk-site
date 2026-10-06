@@ -3,12 +3,14 @@
  *
  *   blocks/   блоки страниц (карточка товара, характеристики, каталог, FAQ…)
  *   catalog/  карточки товаров, фильтр, сравнение, правила бейджей
- *   forms/    формы заявок, маска телефона, «Запросить цену»
- *   page/     общее поведение страницы («Запросить цену», скролл к форме)
+ *   forms/    формы заявок (разметка; отправка — клиентский модуль forms)
+ *   browser/  общая логика клиентских модулей сайта (без React)
  *   primitives/ крошки, кнопки, заголовки секций, вывод HTML
  *
- * Оформление — дизайн-система сайта (public/css в apps/web); новые элементы —
- * Tailwind с токенами (apps/web/src/app/globals.css).
+ * Компоненты рендерятся только на сервере (сайт, предпросмотр в админке,
+ * SEO-разметка в контент-сервисе): клиентского React на сайте нет, поведение —
+ * маленькие TypeScript-модули apps/web/src/client. Оформление — дизайн-система
+ * сайта (public/css в apps/web).
  */
 export * from './context.ts';
 export { Blocks, BlockView } from './blocks/BlockRenderer.tsx';
@@ -27,10 +29,9 @@ export { Adv } from './blocks/Adv.tsx';
 export { WhyUs } from './blocks/WhyUs.tsx';
 export { ProductCard } from './catalog/ProductCard.tsx';
 export { CatalogGrid } from './catalog/CatalogGrid.tsx';
-export { CompareBar, CompareButton } from './catalog/Compare.tsx';
+export { CompareButton } from './catalog/Compare.tsx';
 export { isMadeInRussia, productSlug } from './catalog/rules.ts';
 export { FileField, FormStatus, LeadForm, PhoneInput, SubmitButton } from './forms/LeadForm.tsx';
 export { ARROW, LEAD_ENDPOINT } from './forms/constants.ts';
-export { PageEnhancements } from './page/PageEnhancements.tsx';
 export { RawElement, Inline } from './primitives/Html.tsx';
 export { ActionLink, Breadcrumbs, SectionHead } from './primitives/common.tsx';

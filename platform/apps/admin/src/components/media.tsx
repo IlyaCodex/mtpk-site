@@ -10,7 +10,7 @@ type Listing = { prefix: string; folders: { name: string; prefix: string; count:
 
 /** Файлы показываются через прокси админки (/media-files → медиасервис). */
 export const fileSrc = (url: string) => (url.startsWith('/') ? `/media-files${url}` : url);
-const isImage = (key: string) => /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(key.split(/[?#]/)[0]);
+export const isImage = (key: string) => /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(key.split(/[?#]/)[0]);
 const ROOTS = ['img/', 'files/', 'docs/', 'og/'];
 const keyPath = (key: string) => key.split('/').map(encodeURIComponent).join('/');
 
@@ -27,16 +27,41 @@ export function safeFileName(name: string): string {
   return `${slug || 'file'}${ext}`;
 }
 
+/** Загрузить файл в папку медиатеки; возвращает адрес на сайте (/img/…). */
+export async function uploadFile(folder: string, file: File): Promise<string> {
+  const key = `${folder}${safeFileName(file.name)}`;
+  const res = await api<{ url: string }>(`media/objects/${keyPath(key)}`, {
+    method: 'PUT',
+    body: file,
+    headers: { 'content-type': file.type || 'application/octet-stream' },
+  });
+  return res.url;
+}
+
 /**
  * Медиатека: папки и файлы хранилища S3. mode=pick — выбор файла для поля
- * блока, manage — раздел «Медиатека» (загрузка, удаление, копирование адреса).
+ * блока (multiple — нескольких сразу, например фото в галерею), manage —
+ * раздел «Медиатека» (загрузка, удаление, копирование адреса).
  */
-export function MediaBrowser({ mode, initialPrefix = 'img/', onPick }: { mode: 'pick' | 'manage'; initialPrefix?: string; onPick?: (url: string) => void }) {
+export function MediaBrowser({
+  mode,
+  initialPrefix = 'img/',
+  multiple = false,
+  onPick,
+  onPickMany,
+}: {
+  mode: 'pick' | 'manage';
+  initialPrefix?: string;
+  multiple?: boolean;
+  onPick?: (url: string) => void;
+  onPickMany?: (urls: string[]) => void;
+}) {
   const [prefix, setPrefix] = useState(initialPrefix);
   const [search, setSearch] = useState('');
   const [data, setData] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(0);
+  const [selected, setSelected] = useState<string[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -59,16 +84,18 @@ export function MediaBrowser({ mode, initialPrefix = 'img/', onPick }: { mode: '
   async function upload(files: FileList | null) {
     if (!files?.length) return;
     setUploading(files.length);
+    const urls: string[] = [];
     for (const file of [...files]) {
-      const key = `${prefix}${safeFileName(file.name)}`;
       try {
-        await api(`media/objects/${keyPath(key)}`, { method: 'PUT', body: file, headers: { 'content-type': file.type || 'application/octet-stream' } });
-        toast.ok(`Загружено: /${key}`);
+        urls.push(await uploadFile(prefix, file));
       } catch (err) {
         toast.error(err);
       }
       setUploading((n) => n - 1);
     }
+    if (urls.length) toast.ok(`Загружено файлов: ${urls.length}`);
+    // загруженные сразу отмечаем выбранными — остаётся нажать «Добавить»
+    if (mode === 'pick' && multiple) setSelected((s) => [...s, ...urls.filter((u) => !s.includes(u))]);
     await load();
   }
 
@@ -81,6 +108,12 @@ export function MediaBrowser({ mode, initialPrefix = 'img/', onPick }: { mode: '
     } catch (err) {
       toast.error(err);
     }
+  }
+
+  function choose(file: MediaFile) {
+    if (mode === 'manage') return window.open(fileSrc(file.url), '_blank');
+    if (!multiple) return onPick?.(file.url);
+    setSelected((s) => (s.includes(file.url) ? s.filter((u) => u !== file.url) : [...s, file.url]));
   }
 
   const crumbs = prefix.split('/').filter(Boolean);
@@ -133,47 +166,66 @@ export function MediaBrowser({ mode, initialPrefix = 'img/', onPick }: { mode: '
                 <span className="text-xs text-slate-400">{f.count} файлов</span>
               </button>
             ))}
-          {data.files.map((f) => (
-            <div key={f.key} className="group overflow-hidden rounded-lg border border-slate-200 bg-white">
-              <button
-                type="button"
-                className="block aspect-[4/3] w-full bg-slate-100"
-                onClick={() => (mode === 'pick' ? onPick?.(f.url) : window.open(fileSrc(f.url), '_blank'))}
-                title={mode === 'pick' ? 'Выбрать' : 'Открыть'}
-              >
-                {isImage(f.key) ? (
-                  <img src={fileSrc(f.url)} alt="" loading="lazy" className="h-full w-full object-contain" />
-                ) : (
-                  <span className="flex h-full items-center justify-center text-xs font-semibold text-slate-500 uppercase">{f.key.split('.').pop()}</span>
-                )}
-              </button>
-              <div className="p-2">
-                <div className="truncate text-xs text-slate-700" title={f.url}>
-                  {f.key.split('/').pop()}
-                </div>
-                <div className="flex items-center justify-between text-[11px] text-slate-400">
-                  <span>
-                    {formatBytes(f.size)}
-                    {f.webp && ' · webp'}
-                  </span>
-                  {mode === 'manage' && (
-                    <span className="flex gap-2 opacity-0 transition group-hover:opacity-100">
-                      <button type="button" className="hover:text-brand-600" onClick={() => void navigator.clipboard.writeText(f.url).then(() => toast.ok('Адрес скопирован'))}>
-                        адрес
-                      </button>
-                      <button type="button" className="hover:text-red-600" onClick={() => void remove(f)}>
-                        удалить
-                      </button>
-                    </span>
+          {data.files.map((f) => {
+            const picked = selected.includes(f.url);
+            return (
+              <div key={f.key} className={cx('group relative overflow-hidden rounded-lg border bg-white', picked ? 'border-brand-500 ring-2 ring-brand-200' : 'border-slate-200')}>
+                <button type="button" className="block aspect-[4/3] w-full bg-slate-100" onClick={() => choose(f)} title={mode === 'pick' ? 'Выбрать' : 'Открыть'}>
+                  {isImage(f.key) ? (
+                    <img src={fileSrc(f.url)} alt="" loading="lazy" className="h-full w-full object-contain" />
+                  ) : (
+                    <span className="flex h-full items-center justify-center text-xs font-semibold text-slate-500 uppercase">{f.key.split('.').pop()}</span>
                   )}
+                </button>
+                {picked && (
+                  <span className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
+                    {selected.indexOf(f.url) + 1}
+                  </span>
+                )}
+                <div className="p-2">
+                  <div className="truncate text-xs text-slate-700" title={f.url}>
+                    {f.key.split('/').pop()}
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] text-slate-400">
+                    <span>
+                      {formatBytes(f.size)}
+                      {f.webp && ' · webp'}
+                    </span>
+                    {mode === 'manage' && (
+                      <span className="flex gap-2 opacity-0 transition group-hover:opacity-100">
+                        <button type="button" className="hover:text-brand-600" onClick={() => void navigator.clipboard.writeText(f.url).then(() => toast.ok('Адрес скопирован'))}>
+                          адрес
+                        </button>
+                        <button type="button" className="hover:text-red-600" onClick={() => void remove(f)}>
+                          удалить
+                        </button>
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       {data && !data.files.length && !data.folders.length && <p className="py-8 text-center text-sm text-slate-500">Здесь пусто.</p>}
       {data && data.total > data.files.length && <p className="mt-3 text-xs text-slate-500">Показаны первые {data.files.length} из {data.total} — уточните поиск.</p>}
+
+      {mode === 'pick' && multiple && (
+        <div className="sticky bottom-0 -mx-6 -mb-6 mt-6 flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-6 py-3">
+          <span className="text-sm text-slate-600">{selected.length ? `Выбрано: ${selected.length}` : 'Отметьте фото — они добавятся в порядке выбора'}</span>
+          <div className="flex gap-2">
+            {selected.length > 0 && (
+              <Button variant="ghost" onClick={() => setSelected([])}>
+                Снять выбор
+              </Button>
+            )}
+            <Button variant="primary" disabled={!selected.length} onClick={() => onPickMany?.(selected)}>
+              Добавить выбранные
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

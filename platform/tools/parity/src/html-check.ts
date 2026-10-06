@@ -122,14 +122,16 @@ export function facts(html: string): PageFacts {
     .filter((e) => (e.tagName === 'link' && attr(e, 'rel') === 'stylesheet') || e.tagName === 'style')
     .map((e) => {
       if (e.tagName === 'style') return `inline:${serialize(e).trim().length}`;
-      return (attr(e, 'href') ?? '').replace('/_astro/BaseLayout.CK1KI5ak.css', '/css/base-layout.css');
+      // ?v= — только сброс кеша браузера, на каскад не влияет
+      return (attr(e, 'href') ?? '').replace('/_astro/BaseLayout.CK1KI5ak.css', '/css/base-layout.css').replace(/\?v=[\w.-]+$/, '');
     })
     .filter((s) => !s.startsWith('/_next/') && s !== '/fonts/fonts-extended.css' && s !== 'inline:0');
 
   const scripts = all
     .filter((e) => e.tagName === 'script' && attr(e, 'src'))
     .map((e) => attr(e, 'src')!)
-    .filter((s) => !s.startsWith('/_next/') && !s.includes('_pagefind') && !REPLACED_SCRIPTS.test(s));
+    // клиентские модули нового сайта (/assets/…) заменяют старые скрипты — сверяются отдельно
+    .filter((s) => !s.startsWith('/_next/') && !s.startsWith('/assets/') && !s.includes('_pagefind') && !REPLACED_SCRIPTS.test(s));
 
   const og = all
     .filter((e) => e.tagName === 'meta' && /^(og:|twitter:)/.test(attr(e, 'property') ?? attr(e, 'name') ?? ''))
@@ -137,7 +139,10 @@ export function facts(html: string): PageFacts {
     .sort()
     .join('\n');
 
-  const bodyEls = (body.childNodes as Node[]).filter(isEl);
+  // Next.js (Pages Router) кладёт разметку страницы в <div id="__next"> — заглядываем внутрь
+  const bodyEls = (body.childNodes as Node[])
+    .filter(isEl)
+    .flatMap((e) => (e.tagName === 'div' && attr(e, 'id') === '__next' ? (e.childNodes as Node[]).filter(isEl) : [e]));
   return {
     title: (serialize(all.find((e) => e.tagName === 'title')!) ?? '').trim(),
     description: attr(meta('name', 'description') ?? ({ attrs: [] } as unknown as Element), 'content') ?? '',

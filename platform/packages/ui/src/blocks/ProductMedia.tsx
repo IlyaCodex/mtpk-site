@@ -1,10 +1,5 @@
-'use client';
-
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import type { ProductHeroBlock } from '@mtpk/content-model';
-import { extra, Inline } from '../primitives/Html.tsx';
-
-type Media = ProductHeroBlock['media'];
+import type { ProductGallery } from '@mtpk/content-model';
+import { Inline } from '../primitives/Html.tsx';
 
 /** Бейдж «Сделано в России» (стили .made-badge — stock.css). */
 export function MadeBadge() {
@@ -31,114 +26,47 @@ const Arrow = ({ dir }: { dir: -1 | 1 }) => (
   </svg>
 );
 
+const THUMBS_CLASS: Record<ProductGallery['thumbs'], string> = {
+  grid: 'phero__thumbs',
+  row: 'phero__thumbs',
+  scroll: 'phero__thumbs phero__thumbs--scroll',
+};
+
 /**
- * Фото карточки товара: главная «сцена» и лента миниатюр. При двух и более
- * миниатюрах — карусель (стрелки, счётчик, свайп, клавиатура); клик по сцене
- * открывает лайтбокс на текущем кадре (data-lightbox-index держим актуальным).
+ * Фото карточки товара: главное фото и, если фото два и больше, лента
+ * миниатюр с перелистыванием (стрелки, счётчик, свайп — клиентский модуль
+ * gallery). Номера кадров для просмотра на весь экран (data-lightbox-index)
+ * и подписи кнопок проставляются сами: в админке редактируется только список фото.
  */
-export function ProductMedia({ media, madeInRussia, inStock }: { media: Media; madeInRussia: boolean; inStock: boolean }) {
-  const thumbs = media.thumbs ?? [];
-  const carousel = thumbs.length >= 2;
-  const slides = thumbs.map((t) => ({
-    src: t.image.attrs?.['data-full'] || t.image.src,
-    alt: t.image.alt,
-  }));
-  const [current, setCurrent] = useState(-1); // -1: исходный кадр из разметки
-  const [switching, setSwitching] = useState(false);
-  const strip = useRef<HTMLDivElement>(null);
-  const preloaded = useRef(new Set<string>());
-  const swipe = useRef<{ x: number; y: number } | null>(null);
-  const swallowClick = useRef(false);
-
-  const preload = useCallback(
-    (i: number) => {
-      if (!slides.length) return;
-      const s = slides[((i % slides.length) + slides.length) % slides.length].src;
-      if (preloaded.current.has(s)) return;
-      preloaded.current.add(s);
-      const im = new Image();
-      im.src = s;
-    },
-    [slides],
-  );
-
-  const go = useCallback(
-    (i: number) => {
-      const n = slides.length;
-      const next = ((i % n) + n) % n;
-      setCurrent(next);
-      setSwitching(true);
-      const active = strip.current?.querySelectorAll('.phero__thumb')[next] as HTMLElement | undefined;
-      active?.scrollIntoView?.({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-      preload(next + 1);
-      preload(next - 1);
-    },
-    [slides.length, preload],
-  );
-
-  useEffect(() => {
-    if (carousel) preload(1);
-  }, [carousel, preload]);
-
-  const idx = current < 0 ? 0 : current;
-  const shown = current < 0 ? { src: media.image.src, alt: media.image.alt } : slides[current];
-  const Main = media.mainTag;
-  const mainAttrs = { ...extra(media.mainAttrs, Main) };
-  if (carousel && current >= 0) mainAttrs['data-lightbox-index'] = String(current);
+export function ProductMedia({ media, madeInRussia, inStock }: { media: ProductGallery; madeInRussia: boolean; inStock: boolean }) {
+  const [first] = media.photos;
+  const carousel = media.photos.length >= 2;
 
   const main = (
-    <Main
+    <button
       className="phero__main"
-      {...mainAttrs}
-      onClickCapture={(e) => {
-        if (swallowClick.current) {
-          swallowClick.current = false;
-          e.stopPropagation();
-          e.preventDefault();
-        }
-      }}
-      onPointerDown={(e) => {
-        if (!carousel || e.pointerType === 'mouse') return;
-        swipe.current = { x: e.clientX, y: e.clientY };
-      }}
-      onPointerUp={(e) => {
-        const s = swipe.current;
-        swipe.current = null;
-        if (!s) return;
-        const dx = e.clientX - s.x;
-        const dy = e.clientY - s.y;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-          go(idx + (dx < 0 ? 1 : -1));
-          swallowClick.current = true; // свайп — не тап, лайтбокс не открываем
-        }
-      }}
+      type="button"
+      aria-label={media.mainLabel ?? 'Открыть фото на весь экран'}
+      data-lightbox-index={media.zoom ? '0' : undefined}
     >
       {media.banner !== undefined && <Inline className="phero__banner" html={media.banner} />}
-      <img
-        src={shown.src}
-        alt={shown.alt}
-        {...extra(media.image.attrs, 'img')}
-        className={switching ? 'is-switching' : undefined}
-        onLoad={() => setSwitching(false)}
-      />
+      <img src={first.src} alt={media.mainAlt ?? first.alt} loading="eager" fetchPriority="high" />
       {madeInRussia && <MadeBadge />}
-    </Main>
+    </button>
   );
 
-  let stage: ReactNode = main;
+  let stage = main;
   if (carousel) {
     stage = (
       <div className="phero__stage">
         {main}
-        <button type="button" className="phero__nav phero__nav--prev" aria-label="Предыдущее фото" onClick={(e) => (e.stopPropagation(), go(idx - 1))}>
+        <button type="button" className="phero__nav phero__nav--prev" aria-label="Предыдущее фото">
           <Arrow dir={-1} />
         </button>
-        <button type="button" className="phero__nav phero__nav--next" aria-label="Следующее фото" onClick={(e) => (e.stopPropagation(), go(idx + 1))}>
+        <button type="button" className="phero__nav phero__nav--next" aria-label="Следующее фото">
           <Arrow dir={1} />
         </button>
-        <span className="phero__counter" aria-live="polite">
-          {`${idx + 1} / ${slides.length}`}
-        </span>
+        <span className="phero__counter" aria-live="polite">{`1 / ${media.photos.length}`}</span>
         {inStock && <StockBadge />}
       </div>
     );
@@ -152,43 +80,18 @@ export function ProductMedia({ media, madeInRussia, inStock }: { media: Media; m
   }
 
   return (
-    <div
-      className="phero__media"
-      onKeyDown={(e) => {
-        if (!carousel) return;
-        if (e.key === 'ArrowLeft') {
-          e.preventDefault();
-          go(idx - 1);
-        }
-        if (e.key === 'ArrowRight') {
-          e.preventDefault();
-          go(idx + 1);
-        }
-      }}
-    >
+    <div className="phero__media">
       {stage}
-      {thumbs.length > 0 && (
+      {carousel && (
         <div
-          ref={strip}
-          className={carousel ? `${media.thumbsClass ?? 'phero__thumbs'} is-carousel` : (media.thumbsClass ?? 'phero__thumbs')}
-          {...extra(media.thumbsAttrs, 'div')}
-          onClickCapture={(e) => {
-            if (!carousel) return;
-            const t = (e.target as Element).closest('.phero__thumb');
-            if (!t) return;
-            e.stopPropagation();
-            e.preventDefault();
-            go(Array.from(strip.current?.querySelectorAll('.phero__thumb') ?? []).indexOf(t));
-          }}
+          className={`${THUMBS_CLASS[media.thumbs]} is-carousel`}
+          style={media.thumbs === 'row' ? { gridTemplateColumns: `repeat(${media.photos.length}, 1fr)` } : undefined}
         >
-          {thumbs.map((t, i) => {
-            const active = current < 0 ? t.active : i === current;
-            return (
-              <button key={i} className={active ? 'phero__thumb is-active' : 'phero__thumb'} {...extra(t.attrs, 'button')}>
-                <img src={t.image.src} alt={t.image.alt} {...extra(t.image.attrs, 'img')} />
-              </button>
-            );
-          })}
+          {media.photos.map((p, i) => (
+            <button key={i} className={i === 0 ? 'phero__thumb is-active' : 'phero__thumb'} type="button" aria-label={`Фото ${i + 1}`} data-lightbox-index={String(i)}>
+              <img src={p.thumb ?? p.src} alt={p.alt} loading={i === 0 ? undefined : 'lazy'} data-full={p.thumb ? p.src : undefined} />
+            </button>
+          ))}
         </div>
       )}
       {media.caption !== undefined && <Inline as="p" className="phero__caption" html={media.caption} />}

@@ -48,7 +48,9 @@ function trimEdges(el: El) {
 /** Классы-хуки скриптов, не влияющие на оформление. */
 const HOOK_CLASSES = new Set(['js-lead-form']);
 /** Атрибуты-хуки скриптов. */
-const HOOK_ATTRS = new Set(['onsubmit', 'onclick', 'data-filter-form']);
+const HOOK_ATTRS = new Set(['onsubmit', 'onclick', 'data-filter-form', 'data-cf-form']);
+/** Подсказки браузеру, как грузить картинку. */
+const LOADING_HINTS = new Set(['loading', 'fetchpriority', 'decoding', 'srcset', 'sizes']);
 
 function normalize(nodes: Node[], opts: CanonOptions): Node[] {
   const out: Node[] = [];
@@ -64,6 +66,10 @@ function normalize(nodes: Node[], opts: CanonOptions): Node[] {
       if (cls.includes('made-badge') || cls.includes('pcard__stock-badge') || cls.includes('cmp-btn')) continue;
       if (cls.includes('phero__nav') || cls.includes('phero__counter')) continue;
       if (cls.includes('catalog-filter__count')) continue;
+      // автофильтр каталога раньше строил скрипт после загрузки, теперь — сервер
+      if (n.tagName === 'form' && getAttr(n, 'data-cf-auto') !== undefined) continue;
+      // число кадров лайтбокса: старый скрипт пересчитывал его при загрузке, теперь считает сервер
+      if (n.tagName === 'span' && getAttr(n, 'id') === 'lb-total') n.childNodes = [];
       // inline-скрипты, чьё поведение перенесено в React-компоненты
       if (n.tagName === 'script' && !getAttr(n, 'src') && !getAttr(n, 'type')) continue;
       // React 19 сам добавляет preload для картинок первого экрана
@@ -78,6 +84,8 @@ function normalize(nodes: Node[], opts: CanonOptions): Node[] {
       .filter((a) => !HOOK_ATTRS.has(a.name))
       .filter((a) => !(a.name === 'src' && a.value === ''))
       .filter((a) => !(opts.stripEnhancements && a.name === 'data-stock'))
+      // подсказки загрузки картинок (lazy, приоритет, адаптивные размеры) на вид не влияют
+      .filter((a) => !(opts.stripEnhancements && n.tagName === 'img' && LOADING_HINTS.has(a.name)))
       .map((a) => {
         if (a.name === 'class') {
           let list = a.value.split(/\s+/).filter((c) => c && !HOOK_CLASSES.has(c));

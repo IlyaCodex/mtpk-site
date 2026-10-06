@@ -13,22 +13,18 @@ export function ProductCard({
   inStock,
   madeInRussia,
   compareUrl,
-  hidden,
 }: {
   card: ProductCardData;
   inStock: boolean;
   madeInRussia: boolean;
   /** адрес товара для сравнения (если в разделе включено сравнение) */
   compareUrl?: string;
-  hidden?: boolean;
 }) {
   return (
     <article
       className="pcard"
       {...extra(card.attrs, 'article')}
       data-stock={inStock ? 'true' : undefined}
-      hidden={hidden || undefined}
-      style={hidden ? { display: 'none' } : undefined}
     >
       <a href={card.href} className="pcard__cover">
         {card.badge !== undefined && <Inline className="pcard__badge" html={card.badge} />}

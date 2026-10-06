@@ -9,3 +9,4 @@ next-env.d.ts
 # служебные каталоги инструментов (локальные отчёты сверки, временные файлы)
 .cache/
 tools/parity/report/
+apps/web/public/assets/
