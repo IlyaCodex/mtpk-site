@@ -1,4 +1,5 @@
 import { $, $$ } from './dom';
+import { setImage } from './images';
 
 /**
  * Галерея карточки товара: миниатюры переключают главное фото, стрелки,
@@ -22,11 +23,12 @@ function initGallery(media: HTMLElement): void {
   const preloaded = new Set<string>();
   let current = 0;
 
+  // соседние кадры — заранее, той же ширины, что выберет главное фото
   const preload = (i: number) => {
     const s = slides[(i + slides.length) % slides.length].src;
     if (preloaded.has(s)) return;
     preloaded.add(s);
-    new Image().src = s;
+    setImage(new Image(), s, 'phero__main');
   };
 
   const go = (i: number) => {
@@ -34,7 +36,7 @@ function initGallery(media: HTMLElement): void {
     const slide = slides[current];
     if (img.getAttribute('src') !== slide.src) {
       img.classList.add('is-switching');
-      img.src = slide.src;
+      setImage(img, slide.src, 'phero__main');
     }
     img.alt = slide.alt;
     if (zoom) main.dataset.lightboxIndex = String(current);

@@ -8,6 +8,7 @@
  * галереи, подсветка оглавления), и JS-хуки, которые больше не нужны.
  */
 import { parseFragment, serialize, type DefaultTreeAdapterMap } from 'parse5';
+import { COVER_IMG_CLASS, coverSource, normalizeDecls } from './inline-styles.ts';
 
 type Node = DefaultTreeAdapterMap['node'];
 type El = DefaultTreeAdapterMap['element'];
@@ -68,6 +69,17 @@ function styleAttrsToCanon(n: El, cls: string[]): void {
   n.attrs = n.attrs.filter((a) => a.name !== 'style' && a.name !== 'hidden');
 }
 
+/**
+ * Обложка: фон style="background-image:url(X)" прежней вёрстки и картинка
+ * <img class="cover-img" src="X"> новой сверяются как атрибут data-cover="X".
+ */
+function canonCover(n: El): void {
+  const img = (n.childNodes as Node[]).find((c): c is El => isEl(c) && classes(c).includes(COVER_IMG_CLASS));
+  const src = img ? getAttr(img, 'src') : coverSource(n, normalizeDecls(getAttr(n, 'style') ?? ''));
+  if (img) n.childNodes = n.childNodes.filter((c) => c !== img);
+  if (src) n.attrs.push({ name: 'data-cover', value: src });
+}
+
 function normalize(nodes: Node[], opts: CanonOptions): Node[] {
   const out: Node[] = [];
   for (const n of nodes) {
@@ -97,6 +109,7 @@ function normalize(nodes: Node[], opts: CanonOptions): Node[] {
       }
       // стили страницы: были <style> в коде, стали подключаемыми файлами
       if (n.tagName === 'style' || (n.tagName === 'link' && getAttr(n, 'rel') === 'stylesheet')) continue;
+      canonCover(n);
       styleAttrsToCanon(n, cls);
     }
     n.attrs = n.attrs

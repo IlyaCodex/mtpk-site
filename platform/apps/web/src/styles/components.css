@@ -24,6 +24,11 @@
 /* Пиксели счётчиков в <noscript> — за пределами экрана */
 .ui-pixel { position: absolute; left: -9999px; }
 
+/* Обложки разделов каталога, разделители, баннер: были фоном (background-image),
+   стали картинкой <img class="cover-img"> — грузится лениво и нужной ширины.
+   Вид как у фона center/cover: заполняет блок целиком. */
+.cover-img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
 /* Страница 404 */
 .nf { background: var(--surface-page); padding: clamp(56px, 12vw, 140px) 0; }
 .nf .container { max-width: 560px; text-align: center; }

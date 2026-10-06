@@ -51,7 +51,13 @@ async function prepare(page: Page, origin: string, url: string) {
     if (u.origin !== origin) return route.abort();
     // новая версия отдаёт WebP по Accept — для честного сравнения просим оригинал, как у статики
     if (route.request().resourceType() === 'image') {
-      return route.continue({ headers: { ...route.request().headers(), accept: 'image/png,image/jpeg,image/*;q=0.8' } });
+      const headers = { ...route.request().headers(), accept: 'image/png,image/jpeg,image/*;q=0.8' };
+      // уменьшенные копии из srcset (?w=…) — тем же оригиналом: сверяем вёрстку, а не перекодирование
+      if (u.searchParams.has('w')) {
+        u.searchParams.delete('w');
+        return route.continue({ url: u.toString(), headers });
+      }
+      return route.continue({ headers });
     }
     return route.continue();
   });

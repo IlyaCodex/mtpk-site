@@ -8,6 +8,7 @@
     ".": "./src/index.ts",
     "./server": "./src/server.ts",
     "./rules": "./src/catalog/rules.ts",
+    "./images": "./src/primitives/images.ts",
     "./browser/*": "./src/browser/*.ts"
   },
   "scripts": {
@@ -17,7 +18,8 @@
     "@mtpk/content-model": "*",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "@mtpk/content-kit": "*"
+    "@mtpk/content-kit": "*",
+    "parse5": "^8.0.1"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

@@ -6,7 +6,11 @@ import { ASSET_VERSIONS, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE } from '@/l
 export type HeadPage = Pick<
   PageDto,
   'path' | 'title' | 'description' | 'noindex' | 'preloadImage' | 'jsonLd' | 'cssTemplates' | 'externalStyles' | 'inlineStyles'
->;
+> & {
+  /** srcset/sizes предзагружаемой картинки — те же, что у неё на странице */
+  preloadSrcSet?: string | null;
+  preloadSizes?: string | null;
+};
 
 /**
  * <head> страницы. Все стили — внешние файлы (кешируются браузером, в коде
@@ -57,7 +61,16 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
         <link key={src} rel="modulepreload" href={src} />
       ))}
       {core && <link rel="stylesheet" href={core} />}
-      {page.preloadImage && <link rel="preload" as="image" href={page.preloadImage} fetchPriority="high" />}
+      {page.preloadImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={page.preloadImage}
+          imageSrcSet={page.preloadSrcSet ?? undefined}
+          imageSizes={page.preloadSizes ?? undefined}
+          fetchPriority="high"
+        />
+      )}
       {page.jsonLd.map((json, i) => (
         <script key={`ld${i}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(json) }} />
       ))}

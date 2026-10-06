@@ -27,7 +27,8 @@
     "parity": "npm run start -w @mtpk/parity --",
     "clean": "node scripts/clean.mjs",
     "build:admin": "npm run build -w @mtpk/admin",
-    "admin:user": "npm run create-user -w @mtpk/admin --"
+    "admin:user": "npm run create-user -w @mtpk/admin --",
+    "media:warm": "tsx scripts/warm-images.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

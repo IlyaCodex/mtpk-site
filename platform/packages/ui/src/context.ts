@@ -1,4 +1,6 @@
 import { pageHasLeadgen, walkBlocks, type Block } from '@mtpk/content-model';
+import { findImagePlace, imageSources } from './primitives/images-html.ts';
+import { responsive } from './primitives/images.ts';
 
 /**
  * Контекст рендера страницы: данные, которые нужны блокам помимо их
@@ -20,6 +22,8 @@ export interface RenderContext {
   hasLeadgenBlock: boolean;
   /** сколько кадров у просмотра фото на весь экран (считается по странице) */
   lightboxTotal?: number;
+  /** первые картинки страницы: грузятся сразу, не лениво (могут быть на первом экране) */
+  eagerImages?: string[];
 }
 
 export const EMPTY_CONTEXT: RenderContext = { path: '/', stock: {}, compareSections: [], hasLeadgenBlock: false };
@@ -41,6 +45,33 @@ export function countLightboxFrames(blocks: Block[]): number {
   return total;
 }
 
+/** Первые картинки страницы по порядку (не больше limit). */
+export function firstImages(blocks: Block[], limit = 2): string[] {
+  const out: string[] = [];
+  for (const b of walkBlocks(blocks)) {
+    if (out.length >= limit) break;
+    if (b.type === 'productHero' && b.media.photos[0]) out.push(b.media.photos[0].src);
+    if (b.type === 'html') out.push(...imageSources(b.html));
+  }
+  return out.slice(0, limit);
+}
+
+/**
+ * Предзагрузка картинки первого экрана. Если на странице это <img> с srcset —
+ * предзагрузка берёт тот же srcset/sizes, иначе браузер скачал бы картинку
+ * дважды (оригинал по ссылке и копию по srcset). Фон из CSS — оригинал.
+ */
+export function preloadHints(src: string, blocks: Block[]): { href: string; srcSet?: string; sizes?: string } {
+  for (const b of walkBlocks(blocks)) {
+    const place =
+      b.type === 'productHero' && b.media.photos[0]?.src === src ? 'phero__main' : b.type === 'html' ? findImagePlace(b.html, src) : null;
+    if (place === null) continue;
+    const hints = responsive(src, place);
+    return hints ? { href: src, ...hints } : { href: src };
+  }
+  return { href: src };
+}
+
 /** Контекст страницы по её блокам и данным сайта. */
 export function buildRenderContext(path: string, blocks: Block[], site: { stock: Record<string, StockInfo>; compareSections: string[] }): RenderContext {
   const frames = countLightboxFrames(blocks);
@@ -50,5 +81,6 @@ export function buildRenderContext(path: string, blocks: Block[], site: { stock:
     compareSections: site.compareSections,
     hasLeadgenBlock: pageHasLeadgen(blocks),
     lightboxTotal: frames || undefined,
+    eagerImages: firstImages(blocks),
   };
 }

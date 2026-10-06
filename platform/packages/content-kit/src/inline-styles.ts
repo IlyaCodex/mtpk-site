@@ -25,10 +25,51 @@ export function styleClassName(decls: string): string {
 export const styleClassRule = (cls: string, decls: string) => `.${cls}.${cls}{${decls}}`;
 
 /**
+ * Обложки, заданные фоном (пустой блок со style="background-image:url(…)"):
+ * карточки разделов, разделители, баннер. Фон браузер грузит сразу для всех
+ * 130 карточек каталога и только оригиналом; картинку <img class="cover-img">
+ * — лениво (при прокрутке к ней) и нужной ширины (srcset добавляется при
+ * выводе страницы). Вид тот же: .cover-img растянута по блоку с object-fit:
+ * cover (components.css). Фоны первого экрана (hero) остаются фонами.
+ */
+const COVER_CLASSES = new Set(['scard__cover', 'section-divider__img', 'modern__banner']);
+const COVER_STYLE = /^background-image:url\((['"]?)([^'")]+)\1\)$/;
+const LOCAL_RASTER = /^\/img\/[^?#]+\.(png|jpe?g|webp)(\?[^#]*)?$/i;
+
+export const COVER_IMG_CLASS = 'cover-img';
+
+export function coverSource(el: El, decls: string): string | null {
+  if (!(getAttr(el, 'class') ?? '').split(/\s+/).some((c) => COVER_CLASSES.has(c))) return null;
+  if (el.childNodes.some((c) => isEl(c as Node) || ((c as { value?: string }).value ?? '').trim())) return null;
+  const m = COVER_STYLE.exec(decls);
+  const src = m?.[2].replace(/^\.{1,2}\/img\//, '/img/');
+  return src && LOCAL_RASTER.test(src) ? src : null;
+}
+
+function coverImage(parent: El, src: string): El {
+  return {
+    nodeName: 'img',
+    tagName: 'img',
+    attrs: [
+      { name: 'class', value: COVER_IMG_CLASS },
+      { name: 'src', value: src },
+      { name: 'alt', value: '' },
+      { name: 'loading', value: 'lazy' },
+      { name: 'decoding', value: 'async' },
+    ],
+    namespaceURI: parent.namespaceURI,
+    childNodes: [],
+    parentNode: parent,
+    sourceCodeLocation: undefined,
+  } as El;
+}
+
+/**
  * Атрибуты style="" в HTML → классы + CSS: в исходном коде страниц не
  * остаётся встроенных стилей. Особые случаи: скрытая строка статуса формы
  * получает атрибут hidden (её показывает модуль форм), служебные метки
- * старого поиска (data-pagefind-meta) удаляются.
+ * старого поиска (data-pagefind-meta) удаляются, фон-обложка становится
+ * картинкой (см. COVER_CLASSES).
  * Возвращает новый HTML и CSS-правила для созданных классов.
  */
 export function extractInlineStyles(html: string): { html: string; rules: Map<string, string> } {
@@ -44,8 +85,11 @@ export function extractInlineStyles(html: string): { html: string; rules: Map<st
         const decls = normalizeDecls(style);
         n.attrs = n.attrs.filter((a) => a.name !== 'style');
         const classes = (getAttr(n, 'class') ?? '').split(/\s+/).filter(Boolean);
+        const cover = coverSource(n, decls);
         if (decls === 'display:none' && classes.includes('js-form-status')) {
           n.attrs.push({ name: 'hidden', value: '' });
+        } else if (cover) {
+          n.childNodes = [coverImage(n, cover)];
         } else if (decls) {
           const cls = styleClassName(decls);
           rules.set(cls, decls);

@@ -1,4 +1,5 @@
 import { $, $$, delegate } from './dom';
+import { fullImage } from './images';
 
 /**
  * Просмотр фото на весь экран. Кадры — элементы с data-lightbox-index (фото
@@ -29,7 +30,7 @@ function initLightbox(): void {
 
   const show = (i: number) => {
     index = (i + list.length) % list.length;
-    img.src = list[index].src;
+    img.src = fullImage(list[index].src);
     img.alt = list[index].alt;
     if (currentEl) currentEl.textContent = String(index + 1);
     $$('.phero__thumb').forEach((t, k) => t.classList.toggle('is-active', k === index));

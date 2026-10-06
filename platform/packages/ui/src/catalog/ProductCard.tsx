@@ -2,6 +2,7 @@ import type { ProductCard as ProductCardData } from '@mtpk/content-model';
 import { extra, Inline } from '../primitives/Html.tsx';
 import { ActionLink } from '../primitives/common.tsx';
 import { MadeBadge, StockBadge } from '../blocks/ProductMedia.tsx';
+import { responsiveProps } from '../primitives/images.ts';
 import { CompareButton } from './Compare.tsx';
 
 /**
@@ -28,7 +29,14 @@ export function ProductCard({
     >
       <a href={card.href} className="pcard__cover">
         {card.badge !== undefined && <Inline className="pcard__badge" html={card.badge} />}
-        <img src={card.image.src} alt={card.image.alt} {...extra(card.image.attrs, 'img')} />
+        <img
+          src={card.image.src}
+          {...responsiveProps(card.image.src, 'pcard__cover')}
+          alt={card.image.alt}
+          loading="lazy"
+          decoding="async"
+          {...extra(card.image.attrs, 'img')}
+        />
         {madeInRussia && <MadeBadge />}
         {inStock && <StockBadge />}
       </a>

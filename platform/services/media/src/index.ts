@@ -28,6 +28,7 @@ import {
   type ZodTypeProvider,
 } from '@mtpk/shared';
 import { assets, asc, createDb, eq, like, sql } from '@mtpk/db';
+import { dropVariants, getVariant, pickFormat, snapWidth, VARIANT_SOURCE } from './variants.ts';
 
 const env = readEnv(
   z.object({
@@ -51,18 +52,19 @@ const WEBP_SOURCE = /\.(png|jpe?g)$/i;
 /** WebP-копия картинки (foo.png.webp) — служебная, в медиатеке не показывается. */
 const WEBP_COPY = /\.(png|jpe?g)\.webp$/i;
 
-// Каталог ключей бакета: решает, есть ли WebP-сосед, без лишних запросов в S3.
-let catalog = new Set<string>();
+// Каталог бакета «ключ → ETag»: есть ли WebP-сосед и какая версия файла —
+// без лишних запросов в S3.
+let catalog = new Map<string, string>();
 let catalogLoaded = false;
 async function loadCatalog(): Promise<void> {
   try {
-    const rows = await db.select({ key: assets.key }).from(assets);
+    const rows = await db.select({ key: assets.key, etag: assets.etag }).from(assets);
     if (rows.length) {
-      catalog = new Set(rows.map((r) => r.key));
+      catalog = new Map(rows.map((r) => [r.key, r.etag]));
     } else {
       // таблица пуста (файлы залиты не импортёром) — читаем список прямо из бакета
-      const keys = new Set<string>();
-      for await (const o of listObjects(s3, bucket)) keys.add(o.key);
+      const keys = new Map<string, string>();
+      for await (const o of listObjects(s3, bucket)) keys.set(o.key, o.etag);
       catalog = keys;
     }
     catalogLoaded = true;
@@ -75,6 +77,14 @@ async function loadCatalog(): Promise<void> {
 async function exists(key: string): Promise<boolean> {
   if (catalogLoaded) return catalog.has(key);
   return (await headObject(s3, bucket, key)) !== null;
+}
+
+/** Версия файла (ETag): из каталога, для только что залитого другим экземпляром — из S3. null — файла нет. */
+async function versionOf(key: string): Promise<string | null> {
+  const known = catalog.get(key);
+  if (known) return known;
+  const head = await headObject(s3, bucket, key);
+  return head ? (head.ETag ?? '').replaceAll('"', '') : null;
 }
 
 function cacheControlFor(key: string): string {
@@ -162,36 +172,61 @@ async function adminRoutes(base: import('fastify').FastifyInstance) {
 
   app.put(
     '/admin/v1/objects/*',
-    { schema: { tags: TAGS, summary: 'Загрузить файл (тело запроса — содержимое файла)', params: keyParam, security: ADMIN } },
+    {
+      schema: {
+        tags: TAGS,
+        summary: 'Загрузить файл (тело запроса — содержимое файла). Имя занято — сохраняется как foo-2.png: адрес ответа — итоговый',
+        params: keyParam,
+        security: ADMIN,
+      },
+    },
     async (req, reply) => {
-      const key = toKey(`/${req.params['*']}`);
-      if (!key || !Buffer.isBuffer(req.body)) return reply.code(400).send({ error: 'bad_key_or_body' });
+      const wanted = toKey(`/${req.params['*']}`);
+      if (!wanted || !Buffer.isBuffer(req.body)) return reply.code(400).send({ error: 'bad_key_or_body' });
+      // Существующий файл не перезаписываем: браузеры и кеш шлюза держат его
+      // до 30 дней, замена «на месте» до посетителей не дойдёт.
+      const key = await freeKey(wanted);
       const contentType = contentTypeFor(key);
       const etag = await putObject(s3, bucket, key, req.body, contentType);
       await db
         .insert(assets)
         .values({ key, size: req.body.length, etag, contentType })
         .onConflictDoUpdate({ target: assets.key, set: { size: req.body.length, etag, contentType, updatedAt: sql`now()` } });
-      catalog.add(key);
+      catalog.set(key, etag);
       return { ok: true, key, url: `/${key}`, etag };
     },
   );
 
   app.delete(
     '/admin/v1/objects/*',
-    { schema: { tags: TAGS, summary: 'Удалить файл (и его WebP-копию)', params: keyParam, security: ADMIN } },
+    { schema: { tags: TAGS, summary: 'Удалить файл (с WebP-копией и уменьшенными копиями)', params: keyParam, security: ADMIN } },
     async (req, reply) => {
       const key = toKey(`/${req.params['*']}`);
       if (!key) return reply.code(400).send({ error: 'bad_key' });
-      for (const k of [key, `${key}.webp`]) {
-        if (!catalog.has(k) && k !== key) continue;
-        await deleteObject(s3, bucket, k);
-        await db.delete(assets).where(eq(assets.key, k));
-        catalog.delete(k);
-      }
+      await removeObject(key);
+      if (catalog.has(`${key}.webp`)) await removeObject(`${key}.webp`);
+      await dropVariants(s3, bucket, key);
       return { ok: true };
     },
   );
+}
+
+/** Свободное имя: foo.png, иначе foo-2.png, foo-3.png… */
+async function freeKey(key: string): Promise<string> {
+  if (!(await exists(key))) return key;
+  const dot = key.lastIndexOf('.');
+  const [stem, ext] = dot > key.lastIndexOf('/') ? [key.slice(0, dot), key.slice(dot)] : [key, ''];
+  for (let i = 2; ; i++) {
+    const candidate = `${stem}-${i}${ext}`;
+    if (!(await exists(candidate))) return candidate;
+  }
+}
+
+/** Удалить файл из бакета, таблицы и каталога. */
+async function removeObject(key: string): Promise<void> {
+  await deleteObject(s3, bucket, key);
+  await db.delete(assets).where(eq(assets.key, key));
+  catalog.delete(key);
 }
 
 await loadCatalog();
@@ -211,6 +246,25 @@ await startService({
     const serve = async (req: import('fastify').FastifyRequest, reply: import('fastify').FastifyReply) => {
       const key = toKey(req.url);
       if (!key) return reply.code(404).type('text/plain').send('Not Found');
+
+      // ?w=640 — уменьшенная копия в AVIF/WebP (для srcset на сайте). Копии
+      // подписаны версией исходника: заменили файл — копии создаются заново.
+      const width = snapWidth(Number(new URL(req.url, 'http://media').searchParams.get('w')));
+      if (width && VARIANT_SOURCE.test(key)) {
+        try {
+          const version = await versionOf(key);
+          if (version === null) return reply.code(404).type('text/plain').send('Not Found');
+          const variant = await getVariant(s3, bucket, key, width, pickFormat(String(req.headers.accept ?? ''), key), version);
+          reply.header('Vary', 'Accept');
+          reply.header('Content-Type', variant.contentType);
+          reply.header('Cache-Control', 'public, max-age=2592000');
+          reply.header('Content-Length', variant.body.length);
+          return reply.send(req.method === 'HEAD' ? undefined : variant.body);
+        } catch (err) {
+          if (isNotFound(err)) return reply.code(404).type('text/plain').send('Not Found');
+          throw err;
+        }
+      }
 
       let target = key;
       const negotiable = WEBP_SOURCE.test(key);
