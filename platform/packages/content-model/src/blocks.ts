@@ -173,6 +173,8 @@ export const productCard = z.object({
   badge: inline('Плашка на обложке').optional(),
   image: image('Обложка'),
   title: inline('Название'),
+  /** «(на гидравлике)» — после ссылки-названия, обычным текстом */
+  titleNote: text('Примечание после названия').optional(),
   origin: inline('Происхождение').optional(),
   caption: inline('Подпись').optional(),
   specs: z.array(z.object({ label: inline('Параметр'), value: inline('Значение') })).describe('Характеристики'),
@@ -184,6 +186,7 @@ export type ProductCard = z.infer<typeof productCard>;
 
 export const catalogFilter = z.object({
   ariaLabel: text('Название фильтра для скринридеров').default('Фильтр каталога'),
+  count: z.boolean().optional().describe('Показывать число моделей'),
   dropdowns: z
     .array(
       z.object({
@@ -211,14 +214,63 @@ export type CatalogFilter = z.infer<typeof catalogFilter>;
 export const catalogListBlock = z
   .object({
     type: z.literal('catalogList'),
+    /** карточки — товары этой страницы из каталога (собираются при выводе); иначе — список ниже */
+    auto: z.boolean().optional().describe('Товары из каталога (карточки собираются автоматически)'),
     head: sectionHead.optional(),
     /** фильтр по характеристикам; если не задан — строится автоматически по data-атрибутам карточек */
     filter: catalogFilter.optional(),
-    cards: z.array(productCard).describe('Карточки товаров'),
+    cards: z.array(productCard).describe('Карточки товаров (когда не из каталога)'),
     attrs: attrs(),
     gridAttrs: attrs(),
   })
   .describe('Каталог: сетка карточек товаров');
+
+/** Карточка, собранная из каталога: категория, подкатегория или товар. */
+export const catalogCardItem = z.object({
+  href: href(),
+  title: inline('Название'),
+  image: z.string().describe('Обложка').meta({ editor: 'media' }).optional(),
+  alt: text('Описание обложки (alt)').default(''),
+  imageAttrs: attrs(),
+  caption: inline('Краткое описание').optional(),
+  label: inline('Надпись над названием').optional(),
+  linkText: inline('Надпись ссылки (по умолчанию «Подробнее»)').optional(),
+});
+export type CatalogCardItem = z.infer<typeof catalogCardItem>;
+
+/**
+ * Карточки из каталога: категории (сетка «Оборудование» на главной),
+ * подкатегории категории («Модельный ряд»), товары страницы. Карточки
+ * собирает контент-сервис при выводе — добавленный товар сам появляется
+ * в своей подкатегории.
+ */
+export const catalogCardsBlock = z
+  .object({
+    type: z.literal('catalogCards'),
+    source: z
+      .enum(['categories', 'spares', 'subcategories', 'products'])
+      .describe('Что показываем')
+      .meta({
+        enumLabels: {
+          categories: 'Категории (отмеченные «на главной»)',
+          spares: 'Категории запчастей',
+          subcategories: 'Подкатегории этой категории',
+          products: 'Товары этой страницы',
+        },
+      }),
+    design: z
+      .enum(['home', 'teaser', 'lvm', 'lgm'])
+      .describe('Вид карточек')
+      .meta({ enumLabels: { home: 'Как на главной: номер, фото, название', teaser: 'Фото, название, описание', lvm: 'Линейка ЛВМ', lgm: 'Линейка ЛГМ' } }),
+    head: sectionHead.optional(),
+    attrs: attrs(),
+    after: element('HTML под карточками').optional(),
+    /** карточки после собранных из каталога: ссылки на другие разделы (запчасти, соседняя категория) */
+    extra: z.array(catalogCardItem).optional().describe('Дополнительные карточки (ссылки на другие разделы)'),
+    /** заполняет контент-сервис при выводе страницы */
+    items: z.array(catalogCardItem).optional().meta({ hidden: true }),
+  })
+  .describe('Карточки каталога (из данных)');
 
 export const categoryHeroBlock = z
   .object({
@@ -291,6 +343,7 @@ export const block: z.ZodType<Block> = z.lazy(() =>
     productSpecBlock,
     lightboxBlock,
     catalogListBlock,
+    catalogCardsBlock,
     categoryHeroBlock,
     faqBlock,
     statsBlock,
@@ -310,6 +363,7 @@ export type ProductHeroBlock = z.infer<typeof productHeroBlock>;
 export type ProductSpecBlock = z.infer<typeof productSpecBlock>;
 export type LightboxBlock = z.infer<typeof lightboxBlock>;
 export type CatalogListBlock = z.infer<typeof catalogListBlock>;
+export type CatalogCardsBlock = z.infer<typeof catalogCardsBlock>;
 export type CategoryHeroBlock = z.infer<typeof categoryHeroBlock>;
 export type FaqBlock = z.infer<typeof faqBlock>;
 export type StatsBlock = z.infer<typeof statsBlock>;
@@ -329,6 +383,7 @@ export type Block =
   | ProductSpecBlock
   | LightboxBlock
   | CatalogListBlock
+  | CatalogCardsBlock
   | CategoryHeroBlock
   | FaqBlock
   | StatsBlock;
@@ -351,6 +406,7 @@ export const BLOCK_SCHEMAS: Record<BlockType, z.ZodType> = {
   productSpec: productSpecBlock,
   lightbox: lightboxBlock,
   catalogList: catalogListBlock,
+  catalogCards: catalogCardsBlock,
   categoryHero: categoryHeroBlock,
   faq: faqBlock,
   stats: statsBlock,
@@ -371,7 +427,8 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   productHero: 'Карточка товара',
   productSpec: 'Характеристики и описание',
   lightbox: 'Просмотр фото',
-  catalogList: 'Каталог (карточки)',
+  catalogList: 'Товары (карточки)',
+  catalogCards: 'Карточки каталога',
   categoryHero: 'Обложка раздела',
   faq: 'Частые вопросы',
   stats: 'Показатели',

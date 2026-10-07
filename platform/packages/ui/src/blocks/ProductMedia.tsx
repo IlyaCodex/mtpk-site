@@ -12,8 +12,19 @@ export function MadeBadge() {
   );
 }
 
-/** Бейдж «В наличии» — ссылка на раздел склада. */
-export function StockBadge() {
+/**
+ * Бейдж «В наличии» — ссылка на раздел склада. На обложке карточки (она сама
+ * ссылка) — span: вложенную ссылку HTML-парсер вынес бы из обложки, и бейдж
+ * уехал бы со своего места. Ссылкой его делает модуль каталога в браузере.
+ */
+export function StockBadge({ inLink = false }: { inLink?: boolean }) {
+  if (inLink) {
+    return (
+      <span className="pcard__stock-badge" data-href="/nalichie/" aria-label="В наличии на складе">
+        В наличии
+      </span>
+    );
+  }
   return (
     <a className="pcard__stock-badge" href="/nalichie/" aria-label="В наличии на складе">
       В наличии

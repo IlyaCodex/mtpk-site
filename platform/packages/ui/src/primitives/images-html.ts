@@ -1,4 +1,4 @@
-import { parseFragment, serialize, type DefaultTreeAdapterMap } from 'parse5';
+import { parseFragment, serialize, serializeOuter, type DefaultTreeAdapterMap } from 'parse5';
 import { PLACES, responsive } from './images.ts';
 
 type Node = DefaultTreeAdapterMap['node'];
@@ -52,6 +52,11 @@ export function findImagePlace(html: string, src: string): string | null {
     if (found === null && getAttr(img, 'src') === src && getAttr(img, 'srcset') === undefined) found = place;
   });
   return found;
+}
+
+/** Элементы верхнего уровня фрагмента — каждый отдельной строкой (пробелы между ними не нужны). */
+export function topElements(html: string): string[] {
+  return (parseFragment(html).childNodes as Node[]).filter(isEl).map((n) => serializeOuter(n));
 }
 
 /** Адреса картинок фрагмента по порядку. */

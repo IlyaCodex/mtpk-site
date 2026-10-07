@@ -53,10 +53,124 @@ model Page {
   status       String    @default("published")
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  /// страница принадлежит каталогу: это страница категории, подкатегории или товара
+  category     Category?
+  subcategory  Subcategory?
+  product      Product?
 
   @@index([template], map: "pages_template_idx")
   @@index([kind], map: "pages_kind_idx")
   @@map("pages")
+  @@schema("content")
+}
+
+// ─── content: каталог продукции — категория → подкатегория → товар ──────────
+// Карточки в списках (главная, «Модельный ряд», товары подкатегории) строятся
+// из этих таблиц. Содержимое страниц (обложка, тексты, фото, характеристики,
+// SEO) — в связанной записи pages.
+
+/// Категория (1-й уровень): «Индукционные плавильные печи». Карточка на главной и своя страница.
+model Category {
+  id            Int           @id @default(autoincrement())
+  pageId        Int           @unique @map("page_id")
+  page          Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  /// название в карточке на главной
+  name          String
+  /// подпись в хлебных крошках
+  crumb         String
+  /// обложка карточки на главной
+  cover         String?
+  coverAlt      String        @default("") @map("cover_alt")
+  /// атрибуты картинки обложки (ширина, высота…)
+  coverAttrs    Json          @default("{}") @map("cover_attrs")
+  /// порядок на главной и в каталоге
+  sort          Int           @default(0)
+  /// показывать карточку в сетке «Оборудование» на главной
+  onHome        Boolean       @default(true) @map("on_home")
+  /// equipment — оборудование; spares — запчасти; hub — витрина раздела (общая страница запчастей)
+  kind          String        @default("equipment")
+  /// секции под каждым товаром категории: формы, преимущества, партнёры (шаблон товара)
+  productBlocks Json          @default("[]") @map("product_blocks")
+  subcategories Subcategory[]
+  products      Product[]
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("categories")
+  @@schema("content")
+}
+
+/// Подкатегория (2-й уровень): «Дробемёт кранового типа». Карточка в «Модельном ряду» категории и своя страница.
+model Subcategory {
+  id          Int       @id @default(autoincrement())
+  pageId      Int       @unique @map("page_id")
+  page        Page      @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  categoryId  Int       @map("category_id")
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  /// название в карточке
+  name        String
+  /// подпись в хлебных крошках
+  crumb       String
+  /// краткое описание в карточке
+  description String    @default("")
+  cover       String?
+  coverAlt    String    @default("") @map("cover_alt")
+  coverAttrs  Json      @default("{}") @map("cover_attrs")
+  sort        Int       @default(0)
+  /// показывать карточку в «Модельном ряду» категории
+  listed      Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([categoryId], map: "subcategories_category_idx")
+  @@map("subcategories")
+  @@schema("content")
+}
+
+/// Товар (3-й уровень): карточка в списке товаров и своя страница.
+model Product {
+  id            Int          @id @default(autoincrement())
+  pageId        Int          @unique @map("page_id")
+  page          Page         @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  categoryId    Int          @map("category_id")
+  category      Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  /// подкатегория (у части товаров её нет — они прямо в категории)
+  subcategoryId Int?         @map("subcategory_id")
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: Restrict)
+  /// название в карточке
+  name          String
+  /// примечание после названия в карточке: «(на гидравлике)»
+  nameNote      String?      @map("name_note")
+  cover         String?
+  coverAlt      String       @default("") @map("cover_alt")
+  coverAttrs    Json         @default("{}") @map("cover_attrs")
+  /// плашка на обложке: «Кранового типа»
+  badge         String?
+  /// происхождение: «Производство Россия»
+  origin        String?
+  /// подпись под названием
+  caption       String?
+  /// раздел линейки над названием: «Воск · Модельный автомат»
+  label         String?
+  /// надпись ссылки в карточке, если не «Подробнее»: «Получить расчёт»
+  linkText      String?      @map("link_text")
+  /// характеристики в карточке: [{ label, value }]
+  specs         Json         @default("[]")
+  /// кнопки карточки
+  actions       Json         @default("[]")
+  /// атрибуты карточки для фильтра каталога (data-power…)
+  attrs         Json         @default("{}")
+  /// порядок в списке
+  sort          Int          @default(0)
+  /// показывать карточку в списке товаров подкатегории (категории)
+  listed        Boolean      @default(true)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([categoryId], map: "products_category_idx")
+  @@index([subcategoryId], map: "products_subcategory_idx")
+  @@map("products")
   @@schema("content")
 }
 

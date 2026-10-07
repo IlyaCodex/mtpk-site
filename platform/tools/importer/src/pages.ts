@@ -65,7 +65,7 @@ export interface PageImportStats {
   inserted: number;
   updated: number;
   unchanged: number;
-  /** правлены в админке — импорт их не трогает (кроме --force) */
+  /** правлены в админке (кроме --force) или ведутся каталогом — импорт их не трогает */
   edited: number;
   deleted: number;
   styles: number;
@@ -203,7 +203,11 @@ export async function importPages(
   const incoming = new Set(allPages.map((p) => p.path));
 
   const stats: PageImportStats = { total: allPages.length, inserted: 0, updated: 0, unchanged: 0, edited: 0, deleted: 0, styles: styleMap.size };
-  const editedInAdmin = (e: { extraMeta: unknown }) => (e.extraMeta as Record<string, unknown>)?.source === 'admin';
+  const source = (e: { extraMeta: unknown }) => (e.extraMeta as Record<string, unknown>)?.source;
+  const editedInAdmin = (e: { extraMeta: unknown }) => source(e) === 'admin';
+  // страницы каталога (категории, подкатегории, товары) ведёт админка: их блоки
+  // собраны из данных каталога, исходник Astro к ним больше не относится
+  const inCatalog = (e: { extraMeta: unknown }) => source(e) === 'catalog';
   const changed: string[] = [];
   const toWrite: NewPage[] = [];
   for (const p of allPages) {
@@ -212,7 +216,7 @@ export async function importPages(
       stats.inserted++;
       changed.push(p.path);
       toWrite.push(p);
-    } else if (editedInAdmin(prev) && !opts.force) {
+    } else if (inCatalog(prev) || (editedInAdmin(prev) && !opts.force)) {
       stats.edited++;
     } else if (prev.sourceHash !== p.sourceHash) {
       stats.updated++;

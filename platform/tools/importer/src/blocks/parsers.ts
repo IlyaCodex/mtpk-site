@@ -32,7 +32,7 @@ import {
   type El,
 } from './dom.ts';
 
-function parseImage(img: El) {
+export function parseImage(img: El) {
   expect(img, 'img');
   if (attr(img, 'class') !== undefined) fail('картинка с классом');
   const src = attr(img, 'src');
@@ -40,7 +40,7 @@ function parseImage(img: El) {
   return { src, alt: attr(img, 'alt') ?? '', attrs: restAttrs(img, 'src', 'alt') };
 }
 
-function parseSectionHead(el: El): SectionHead {
+export function parseSectionHead(el: El): SectionHead {
   expect(el, 'div', 's-head');
   onlyAttrs(el, []);
   const k = kids(el);
@@ -384,7 +384,7 @@ export function parseCategoryHero(el: El): CategoryHeroBlock {
 
 // ── Каталог ───────────────────────────────────────────────────────────────
 
-function parseCard(article: El): ProductCard {
+export function parseCard(article: El): ProductCard {
   expect(article, 'article', 'pcard');
   const [cover, body, ...r] = kids(article);
   if (r.length) fail('pcard: лишнее');

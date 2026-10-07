@@ -79,7 +79,7 @@ export function CatalogGrid({ filter, cards, gridAttrs }: { filter?: FilterData;
             </div>
           ))}
           <div className="catalog-filter__spacer" />
-          {auto && (
+          {(auto || f.count) && (
             <div className="catalog-filter__count" data-cf-count="" aria-live="polite">
               {pluralizeModels(cards.length)}
             </div>

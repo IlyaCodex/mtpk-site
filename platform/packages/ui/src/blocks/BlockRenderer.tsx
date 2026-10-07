@@ -5,6 +5,7 @@ import { enhanceImages } from '../primitives/images-html.ts';
 import { Adv } from './Adv.tsx';
 import { BestOffer } from './BestOffer.tsx';
 import { CatalogCta } from './CatalogCta.tsx';
+import { CatalogCards } from './CatalogCards.tsx';
 import { CatalogList } from './CatalogList.tsx';
 import { CategoryHero } from './CategoryHero.tsx';
 import { Leadgen } from './Leadgen.tsx';
@@ -46,6 +47,8 @@ export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) 
       return <Lightbox label={block.label} total={ctx.lightboxTotal ?? block.total} />;
     case 'catalogList':
       return <CatalogList block={block} ctx={ctx} />;
+    case 'catalogCards':
+      return <CatalogCards block={block} ctx={ctx} />;
     case 'categoryHero':
       return <CategoryHero block={block} />;
     case 'faq':

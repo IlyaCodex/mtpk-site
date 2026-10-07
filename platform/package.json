@@ -29,6 +29,7 @@
     "build:admin": "npm run build -w @mtpk/admin",
     "admin:user": "npm run create-user -w @mtpk/admin --",
     "media:warm": "tsx scripts/warm-images.ts",
+    "catalog:migrate": "tsx scripts/migrate-catalog.ts",
     "db:migration": "npm run migration -w @mtpk/db --",
     "db:status": "npm run status -w @mtpk/db",
     "postinstall": "npm run generate -w @mtpk/db"

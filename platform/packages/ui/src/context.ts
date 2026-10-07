@@ -1,4 +1,5 @@
 import { pageHasLeadgen, walkBlocks, type Block } from '@mtpk/content-model';
+import { CARD_COVER_PLACE } from './blocks/CatalogCards.tsx';
 import { findImagePlace, imageSources } from './primitives/images-html.ts';
 import { responsive } from './primitives/images.ts';
 
@@ -52,6 +53,11 @@ export function firstImages(blocks: Block[], limit = 2): string[] {
     if (out.length >= limit) break;
     if (b.type === 'productHero' && b.media.photos[0]) out.push(b.media.photos[0].src);
     if (b.type === 'html') out.push(...imageSources(b.html));
+    // карточки из каталога заменили такие же сетки в блоках «HTML как есть»
+    if (b.type === 'catalogCards') {
+      out.push(...(b.items ?? []).flatMap((it) => (it.image ? [it.image] : [])));
+      if (b.after) out.push(...imageSources(b.after));
+    }
   }
   return out.slice(0, limit);
 }
@@ -64,7 +70,17 @@ export function firstImages(blocks: Block[], limit = 2): string[] {
 export function preloadHints(src: string, blocks: Block[]): { href: string; srcSet?: string; sizes?: string } {
   for (const b of walkBlocks(blocks)) {
     const place =
-      b.type === 'productHero' && b.media.photos[0]?.src === src ? 'phero__main' : b.type === 'html' ? findImagePlace(b.html, src) : null;
+      b.type === 'productHero' && b.media.photos[0]?.src === src
+        ? 'phero__main'
+        : b.type === 'html'
+          ? findImagePlace(b.html, src)
+          : b.type === 'catalogCards' && b.items?.some((it) => it.image === src && it.imageAttrs?.srcset === undefined)
+            ? CARD_COVER_PLACE[b.design]
+            : b.type === 'catalogCards' && b.after
+              ? findImagePlace(b.after, src)
+              : b.type === 'catalogList' && b.cards.some((c) => c.image.src === src)
+              ? 'pcard__cover'
+              : null;
     if (place === null) continue;
     const hints = responsive(src, place);
     return hints ? { href: src, ...hints } : { href: src };

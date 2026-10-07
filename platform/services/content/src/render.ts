@@ -123,6 +123,14 @@ function stripCrumbs(html: string): string {
     .replace(/<div\s+class="(?:breadcrumbs|ui-crumb)"[^>]*>[\s\S]*?<\/div>/g, ' ');
 }
 
+/**
+ * Бейджи на обложках («Сделано в России») — оформление, а не текст страницы:
+ * в индекс прежнего сайта они не попадали (их дорисовывал скрипт).
+ */
+function stripBadges(html: string): string {
+  return html.replace(/<span[^>]*class="made-badge"[^>]*>[\s\S]*?<\/span>[^<]*<\/span>/g, ' ');
+}
+
 /** Текст первого <h1> — Pagefind брал заголовок результата именно отсюда. */
 function firstH1(html: string): string | null {
   const m = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
@@ -147,7 +155,7 @@ const hyphens = (t: string) => t.replace(/[\u2010\u2011\u2012]/g, '-');
  */
 export function toSearchDoc(page: Page, dto: PageDto): SearchDoc | null {
   if (!dto.searchable || page.noindex || page.status !== 'published') return null;
-  const source = stripCrumbs(page.kind === 'document' ? pagefindRegion(page.body ?? '') : seoHtml(page, { contentOnly: true }));
+  const source = stripBadges(stripCrumbs(page.kind === 'document' ? pagefindRegion(page.body ?? '') : seoHtml(page, { contentOnly: true })));
   const title = hyphens(firstH1(source) || page.title.split('|')[0].trim());
   return {
     path: page.path,

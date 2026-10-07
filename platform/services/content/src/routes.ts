@@ -4,6 +4,7 @@ import { CONTENT_STREAM, isAuthorized, publishEvent, type Logger, type Redis, ty
 import { classifyStyleBlock, detectTemplate, normalizePath } from '@mtpk/content-kit';
 import { cssFileRecord } from '@mtpk/content-kit/styles';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
+import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
 import { BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
 import { renderBlocksToHtml } from '@mtpk/ui/server';
 import { catalogNodes } from './catalog.ts';
@@ -354,7 +355,9 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       },
     },
     async (req) => {
-      const blocks = req.body.blocks as Block[];
+      // как на сайте: карточки из каталога, у товара — общие блоки категории
+      const page = await db.page.findUnique({ where: { path: normalizePath(req.body.path) }, select: { id: true } });
+      const blocks = page ? resolveCatalogBlocks(page, req.body.blocks as Block[], await store.catalog()) : (req.body.blocks as Block[]);
       const site = await store.siteData();
       return {
         html: renderBlocksToHtml(blocks, {

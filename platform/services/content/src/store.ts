@@ -1,6 +1,8 @@
 import { buildCompareIndex, resolveStock, type StockConfigItem } from '@mtpk/content-kit';
+import { resolveCatalogBlocks, type CatalogData } from '@mtpk/content-kit/catalog';
 import { styleFileCss } from '@mtpk/content-kit/styles';
-import { DEFAULT_SETTINGS, siteSettings, type SiteSettings } from '@mtpk/content-model';
+import { DEFAULT_SETTINGS, siteSettings, type Block, type SiteSettings } from '@mtpk/content-model';
+import { loadCatalog } from './catalog-data.ts';
 import type { Db, Page, StyleBlock } from './db.ts';
 import type { JsonCache, Logger, PageDto, PageListItem, RedirectDto } from '@mtpk/shared';
 import { renderPage, seoHtml, toSearchDoc, type SearchDoc } from './render.ts';
@@ -9,9 +11,15 @@ import type { SiteDataDto } from '@mtpk/shared';
 const MISSING = { missing: true } as const;
 type Cached<T> = T | typeof MISSING;
 
+/** Блоки страницы для вывода: карточки — из каталога, у товара — общие блоки его категории. */
+function withCatalog<T extends { id: number; blocks: unknown }>(row: T, data: CatalogData): T {
+  return { ...row, blocks: resolveCatalogBlocks(row, row.blocks as Block[], data) };
+}
+
 /**
  * Доступ к контенту с кешем в Redis. Всё, что отдаётся сайту, — производное
- * от таблиц content.*: страница с развёрнутыми блоками, склад, индекс сравнения.
+ * от таблиц content.*: страница с развёрнутыми блоками (карточки каталога,
+ * шаблон товара), склад, индекс сравнения.
  */
 export class ContentStore {
   private styles: Map<string, StyleBlock> | null = null;
@@ -37,6 +45,11 @@ export class ContentStore {
     return row && row.status === 'published' ? row : null;
   }
 
+  /** Каталог: категории, подкатегории, товары — из них собираются карточки и шаблоны страниц. */
+  async catalog(): Promise<CatalogData> {
+    return this.cache.wrap('catalog', this.ttl, () => loadCatalog(this.db));
+  }
+
   async getPage(path: string): Promise<PageDto | null> {
     const key = `page:${path}`;
     const hit = await this.cache.get<Cached<PageDto>>(key);
@@ -47,7 +60,7 @@ export class ContentStore {
       await this.cache.set(key, MISSING, 60);
       return null;
     }
-    const dto = renderPage(row, await this.styleMap(), this.site);
+    const dto = renderPage(withCatalog(row, await this.catalog()), await this.styleMap(), this.site);
     await this.cache.set(key, dto, this.ttl);
     return dto;
   }
@@ -103,10 +116,11 @@ export class ContentStore {
         if (parts.length >= 3) wanted.add(`/${parts.slice(0, -1).join('/')}/`);
       }
       const rows = wanted.size
-        ? await this.db.page.findMany({ select: { path: true, blocks: true, title: true }, where: { path: { in: [...wanted] } } })
+        ? await this.db.page.findMany({ select: { id: true, path: true, blocks: true, title: true }, where: { path: { in: [...wanted] } } })
         : [];
       // разметка страниц — серверный рендер тех же блоков, что видит посетитель
-      const byPath = new Map(rows.map((r) => [r.path, { body: seoHtml(r), title: r.title }]));
+      const catalog = await this.catalog();
+      const byPath = new Map(rows.map((r) => [r.path, { body: seoHtml(withCatalog(r, catalog)), title: r.title }]));
       const { items: resolved, warnings } = resolveStock(config, (p) => byPath.get(p));
       for (const w of warnings) this.log.warn({ stock: w }, 'склад');
       return {
@@ -120,8 +134,9 @@ export class ContentStore {
   /** Индекс сравнения: { index, sections } — compare-index.json и compare-sections.json. */
   async compare(): Promise<{ index: unknown; sections: string[] }> {
     return this.cache.wrap('compare', this.ttl * 24, async () => {
-      const rows = await this.db.page.findMany({ select: { path: true, blocks: true }, where: { path: { startsWith: '/products/' } } });
-      const { index, sections, report } = buildCompareIndex(rows.map((r) => ({ path: r.path, body: seoHtml(r) })));
+      const rows = await this.db.page.findMany({ select: { id: true, path: true, blocks: true }, where: { path: { startsWith: '/products/' } } });
+      const catalog = await this.catalog();
+      const { index, sections, report } = buildCompareIndex(rows.map((r) => ({ path: r.path, body: seoHtml(withCatalog(r, catalog)) })));
       this.log.info({ sections: sections.length, scanned: report.scanned }, 'индекс сравнения пересобран');
       return { index, sections };
     });
@@ -152,19 +167,22 @@ export class ContentStore {
   }
 
   async searchDoc(path: string): Promise<SearchDoc | null> {
-    const row = await this.loadPage(path);
-    if (!row) return null;
+    const found = await this.loadPage(path);
+    if (!found) return null;
+    const row = withCatalog(found, await this.catalog());
     return toSearchDoc(row, renderPage(row, await this.styleMap(), this.site));
   }
 
   /** Все документы для поиска — постранично, чтобы не держать 50 МБ HTML разом. */
   async *searchDocs(batch = 100): AsyncGenerator<SearchDoc> {
     const styles = await this.styleMap();
+    const catalog = await this.catalog();
     const paths = (await this.db.page.findMany({ select: { path: true }, orderBy: { path: 'asc' } })).map((r) => r.path);
     for (let i = 0; i < paths.length; i += batch) {
       const rows = await this.db.page.findMany({ where: { path: { in: paths.slice(i, i + batch) } } });
-      for (const row of rows) {
-        if (row.status !== 'published') continue;
+      for (const found of rows) {
+        if (found.status !== 'published') continue;
+        const row = withCatalog(found, catalog);
         const doc = toSearchDoc(row, renderPage(row, styles, this.site));
         if (doc) yield doc;
       }
@@ -175,11 +193,14 @@ export class ContentStore {
     await this.cache.del('redirects');
   }
 
-  /** Сброс кеша: конкретные страницы (+ производные списки) или всё. */
+  /**
+   * Сброс кеша: конкретные страницы (+ производные списки) или всё. Каталог
+   * сбрасывается всегда: адрес и статус страницы входят в его карточки.
+   */
   async purge(paths?: string[]): Promise<number> {
     this.styles = null;
     if (!paths || !paths.length) return this.cache.clear();
-    await this.cache.del(...paths.map((p) => `page:${p}`), 'pages:list', 'redirects', 'stock', 'site-data');
+    await this.cache.del(...paths.map((p) => `page:${p}`), 'pages:list', 'redirects', 'stock', 'site-data', 'catalog');
     if (paths.some((p) => p.startsWith('/products/'))) await this.cache.del('compare');
     return paths.length;
   }

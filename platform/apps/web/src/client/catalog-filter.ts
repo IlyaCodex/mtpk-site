@@ -81,3 +81,18 @@ function initFilter(form: HTMLFormElement): void {
 }
 
 for (const form of $$<HTMLFormElement>('form[data-cf-form]')) initFilter(form);
+
+/**
+ * «В наличии» на обложке карточки — ссылка на склад. Сервер выводит бейдж
+ * span'ом (ссылку внутри ссылки-обложки парсер вынес бы из обложки), здесь он
+ * становится ссылкой: вставленная скриптом, она остаётся на месте — как у
+ * прежнего stock-badges.js.
+ */
+for (const span of $$<HTMLElement>('span.pcard__stock-badge[data-href]')) {
+  const a = document.createElement('a');
+  a.className = span.className;
+  a.href = span.dataset.href ?? '/nalichie/';
+  a.setAttribute('aria-label', span.getAttribute('aria-label') ?? 'В наличии на складе');
+  a.textContent = span.textContent;
+  span.replaceWith(a);
+}

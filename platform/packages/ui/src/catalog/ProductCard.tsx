@@ -38,11 +38,12 @@ export function ProductCard({
           {...extra(card.image.attrs, 'img')}
         />
         {madeInRussia && <MadeBadge />}
-        {inStock && <StockBadge />}
+        {inStock && <StockBadge inLink />}
       </a>
       <div className="pcard__body">
         <h3 className="pcard__title">
           <a href={card.href} dangerouslySetInnerHTML={{ __html: card.title }} />
+          {card.titleNote !== undefined && ` ${card.titleNote}`}
         </h3>
         {card.origin !== undefined && <Inline as="div" className="pcard__origin" html={card.origin} />}
         {card.caption !== undefined && <Inline as="p" className="pcard__caption" html={card.caption} />}
