@@ -36,19 +36,19 @@
       var shipping = item.shipping || 'от 1 рабочего дня';
 
       // 1) Пилюля-статус: наличие + срок отгрузки (вместо срока производства).
-      var status = phero.querySelector('.phero__status');
+      var status = phero!.querySelector('.phero__status');
       if (status) status.textContent = 'В наличии · отгрузка ' + shipping;
 
       // 2) Бейдж «В наличии» поверх обложки (снизу-слева, как в каталоге).
-      var cover = phero.querySelector('.phero__main');
-      if (cover && !phero.querySelector('.pcard__stock-badge')) {
+      var cover = phero!.querySelector('.phero__main');
+      if (cover && !phero!.querySelector('.pcard__stock-badge')) {
         // Keep the stock link a sibling of the lightbox button, never a
         // focusable link inside another interactive control.
-        var badgeHost = cover.parentElement;
+        var badgeHost = cover.parentElement!;
         if (!badgeHost.classList.contains('phero__stage')) {
           badgeHost = document.createElement('div');
           badgeHost.className = 'audit-stock-cover';
-          cover.parentNode.insertBefore(badgeHost, cover);
+          cover.parentNode!.insertBefore(badgeHost, cover);
           badgeHost.appendChild(cover);
         }
         var badge = document.createElement('a');
@@ -59,7 +59,9 @@
         badgeHost.appendChild(badge);
       }
 
-      phero.setAttribute('data-stock', 'true');
+      phero!.setAttribute('data-stock', 'true');
     })
     .catch(function () { /* нет файла — молча выходим */ });
 })();
+
+export {};

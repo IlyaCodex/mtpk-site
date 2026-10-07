@@ -1,5 +1,5 @@
 // Показывает и убирает управляющие символы (кроме \t \n \r) в исходниках —
-// следы неудачного экранирования. Запуск: node scripts/fix-control-chars.mjs <файлы…>
+// следы неудачного экранирования. Запуск: npx tsx scripts/fix-control-chars.ts <файлы…>
 import fs from 'node:fs';
 
 for (const file of process.argv.slice(2)) {

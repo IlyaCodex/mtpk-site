@@ -1,20 +1,19 @@
-#!/usr/bin/env node
 /**
  * Сборка сервисов в бандлы для продакшна (esbuild):
  * код монорепо (@mtpk/*, TypeScript/TSX) вшивается в бандл, сторонние пакеты
  * остаются внешними — в Docker-образе их ставит `npm ci --omit=dev`.
  *
- *   node scripts/build-services.mjs            — всё
- *   node scripts/build-services.mjs content    — выборочно
+ *   tsx scripts/build-services.ts            — всё
+ *   tsx scripts/build-services.ts content    — выборочно
  */
-import { build } from 'esbuild';
+import { build, type Plugin } from 'esbuild';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-const TARGETS = {
+const TARGETS: Record<string, { dir: string; entries: string[] }> = {
   content: { dir: 'services/content', entries: ['src/index.ts'] },
   media: { dir: 'services/media', entries: ['src/index.ts'] },
   search: { dir: 'services/search', entries: ['src/index.ts'] },
@@ -22,7 +21,7 @@ const TARGETS = {
 };
 
 /** Пакеты монорепо — в бандл; всё остальное (node_modules) — внешнее. */
-const externalizeDeps = {
+const externalizeDeps: Plugin = {
   name: 'externalize-deps',
   setup(b) {
     b.onResolve({ filter: /^[^./]/ }, (args) => {

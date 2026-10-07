@@ -1,0 +1,10 @@
+{
+  // Старые скрипты страниц — отдельные классические скрипты браузера (не модули сайта):
+  // свои глобальные объекты (globals.d.ts), без типов Node.
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": []
+  },
+  "include": ["*.ts"]
+}

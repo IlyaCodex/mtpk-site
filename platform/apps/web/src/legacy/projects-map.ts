@@ -3,19 +3,24 @@
    Yandex Maps JS API 2.1, кластеризация, hover-балун.
    Данные: window.projects (js/projects-data.js).
    ============================================================ */
+type GeoObject = { properties: { get(key: 'projectData'): Project | undefined } };
+type ClusterObject = { properties: { get(key: 'geoObjects'): GeoObject[] | undefined; set(key: 'balloonContent', value: string): void } };
+type MapTarget = { balloon?: { open(): void; close(): void } };
+type MapEvent = { get(key: 'target'): MapTarget | undefined };
+
 (function () {
   'use strict';
 
   var MAP_ID = 'projects-map';
 
-  function esc(s) {
+  function esc(s: unknown): string {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
 
   // — Balloon для одиночной метки —
-  function buildSinglePopup(p) {
+  function buildSinglePopup(p: Project): string {
     var img = p.image ? '<img class="pm-pop__img" src="' + esc(p.image) + '" alt="" loading="lazy">' : '';
     var meta = [];
     if (p.city) meta.push(esc(p.city));
@@ -30,9 +35,9 @@
   }
 
   // — Содержимое balloon для кластера (2+ проектов) — собираем сами из geoObjects —
-  function buildClusterPopup(geoObjects) {
+  function buildClusterPopup(geoObjects: GeoObject[]): string {
     var items = geoObjects.map(function (go) {
-      var p = go.properties.get('projectData') || {};
+      var p: Partial<Project> = go.properties.get('projectData') || {};
       var img = p.image ? '<img class="pm-cluster-item__img" src="' + esc(p.image) + '" alt="" loading="lazy">'
                         : '<div class="pm-cluster-item__noimg" aria-hidden="true"></div>';
       var meta = [];
@@ -103,16 +108,16 @@
     });
 
     // — Hover-логика (общая для placemark и cluster) —
-    var closeTimer = null;
-    function cancelClose() { clearTimeout(closeTimer); closeTimer = null; }
-    function scheduleClose(obj) {
+    var closeTimer: ReturnType<typeof setTimeout> | null = null;
+    function cancelClose() { clearTimeout(closeTimer!); closeTimer = null; }
+    function scheduleClose(obj: MapTarget | undefined) {
       cancelClose();
       closeTimer = setTimeout(function () {
         if (obj && obj.balloon) obj.balloon.close();
       }, 400);
     }
 
-    var placemarks = [];
+    var placemarks: unknown[] = [];
     window.projects.forEach(function (p) {
       if (!p.ll) return;
       var pm = new ymaps.Placemark(p.ll, {
@@ -140,7 +145,7 @@
     map.geoObjects.add(cluster);
 
     // — Когда кластер формируется, подкладываем готовый HTML в его properties.balloonContent —
-    function patchClusterHTML(clusterObj) {
+    function patchClusterHTML(clusterObj: ClusterObject) {
       var gobjs = clusterObj.properties.get('geoObjects') || [];
       clusterObj.properties.set('balloonContent', buildClusterPopup(gobjs));
     }
@@ -153,7 +158,7 @@
 
     // — Hover на кластерах —
     // events на ClustererInstance с фильтром по типу target
-    cluster.events.add('mouseenter', function (e) {
+    cluster.events.add('mouseenter', function (e: MapEvent) {
       var target = e.get('target');
       // target может быть Placemark (внутри кластера до раскрытия — это сам Cluster)
       // если есть метод .balloon — открываем
@@ -162,13 +167,13 @@
         target.balloon.open();
       }
     });
-    cluster.events.add('mouseleave', function (e) {
+    cluster.events.add('mouseleave', function (e: MapEvent) {
       var target = e.get('target');
       if (target && target.balloon) scheduleClose(target);
     });
 
     // — Если курсор зашёл в открытый balloon — не закрываем; покинул — закрываем —
-    map.events.add('balloonopen', function (e) {
+    map.events.add('balloonopen', function (e: MapEvent) {
       setTimeout(function () {
         var balloonEl = document.querySelector('#' + MAP_ID + ' [class*="balloon__layout"]');
         if (!balloonEl) return;
@@ -188,3 +193,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+
+import type { Project } from './globals';

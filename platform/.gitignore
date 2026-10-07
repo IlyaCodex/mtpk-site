@@ -11,6 +11,9 @@ next-env.d.ts
 tools/checks/report/
 tools/checks/baseline/
 apps/web/public/assets/
+# старые скрипты страниц собираются из apps/web/src/legacy (scripts/build-client.ts); готовый сторонний — в git
+apps/web/public/js/*.js
+!apps/web/public/js/mango-*.js
 
 # Prisma Client — генерируется из packages/db/prisma/schema.prisma (npm install / npm run db:generate)
 packages/db/src/generated/

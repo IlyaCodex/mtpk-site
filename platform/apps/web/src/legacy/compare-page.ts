@@ -10,11 +10,15 @@
  * видит, что именно сравнивал клиент. Отдельное поле формы не подходит:
  * send.php читает фиксированный набор полей, незнакомые молча отбрасывает.
  */
+type CompareItem = { url: string; name: string; image?: string; specs: Record<string, string> };
+type CompareSection = { title: string; params: string[]; items: CompareItem[] };
+type CompareIndex = { sections: Record<string, CompareSection> };
+
 (function () {
   'use strict';
 
   var PREFIX = 'Сравнение';
-  var root, store;
+  var root: HTMLElement, store: CompareStore;
 
   /* Хранилище ведёт compare.js, а он подключён в общем блоке скриптов —
      то есть ПОЗЖЕ этого файла в разметке. Ждём DOMContentLoaded: к этому
@@ -23,9 +27,9 @@
   else document.addEventListener('DOMContentLoaded', start);
 
   function start() {
-    root = document.getElementById('cmp-root');
+    root = document.getElementById('cmp-root')!;
     if (!root) return;
-    store = window.uiCompare;
+    store = window.uiCompare!;
 
     dressForm();   // тексты формы нужны и на пустой странице сравнения
 
@@ -46,7 +50,7 @@
   }
 
   /* Пустое состояние и ошибки выглядят одинаково: текст и ссылка в каталог. */
-  function show(message) {
+  function show(message: string) {
     root.innerHTML =
       '<div class="cmp-empty">'
       + '<p class="cmp-empty__text">' + esc(message) + '</p>'
@@ -56,7 +60,7 @@
   }
 
   /* ── таблица ─────────────────────────────────────────────────────── */
-  function render(index, data) {
+  function render(index: CompareIndex, data: CompareSelection | null) {
     if (!data || !data.items.length) {
       show('В сравнении пусто. Отметьте «К сравнению» на карточках товара.');
       return;
@@ -64,7 +68,7 @@
     var section = index.sections[data.section];
     if (!section) { show('Для этого раздела сравнение недоступно.'); return; }
 
-    var byUrl = {};
+    var byUrl: Record<string, CompareItem> = {};
     section.items.forEach(function (it) { byUrl[it.url] = it; });
     var picked = data.items.map(function (u) { return byUrl[u]; }).filter(Boolean);
     if (!picked.length) {
@@ -114,14 +118,14 @@
     root.innerHTML = html;
     fillTask(section, picked);
 
-    document.getElementById('cmp-diff').addEventListener('change', function () {
-      root.querySelector('.cmp-table').classList.toggle('cmp-table--diff', this.checked);
+    document.getElementById('cmp-diff')!.addEventListener('change', function (this: HTMLInputElement) {
+      root.querySelector('.cmp-table')!.classList.toggle('cmp-table--diff', this.checked);
     });
-    document.getElementById('cmp-clear').addEventListener('click', function () {
+    document.getElementById('cmp-clear')!.addEventListener('click', function () {
       store.clear();
       location.reload();
     });
-    [].forEach.call(root.querySelectorAll('[data-remove]'), function (btn) {
+    ([].forEach as Function).call(root.querySelectorAll('[data-remove]'), function (btn: Element) {
       btn.addEventListener('click', function () {
         var d = store.read();
         if (!d) return;
@@ -133,8 +137,8 @@
   }
 
   /* ── список позиций в заявку ─────────────────────────────────────── */
-  function fillTask(section, picked) {
-    var ta = document.querySelector('#cmp-form-wrap textarea[name="task"]');
+  function fillTask(section: CompareSection, picked: CompareItem[]) {
+    var ta = document.querySelector<HTMLTextAreaElement>('#cmp-form-wrap textarea[name="task"]');
     if (!ta) return;
     var lines = [PREFIX + ' (' + picked.length + ' поз.), раздел «' + section.title + '»:'];
     picked.forEach(function (it, i) {
@@ -175,9 +179,11 @@
     if (form) form.setAttribute('data-form', 'Сравнение товаров');
   }
 
-  function esc(s) {
+  function esc(s: unknown): string {
     return String(s).replace(/[&<>"]/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' } as Record<string, string>)[c];
     });
   }
 })();
+
+import type { CompareSelection, CompareStore } from './globals';

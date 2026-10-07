@@ -14,21 +14,21 @@
   const root = document.querySelector('.ui-case');
   if (!root) return;
 
-  const main = root.querySelector('#main-photo');
-  const thumbs = [...root.querySelectorAll('.ui-thumb')];
-  const track = root.querySelector('.ui-thumbs-track');
-  const viewer = root.querySelector('#viewer');
+  const main = root.querySelector<HTMLImageElement>('#main-photo');
+  const thumbs = [...root.querySelectorAll<HTMLElement>('.ui-thumb')];
+  const track = root.querySelector<HTMLElement>('.ui-thumbs-track');
+  const viewer = root.querySelector<HTMLDialogElement>('#viewer');
   const vImg = viewer && viewer.querySelector('img');
   const vCount = viewer && viewer.querySelector('#viewer-count');
-  const vControls = viewer && viewer.querySelector('#viewer-controls');
+  const vControls = viewer && viewer.querySelector<HTMLElement>('#viewer-controls');
 
   // Список кадров: главный снимок — первый, дальше миниатюры.
   const shots = thumbs.length
-    ? thumbs.map(t => ({ src: t.dataset.src, alt: t.dataset.alt || '' }))
+    ? thumbs.map(t => ({ src: t.dataset.src!, alt: t.dataset.alt || '' }))
     : (main ? [{ src: main.src, alt: main.alt }] : []);
   let current = 0;
 
-  const show = i => {
+  const show = (i: number) => {
     if (!shots.length) return;
     current = (i + shots.length) % shots.length;
     if (main) {
@@ -49,7 +49,7 @@
   thumbs.forEach((t, i) => t.addEventListener('click', () => show(i)));
 
   // стрелки ленты листают на видимую ширину
-  root.querySelectorAll('[data-thumb-step]').forEach(btn => {
+  root.querySelectorAll<HTMLElement>('[data-thumb-step]').forEach(btn => {
     btn.addEventListener('click', () => {
       if (!track) return;
       track.scrollBy({ left: Number(btn.dataset.thumbStep) * track.clientWidth * 0.8,
@@ -58,30 +58,30 @@
   });
 
   // ---- полноэкранный просмотр -------------------------------------
-  const openViewer = (i, single) => {
+  const openViewer = (i: number, single?: { src: string; alt: string }) => {
     if (!viewer) return;
     if (single) {
-      vImg.src = single.src;
-      vImg.alt = single.alt;
+      vImg!.src = single.src;
+      vImg!.alt = single.alt;
       if (vControls) vControls.hidden = true;
     } else {
       show(i);
-      vImg.src = shots[current].src;
-      vImg.alt = shots[current].alt;
+      vImg!.src = shots[current].src;
+      vImg!.alt = shots[current].alt;
       if (vControls) vControls.hidden = shots.length < 2;
       if (vCount) vCount.textContent = (current + 1) + ' / ' + shots.length;
     }
     if (!viewer.open) viewer.showModal();
   };
 
-  const step = d => {
+  const step = (d: number) => {
     show(current + d);
-    vImg.src = shots[current].src;
-    vImg.alt = shots[current].alt;
+    vImg!.src = shots[current].src;
+    vImg!.alt = shots[current].alt;
     if (vCount) vCount.textContent = (current + 1) + ' / ' + shots.length;
   };
 
-  const hero = root.querySelector('.ui-main-photo');
+  const hero = root.querySelector<HTMLElement>('.ui-main-photo');
   if (hero) {
     hero.addEventListener('click', () => openViewer(current));
     hero.addEventListener('keydown', e => {
@@ -92,7 +92,7 @@
   // Письмо открывают два элемента: плитка первого экрана с картинкой
   // внутри и кнопка в карточке «Благодарственное письмо», где картинки
   // нет — там адрес скана лежит в data-src.
-  root.querySelectorAll('[data-letter]').forEach(btn => {
+  root.querySelectorAll<HTMLElement>('[data-letter]').forEach(btn => {
     const img = btn.querySelector('img');
     const src = btn.dataset.src || (img && img.getAttribute('src'));
     if (!src) return;
@@ -100,11 +100,11 @@
       openViewer(0, { src, alt: 'Благодарственное письмо' }));
   });
 
-  root.querySelectorAll('[data-view-step]').forEach(btn =>
+  root.querySelectorAll<HTMLElement>('[data-view-step]').forEach(btn =>
     btn.addEventListener('click', () => step(Number(btn.dataset.viewStep))));
 
   root.querySelectorAll('dialog .ui-close').forEach(btn =>
-    btn.addEventListener('click', () => btn.closest('dialog').close()));
+    btn.addEventListener('click', () => btn.closest('dialog')!.close()));
   root.querySelectorAll('dialog').forEach(d =>
     d.addEventListener('click', e => { if (e.target === d) d.close(); }));
 
@@ -116,3 +116,5 @@
 
   show(0);
 })();
+
+export {};

@@ -36,7 +36,7 @@ COPY services services
 COPY scripts scripts
 COPY tsconfig.base.json tsconfig.json ./
 # Prisma Client генерируется из схемы и вшивается в бандл (рантайм — @prisma/client)
-RUN npm run generate -w @mtpk/db && node scripts/build-services.mjs
+RUN npm run generate -w @mtpk/db && npx tsx scripts/build-services.ts
 
 # --- только продакшн-зависимости нужного пакета ----------------------------------
 FROM manifests AS prod-deps

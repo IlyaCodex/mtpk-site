@@ -11,7 +11,7 @@
   // Форматирование российского/казахстанского номера.
   // d — строка из цифр абонентского номера (без кода 7), максимум 10.
   // Разделители-«хвосты» не добавляются — иначе номер нельзя стереть.
-  function formatRu(d) {
+  function formatRu(d: string): string {
     d = d.slice(0, 10);
     var out = '+7';
     if (d.length === 0) return out;
@@ -22,8 +22,8 @@
     return out;
   }
 
-  function onInput(e) {
-    var el = e.target;
+  function onInput(e: Event) {
+    var el = e.target as HTMLInputElement;
     var v = el.value;
 
     // Иностранный код: начинается с «+» и следующая цифра не 7 → свободный ввод.
@@ -62,3 +62,5 @@
     init();
   }
 })();
+
+export {};

@@ -8,20 +8,31 @@
      [data-stock-count]  — счётчик в заголовке (число видимых позиций)
      [data-stock-empty]  — empty-state, если позиций нет
    ============================================================ */
+type StockItem = {
+  url: string;
+  title?: string;
+  category?: string;
+  image?: string;
+  qty?: number | null;
+  shipping?: string | null;
+  specs?: unknown[][] | null;
+  cardHtml?: string;
+};
+
 (function () {
   'use strict';
   var grid    = document.querySelector('[data-stock-grid]');
   if (!grid) return;
-  var filterEl = document.querySelector('[data-stock-filter]');
+  var filterEl = document.querySelector<HTMLElement>('[data-stock-filter]');
   // Внешняя обёртка-полоска с лейблом «Фильтр:» — её показываем/скрываем целиком.
-  var filterBar = document.querySelector('[data-stock-filterbar]');
+  var filterBar = document.querySelector<HTMLElement>('[data-stock-filterbar]');
   var counter  = document.querySelector('[data-stock-count]');
-  var emptyEl  = document.querySelector('[data-stock-empty]');
+  var emptyEl  = document.querySelector<HTMLElement>('[data-stock-empty]');
 
   fetch('/data/stock.json', { credentials: 'same-origin' })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
-      var items = (data && Array.isArray(data.items)) ? data.items : [];
+      var items: StockItem[] = (data && Array.isArray(data.items)) ? data.items : [];
 
       if (!items.length) {
         if (counter) counter.textContent = '0';
@@ -31,14 +42,14 @@
       if (emptyEl) emptyEl.hidden = true;
 
       // 1) Сначала рендерим карточки.
-      var cards = [];
+      var cards: HTMLElement[] = [];
       var fragCards = document.createDocumentFragment();
       items.forEach(function (it) {
         if (!it || !it.url) return;
         var card = renderCard(it);
         if (card) { fragCards.appendChild(card); cards.push(card); }
       });
-      grid.appendChild(fragCards);
+      grid!.appendChild(fragCards);
 
       // 1b) Карточки дорисованы динамически — досыпаем бейдж «Сделано в России»
       //     на обложки трёх отечественных разделов (made-badges.js уже отработал
@@ -46,7 +57,7 @@
       if (typeof window.refreshMadeBadges === 'function') window.refreshMadeBadges();
 
       // 2) Собираем уникальные категории — порядок появления как в stock.json.
-      var cats = [];
+      var cats: string[] = [];
       var seenCats = Object.create(null);
       items.forEach(function (it) {
         var c = (it && it.category) ? String(it.category).trim() : '';
@@ -69,10 +80,10 @@
     .catch(function () { /* нет файла — секция остаётся со скелетом-пустышкой */ });
 
   /* ── рендер фильтра ── */
-  function renderFilter(host, cats, total, cards, counter) {
+  function renderFilter(host: HTMLElement, cats: string[], total: number, cards: HTMLElement[], counter: Element | null) {
     host.innerHTML = ''; // на случай горячей перезагрузки
 
-    function makeBtn(label, cat, count) {
+    function makeBtn(label: string, cat: string, count: number) {
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'case-filter';
@@ -93,7 +104,7 @@
     });
 
     host.addEventListener('click', function (e) {
-      var btn = e.target.closest && e.target.closest('.case-filter');
+      var btn = (e.target as Element).closest && (e.target as Element).closest('.case-filter');
       if (!btn || !host.contains(btn)) return;
       // активная кнопка
       host.querySelectorAll('.case-filter').forEach(function (x) { x.classList.remove('is-active'); });
@@ -116,7 +127,7 @@
   }
 
   /* ── DOM helpers ── */
-  function el(tag, attrs, children) {
+  function el(tag: string, attrs?: Record<string, string> | null, children?: (Node | null)[]): HTMLElement {
     var n = document.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(function (k) {
       if (k === 'class')      n.className = attrs[k];
@@ -133,12 +144,12 @@
     return el('a', { href: '#leadgen', class: 'btn btn--primary btn--block js-quote-btn' },
       [document.createTextNode('Запросить цену '), arrow()]);
   }
-  function moreBtn(url) {
+  function moreBtn(url: string) {
     return el('a', { href: url, class: 'pcard__more' },
       [document.createTextNode('Подробнее о позиции '), arrow()]);
   }
   // Гарантируем, что в карточке есть обе кнопки (Запросить цену + Подробнее).
-  function ensureActions(card, url) {
+  function ensureActions(card: Element, url: string) {
     var body = card.querySelector('.pcard__body') || card;
     var actions = card.querySelector('.pcard__actions');
     if (!actions) { actions = el('div', { class: 'pcard__actions' }); body.appendChild(actions); }
@@ -146,7 +157,7 @@
     if (!actions.querySelector('.pcard__more')) actions.appendChild(moreBtn(url));
   }
 
-  function renderCard(it) {
+  function renderCard(it: StockItem): HTMLElement {
     // Приоритет 1: готовый HTML из подкатегории каталога — рендерим как в
     // подразделе товара 1-в-1 (фото, бейдж категории, специ, кнопки) и сверху
     // вешаем зелёный бейдж «В наличии».
@@ -162,7 +173,7 @@
   // относительные («uik-cht-0-5/» вместо полного адреса). На /nalichie/
   // такая ссылка разворачивалась от адреса страницы и вела на
   // /nalichie/uik-cht-0-5/ — 404. Разворачиваем их от адреса подкатегории.
-  function absolutizeLinks(card, url) {
+  function absolutizeLinks(card: Element, url: string) {
     var base = String(url).replace(/[^/]+\/?$/, '');   // /products/a/b/c/ → /products/a/b/
     var links = card.querySelectorAll('a[href]');
     for (var i = 0; i < links.length; i++) {
@@ -172,10 +183,10 @@
     }
   }
 
-  function injectCatalogCard(it) {
+  function injectCatalogCard(it: StockItem): HTMLElement | null {
     var tmp = document.createElement('div');
-    tmp.innerHTML = it.cardHtml.trim();
-    var card = tmp.firstElementChild;
+    tmp.innerHTML = it.cardHtml!.trim();
+    var card = tmp.firstElementChild as HTMLElement | null;
     if (!card || !card.classList || !card.classList.contains('pcard')) return null;
     absolutizeLinks(card, it.url);
 
@@ -203,7 +214,7 @@
     return card;
   }
 
-  function renderFallbackCard(it) {
+  function renderFallbackCard(it: StockItem): HTMLElement {
     var url   = it.url;
     var title = it.title    || 'Позиция';
     var cat   = it.category || '';
@@ -211,14 +222,14 @@
     var qty   = it.qty;
     var ship  = it.shipping;
 
-    var coverChildren = [];
+    var coverChildren: HTMLElement[] = [];
     coverChildren.push(el('span', { class: 'pcard__stock-badge', 'aria-label': 'В наличии на складе', text: 'В наличии' }));
     if (img) {
       coverChildren.push(el('img', { src: img, alt: title, loading: 'lazy' }));
     }
     var cover = el('a', { href: url, class: 'pcard__cover' }, coverChildren);
 
-    var bodyChildren = [];
+    var bodyChildren: HTMLElement[] = [];
     if (cat) bodyChildren.push(el('div', { class: 'pcard__cat', text: cat }));
     var titleLink = el('a', { href: url, text: title });
     bodyChildren.push(el('h3', { class: 'pcard__title' }, [titleLink]));
@@ -250,3 +261,5 @@
     return card;
   }
 })();
+
+export {};

@@ -2,6 +2,9 @@
  * Все формы с классом .js-lead-form отправляются на /api/send.php через fetch.
  * Защита: honeypot (.hp-field), form_ts (время загрузки), source (URL).
  */
+type Marketing = Record<string, string>;
+type StatusType = 'pending' | 'success' | 'error';
+
 (function () {
   'use strict';
 
@@ -10,10 +13,10 @@
   var YM_UIBUSINESS_COUNTER = 112991420;   // рекламный кабинет uibusiness
   var PRIMARY_YM_COUNTER = YM_UIBUSINESS_COUNTER;
   var TMR_COUNTER = 3784620;   // Top.Mail.Ru
-  var forms = document.querySelectorAll('form.js-lead-form');
+  var forms = document.querySelectorAll<HTMLFormElement>('form.js-lead-form');
   if (!forms.length) return;
 
-  function getCookie(name) {
+  function getCookie(name: string): string {
     var escaped = name.replace(/[.*+?^$(){}|[\]\\]/g, '\\$&');
     var m = document.cookie.match(new RegExp('(?:^|; )' + escaped + '=([^;]*)'));
     if (!m) return '';
@@ -26,31 +29,31 @@
   // начинает чистую атрибуцию: отсутствующие click-id не наследуются от
   // предыдущей кампании, landing_url фиксируется заново.
   var UTM_KEY = 'ui_marketing_trace';
-  function setCookie(name, value, days) {
+  function setCookie(name: string, value: string, days: number) {
     var d = new Date(); d.setTime(d.getTime() + days * 864e5);
     document.cookie = name + '=' + encodeURIComponent(value) +
       ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
   }
-  function getMarketing() {
+  function getMarketing(): Marketing {
     var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'yclid', 'gclid', 'fbclid'];
-    var saved = {};
+    var saved: Marketing = {};
     try {
       var raw = localStorage.getItem(UTM_KEY) || getCookie(UTM_KEY);
       if (raw) saved = JSON.parse(raw) || {};
     } catch (e) {}
     if (!saved || typeof saved !== 'object' || Array.isArray(saved)) saved = {};
-    var params = null;
+    var params: URLSearchParams | null = null;
     try { params = new URLSearchParams(location.search); } catch (e) {}
     var hasIncomingMarketing = false;
     if (params) keys.forEach(function (k) {
-      if (params.get(k)) hasIncomingMarketing = true;
+      if (params!.get(k)) hasIncomingMarketing = true;
     });
 
-    var data = hasIncomingMarketing ? {} : saved;
+    var data: Marketing = hasIncomingMarketing ? {} : saved;
     var changed = hasIncomingMarketing;
     if (hasIncomingMarketing) {
       keys.forEach(function (k) {
-        var v = params.get(k);
+        var v = params!.get(k);
         if (v) data[k] = v.slice(0, 500);
       });
       data.landing_url = location.href.slice(0, 500);
@@ -91,7 +94,7 @@
   function refreshYmClientId() {
     try {
       if (typeof window.ym === 'function') {
-        window.ym(PRIMARY_YM_COUNTER, 'getClientID', function (clientId) {
+        window.ym(PRIMARY_YM_COUNTER, 'getClientID', function (clientId: unknown) {
           if (clientId) primaryYmClientId = String(clientId).slice(0, 100);
         });
       }
@@ -100,7 +103,7 @@
   setTimeout(refreshYmClientId, 3000);
   window.addEventListener('cookie-consent-accepted', refreshYmClientId);
 
-  function appendAnalyticsCookies(fd) {
+  function appendAnalyticsCookies(fd: FormData) {
     var b24Trace = '';
     try {
       if (window.b24Tracker && window.b24Tracker.guest &&
@@ -120,7 +123,7 @@
   // Целей не было вообще: конверсии форм в Метрике не считались.
   // Шлём одну общую цель lead_form_submit и вторую — по имени формы
   // (data-form), чтобы разделить экспресс-звонок и полную заявку.
-  function isUiBusinessPaidClick(marketing) {
+  function isUiBusinessPaidClick(marketing: Marketing) {
     var campaign = String(marketing.utm_campaign || '').toLowerCase();
     var source = String(marketing.utm_source || '').toLowerCase();
     var medium = String(marketing.utm_medium || '').toLowerCase();
@@ -129,7 +132,7 @@
       source === 'yandex' && medium === 'cpc' && /^\d{10,40}$/.test(yclid);
   }
 
-  function reachGoal(form) {
+  function reachGoal(form: HTMLFormElement) {
     var label = (form.getAttribute('data-form') || 'lead').toLowerCase()
       .replace(/[^a-zа-я0-9]+/gi, '_').replace(/^_+|_+$/g, '').slice(0, 40);
     var marketing = getMarketing();
@@ -179,25 +182,25 @@
       }
     }
     // Проставляем timestamp загрузки формы (для time-check на бэке)
-    var tsField = form.querySelector('.js-form-ts');
+    var tsField = form.querySelector<HTMLInputElement>('.js-form-ts');
     if (tsField) tsField.value = String(Date.now());
 
     // Источник заявки — URL + заголовок формы
-    var srcField = form.querySelector('.js-form-source');
+    var srcField = form.querySelector<HTMLInputElement>('.js-form-source');
     if (srcField && !srcField.value) {
       var label = form.getAttribute('data-form') || '';
       srcField.value = (label ? label + ' · ' : '') + location.pathname;
     }
 
     // «Прикрепить КП»: показываем имя выбранного файла на кнопке + лимит 10 МБ
-    var fileInput = form.querySelector('input[type="file"]');
+    var fileInput = form.querySelector<HTMLInputElement>('input[type="file"]');
     var fileLabel = fileInput ? fileInput.closest('label') : null;
-    var fileTextNode = null;
+    var fileTextNode: ChildNode | null = null;
     var fileDefaultText = '';
     if (fileLabel) {
       for (var fi = 0; fi < fileLabel.childNodes.length; fi++) {
         var fnode = fileLabel.childNodes[fi];
-        if (fnode.nodeType === 3 && fnode.textContent.trim()) { fileTextNode = fnode; break; }
+        if (fnode.nodeType === 3 && fnode.textContent!.trim()) { fileTextNode = fnode; break; }
       }
     }
     function resetFileBtn() {
@@ -206,19 +209,19 @@
       if (fileLabel) fileLabel.classList.remove('is-attached');
     }
     if (fileInput && fileTextNode) {
-      fileDefaultText = fileTextNode.textContent;
+      fileDefaultText = fileTextNode.textContent!;
       fileInput.addEventListener('change', function () {
-        var f = fileInput.files && fileInput.files[0];
+        var f = fileInput!.files && fileInput!.files[0];
         if (f && f.size > 10 * 1024 * 1024) {
-          fileInput.value = '';
+          fileInput!.value = '';
           f = null;
-          showStatus(form.querySelector('.js-form-status'), 'error',
+          showStatus(form.querySelector<HTMLElement>('.js-form-status'), 'error',
             'Файл больше 10 МБ — приложите файл поменьше');
         }
         if (f) {
           var nm = f.name;
           if (nm.length > 28) nm = nm.slice(0, 15) + '…' + nm.slice(-9);
-          fileTextNode.textContent = ' ' + nm;
+          fileTextNode!.textContent = ' ' + nm;
           if (fileLabel) fileLabel.classList.add('is-attached');
         } else {
           resetFileBtn();
@@ -230,8 +233,8 @@
       e.preventDefault();
       if (submitting) return;
 
-      var submitBtn = form.querySelector('[type="submit"]');
-      var status = form.querySelector('.js-form-status');
+      var submitBtn = form.querySelector<HTMLButtonElement>('[type="submit"]');
+      var status = form.querySelector<HTMLElement>('.js-form-status');
 
       // Нативная HTML5-валидация (required, type=email и т.д.) с подсказками браузера.
       // preventDefault её глушит — поэтому вызываем вручную.
@@ -240,7 +243,7 @@
       }
 
       // phone обязателен — дополнительная проверка (минимум 6 цифр)
-      var phone = form.querySelector('[name="phone"]');
+      var phone = form.querySelector<HTMLInputElement>('[name="phone"]');
       if (phone && phone.value.replace(/\D/g, '').length < 6) {
         phone.setAttribute('aria-invalid', 'true');
         showStatus(status, 'error', 'Укажите корректный телефон');
@@ -340,7 +343,7 @@
     });
   });
 
-  function showStatus(el, type, msg) {
+  function showStatus(el: HTMLElement | null, type: StatusType, msg: string) {
     if (!el) {
       // нет контейнера статуса — fallback на alert при успехе/ошибке
       if (type === 'success' || type === 'error') alert(msg);
@@ -356,3 +359,5 @@
     }
   }
 })();
+
+export {};

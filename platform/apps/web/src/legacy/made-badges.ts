@@ -35,7 +35,7 @@
     'drobemetnoe-oborudovanie/turbina-s-remennym-privodom'
   ];
 
-  function eligible(slug) {
+  function eligible(slug: string) {
     slug = String(slug).replace(/^\/+|\/+$/g, '');
     var i;
     for (i = 0; i < DENY.length; i++) {
@@ -47,7 +47,7 @@
     return false;
   }
 
-  function eligibleHref(href) {
+  function eligibleHref(href: string | null) {
     var m = String(href || '').match(/^\/products\/(.+?)\/?$/);
     return m ? eligible(m[1]) : false;
   }
@@ -65,7 +65,7 @@
   }
 
   // Навешиваем бейдж в обложку, если ещё нет. cover — позиционируемый контейнер.
-  function pin(cover) {
+  function pin(cover: HTMLElement | null) {
     if (!cover || cover.querySelector('.made-badge')) return;
     if (getComputedStyle(cover).position === 'static') cover.style.position = 'relative';
     cover.appendChild(makeBadge());
@@ -77,19 +77,19 @@
     document.querySelectorAll('article.pcard').forEach(function (card) {
       var a = card.querySelector('a[href^="/products/"]');
       if (!a || !eligibleHref(a.getAttribute('href'))) return;
-      pin(card.querySelector('.pcard__cover'));
+      pin(card.querySelector<HTMLElement>('.pcard__cover'));
     });
 
     // 2) Плитки подкатегорий на хабе (.teaser-card) — по href плитки.
     document.querySelectorAll('a.teaser-card[href^="/products/"]').forEach(function (a) {
       if (!eligibleHref(a.getAttribute('href'))) return;
-      pin(a.querySelector('.teaser-card__cover'));
+      pin(a.querySelector<HTMLElement>('.teaser-card__cover'));
     });
 
     // 3) Карточки категорий на главной (.cat-card) — по href карточки.
     document.querySelectorAll('a.cat-card[href^="/products/"]').forEach(function (a) {
       if (!eligibleHref(a.getAttribute('href'))) return;
-      pin(a.querySelector('.cat-card__cover'));
+      pin(a.querySelector<HTMLElement>('.cat-card__cover'));
     });
 
     // 4) Карточка товара (.phero) — по текущему URL.
@@ -103,3 +103,5 @@
   // Точка дорисовки для асинхронных карточек (stock-list.js на /nalichie/).
   window.refreshMadeBadges = scan;
 })();
+
+export {};

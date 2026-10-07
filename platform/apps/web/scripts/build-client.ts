@@ -1,27 +1,29 @@
-#!/usr/bin/env node
 /**
- * Сборка статики сайта в public/assets/ (имена с хешем — кешируются навсегда):
- *  - клиентские модули (src/client/*.ts): минифицированные ES-модули, общий
- *    код — в отдельных чанках;
- *  - общие стили: два файла по месту в каскаде — core.css (до стилей
- *    страницы) и core-end.css (после них). В коде страниц <style> нет.
+ * Сборка статики сайта (имена с хешем — кешируются навсегда):
+ *  - клиентские модули (src/client/*.ts) → public/assets: минифицированные
+ *    ES-модули, общий код — в отдельных чанках;
+ *  - общие стили → public/assets: два файла по месту в каскаде — core.css
+ *    (до стилей страницы) и core-end.css (после них). В коде страниц <style> нет;
+ *  - старые скрипты страниц (src/legacy/*.ts) → public/js/<имя>.js: обычные
+ *    скрипты (не модули), адреса прежние — на них ссылаются страницы.
  * manifest.json «имя → файл» читает сервер (src/lib/assets.ts).
  *
- *   node scripts/build-client.mjs           — сборка (перед next build)
- *   node scripts/build-client.mjs --watch   — разработка
+ *   tsx scripts/build-client.ts           — сборка (перед next build)
+ *   tsx scripts/build-client.ts --watch   — разработка
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { build, context, transform } from 'esbuild';
+import { build, context, transform, type BuildOptions, type Plugin } from 'esbuild';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'public/assets');
 const watch = process.argv.includes('--watch');
+const TARGET = ['es2020', 'chrome90', 'safari15', 'firefox90'];
 
 /** Модули: общий (на каждой странице) и модули отдельных блоков. */
-const ENTRIES = {
+const ENTRIES: Record<string, string> = {
   site: 'src/client/site.ts',
   gallery: 'src/client/gallery.ts',
   lightbox: 'src/client/lightbox.ts',
@@ -33,7 +35,7 @@ const ENTRIES = {
  * Общие стили в порядке каскада. Между core и core-end страница подключает
  * свои: шаблонные (/css/tpl) и собственные (/css/inline-extracted).
  */
-const CSS_BUNDLES = {
+const CSS_BUNDLES: Record<string, string[]> = {
   core: [
     'public/fonts/fonts-critical.css',
     'public/fonts/fonts-extended.css',
@@ -45,10 +47,18 @@ const CSS_BUNDLES = {
   'core-end': ['public/css/mobile-fixes.css', 'public/css/stock.css', 'public/css/base-layout.css', 'src/styles/components.css'],
 };
 
-const hash = (s) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
+/** Старые скрипты страниц: каждый — отдельный файл public/js/<имя>.js. */
+const LEGACY_DIR = 'src/legacy';
+const legacyEntries = () =>
+  fs
+    .readdirSync(path.join(ROOT, LEGACY_DIR))
+    .filter((f) => f.endsWith('.ts') && !f.endsWith('.d.ts'))
+    .map((f) => `${LEGACY_DIR}/${f}`);
 
-async function buildCss() {
-  const out = {};
+const hash = (s: string) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
+
+async function buildCss(): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
   for (const [name, files] of Object.entries(CSS_BUNDLES)) {
     const source = files.map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
     const { code } = await transform(source, { loader: 'css', minify: !watch, legalComments: 'none' });
@@ -59,7 +69,7 @@ async function buildCss() {
   return out;
 }
 
-const writeManifest = {
+const writeManifest: Plugin = {
   name: 'manifest',
   setup(b) {
     b.onStart(() => {
@@ -68,12 +78,12 @@ const writeManifest = {
     b.onEnd(async (result) => {
       if (result.errors.length || !result.metafile) return;
       fs.mkdirSync(OUT, { recursive: true });
-      const manifest = {};
+      const manifest: Record<string, string> = {};
       let bytes = 0;
       for (const [file, meta] of Object.entries(result.metafile.outputs)) {
         bytes += meta.bytes;
         if (!meta.entryPoint) continue;
-        const name = Object.entries(ENTRIES).find(([, src]) => path.resolve(ROOT, src) === path.resolve(ROOT, meta.entryPoint))?.[0];
+        const name = Object.entries(ENTRIES).find(([, src]) => path.resolve(ROOT, src) === path.resolve(ROOT, meta.entryPoint!))?.[0];
         if (name) manifest[name] = `/${path.relative(path.join(ROOT, 'public'), path.resolve(ROOT, file)).split(path.sep).join('/')}`;
       }
       Object.assign(manifest, await buildCss());
@@ -83,7 +93,7 @@ const writeManifest = {
   },
 };
 
-const options = {
+const modules: BuildOptions = {
   absWorkingDir: ROOT,
   entryPoints: ENTRIES,
   outdir: OUT,
@@ -93,7 +103,7 @@ const options = {
   splitting: true,
   format: 'esm',
   platform: 'browser',
-  target: ['es2020', 'chrome90', 'safari15', 'firefox90'],
+  target: TARGET,
   minify: !watch,
   sourcemap: watch ? 'inline' : false,
   legalComments: 'none',
@@ -102,11 +112,36 @@ const options = {
   plugins: [writeManifest],
 };
 
+/** Обычные скрипты: каждый в своей области видимости (IIFE), типы стираются. */
+const legacy: BuildOptions = {
+  absWorkingDir: ROOT,
+  entryPoints: legacyEntries(),
+  outdir: 'public/js',
+  bundle: false,
+  format: 'iife',
+  platform: 'browser',
+  target: TARGET,
+  minify: !watch,
+  // кириллица как есть (как в прежних файлах), а не \uXXXX — файлы заметно меньше
+  charset: 'utf8',
+  legalComments: 'none',
+  logLevel: 'warning',
+  plugins: [
+    {
+      name: 'legacy-report',
+      setup(b) {
+        b.onEnd((result) => {
+          if (!result.errors.length) console.log(`старые скрипты страниц: ${legacyEntries().length} файлов → public/js`);
+        });
+      },
+    },
+  ],
+};
+
 if (watch) {
-  const ctx = await context(options);
-  await ctx.watch();
+  await Promise.all([(await context(modules)).watch(), (await context(legacy)).watch()]);
   // стили пересобираются вместе с модулями; правка только CSS — перезапуск сборщика
   console.log('статика сайта: слежу за изменениями…');
 } else {
-  await build(options);
+  await Promise.all([build(modules), build(legacy)]);
 }

@@ -30,7 +30,7 @@
     }
   }
 
-  function setItems(items) {
+  function setItems(items: string[]) {
     try {
       sessionStorage.setItem(SS_KEY, JSON.stringify(items));
     } catch (e) { /* приватный режим / переполнение — молча игнорируем */ }
@@ -41,18 +41,18 @@
   }
 
   // Название позиции для конкретной кнопки.
-  function nameForButton(btn) {
-    var el = null;
+  function nameForButton(btn: Element): string {
+    var el: Element | null = null;
     var card = btn.closest ? btn.closest('.pcard') : null;
     if (card) el = card.querySelector('.pcard__title');
     if (!el) el = document.querySelector('.phero__title');
     if (!el) return '';
-    return el.textContent.replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
+    return el.textContent!.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
   // Все textarea задачи на странице (форма Leadgen).
   function taskFields() {
-    return document.querySelectorAll('form.js-lead-form textarea[name="task"]');
+    return document.querySelectorAll<HTMLTextAreaElement>('form.js-lead-form textarea[name="task"]');
   }
 
   // Перерисовать поля задачи: управляемый блок «Интересует …» сверху,
@@ -86,7 +86,7 @@
 
   // Клик по кнопке «Запросить цену» (делегирование — ловит и динамику).
   document.addEventListener('click', function (e) {
-    var btn = e.target.closest ? e.target.closest('.js-quote-btn') : null;
+    var btn = (e.target as Element).closest ? (e.target as Element).closest('.js-quote-btn') : null;
     if (!btn) return;
     e.preventDefault();
 
@@ -104,7 +104,7 @@
 
   // Успешная отправка → forms.js делает form.reset() → событие reset всплывает.
   document.addEventListener('reset', function (e) {
-    var f = e.target;
+    var f = e.target as Element | null;
     if (f && f.classList && f.classList.contains('js-lead-form')) {
       clearItems();
     }
@@ -117,3 +117,5 @@
     document.addEventListener('DOMContentLoaded', renderTaskFields);
   }
 })();
+
+export {};

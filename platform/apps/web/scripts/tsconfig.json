@@ -1,0 +1,5 @@
+{
+  // Сборка статики сайта (запуск — tsx).
+  "extends": "../../../tsconfig.base.json",
+  "include": ["*.ts"]
+}

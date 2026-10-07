@@ -11,17 +11,17 @@
     var body = spec.querySelector('.spec__body');
     if (!nav || !body) return;
 
-    var links = Array.prototype.slice.call(spec.querySelectorAll('.spec__nav-link'));
-    var panels = Array.prototype.slice.call(body.querySelectorAll('.spec__panel'));
+    var links: HTMLAnchorElement[] = Array.prototype.slice.call(spec.querySelectorAll('.spec__nav-link'));
+    var panels: HTMLElement[] = Array.prototype.slice.call(body.querySelectorAll('.spec__panel'));
     if (!links.length || !panels.length) return;
 
-    var linkById = {};
+    var linkById: Record<string, HTMLAnchorElement> = {};
     links.forEach(function (l) {
       var href = l.getAttribute('href') || '';
       if (href.charAt(0) === '#') linkById[href.slice(1)] = l;
     });
 
-    function setActive(id) {
+    function setActive(id: string) {
       links.forEach(function (l) {
         l.classList.toggle('is-active', l === linkById[id]);
       });
@@ -48,10 +48,10 @@
     // Scrollspy: при скролле подсвечиваем самую верхнюю секцию,
     // попавшую в узкую зону у верха вьюпорта.
     if ('IntersectionObserver' in window) {
-      var ratios = {};
+      var ratios: Record<string, boolean> = {};
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (en) {
-          ratios[en.target.id] = en.isIntersecting;
+          ratios[(en.target as HTMLElement).id] = en.isIntersecting;
         });
         var bestId = null;
         for (var i = 0; i < panels.length; i++) {
@@ -67,3 +67,5 @@
     }
   });
 })();
+
+export {};

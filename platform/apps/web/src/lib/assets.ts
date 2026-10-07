@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-/** Клиентские модули (см. scripts/build-client.mjs). */
+/** Клиентские модули (см. scripts/build-client.ts). */
 export type ClientModule = 'site' | 'gallery' | 'lightbox' | 'spec-nav' | 'catalog-filter' | 'core.css' | 'core-end.css';
 
 const MANIFEST = path.join(process.cwd(), 'public/assets/manifest.json');

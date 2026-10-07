@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Удаляет сборочные артефакты и кеши монорепо (диск C у разработчика один):
  * .next сайта и админки, dist сервисов и инструментов, отчёты сверки.
@@ -10,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(import.meta.dirname, '..');
-const targets = [];
+const targets: string[] = [];
 for (const group of ['apps', 'services', 'packages', 'tools']) {
   const dir = path.join(root, group);
   if (!fs.existsSync(dir)) continue;
@@ -23,7 +22,7 @@ for (const group of ['apps', 'services', 'packages', 'tools']) {
 }
 
 let freed = 0;
-const size = (p) => {
+const size = (p: string): number => {
   const st = fs.lstatSync(p);
   if (!st.isDirectory()) return st.size;
   return fs.readdirSync(p).reduce((s, n) => s + size(path.join(p, n)), 0);

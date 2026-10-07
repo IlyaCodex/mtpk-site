@@ -18,11 +18,14 @@
  *   "N-M"     → N ≤ значение ≤ M
  *   "M+"      → значение ≥ M
  */
+type FilterDef = { label: string; anyLabel: string; ranges: { v: string; l: string; short: string }[] };
+type Range = { min: number; max: number };
+
 (function () {
   'use strict';
 
   /* Конфигурация известных атрибутов: лейбл, единица, варианты диапазонов. */
-  var FILTER_DEFS = {
+  var FILTER_DEFS: Record<string, FilterDef> = {
     mass: {
       label: 'Масса',
       anyLabel: 'любая',
@@ -58,7 +61,7 @@
   };
 
   /* ---------- утилиты ---------- */
-  function parseRange(value) {
+  function parseRange(value: string): Range | null {
     if (!value) return null;
     if (value.indexOf('up-') === 0) {
       return { min: 0, max: parseFloat(value.slice(3)) };
@@ -72,7 +75,7 @@
     }
     return null;
   }
-  function pluralizeModels(n) {
+  function pluralizeModels(n: number): string {
     var mod10 = n % 10, mod100 = n % 100;
     if (mod10 === 1 && mod100 !== 11) return n + ' модель';
     if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return n + ' модели';
@@ -80,9 +83,9 @@
   }
 
   /* ---------- авто-генерация HTML фильтра ---------- */
-  function detectKeys(cards) {
+  function detectKeys(cards: Element[]): string[] {
     /* Возвращает массив атрибутов, которые встретились хотя бы у половины карточек. */
-    var counts = {};
+    var counts: Record<string, number> = {};
     cards.forEach(function (c) {
       var attrs = c.attributes;
       for (var i = 0; i < attrs.length; i++) {
@@ -93,7 +96,7 @@
       }
     });
     var threshold = Math.ceil(cards.length / 2);
-    var keys = [];
+    var keys: string[] = [];
     for (var k in counts) {
       if (counts[k] >= threshold) keys.push(k);
     }
@@ -105,7 +108,7 @@
     return keys;
   }
 
-  function buildDropdown(key, def) {
+  function buildDropdown(key: string, def: FilterDef) {
     var dropdown = document.createElement('div');
     dropdown.className = 'cf-dropdown';
     dropdown.setAttribute('data-cf-dropdown', '');
@@ -132,7 +135,7 @@
     return dropdown;
   }
 
-  function buildFilterForm(keys) {
+  function buildFilterForm(keys: string[]) {
     var form = document.createElement('form');
     form.className = 'catalog-filter';
     form.setAttribute('aria-label', 'Фильтр каталога');
@@ -188,7 +191,7 @@
        там уже есть inline-скрипт, который привязал click к trigger; мы не
        должны вешать второй обработчик, иначе toggle отменит сам себя. */
     form.setAttribute('data-cf-self-generated', '');
-    grid.parentNode.insertBefore(form, grid);
+    grid.parentNode!.insertBefore(form, grid);
     return form;
   }
 
@@ -205,10 +208,10 @@
     var dropdowns = form.querySelectorAll('[data-cf-dropdown]');
     var resetBtn = form.querySelector('[data-cf-reset]');
     var countEl = form.querySelector('[data-cf-count]');
-    var cards = document.querySelectorAll('.pcard');
+    var cards = document.querySelectorAll<HTMLElement>('.pcard');
     if (!cards.length) return;
 
-    var activeFilters = {};
+    var activeFilters: Record<string, { value: string; range: Range | null } | null> = {};
 
     function applyFilters() {
       var shown = 0;
@@ -240,7 +243,7 @@
       if (countEl) countEl.textContent = pluralizeModels(shown);
     }
 
-    function closeAll(except) {
+    function closeAll(except: Element | null) {
       dropdowns.forEach(function (d) {
         if (d === except) return;
         d.classList.remove('is-open');
@@ -254,7 +257,7 @@
       if (!key) return;
       activeFilters[key] = null;
 
-      var trigger = dropdown.querySelector('[data-cf-trigger]');
+      var trigger = dropdown.querySelector('[data-cf-trigger]')!;
       var valueEl = dropdown.querySelector('[data-cf-value]');
       var options = dropdown.querySelectorAll('[data-cf-option]');
 
@@ -280,7 +283,7 @@
           if (valueEl) valueEl.textContent = label;
           var value = opt.getAttribute('data-value') || '';
           trigger.classList.toggle('is-active', !!value);
-          activeFilters[key] = value ? { value: value, range: parseRange(value) } : null;
+          activeFilters[key!] = value ? { value: value, range: parseRange(value) } : null;
           dropdown.classList.remove('is-open');
           trigger.setAttribute('aria-expanded', 'false');
           applyFilters();
@@ -299,7 +302,7 @@
       resetBtn.addEventListener('click', function () {
         dropdowns.forEach(function (d) {
           var key = d.getAttribute('data-cf-key');
-          activeFilters[key] = null;
+          activeFilters[key!] = null;
           var t = d.querySelector('[data-cf-trigger]');
           var v = d.querySelector('[data-cf-value]');
           var opts = d.querySelectorAll('[data-cf-option]');
@@ -322,3 +325,5 @@
     init();
   }
 })();
+
+export {};

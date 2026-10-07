@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Локальная разработка: все сервисы и сайт одной командой, с цветными
  * префиксами в выводе. Хранилища (Postgres, Redis, MinIO) — в Docker:
@@ -7,16 +6,17 @@
  *   npm run dev                 — всё
  *   npm run dev -- web content  — выборочно
  */
-import { spawn, execSync } from 'node:child_process';
+import { execSync, spawn, type ChildProcess } from 'node:child_process';
+import type { Readable, Writable } from 'node:stream';
 
-const PROCS = {
+const PROCS: Record<string, [string, string[]]> = {
   content: ['npm', ['run', 'dev', '-w', '@mtpk/content-service']],
   media: ['npm', ['run', 'dev', '-w', '@mtpk/media-service']],
   leads: ['npm', ['run', 'dev', '-w', '@mtpk/leads-service']],
   'leads-worker': ['npm', ['run', 'dev:worker', '-w', '@mtpk/leads-service']],
   search: ['npm', ['run', 'dev', '-w', '@mtpk/search-service']],
   web: ['npm', ['run', 'dev', '-w', '@mtpk/web']],
-  // клиентские модули сайта (src/client → public/assets), пересборка при изменениях
+  // клиентские модули и старые скрипты сайта (src/client, src/legacy), пересборка при изменениях
   'web-client': ['npm', ['run', 'dev:client', '-w', '@mtpk/web']],
   admin: ['npm', ['run', 'dev', '-w', '@mtpk/admin']],
 };
@@ -24,7 +24,7 @@ const COLORS = [36, 33, 35, 32, 34, 31, 96, 93];
 
 const only = process.argv.slice(2);
 const names = only.length ? only : Object.keys(PROCS);
-const children = [];
+const children: ChildProcess[] = [];
 const env = { ...process.env, NEXT_TELEMETRY_DISABLED: '1', FORCE_COLOR: '1' };
 
 names.forEach((name, i) => {
@@ -36,7 +36,7 @@ names.forEach((name, i) => {
   const color = COLORS[i % COLORS.length];
   const prefix = `\x1b[${color}m${name.padEnd(12)}\x1b[0m│ `;
   const child = spawn(def[0], def[1], { env, shell: process.platform === 'win32' });
-  const pipe = (stream, out) => {
+  const pipe = (stream: Readable, out: Writable) => {
     let buf = '';
     stream.on('data', (d) => {
       buf += d;
