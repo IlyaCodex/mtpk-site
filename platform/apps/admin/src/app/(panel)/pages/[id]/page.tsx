@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import type { BlockSchemas } from '@/components/BlockList';
 import { PageEditor, type EditablePage } from '@/components/PageEditor';
@@ -36,19 +35,10 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
   const initial = { ...rest, source: String(extraMeta?.source ?? '') };
   const crumbs = editorCrumbs(page.path, page.blocks as never);
   const props = { initial, schemas: schemas.blocks, siteUrl: env().PUBLIC_SITE_URL, crumbs };
-  const notice = catalog && (
-    <p className="mb-4 rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-900">
-      {catalog.kind === 'category' ? 'Это страница категории каталога.' : 'Это страница подкатегории каталога.'} Карточка (название, обложка, описание, порядок), адрес
-      {catalog.kind === 'category' ? ' и общие секции под товарами' : ''} — в{' '}
-      <Link className="font-medium underline" href={`/catalog/${catalog.kind === 'category' ? 'categories' : 'subcategories'}/${catalog.id}`}>
-        карточке {catalog.kind === 'category' ? 'категории' : 'подкатегории'}
-      </Link>
-      . Здесь — тексты, картинки и SEO страницы.
-    </p>
-  );
   return page.blocks.some((b) => b.type === 'productHero') ? (
     <ProductEditor {...props} />
   ) : (
-    <PageEditor {...props} notice={notice || undefined} pathNote={catalog ? 'Адрес меняется в карточке каталога — там же, где название и обложка.' : undefined} />
+    // в клиентский редактор — только данные: разметку подсказки он строит сам
+    <PageEditor {...props} catalogOwner={catalog && catalog.kind !== 'product' ? { kind: catalog.kind, id: catalog.id } : undefined} />
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import Link from 'next/link';
+import { useState } from 'react';
 import { BlockList, type BlockSchemas } from './BlockList';
 import { EditorContext } from './editor-context';
 import { EditorHeader, type Crumb } from './EditorHeader';
@@ -22,17 +23,14 @@ export function PageEditor({
   schemas,
   siteUrl,
   crumbs,
-  notice,
-  pathNote,
+  catalogOwner,
 }: {
   initial: EditablePage;
   schemas: BlockSchemas;
   siteUrl: string;
   crumbs: Crumb[];
-  /** пояснение над вкладками (у страниц каталога — где их карточка) */
-  notice?: ReactNode;
-  /** адрес меняется в другом месте */
-  pathNote?: string;
+  /** страница категории или подкатегории каталога: её карточка (и адрес) — в разделе «Каталог» */
+  catalogOwner?: { kind: 'category' | 'subcategory'; id: number };
 }) {
   const { page, update, dirty, saving, save } = usePageDraft(initial);
   const [tab, setTab] = useState<Tab>('blocks');
@@ -55,7 +53,7 @@ export function PageEditor({
 
       <div className={cx('grid gap-6 px-8 py-6', device !== 'off' && '2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]')}>
         <div className="min-w-0">
-          {notice}
+          {catalogOwner && <CatalogNotice owner={catalogOwner} />}
           <div className="mb-4 flex gap-1 border-b border-slate-200">
             {(
               [
@@ -87,7 +85,7 @@ export function PageEditor({
             </>
           )}
 
-          {tab === 'seo' && <SeoFields page={page} update={update} pathNote={pathNote} />}
+          {tab === 'seo' && <SeoFields page={page} update={update} pathNote={catalogOwner ? 'Адрес меняется в карточке каталога — там же, где название и обложка.' : undefined} />}
 
           {tab === 'styles' && (
             <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
@@ -120,5 +118,22 @@ export function PageEditor({
         <PreviewPane page={page} device={device} onDevice={setDevice} />
       </div>
     </div>
+  );
+}
+
+/** Страница категории или подкатегории: где правится её карточка в каталоге. */
+function CatalogNotice({ owner }: { owner: { kind: 'category' | 'subcategory'; id: number } }) {
+  const category = owner.kind === 'category';
+  return (
+    <p className="mb-4 rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-900">
+      {category ? 'Это страница категории каталога.' : 'Это страница подкатегории каталога.'}{' '}
+      {category
+        ? 'Карточка (название, обложка, порядок на главной), адрес и общие секции под товарами — в '
+        : 'Карточка (название, обложка, описание, порядок), адрес — в '}
+      <Link className="font-medium underline" href={`/catalog/${category ? 'categories' : 'subcategories'}/${owner.id}`}>
+        {category ? 'карточке категории' : 'карточке подкатегории'}
+      </Link>
+      . Здесь — тексты, картинки и SEO страницы.
+    </p>
   );
 }
