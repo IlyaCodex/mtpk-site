@@ -2,16 +2,17 @@
  * Скриншоты страниц админки для проверки вёрстки: вход и снимок каждого
  * адреса (экран 1600×1000, по желанию — во всю длину). «Адрес@Текст» —
  * перед снимком нажать кнопку с этим текстом (вкладку редактора и т. п.).
- * Ошибки консоли и ответы 5xx печатаются. Пароль — из ADMIN_SMOKE_PASSWORD.
+ * Ошибки консоли и ответы 5xx печатаются. Пароль — из ADMIN_SMOKE_PASSWORD,
+ * вход — по секретной ссылке (токен из platform/.env).
  *
  *   ADMIN_SMOKE_EMAIL=… ADMIN_SMOKE_PASSWORD=… npx tsx tools/checks/src/admin-shot.ts <каталог> /catalog "/pages/65@Характеристики" [--full]
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { ADMIN_BASE as base, adminLogin } from './admin-login.ts';
 import { chromiumPath } from './browser.ts';
 
-const base = process.env.ADMIN_BASE ?? 'http://127.0.0.1:3300';
 const args = process.argv.slice(2);
 const full = args.includes('--full');
 const [outDir, ...paths] = args.filter((a) => a !== '--full');
@@ -29,11 +30,7 @@ page.on('response', (r) => {
   if (r.status() >= 500) problems.push(`[${r.status()}] ${r.url()}`);
 });
 
-await page.goto(`${base}/login`, { waitUntil: 'networkidle' });
-await page.fill('input[name=email]', process.env.ADMIN_SMOKE_EMAIL ?? '');
-await page.fill('input[name=password]', process.env.ADMIN_SMOKE_PASSWORD ?? '');
-await page.click('button[type=submit]');
-await page.waitForURL(`${base}/`, { timeout: 60_000 });
+await adminLogin(page);
 
 for (const [i, target] of paths.entries()) {
   const t0 = Date.now();

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Badge, EmptyState, formatDate, PageHeader, Pager, Table } from '@/components/ui';
 import { LEAD_STATUS } from '@/lib/leads';
 import { requireUser } from '@/lib/auth';
+import { withBase } from '@/lib/base-path';
 import { serviceJson } from '@/lib/services';
 
 export const metadata: Metadata = { title: 'Заявки' };
@@ -40,7 +41,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
         title="Заявки"
         description="Все заявки с форм сайта. Каждая сохраняется до отправки, поэтому не теряется: если почта или Битрикс24 были недоступны, доставка повторяется автоматически, а здесь её можно запустить вручную."
       />
-      <form className="mb-4 flex flex-wrap gap-2" action="/leads">
+      <form className="mb-4 flex flex-wrap gap-2" action={withBase('/leads')}>
         <input name="search" defaultValue={sp.search} placeholder="Телефон, имя, e-mail, текст" className="field max-w-80" />
         <select name="status" defaultValue={sp.status ?? ''} className="field max-w-56">
           <option value="">Все статусы</option>

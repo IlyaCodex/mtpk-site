@@ -12,6 +12,7 @@ const CONTENT = process.env.CONTENT_URL ?? 'http://127.0.0.1:4101';
 const MEDIA = process.env.MEDIA_URL ?? 'http://127.0.0.1:4104';
 const LEADS = process.env.LEADS_URL ?? 'http://127.0.0.1:4102';
 const SEARCH = process.env.SEARCH_URL ?? 'http://127.0.0.1:4103';
+const ADMIN = process.env.ADMIN_URL ?? 'http://127.0.0.1:3300';
 
 const cache = (value: string) => [{ key: 'Cache-Control', value }];
 
@@ -58,6 +59,10 @@ const nextConfig: NextConfig = {
         { source: '/api/send.php', destination: `${LEADS}/api/send.php` },
         { source: '/api/leads', destination: `${LEADS}/api/leads` },
         { source: '/api/search', destination: `${SEARCH}/api/search` },
+        // админка на домене сайта: /admin (вход — по секретной ссылке, см. apps/admin/src/lib/gate.ts);
+        // в проде этот адрес шлюз отдаёт админке сам, сюда запросы не доходят
+        { source: '/admin', destination: `${ADMIN}/admin` },
+        { source: '/admin/:path*', destination: `${ADMIN}/admin/:path*` },
       ],
     };
   },

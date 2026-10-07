@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { withBase } from '@/lib/base-path';
 import { api } from '@/lib/client-api';
 import { toast } from './toast';
 import { Button, cx, formatBytes } from './ui';
@@ -9,7 +10,7 @@ type MediaFile = { key: string; url: string; size: number; contentType: string; 
 type Listing = { prefix: string; folders: { name: string; prefix: string; count: number }[]; total: number; files: MediaFile[] };
 
 /** Файлы показываются через прокси админки (/media-files → медиасервис). */
-export const fileSrc = (url: string) => (url.startsWith('/') ? `/media-files${url}` : url);
+export const fileSrc = (url: string) => (url.startsWith('/') ? withBase(`/media-files${url}`) : url);
 export const isImage = (key: string) => /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(key.split(/[?#]/)[0]);
 const ROOTS = ['img/', 'files/', 'docs/', 'og/'];
 const keyPath = (key: string) => key.split('/').map(encodeURIComponent).join('/');

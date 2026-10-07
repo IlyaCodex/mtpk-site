@@ -1,8 +1,12 @@
+import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { audit, clientIp } from '@/lib/audit';
 import { jsonError } from '@/lib/api';
 import { createSession } from '@/lib/auth';
+import { BASE_PATH } from '@/lib/base-path';
+import { GATE_COOKIE, GATE_TTL, gatePass, secureCookies } from '@/lib/gate';
 import { db, redis } from '@/lib/db';
+import { env } from '@/lib/env';
 import { verifyPassword } from '@/lib/password';
 
 const input = z.object({ email: z.string().trim().toLowerCase().email(), password: z.string().min(1).max(200) });
@@ -32,6 +36,14 @@ export async function POST(req: Request): Promise<Response> {
     return jsonError(401, 'invalid_credentials', { message: 'Неверный e-mail или пароль' });
   }
   await createSession(user.id);
+  // пропуск продлевается с каждым входом (сюда без пропуска не попасть — см. proxy.ts)
+  (await cookies()).set(GATE_COOKIE, await gatePass(env().ADMIN_LOGIN_TOKEN), {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: secureCookies(),
+    path: BASE_PATH,
+    maxAge: GATE_TTL,
+  });
   await db().user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
   await redis().del(attemptsKey);
   await audit(user, 'login', user.email);

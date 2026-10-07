@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { BASE_PATH } from './base-path';
 import { db, redis } from './db';
 import { env } from './env';
 
@@ -53,7 +54,8 @@ export async function createSession(userId: number): Promise<void> {
     httpOnly: true,
     sameSite: 'lax',
     secure: env().ADMIN_SECURE_COOKIE ? env().ADMIN_SECURE_COOKIE === 'true' : env().NODE_ENV === 'production',
-    path: '/',
+    // cookie админки сайту не отправляется
+    path: BASE_PATH,
     maxAge: TTL,
   });
 }
@@ -89,7 +91,7 @@ export async function destroySession(): Promise<void> {
     await redis().del(sessionKey(id));
     if (userId) await redis().srem(userSessionsKey(Number(userId)), id);
   }
-  jar.delete(COOKIE);
+  jar.delete({ name: COOKIE, path: BASE_PATH });
 }
 
 /** Завершить все сессии пользователя (отключение, смена пароля). */

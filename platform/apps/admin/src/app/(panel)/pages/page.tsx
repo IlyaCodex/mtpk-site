@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { AutoSubmitForm } from '@/components/AutoSubmitForm';
 import { Badge, EmptyState, formatDate, LinkButton, PageHeader, Pager } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
+import { withBase } from '@/lib/base-path';
 import { PAGE_TYPES, SITE_GROUPS, typeLabel, type SiteGroup } from '@/lib/catalog';
 import { env } from '@/lib/env';
 import { serviceJson } from '@/lib/services';
@@ -64,7 +65,7 @@ export default async function PagesList({ searchParams }: { searchParams: Promis
         }
       />
 
-      <AutoSubmitForm className="mb-4 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs" action="/pages">
+      <AutoSubmitForm className="mb-4 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs" action={withBase('/pages')}>
         <label className="block w-56">
           <span className="mb-1 block text-xs font-medium text-slate-500">Раздел сайта</span>
           <select name="group" defaultValue={sp.group ?? ''} className="field">

@@ -1,3 +1,4 @@
+import { BASE_PATH } from './base-path';
 import { SERVICES, serviceBase } from './services';
 
 export type OpenApi = {
@@ -51,6 +52,8 @@ export async function buildOpenApi() {
   services.sort((a, b) => a.name.localeCompare(b.name));
   return {
     openapi: '3.0.3',
+    // адреса методов — от /admin (basePath админки)
+    servers: [{ url: BASE_PATH }],
     info: {
       title: 'МТПК · REST API админки',
       version: '1.0.0',

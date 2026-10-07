@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRef, useState, type ReactNode } from 'react';
 import { api } from '@/lib/client-api';
 import type { ProductEntity } from '@/lib/catalog';
@@ -282,9 +283,9 @@ export function ProductEditor({
                   {catalog ? (
                     <>
                       Секции этой страницы ниже характеристик. Формы заявки, преимущества и партнёры — общие для всех товаров категории: они правятся в{' '}
-                      <a className="text-brand-600 underline" href={`/catalog/categories/${catalog.product.categoryId}`}>
+                      <Link className="text-brand-600 underline" href={`/catalog/categories/${catalog.product.categoryId}`}>
                         карточке категории
-                      </a>
+                      </Link>
                       .
                     </>
                   ) : (

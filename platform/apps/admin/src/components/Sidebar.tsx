@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cx } from './ui';
+import { withBase } from '@/lib/base-path';
 import { api } from '@/lib/client-api';
 
 /** Иконки разделов (Lucide, ISC). */
@@ -36,13 +37,13 @@ export function Sidebar({ items, user, siteUrl }: { items: NavItem[]; user: { na
 
   async function logout() {
     await api('auth/logout', { method: 'POST' }).catch(() => {});
-    window.location.assign('/login');
+    window.location.assign(withBase('/login'));
   }
 
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-brand-900 bg-brand-950 text-brand-100">
       <div className="flex items-center gap-3 px-5 py-5">
-        <img src="/favicon.svg" alt="" className="h-8 w-8" />
+        <img src={withBase('/favicon.svg')} alt="" className="h-8 w-8" />
         <div className="leading-tight">
           <div className="text-sm font-semibold text-white">УралИндуктор</div>
           <a href={siteUrl} target="_blank" rel="noopener" className="text-xs text-brand-200 hover:text-white">

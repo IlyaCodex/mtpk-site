@@ -7,6 +7,8 @@ const schema = z.object({
   REDIS_URL: z.string().min(1),
   /** служебный токен для /admin/v1 сервисов */
   ADMIN_TOKEN: z.string().min(8),
+  /** секрет ссылки входа /admin/login?token=… (см. lib/gate.ts) */
+  ADMIN_LOGIN_TOKEN: z.string().min(24),
   CONTENT_URL: z.string().default('http://127.0.0.1:4101'),
   LEADS_URL: z.string().default('http://127.0.0.1:4102'),
   SEARCH_URL: z.string().default('http://127.0.0.1:4103'),

@@ -1,3 +1,5 @@
+import { withBase } from './base-path';
+
 /**
  * Каталог продукции и типы страниц — словарь для людей: вместо технических
  * кодов шаблонов (product, spare-category…) — понятные названия, вместо
@@ -132,7 +134,7 @@ export function lineage(node: TreeNode): TreeNode[] {
 }
 
 /** Миниатюра картинки сайта (уменьшенная копия из медиасервиса). */
-export const thumbUrl = (src: string | null, w = 160) => (src && src.startsWith('/img/') ? `/media-files${src}${src.includes('?') ? '&' : '?'}w=${w}` : src);
+export const thumbUrl = (src: string | null, w = 160) => (src && src.startsWith('/img/') ? withBase(`/media-files${src}${src.includes('?') ? '&' : '?'}w=${w}`) : src);
 
 type CrumbBlock = { type: string; breadcrumbs?: { href?: string; label?: string }[]; html?: string };
 

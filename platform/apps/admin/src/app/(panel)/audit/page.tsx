@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Badge, EmptyState, formatDate, PageHeader, Pager, Table } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
+import { withBase } from '@/lib/base-path';
 import { listAudit } from '@/lib/audit';
 import { actionTone, describeAction } from '@/lib/audit-labels';
 
@@ -17,7 +18,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <PageHeader title="Журнал действий" description="Кто и когда входил в админку и что менял: страницы, настройки, файлы, редиректы, пользователей." />
-      <form className="mb-4 flex gap-2" action="/audit">
+      <form className="mb-4 flex gap-2" action={withBase('/audit')}>
         <input name="search" defaultValue={search} placeholder="E-mail, адрес страницы или файла" className="field max-w-80" />
         <button className="rounded-lg bg-slate-800 px-4 text-sm text-white hover:bg-slate-700">Найти</button>
       </form>

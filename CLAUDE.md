@@ -24,7 +24,10 @@
 - Инфраструктура: `npm run infra:up` — Postgres (:5442), Redis, MinIO в Docker Desktop.
 - Сервисы: `npm run dev` — контент :4101, заявки :4102, поиск :4103, медиа :4104.
 - Сайт: `npm run build:web` → `npm run start -w @mtpk/web` — http://127.0.0.1:3200.
-- Админка: `npm run dev -w @mtpk/admin` — http://127.0.0.1:3300 (локальный пользователь).
+- Админка: `npm run dev -w @mtpk/admin` — адрес `/admin`: http://127.0.0.1:3300/admin, через сайт —
+  http://127.0.0.1:3200/admin (на домене — uralinduktor.ru/admin). Вход — только по секретной ссылке
+  `/admin/login?token=<ADMIN_LOGIN_TOKEN из platform/.env>`, без неё админка отвечает 404.
+  Токен не публиковать; новый токен в .env отменяет выданные пропуска.
 - База: схема и миграции — packages/db/prisma; новая миграция — `npm run db:migration -- --name …`.
   **Никогда** `prisma migrate reset` — сносит данные.
 - Docker-образы локально не собирать (диск C), кеш сборки Docker не чистить без команды Евгения.

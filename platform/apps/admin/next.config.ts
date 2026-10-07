@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { NextConfig } from 'next';
+import { BASE_PATH } from './src/lib/base-path';
 
 // Локально переменные лежат в platform/.env (общий файл монорепо).
 try {
@@ -11,6 +12,8 @@ try {
 const MEDIA = process.env.MEDIA_URL ?? 'http://127.0.0.1:4104';
 
 const nextConfig: NextConfig = {
+  // админка — по адресу /admin (на домене сайта его проксирует сайт или шлюз)
+  basePath: BASE_PATH,
   output: 'standalone',
   outputFileTracingRoot: path.resolve(process.cwd(), '../..'),
   transpilePackages: ['@mtpk/content-model', '@mtpk/db', '@mtpk/shared'],

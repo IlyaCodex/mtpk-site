@@ -1,4 +1,6 @@
-/** Обращения страниц админки к её REST API (/api/v1/…) из браузера. */
+import { withBase } from './base-path';
+
+/** Обращения страниц админки к её REST API (/admin/api/v1/…) из браузера. */
 
 export class ApiError extends Error {
   constructor(
@@ -32,7 +34,7 @@ export async function api<T = unknown>(
   path: string,
   init: { method?: string; json?: unknown; body?: BodyInit; headers?: Record<string, string> } = {},
 ): Promise<T> {
-  const res = await fetch(`/api/v1/${path.replace(/^\/+/, '')}`, {
+  const res = await fetch(withBase(`/api/v1/${path.replace(/^\/+/, '')}`), {
     method: init.method ?? (init.json !== undefined || init.body ? 'POST' : 'GET'),
     headers: init.json !== undefined ? { 'content-type': 'application/json', ...init.headers } : init.headers,
     body: init.json !== undefined ? JSON.stringify(init.json) : init.body,
@@ -40,7 +42,7 @@ export async function api<T = unknown>(
   });
   const isJson = res.headers.get('content-type')?.includes('json');
   const data = isJson ? await res.json().catch(() => null) : await res.text();
-  if (res.status === 401 && typeof window !== 'undefined') window.location.assign('/login');
+  if (res.status === 401 && typeof window !== 'undefined') window.location.assign(withBase('/login'));
   if (!res.ok) throw new ApiError(res.status, data);
   return data as T;
 }

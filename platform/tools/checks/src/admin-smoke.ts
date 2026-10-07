@@ -1,17 +1,16 @@
 /**
- * Дымовая проверка админки в браузере: вход, все разделы, ошибки консоли,
- * скриншоты. Пароль — из ADMIN_SMOKE_PASSWORD (в репозиторий не пишется).
+ * Дымовая проверка админки в браузере: вход по секретной ссылке, все разделы,
+ * ошибки консоли, скриншоты. Пароль — из ADMIN_SMOKE_PASSWORD, токен ссылки
+ * входа — из platform/.env (в репозиторий не пишутся).
  *
  *   ADMIN_SMOKE_EMAIL=… ADMIN_SMOKE_PASSWORD=… npx tsx tools/checks/src/admin-smoke.ts [каталог-скриншотов]
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { ADMIN_BASE as base, adminLogin } from './admin-login.ts';
 import { chromiumPath } from './browser.ts';
 
-const base = process.env.ADMIN_BASE ?? 'http://127.0.0.1:3300';
-const email = process.env.ADMIN_SMOKE_EMAIL ?? '';
-const password = process.env.ADMIN_SMOKE_PASSWORD ?? '';
 const outDir = process.argv[2] ?? path.resolve('tools/checks/report/admin');
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -29,15 +28,16 @@ page.on('response', (r) => {
   if (r.status() >= 500) problems.push(`[${r.status()}] ${r.url()}`);
 });
 
-await page.goto(`${base}/login`, { waitUntil: 'networkidle' });
-await page.fill('input[name=email]', email);
-await page.fill('input[name=password]', password);
-await page.click('button[type=submit]');
-await page.waitForURL(`${base}/`, { timeout: 60_000 });
+// без пропуска админки «нет»: страница входа и главная — 404
+const closed = await Promise.all(['/login', ''].map(async (p) => (await fetch(`${base}${p}`, { redirect: 'manual' })).status));
+console.log(`без секретной ссылки: /admin/login → ${closed[0]}, /admin → ${closed[1]}`);
+if (closed.some((s) => s !== 404)) problems.push(`[вход] без секретной ссылки ответ не 404: ${closed.join(', ')}`);
+
+await adminLogin(page);
 
 for (const p of PAGES) {
   const t0 = Date.now();
-  await page.goto(`${base}${p}`, { waitUntil: 'networkidle', timeout: 120_000 });
+  await page.goto(`${base}${p === '/' ? '' : p}`, { waitUntil: 'networkidle', timeout: 120_000 });
   await page.waitForTimeout(500);
   const file = path.join(outDir, `${p === '/' ? 'dashboard' : p.slice(1).replace(/\//g, '_')}.png`);
   await page.screenshot({ path: file, fullPage: false });
@@ -46,7 +46,7 @@ for (const p of PAGES) {
 
 // карточка товара: первый товар подкатегории каталога, вкладка «Описание и характеристики»
 await page.goto(`${base}/catalog?c=drobemetnoe-oborudovanie&s=kranovogo-tipa`, { waitUntil: 'networkidle' });
-const first = page.locator('table a[href^="/catalog/products/"]').first();
+const first = page.locator('table a[href*="/catalog/products/"]').first();
 if (await first.count()) {
   await first.click();
   await page.waitForLoadState('networkidle');

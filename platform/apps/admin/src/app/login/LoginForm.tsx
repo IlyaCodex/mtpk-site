@@ -1,12 +1,16 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Button, Field } from '@/components/ui';
+import { BASE_PATH } from '@/lib/base-path';
 import { api } from '@/lib/client-api';
 
 export function LoginForm() {
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
+  // до загрузки скриптов кнопка неактивна: иначе форма ушла бы обычным запросом
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -15,7 +19,7 @@ export function LoginForm() {
     setError('');
     try {
       await api('auth/login', { json: { email: form.get('email'), password: form.get('password') } });
-      window.location.assign('/');
+      window.location.assign(BASE_PATH);
     } catch (err) {
       setError((err as Error).message);
       setPending(false);
@@ -23,7 +27,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form onSubmit={submit} method="post" className="space-y-4">
       <Field label="E-mail">
         <input name="email" type="email" autoComplete="username" required autoFocus className="field" />
       </Field>
@@ -35,7 +39,7 @@ export function LoginForm() {
           {error}
         </p>
       )}
-      <Button type="submit" variant="primary" className="w-full" disabled={pending}>
+      <Button type="submit" variant="primary" className="w-full" disabled={pending || !ready}>
         {pending ? 'Входим…' : 'Войти'}
       </Button>
     </form>
