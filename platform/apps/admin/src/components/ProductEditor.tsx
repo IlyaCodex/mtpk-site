@@ -198,7 +198,7 @@ export function ProductEditor({ initial, schemas, siteUrl, crumbs }: { initial: 
             {tab === 'sections' && (
               <>
                 <p className="mb-3 text-sm text-slate-500">
-                  Всё, что на странице ниже карточки товара: описание, формы заявки, преимущества, партнёры. Тексты, перенесённые со старого сайта, редактируются как HTML.
+                  Всё, что на странице ниже карточки товара: описание, формы заявки, преимущества, партнёры. В секциях со старого сайта тексты и картинки правятся во вкладке «Поля», вёрстка целиком — в «HTML».
                 </p>
                 <BlockList blocks={others} schemas={schemas} onChange={setOthers} />
               </>

@@ -21,7 +21,8 @@ const browser = await chromium.launch({ executablePath: chromiumPath(), headless
 const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
 const problems: string[] = [];
 page.on('console', (m) => {
-  if (m.type() === 'error') problems.push(`[console] ${page.url()} ${m.text().slice(0, 300)}`);
+  // предпросмотр в песочнице без скриптов — так задумано, не ошибка
+  if (m.type() === 'error' && !m.text().includes('about:srcdoc')) problems.push(`[console] ${page.url()} ${m.text().slice(0, 300)}`);
 });
 page.on('pageerror', (e) => problems.push(`[pageerror] ${page.url()} ${e.message.slice(0, 300)}`));
 page.on('response', (r) => {

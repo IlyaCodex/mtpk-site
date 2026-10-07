@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { defaultFor, ItemActions, move, ObjectFields, summarize, type JsonSchema } from './schema-form';
+import { HtmlFieldsEditor, sectionTitle } from './html-fields';
+import { defaultFor, ItemActions, move, ObjectFields, SchemaField, summarize, type JsonSchema } from './schema-form';
 import { Badge, Button, cx } from './ui';
 
 export type BlockData = { type: string; [key: string]: unknown };
@@ -42,13 +43,33 @@ function AddBlock({ schemas, onAdd }: { schemas: BlockSchemas; onAdd: (b: BlockD
   );
 }
 
-/** Подпись блока «HTML как есть»: класс или id внешнего элемента — чтобы различать секции. */
-function htmlCaption(html: string): string {
-  const open = html.match(/^\s*<([a-z0-9-]+)([^>]*)>/i);
-  if (!open) return '';
-  const cls = open[2].match(/class="([^"]+)"/)?.[1]?.split(/\s+/)[0];
-  const id = open[2].match(/id="([^"]+)"/)?.[1];
-  return `<${open[1]}${cls ? `.${cls}` : ''}${id ? `#${id}` : ''}>`;
+/**
+ * Секция, перенесённая со старого сайта: «Поля» — тексты, ссылки, картинки и
+ * списки (карточки, пункты) подписанными полями; «HTML» — разметка целиком.
+ */
+function HtmlSection({ block, schema, onChange }: { block: BlockData; schema: JsonSchema; onChange: (b: BlockData) => void }) {
+  const [mode, setMode] = useState<'fields' | 'html'>(() => (String(block.html ?? '').trimStart().startsWith('<script') ? 'html' : 'fields'));
+  return (
+    <div>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-xs text-slate-500">
+          {mode === 'fields' ? 'Тексты, ссылки и картинки секции. Вёрстка целиком — во вкладке HTML.' : 'Разметка секции целиком — для тонкой правки.'}
+        </p>
+        <div className="flex shrink-0 overflow-hidden rounded-md border border-slate-200 text-xs">
+          {(['fields', 'html'] as const).map((m) => (
+            <button key={m} type="button" onClick={() => setMode(m)} className={cx('px-3 py-1', mode === m ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-50')}>
+              {m === 'fields' ? 'Поля' : 'HTML'}
+            </button>
+          ))}
+        </div>
+      </div>
+      {mode === 'fields' ? (
+        <HtmlFieldsEditor html={String(block.html ?? '')} onChange={(html) => onChange({ ...block, html })} />
+      ) : (
+        <SchemaField schema={schema.properties!.html} root={schema} value={block.html} label="" onChange={(html) => onChange({ ...block, html: html as string })} />
+      )}
+    </div>
+  );
 }
 
 /**
@@ -67,7 +88,8 @@ export function BlockList({
   onChange: (blocks: BlockData[]) => void;
   depth?: number;
 }) {
-  const [open, setOpen] = useState<Set<number>>(new Set());
+  // единственную секцию (страницы запчастей) сразу открываем
+  const [open, setOpen] = useState<Set<number>>(() => new Set(blocks.length === 1 ? [0] : []));
   const toggle = (i: number) =>
     setOpen((s) => {
       const next = new Set(s);
@@ -84,7 +106,7 @@ export function BlockList({
         const isOpen = open.has(i);
         const caption =
           block.type === 'html'
-            ? htmlCaption(String(block.html ?? ''))
+            ? sectionTitle(String(block.html ?? ''))
             : block.type === 'container'
               ? `<${String(block.tag)}> · ${(block.children as BlockData[]).length} блоков`
               : summarize(block);
@@ -93,8 +115,8 @@ export function BlockList({
             <div className="flex items-center gap-3 px-4 py-2.5">
               <button type="button" onClick={() => toggle(i)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
                 <span className="w-4 text-xs text-slate-400">{isOpen ? '▾' : '▸'}</span>
-                <Badge tone={block.type === 'html' ? 'amber' : block.type === 'container' ? 'gray' : 'blue'}>
-                  {def?.label ?? (block.type === 'container' ? 'Контейнер' : block.type)}
+                <Badge tone={block.type === 'html' || block.type === 'container' ? 'gray' : 'blue'}>
+                  {block.type === 'html' ? 'Секция' : (def?.label ?? (block.type === 'container' ? 'Контейнер' : block.type))}
                 </Badge>
                 <span className="truncate text-sm text-slate-600">{caption}</span>
               </button>
@@ -140,13 +162,10 @@ export function BlockList({
                       />
                     </div>
                   </div>
+                ) : block.type === 'html' && def ? (
+                  <HtmlSection block={block} schema={def.schema} onChange={(b) => set(i, b)} />
                 ) : def ? (
                   <>
-                    {block.type === 'html' && (
-                      <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                        Секция перенесена со старого сайта как есть. Её можно править в HTML или заменить блоком с полями.
-                      </p>
-                    )}
                     {Object.keys(def.schema.properties ?? {}).filter((k) => k !== 'type').length ? (
                       <ObjectFields schema={def.schema} root={def.schema} value={block} onChange={(v) => set(i, v as BlockData)} skip={['type']} />
                     ) : (

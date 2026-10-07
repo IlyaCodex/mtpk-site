@@ -12,15 +12,17 @@ import { Button, cx } from './ui';
  */
 const ENTITIES: Record<string, string> = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', laquo: '«', raquo: '»', mdash: '—', ndash: '–', hellip: '…', times: '×' };
 
+const NBSP = String.fromCharCode(160);
+
 export const hasTags = (s: string) => /<[a-z/!][^>]*>/i.test(s);
 
 export function fromHtml(s: string): string {
-  if (hasTags(s)) return s;
+  if (hasTags(s)) return s.replace(/&nbsp;/g, NBSP);
   return s.replace(/&(#\d+|[a-z]+);/gi, (m, e: string) => (e.startsWith('#') ? String.fromCodePoint(Number(e.slice(1))) : (ENTITIES[e.toLowerCase()] ?? m)));
 }
 
 export function toHtml(s: string, wasHtml: boolean): string {
-  if (wasHtml && hasTags(s)) return s;
+  if (wasHtml && hasTags(s)) return s.split(NBSP).join('&nbsp;');
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/ /g, '&nbsp;');
 }
 
@@ -43,9 +45,9 @@ export function TextInput({
   const shown = fromHtml(raw);
   const set = (v: string) => onChange(toHtml(v, html));
   const field = multiline ? (
-    <textarea className={cx('field', html && 'font-mono text-xs', className)} rows={Math.min(8, Math.max(2, Math.ceil(shown.length / 80) + 1))} value={shown} placeholder={placeholder} onChange={(e) => set(e.target.value)} />
+    <textarea className={cx('field', className)} rows={Math.min(8, Math.max(2, Math.ceil(shown.length / 80) + 1))} value={shown} placeholder={placeholder} onChange={(e) => set(e.target.value)} />
   ) : (
-    <input className={cx('field', html && 'font-mono text-xs', className)} value={shown} placeholder={placeholder} onChange={(e) => set(e.target.value)} />
+    <input className={cx('field', className)} value={shown} placeholder={placeholder} onChange={(e) => set(e.target.value)} />
   );
   return html ? (
     <div>

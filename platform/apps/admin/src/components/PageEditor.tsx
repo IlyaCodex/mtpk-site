@@ -62,7 +62,7 @@ export function PageEditor({ initial, schemas, siteUrl, crumbs }: { initial: Edi
             <>
               <p className="mb-3 text-sm text-slate-500">
                 Страница собрана из секций сверху вниз. Откройте секцию, чтобы изменить её; порядок — стрелками.
-                {htmlBlocks > 0 && ' Секции, перенесённые со старого сайта, редактируются как HTML.'}
+                {htmlBlocks > 0 && ' В секциях со старого сайта тексты, ссылки и картинки правятся во вкладке «Поля», вёрстка целиком — в «HTML».'}
               </p>
               <EditorContext.Provider value={{ pagePath: page.path }}>
                 <BlockList blocks={page.blocks} schemas={schemas} onChange={(blocks) => update({ blocks })} />
