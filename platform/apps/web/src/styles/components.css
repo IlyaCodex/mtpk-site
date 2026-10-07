@@ -43,3 +43,8 @@
 .nf__text { margin: 14px auto 0; max-width: 44ch; font-size: var(--fs-lead, 18px); line-height: 1.5; color: var(--text-secondary); }
 .nf__actions { margin-top: clamp(24px, 4vw, 36px); display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-4, 16px); }
 .nf__actions .btn { cursor: pointer; }
+
+/* Секция, добавленная в админке («+ Вставить блок» → «HTML-секция»):
+   отступы сверху и снизу — как у секций сайта; --subtle — светлый фон */
+.cms-section { padding: var(--section-py-base, 96px) 0; }
+.cms-section--subtle { background: var(--surface-subtle); }
