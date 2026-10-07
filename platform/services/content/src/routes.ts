@@ -91,7 +91,7 @@ function blockStats(blocks: Block[]) {
 
 const listQuery = z.object({
   search: z.string().max(200).optional().describe('Поиск по адресу и заголовку'),
-  template: z.string().max(64).optional().describe('Тип страницы'),
+  template: z.string().max(1000).optional().describe('Тип страницы; несколько — через запятую'),
   kind: z.enum(['page', 'document']).optional(),
   status: z.enum(['published', 'draft']).optional(),
   offset: z.coerce.number().int().min(0).default(0),
@@ -161,7 +161,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
         ...(q.search
           ? { OR: [{ path: { contains: q.search, mode: 'insensitive' } }, { title: { contains: q.search, mode: 'insensitive' } }] }
           : {}),
-        ...(q.template ? { template: q.template } : {}),
+        ...(q.template ? { template: { in: q.template.split(',') } } : {}),
         ...(q.kind ? { kind: q.kind } : {}),
         ...(q.status ? { status: q.status } : {}),
       };
