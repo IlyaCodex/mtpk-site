@@ -133,3 +133,35 @@ export function lineage(node: TreeNode): TreeNode[] {
 
 /** Миниатюра картинки сайта (уменьшенная копия из медиасервиса). */
 export const thumbUrl = (src: string | null, w = 160) => (src && src.startsWith('/img/') ? `/media-files${src}${src.includes('?') ? '&' : '?'}w=${w}` : src);
+
+type CrumbBlock = { type: string; breadcrumbs?: { href?: string; label?: string }[]; html?: string };
+
+/**
+ * Хлебные крошки редактора: страницы каталога — «Каталог / категория /
+ * подкатегория» со ссылками на нужный уровень раздела «Каталог продукции»
+ * (берутся из крошек самой страницы), остальные — «Все страницы».
+ */
+export function editorCrumbs(path: string, blocks: CrumbBlock[]): { href: string; label: string }[] {
+  if (!path.startsWith('/products/')) return [{ href: '/pages', label: 'Все страницы' }];
+  let links: [string, string][] = [];
+  for (const b of blocks) {
+    if (b.breadcrumbs?.length) links = b.breadcrumbs.filter((c) => c.href && c.label).map((c) => [c.href!, c.label!]);
+    else if (b.type === 'html' && b.html?.includes('class="breadcrumbs"')) {
+      const box = b.html.match(/<div class="breadcrumbs">([\s\S]*?)<\/div>/)?.[1] ?? '';
+      links = [...box.matchAll(/<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map((m) => [m[1], m[2]]);
+    }
+    if (links.length) break;
+  }
+  const levels = links
+    .map(([href, label]) => [href.replace(/^https?:\/\/[^/]+/, ''), label.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim()] as const)
+    .filter(([href]) => href.startsWith('/products/') && href !== '/products/' && href !== path)
+    .slice(0, 3);
+  const keys = ['c', 's', 'g'];
+  return [
+    { href: '/catalog', label: 'Каталог' },
+    ...levels.map(([href, label], i) => {
+      const query = levels.slice(0, i + 1).map(([h], k) => `${keys[k]}=${h.split('/').filter(Boolean).pop()}`);
+      return { href: `/catalog?${query.join('&')}`, label: label || href };
+    }),
+  ];
+}

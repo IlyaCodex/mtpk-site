@@ -1,9 +1,10 @@
 /**
  * Скриншоты страниц админки для проверки вёрстки: вход и снимок каждого
- * адреса (экран 1600×1000, по желанию — во всю длину). Ошибки консоли и
- * ответы 5xx печатаются. Пароль — из ADMIN_SMOKE_PASSWORD.
+ * адреса (экран 1600×1000, по желанию — во всю длину). «Адрес@Текст» —
+ * перед снимком нажать кнопку с этим текстом (вкладку редактора и т. п.).
+ * Ошибки консоли и ответы 5xx печатаются. Пароль — из ADMIN_SMOKE_PASSWORD.
  *
- *   ADMIN_SMOKE_EMAIL=… ADMIN_SMOKE_PASSWORD=… npx tsx tools/parity/src/admin-shot.ts <каталог> /catalog "/catalog?c=…" [--full]
+ *   ADMIN_SMOKE_EMAIL=… ADMIN_SMOKE_PASSWORD=… npx tsx tools/parity/src/admin-shot.ts <каталог> /catalog "/pages/65@Характеристики" [--full]
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,11 +34,13 @@ await page.fill('input[name=password]', process.env.ADMIN_SMOKE_PASSWORD ?? '');
 await page.click('button[type=submit]');
 await page.waitForURL(`${base}/`, { timeout: 60_000 });
 
-for (const [i, p] of paths.entries()) {
+for (const [i, target] of paths.entries()) {
   const t0 = Date.now();
+  const [p, click] = target.split('@');
   await page.goto(`${base}${p}`, { waitUntil: 'networkidle', timeout: 120_000 });
-  await page.waitForTimeout(800);
-  const name = `${String(i + 1).padStart(2, '0')}-${p.replace(/^\//, '').replace(/[^a-zA-Zа-яА-Я0-9-]+/g, '_').slice(0, 60) || 'dashboard'}.png`;
+  if (click) await page.getByRole('button', { name: click }).first().click();
+  await page.waitForTimeout(click ? 2500 : 800);
+  const name = `${String(i + 1).padStart(2, '0')}-${target.replace(/^\//, '').replace(/[^a-zA-Zа-яА-Я0-9-]+/g, '_').slice(0, 60) || 'dashboard'}.png`;
   await page.screenshot({ path: path.join(outDir, name), fullPage: full });
   console.log(`${name}  ${Date.now() - t0} мс  ${await page.title()}`);
 }

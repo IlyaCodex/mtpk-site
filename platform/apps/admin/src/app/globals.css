@@ -37,3 +37,35 @@
 @utility field {
   @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs transition outline-none placeholder:text-slate-400 focus:border-brand-500 focus:ring-3 focus:ring-brand-100 disabled:bg-slate-100;
 }
+
+/* Визуальный редактор текста (характеристики, описания): абзацы, списки, ссылки — как в тексте сайта */
+.rte p {
+  margin: 0 0 0.6em;
+}
+.rte ul,
+.rte ol {
+  margin: 0 0 0.6em;
+  padding-left: 1.4em;
+}
+.rte ul {
+  list-style: disc;
+}
+.rte ol {
+  list-style: decimal;
+}
+.rte h3,
+.rte h4 {
+  margin: 0.8em 0 0.4em;
+  font-weight: 600;
+}
+.rte a {
+  color: var(--color-brand-600);
+  text-decoration: underline;
+}
+.rte b,
+.rte strong {
+  font-weight: 600;
+}
+.rte > :last-child {
+  margin-bottom: 0;
+}

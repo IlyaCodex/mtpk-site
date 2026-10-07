@@ -50,7 +50,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
         title="Каталог продукции"
         description="Категории, подкатегории и товары сайта. Откройте товар, чтобы изменить название, фото, параметры и описание."
         actions={
-          <LinkButton href={`/pages/${root.id}`} variant="secondary">
+          <LinkButton href={`/catalog/${root.id}`} variant="secondary">
             Страница «Каталог»
           </LinkButton>
         }
@@ -122,7 +122,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
                 <div className="truncate text-xs text-slate-500">{current.name}</div>
               </div>
               <div className="flex gap-2">
-                <LinkButton size="sm" href={`/pages/${current.id}`}>
+                <LinkButton size="sm" href={`/catalog/${current.id}`}>
                   Изменить страницу {group ? 'группы' : subcategory ? 'подкатегории' : 'категории'}
                 </LinkButton>
                 <a href={`${site}${current.path}`} target="_blank" rel="noopener" className="self-center text-xs text-brand-600 hover:underline">
@@ -160,7 +160,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
               <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-xs">
                 {infoPages.map((n) => (
                   <li key={n.id} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm">
-                    <Link href={`/pages/${n.id}`} className="truncate font-medium text-slate-800 hover:text-brand-600">
+                    <Link href={`/catalog/${n.id}`} className="truncate font-medium text-slate-800 hover:text-brand-600">
                       {n.short}
                     </Link>
                     <a href={`${site}${n.path}`} target="_blank" rel="noopener" className="shrink-0 text-xs text-brand-600 hover:underline">
@@ -209,7 +209,7 @@ function ProductTable({ products, scope, site }: { products: TreeNode[]; scope: 
                   </div>
                 </td>
                 <td className="max-w-xl px-4 py-2">
-                  <Link href={`/pages/${p.id}`} className="block font-medium text-slate-900 hover:text-brand-600">
+                  <Link href={`/catalog/${p.id}`} className="block font-medium text-slate-900 hover:text-brand-600">
                     {p.short !== p.name && p.short.length < 40 ? p.short : p.name}
                   </Link>
                   {p.short !== p.name && p.short.length < 40 && <span className="block truncate text-xs text-slate-500">{p.name}</span>}
@@ -220,7 +220,7 @@ function ProductTable({ products, scope, site }: { products: TreeNode[]; scope: 
                 </td>
                 <td className="px-4 py-2 text-xs whitespace-nowrap text-slate-500">{formatDate(p.updatedAt)}</td>
                 <td className="px-4 py-2 text-right whitespace-nowrap">
-                  <LinkButton size="sm" href={`/pages/${p.id}`}>
+                  <LinkButton size="sm" href={`/catalog/${p.id}`}>
                     Изменить
                   </LinkButton>
                   <a href={`${site}${p.path}`} target="_blank" rel="noopener" className="ml-3 text-xs text-brand-600 hover:underline" title="Открыть на сайте">

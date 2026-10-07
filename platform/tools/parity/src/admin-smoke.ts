@@ -15,7 +15,7 @@ const password = process.env.ADMIN_SMOKE_PASSWORD ?? '';
 const outDir = process.argv[2] ?? path.resolve('tools/parity/report/admin');
 fs.mkdirSync(outDir, { recursive: true });
 
-const PAGES = ['/', '/pages', '/settings', '/media', '/redirects', '/stock', '/leads', '/users', '/audit', '/api-docs'];
+const PAGES = ['/', '/catalog', '/pages', '/settings', '/media', '/redirects', '/stock', '/leads', '/users', '/audit', '/api-docs'];
 
 const browser = await chromium.launch({ executablePath: chromiumPath(), headless: true });
 const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
@@ -43,13 +43,13 @@ for (const p of PAGES) {
   console.log(`${p.padEnd(12)} ${Date.now() - t0} мс  ${await page.title()}`);
 }
 
-// редактор страницы: первая страница типа product, раскрыть первый блок
-await page.goto(`${base}/pages?template=product`, { waitUntil: 'networkidle' });
-const first = page.locator('table a[href^="/pages/"]').first();
+// карточка товара: первый товар раздела каталога, вкладка «Характеристики»
+await page.goto(`${base}/catalog?c=drobemetnoe-oborudovanie`, { waitUntil: 'networkidle' });
+const first = page.locator('table a[href^="/catalog/"]').first();
 if (await first.count()) {
   await first.click();
   await page.waitForLoadState('networkidle');
-  await page.locator('button:has-text("Карточка товара")').first().click();
+  await page.getByRole('button', { name: /^Характеристики/ }).click();
   await page.waitForTimeout(2500);
   await page.screenshot({ path: path.join(outDir, 'editor.png') });
   console.log(`редактор: ${page.url()}`);
