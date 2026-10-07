@@ -1,6 +1,6 @@
 /* B-3 шаблон «tovar-a» — 125 страниц. Правка здесь = правка всех.
    Разделы: stalerozlivochnye-kovshi (42), drobemetnoe-oborudovanie (40), sistemy-ohlazhdeniya (35), vakuumnoe-oborudovanie-dlya-termoobrabotki (8).
-   Грузится <link>'ом в <head> ПОСЛЕ site.css (та же позиция, что был inline-блоб). */
+   Грузится <link>'ом в <head> ПОСЛЕ site.css. */
 @media (max-width: 768px) {
   .container { padding: 0 var(--sp-5); }
 }

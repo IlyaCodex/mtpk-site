@@ -62,7 +62,7 @@ async function loadCatalog(): Promise<void> {
     if (rows.length) {
       catalog = new Map(rows.map((r) => [r.key, r.etag]));
     } else {
-      // таблица пуста (файлы залиты не импортёром) — читаем список прямо из бакета
+      // таблица пуста (файлы залиты в бакет напрямую) — читаем список прямо из бакета
       const keys = new Map<string, string>();
       for await (const o of listObjects(s3, bucket)) keys.set(o.key, o.etag);
       catalog = keys;

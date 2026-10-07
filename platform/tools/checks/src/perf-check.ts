@@ -1,27 +1,28 @@
 /**
- * Вес и скорость страниц: старый сайт (astro/dist) против нового.
- * По каждой странице — байты по типам (текст — после gzip, одинаково для обоих
- * серверов; картинки и шрифты — как есть), число запросов, LCP и «блокирующее
+ * Вес и скорость страниц. По каждой странице — байты по типам (текст — после
+ * gzip; картинки и шрифты — как есть), число запросов, LCP и «блокирующее
  * время» (сумма длинных задач сверх 50 мс) при эмуляции телефона:
  * процессор ×4, сеть ≈ Slow 4G. Сторонние скрипты (Метрика, коллтрекинг) не грузятся.
+ * --save — запомнить цифры как эталон; обычный запуск показывает «эталон → сейчас».
  *
- *   npx tsx tools/parity/src/perf-check.ts [--only=/,/products/] [--new=http://127.0.0.1:3200] [--no-old]
+ *   npx tsx tools/checks/src/perf-check.ts [--save] [--only=/,/products/] [--site=http://127.0.0.1:3200]
  */
+import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { chromium, type Browser } from 'playwright';
-import { serveDist } from './static-server.ts';
-import { chromiumPath } from './visual-check.ts';
+import { chromiumPath } from './browser.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const DIST = path.resolve(here, '../../../../astro/dist');
-const args = new Map(process.argv.slice(2).map((a) => {
-  const [k, v] = a.replace(/^--/, '').split('=');
-  return [k, v ?? 'true'] as const;
-}));
-const NEW = args.get('new') ?? 'http://127.0.0.1:3200';
-const OLD = 'http://127.0.0.1:4400';
+const BASELINE = path.resolve(here, '../baseline/perf.json');
+const args = new Map(
+  process.argv.slice(2).map((a) => {
+    const [k, v] = a.replace(/^--/, '').split('=');
+    return [k, v ?? 'true'] as const;
+  }),
+);
+const SITE = args.get('site') ?? 'http://127.0.0.1:3200';
 const PAGES = args.get('only')?.split(',') ?? [
   '/',
   '/products/',
@@ -114,15 +115,22 @@ const kb = (n: number) => `${(n / 1024).toFixed(0)}`.padStart(5);
 const row = (m: Metrics) =>
   `html ${kb(m.bytes.html)} · js ${kb(m.bytes.js)} · css ${kb(m.bytes.css)} · font ${kb(m.bytes.font)} · img ${kb(m.bytes.img)} КБ · ${String(m.requests).padStart(3)} запр. · LCP ${String(m.lcp).padStart(5)} мс · TBT ${String(m.tbt).padStart(4)} мс`;
 
-const server = args.get('no-old') ? null : await serveDist(DIST, 4400);
+const base: Record<string, Metrics> = fs.existsSync(BASELINE) ? JSON.parse(fs.readFileSync(BASELINE, 'utf8')) : {};
+const saved: Record<string, Metrics> = { ...base };
 const browser = await chromium.launch({ executablePath: chromiumPath(), headless: true });
 try {
   for (const p of PAGES) {
+    const m = await measure(browser, SITE, p);
     console.log(p);
-    if (server) console.log(`  было:  ${row(await measure(browser, OLD, p))}`);
-    console.log(`  стало: ${row(await measure(browser, NEW, p))}`);
+    if (base[p] && !args.has('save')) console.log(`  эталон: ${row(base[p])}`);
+    console.log(`  сейчас: ${row(m)}`);
+    saved[p] = m;
   }
 } finally {
   await browser.close();
-  server?.close();
+}
+if (args.has('save')) {
+  fs.mkdirSync(path.dirname(BASELINE), { recursive: true });
+  fs.writeFileSync(BASELINE, JSON.stringify(saved, null, 2));
+  console.log(`эталон сохранён: ${BASELINE}`);
 }

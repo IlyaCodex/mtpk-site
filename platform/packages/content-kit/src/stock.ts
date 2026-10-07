@@ -1,7 +1,7 @@
 /**
- * «Наличие на складе» — перенос astro/scripts/build-stock.mjs. Формат
- * результата 1:1 со старым public/data/stock.json: его читают
- * stock-list.js, stock-badges.js и stock-product.js без изменений.
+ * «Наличие на складе»: позиции склада с карточками товаров. Формат
+ * /data/stock.json — его читают stock-list.js, stock-badges.js и
+ * stock-product.js.
  */
 
 export interface StockConfigItem {

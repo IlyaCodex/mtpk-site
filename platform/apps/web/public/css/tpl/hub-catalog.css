@@ -1,6 +1,6 @@
 /* B-3 шаблон «hub-catalog» — 5 страниц. Правка здесь = правка всех.
    Разделы: drobemetnoe-oborudovanie (1), mufelnye-termicheskie-pechi (1), stalerozlivochnye-kovshi (1), vakuumnoe-oborudovanie-dlya-termoobrabotki (1), zapchasti-na-indukcionnoe-oborudovanie (1).
-   Грузится <link>'ом в <head> ПОСЛЕ site.css (та же позиция, что был inline-блоб). */
+   Грузится <link>'ом в <head> ПОСЛЕ site.css. */
 @media (max-width: 768px) {
   .container { padding: 0 var(--sp-5); }
 }

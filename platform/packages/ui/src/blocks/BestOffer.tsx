@@ -1,8 +1,7 @@
 import { FileField, FormStatus, LeadForm, PhoneInput, SubmitButton } from "../forms/LeadForm.tsx";
 import { ARROW } from "../forms/constants.ts";
-// Блок «Лучшее коммерческое предложение» (маркер best-offer) — короткая форма заявки, из BestOffer.astro.
-// Разметка сгенерирована из итогового HTML Astro-сборки (tools/codegen) и совпадает
-// с ней до пробела: пробелы между тегами влияют на отрисовку inline-элементов.
+// Блок «Лучшее коммерческое предложение» (маркер best-offer) — короткая форма заявки.
+// Разметка совпадает с прежней вёрсткой сайта до пробела: пробелы между тегами влияют на отрисовку inline-элементов.
 // anchorId — якорь секции: leadgen, если отдельного блока заявки на странице нет (на него ведут
 // кнопки «Обсудить задачу»), иначе best-offer — чтобы не было двух id=leadgen.
 export function BestOffer({ anchorId = 'leadgen' }: { anchorId?: string }) {

@@ -4,12 +4,12 @@
  * перед снимком нажать кнопку с этим текстом (вкладку редактора и т. п.).
  * Ошибки консоли и ответы 5xx печатаются. Пароль — из ADMIN_SMOKE_PASSWORD.
  *
- *   ADMIN_SMOKE_EMAIL=… ADMIN_SMOKE_PASSWORD=… npx tsx tools/parity/src/admin-shot.ts <каталог> /catalog "/pages/65@Характеристики" [--full]
+ *   ADMIN_SMOKE_EMAIL=… ADMIN_SMOKE_PASSWORD=… npx tsx tools/checks/src/admin-shot.ts <каталог> /catalog "/pages/65@Характеристики" [--full]
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { chromiumPath } from './visual-check.ts';
+import { chromiumPath } from './browser.ts';
 
 const base = process.env.ADMIN_BASE ?? 'http://127.0.0.1:3300';
 const args = process.argv.slice(2);

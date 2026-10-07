@@ -12,7 +12,7 @@ Allow: /
 # попадает в индекс десятком копий с разными utm (аудит 01.10.2026, P2-2).
 Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&fbclid&roistat
 
-# Карту генерирует сборка (@astrojs/sitemap): sitemap-index.xml → sitemap-0.xml.
+# Карта сайта (строит сайт из списка страниц): sitemap-index.xml → sitemap-0.xml.
 # Отдельной копии по адресу /sitemap.xml больше нет — nginx отдаёт на ней 301
 # на индекс, чтобы одни и те же адреса не публиковались двумя файлами.
 Sitemap: https://uralinduktor.ru/sitemap-index.xml

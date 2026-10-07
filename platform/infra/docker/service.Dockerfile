@@ -25,8 +25,7 @@ COPY services/search/package.json services/search/
 COPY services/leads/package.json services/leads/
 COPY apps/web/package.json apps/web/
 COPY apps/admin/package.json apps/admin/
-COPY tools/importer/package.json tools/importer/
-COPY tools/parity/package.json tools/parity/
+COPY tools/checks/package.json tools/checks/
 
 # --- все зависимости + бандлы -------------------------------------------------
 FROM manifests AS build
@@ -34,7 +33,6 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 RUN --mount=type=cache,target=/root/.npm npm ci --ignore-scripts
 COPY packages packages
 COPY services services
-COPY tools/importer tools/importer
 COPY scripts scripts
 COPY tsconfig.base.json tsconfig.json ./
 # Prisma Client генерируется из схемы и вшивается в бандл (рантайм — @prisma/client)

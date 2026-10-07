@@ -13,7 +13,7 @@ export const config = { unstable_runtimeJS: false };
 
 type Props = DocumentProps & { settings: SiteSettings };
 
-// Каркас страницы 404 — стили главной (как в 404.astro), без её LCP-картинки и разметки.
+// Каркас страницы 404 — стили главной, без её LCP-картинки и разметки.
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const [home, settings] = await Promise.all([getPage('/').catch(() => null), getSettings()]);
   return {

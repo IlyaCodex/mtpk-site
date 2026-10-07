@@ -1,6 +1,6 @@
 /**
- * Базовые операции над HTML страниц. Перенесено из Astro-сборки
- * (strip-html-comments.mjs, [...slug].astro) без изменения поведения.
+ * Базовые операции над HTML страниц: комментарии, маркеры общих секций,
+ * сущности.
  */
 
 const PROTECT_RE = /<(script|style|pre|textarea)\b[^>]*>[\s\S]*?<\/\1>/gi;
@@ -29,7 +29,7 @@ export function stripHtmlComments(html: string, opts: { keepBlockMarkers?: boole
 
 export type Segment = { type: 'html'; content: string } | { type: 'block'; name: string };
 
-/** Делит тело страницы по маркерам <!--C:имя--> (как [...slug].astro). */
+/** Делит тело страницы по маркерам общих секций <!--C:имя-->. */
 export function splitSegments(body: string): Segment[] {
   const parts = body.split(/<!--C:([a-z0-9-]+)-->/);
   const segments: Segment[] = [];
@@ -53,7 +53,7 @@ const ENTITY_MAP: Record<string, string> = {
   '&raquo;': '»', '&amp;': '&', '&quot;': '"', '&#8209;': '\u2011', '&deg;': '°',
 };
 
-/** Декодер сущностей для JSON-LD (тот же набор, что в [...slug].astro). */
+/** Декодер сущностей для JSON-LD. */
 export function decodeEntities(s: string): string {
   return s.replace(/&[a-z]+;|&#\d+;/gi, (m) => ENTITY_MAP[m] ?? m).replace(/\s+/g, ' ').trim();
 }

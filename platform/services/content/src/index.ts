@@ -55,8 +55,8 @@ await startService({
   },
 });
 
-// Массовый импорт (событие content.reindex) — сбрасываем весь кеш, даже если
-// импортёр не достучался до HTTP-эндпоинта.
+// Массовое изменение контента (событие content.reindex) — сбрасываем весь кеш, даже если
+// отправитель не достучался до HTTP-эндпоинта.
 const consumer = createRedis(env.REDIS_URL);
 void consumeEvents({
   redis: consumer,

@@ -1,6 +1,6 @@
 /**
- * Производные свойства страницы, которые Astro-сборка вычисляла на лету:
- * картинка для поиска, индексируемость, вес, тип шаблона, раздел меню.
+ * Производные свойства страницы: картинка для поиска, индексируемость, вес,
+ * тип шаблона, раздел меню.
  */
 
 /** Нормализованный путь: '/', '/products/', '/products/x/y/' */
@@ -28,7 +28,7 @@ export function pickSearchImage(body: string, preloadImage: string | null | unde
   return raw || null;
 }
 
-/** Правила Pagefind из [...slug].astro: проекты и служебные страницы не ищутся. */
+/** Что попадает в поиск по сайту: проекты и служебные страницы не ищутся. */
 export function isSearchable(path: string): boolean {
   const slug = pathToSlug(path);
   if (slug.startsWith('proekty')) return false;
@@ -42,7 +42,7 @@ export function searchWeight(path: string, body: string): number {
   return slug.startsWith('products') && body.includes('class="cat-hero"') ? 10 : 1;
 }
 
-/** Пункт главного меню, подсвечиваемый на странице (как activeNav в Astro). */
+/** Пункт главного меню, подсвечиваемый на странице. */
 export function activeNavFor(path: string): string | undefined {
   const slug = pathToSlug(path);
   if (slug === '') return 'home';
@@ -95,7 +95,7 @@ export function detectTemplate(path: string, body: string): string {
   return 'page';
 }
 
-/** Приоритет и частота обновления в sitemap — правила из astro.config.mjs. */
+/** Приоритет и частота обновления в sitemap — по типу страницы. */
 export function sitemapRules(path: string): { priority: number; changefreq: string } {
   if (path === '/' || path === '') return { priority: 1.0, changefreq: 'weekly' };
   if (
@@ -113,7 +113,7 @@ export function sitemapRules(path: string): { priority: number; changefreq: stri
   return { priority: 0.6, changefreq: 'monthly' };
 }
 
-/** Страницы вне sitemap (служебные + noindex) — фильтр из astro.config.mjs. */
+/** Страницы вне sitemap: служебные и закрытые от поисковиков (noindex). */
 export function inSitemap(path: string): boolean {
   if (path.includes('/404')) return false;
   if (path.includes('/sravnenie')) return false;

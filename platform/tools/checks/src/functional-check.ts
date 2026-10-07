@@ -3,10 +3,10 @@
  * галерея товара, просмотр фото, фильтр каталога, сравнение, «Запросить цену»,
  * согласие на cookie, отправка заявки.
  *
- *   npx tsx tools/parity/src/functional-check.ts [--base=http://127.0.0.1:3200] [--no-submit]
+ *   npx tsx tools/checks/src/functional-check.ts [--base=http://127.0.0.1:3200] [--no-submit]
  */
 import { chromium, type Page } from 'playwright';
-import { chromiumPath } from './visual-check.ts';
+import { chromiumPath } from './browser.ts';
 
 const args = new Map(process.argv.slice(2).map((a) => {
   const [k, v] = a.replace(/^--/, '').split('=');

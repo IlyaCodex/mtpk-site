@@ -2,17 +2,17 @@
  * Дымовая проверка админки в браузере: вход, все разделы, ошибки консоли,
  * скриншоты. Пароль — из ADMIN_SMOKE_PASSWORD (в репозиторий не пишется).
  *
- *   ADMIN_SMOKE_EMAIL=… ADMIN_SMOKE_PASSWORD=… npx tsx tools/parity/src/admin-smoke.ts [каталог-скриншотов]
+ *   ADMIN_SMOKE_EMAIL=… ADMIN_SMOKE_PASSWORD=… npx tsx tools/checks/src/admin-smoke.ts [каталог-скриншотов]
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { chromiumPath } from './visual-check.ts';
+import { chromiumPath } from './browser.ts';
 
 const base = process.env.ADMIN_BASE ?? 'http://127.0.0.1:3300';
 const email = process.env.ADMIN_SMOKE_EMAIL ?? '';
 const password = process.env.ADMIN_SMOKE_PASSWORD ?? '';
-const outDir = process.argv[2] ?? path.resolve('tools/parity/report/admin');
+const outDir = process.argv[2] ?? path.resolve('tools/checks/report/admin');
 fs.mkdirSync(outDir, { recursive: true });
 
 const PAGES = ['/', '/catalog', '/pages', '/settings', '/media', '/redirects', '/stock', '/leads', '/users', '/audit'];

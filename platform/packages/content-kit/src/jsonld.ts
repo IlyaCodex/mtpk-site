@@ -1,6 +1,5 @@
 /**
- * JSON-LD разметка страниц — перенос из astro/src/pages/[...slug].astro 1:1
- * (аудиты 01–02.10.2026: P0-2, R1, R5). Источник данных — видимый HTML
+ * JSON-LD разметка страниц (аудиты 01–02.10.2026: P0-2, R1, R5). Источник данных — видимый HTML
  * страницы, поэтому разметка не расходится с текстом.
  */
 import { decodeEntities } from './html.ts';
@@ -270,7 +269,7 @@ export function buildFaqSchema(html: string): string | null {
   });
 }
 
-/** Все JSON-LD страницы в порядке вывода Astro: Breadcrumb, FAQ, Product, Article. */
+/** Все JSON-LD страницы в порядке вывода: Breadcrumb, FAQ, Product, Article. */
 export function buildPageJsonLd(
   body: string,
   page: { path: string; title: string; description: string | null; publishedAt?: string | null; modifiedAt?: string | null },

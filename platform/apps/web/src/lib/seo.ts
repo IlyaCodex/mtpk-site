@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import type { PageDto } from '@mtpk/shared/contracts';
 import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE } from './site';
 
-/** JSON-LD Organization — единое описание компании (SEO-T3, перенос из BaseLayout.astro). */
+/** JSON-LD Organization — единое описание компании (SEO-T3). */
 export const ORGANIZATION_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'Organization',

@@ -40,7 +40,7 @@ model Page {
   styleHashes  String[]  @default([]) @map("style_hashes")
   preloadImage String?   @map("preload_image")
   noindex      Boolean   @default(false)
-  /// прочие поля meta.json исходной страницы (сохранены, чтобы ничего не потерять)
+  /// служебные отметки: source — откуда страница (import, admin, catalog), pagefindBody — у документов: что индексировать в поиске
   extraMeta    Json      @default("{}") @map("extra_meta")
   /// первая публикация — datePublished в JSON-LD
   publishedAt  DateTime? @map("published_at") @db.Timestamptz(6)

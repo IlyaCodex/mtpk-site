@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
   // индикатор Next.js Dev Tools в углу экрана — мешает попиксельной сверке со старым сайтом
   devIndicators: false,
   reactStrictMode: true,
-  // Адреса сайта — со слешем на конце (как в Astro). Редирект /foo → /foo/
+  // Адреса сайта — со слешем на конце (так они в поиске). Редирект /foo → /foo/
   // делает src/proxy.ts кодом 301, как nginx (у Next по умолчанию 308).
   trailingSlash: true,
   skipTrailingSlashRedirect: true,

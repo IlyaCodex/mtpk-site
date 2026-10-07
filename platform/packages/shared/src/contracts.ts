@@ -28,8 +28,8 @@ export interface PageDto {
   jsonLd: string[];
   /**
    * Клиентские скрипты для блоков «HTML как есть» (галерея, фильтр, проекты…)
-   * — правила PAGE_SCRIPTS из Astro-сборки. У типизированных блоков поведение
-   * встроено в React-компоненты.
+   * — см. content-kit/features. У типизированных блоков поведение встроено в
+   * React-компоненты.
    */
   features: string[];
   searchable: boolean;

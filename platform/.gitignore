@@ -8,7 +8,8 @@ next-env.d.ts
 .env.local
 # служебные каталоги инструментов (локальные отчёты сверки, временные файлы)
 .cache/
-tools/parity/report/
+tools/checks/report/
+tools/checks/baseline/
 apps/web/public/assets/
 
 # Prisma Client — генерируется из packages/db/prisma/schema.prisma (npm install / npm run db:generate)

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Сборка сервисов и инструментов в бандлы для продакшна (esbuild):
+ * Сборка сервисов в бандлы для продакшна (esbuild):
  * код монорепо (@mtpk/*, TypeScript/TSX) вшивается в бандл, сторонние пакеты
  * остаются внешними — в Docker-образе их ставит `npm ci --omit=dev`.
  *
@@ -19,7 +19,6 @@ const TARGETS = {
   media: { dir: 'services/media', entries: ['src/index.ts'] },
   search: { dir: 'services/search', entries: ['src/index.ts'] },
   leads: { dir: 'services/leads', entries: ['src/index.ts', 'src/worker.ts'] },
-  importer: { dir: 'tools/importer', entries: ['src/index.ts'] },
 };
 
 /** Пакеты монорепо — в бандл; всё остальное (node_modules) — внешнее. */

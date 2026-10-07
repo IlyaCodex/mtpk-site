@@ -9,9 +9,9 @@ const URLSET_OPEN =
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /**
- * Карта сайта в формате @astrojs/sitemap: те же адреса, lastmod из истории
+ * Карта сайта: индекс sitemap-index.xml и один файл sitemap-0.xml, lastmod из истории
  * правок (SEO-T6), priority/changefreq по типу страницы, без служебных и noindex.
- * Статьи Практикума — в конце, как customPages в astro.config.mjs.
+ * Статьи Практикума — в конце списка.
  */
 export async function buildSitemap(): Promise<string> {
   const all = await listPages();

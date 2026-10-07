@@ -1,7 +1,7 @@
 // Отладка страницы в браузере: ошибки консоли, гидратация, форматы картинок.
-// MSYS_NO_PATHCONV=1 npx tsx tools/parity/src/debug-browser.ts /путь/ [base]
+// MSYS_NO_PATHCONV=1 npx tsx tools/checks/src/debug-browser.ts /путь/ [base]
 import { chromium } from 'playwright';
-import { chromiumPath } from './visual-check.ts';
+import { chromiumPath } from './browser.ts';
 
 const p = process.argv[2] ?? '/';
 const base = process.argv[3] ?? 'http://127.0.0.1:3200';

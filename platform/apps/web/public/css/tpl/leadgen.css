@@ -2,8 +2,8 @@
    Базовые .leadgen__intro/__eyebrow/__title и .form__field/__row/__submit
    лежат в site.css; здесь — остальное (фон секции, чек-лист, светлая карточка
    формы). Вариант «как на главной/legal» (светлая форма). Грузится <link>'ом
-   после site.css. Подключать на hand-made raw-pages, где блок C:leadgen
-   используется без своего inline-блоба (например /spasibo/). */
+   после site.css. Подключать на страницах, где блок заявки используется
+   без своих стилей (например /spasibo/). */
 .leadgen { background: var(--surface-subtle, #F5F7F8); padding: var(--sp-32) 0; border-bottom: 1px solid var(--border-subtle); position: relative; overflow: hidden; }
 .leadgen::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 96px; background: var(--teal-600); z-index: 2; }
 .leadgen::after { content: ""; position: absolute; inset: 0; background-image:

@@ -1,8 +1,8 @@
 /* tpl «cases» — стили блока «Реализованные проекты» (интерактивные вкладки +
    карточка-кейс, данные из /js/cases-data.js). Тот же блок, что на главной и
    /proekty/. Секционные классы .s-head/.s-title/.s-eyebrow/.s-lead — глобальны
-   (site.css). Грузится <link>'ом после site.css. Подключать на hand-made
-   raw-pages, где блок .cases используется без своего inline-блоба. */
+   (site.css). Грузится <link>'ом после site.css. Подключать на страницах, где блок
+   .cases используется без своих стилей. */
 .cases { background: var(--neutral-0); padding: var(--section-py-base) 0 var(--sp-12); }
 .cases__head { text-align: center; max-width: 800px; margin: 0 auto var(--sp-10); }
 .cases-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-2); margin: 0 auto var(--sp-12); max-width: 1080px; }

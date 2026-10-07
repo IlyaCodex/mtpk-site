@@ -1,6 +1,5 @@
 /**
- * Индекс «Сравнения товаров» — перенос astro/scripts/build-compare-index.mjs.
- * Результат 1:1: compare-index.json (грузит /sravnenie/) и
+ * Индекс «Сравнения товаров» по характеристикам в карточках товаров: compare-index.json (грузит /sravnenie/) и
  * compare-sections.json (список разделов с включённым сравнением).
  */
 
@@ -69,10 +68,13 @@ function specs(html: string): [string, string][] {
   return out;
 }
 
-/** Сравнение путей в порядке обхода дерева raw-pages (папки и body.html вперемешку по алфавиту). */
+/** Страница раздела сортируется среди подразделов под этим ключом (по алфавиту) — порядок индекса постоянный. */
+const OWN_PAGE = 'body.html';
+
+/** Сравнение путей в порядке обхода дерева страниц: подразделы и страница раздела вперемешку по алфавиту. */
 export function compareWalkOrder(a: string, b: string): number {
-  const sa = [...a.split('/').filter(Boolean), 'body.html'];
-  const sb = [...b.split('/').filter(Boolean), 'body.html'];
+  const sa = [...a.split('/').filter(Boolean), OWN_PAGE];
+  const sb = [...b.split('/').filter(Boolean), OWN_PAGE];
   const n = Math.min(sa.length, sb.length);
   for (let i = 0; i < n; i++) {
     if (sa[i] !== sb[i]) return sa[i] < sb[i] ? -1 : 1;
@@ -114,10 +116,10 @@ export function buildCompareIndex(
   const sections = new Map<string, { title: string; parent: string; items: CompareItem[] }>();
   let scanned = 0;
 
-  // Порядок обхода — как рекурсивный readdirSync в Astro-скрипте: внутри папки
-  // записи по алфавиту, и собственный body.html раздела стоит среди подпапок
+  // Порядок обхода — по адресам, как в файловом дереве страниц: внутри раздела
+  // записи по алфавиту, и страница самого раздела стоит среди подразделов
   // на своём алфавитном месте. От порядка зависит очерёдность параметров
-  // с одинаковой частотой, поэтому воспроизводим его точно.
+  // с одинаковой частотой, поэтому он постоянный.
   const sorted = pages.filter((p) => p.path.startsWith('/products/')).sort((a, b) => compareWalkOrder(a.path, b.path));
   for (const page of sorted) {
     const html = page.body;

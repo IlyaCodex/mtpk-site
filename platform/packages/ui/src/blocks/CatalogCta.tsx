@@ -1,8 +1,7 @@
 import { FileField, FormStatus, LeadForm, PhoneInput, SubmitButton } from "../forms/LeadForm.tsx";
 import { ARROW } from "../forms/constants.ts";
-// Блок «Каталог / запрос КП» (маркер catalog-cta) — из CatalogCta.astro.
-// Разметка сгенерирована из итогового HTML Astro-сборки (tools/codegen) и совпадает
-// с ней до пробела: пробелы между тегами влияют на отрисовку inline-элементов.
+// Блок «Каталог / запрос КП» (маркер catalog-cta) — общая секция сайта.
+// Разметка совпадает с прежней вёрсткой сайта до пробела: пробелы между тегами влияют на отрисовку inline-элементов.
 export function CatalogCta() {
   return (
     <>

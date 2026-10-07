@@ -1,6 +1,6 @@
 /* B-3 шаблон «proekt» — 176 страниц. Правка здесь = правка всех.
    Разделы: proekty (176).
-   Грузится <link>'ом в <head> ПОСЛЕ site.css (та же позиция, что был inline-блоб). */
+   Грузится <link>'ом в <head> ПОСЛЕ site.css. */
 body {font-family: var(--font-body); color: var(--text-primary); background: var(--surface-page); }
 @media (max-width: 768px) { .container { padding: 0 var(--sp-5); } }
 @media (max-width: 768px) {

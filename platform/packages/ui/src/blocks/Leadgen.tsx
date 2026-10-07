@@ -1,7 +1,6 @@
 import { FileField, FormStatus, LeadForm, PhoneInput, SubmitButton } from "../forms/LeadForm.tsx";
-// Блок заявки «Подбор и расчёт» (маркер leadgen) — из Leadgen.astro.
-// Разметка сгенерирована из итогового HTML Astro-сборки (tools/codegen) и совпадает
-// с ней до пробела: пробелы между тегами влияют на отрисовку inline-элементов.
+// Блок заявки «Подбор и расчёт» (маркер leadgen) — общая секция сайта.
+// Разметка совпадает с прежней вёрсткой сайта до пробела: пробелы между тегами влияют на отрисовку inline-элементов.
 // Форма — React-компонент LeadForm (отправка в сервис заявок, статусы, цели Метрики).
 export function Leadgen() {
   return (

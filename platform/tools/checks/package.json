@@ -1,5 +1,5 @@
 {
-  "name": "@mtpk/parity",
+  "name": "@mtpk/checks",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -16,5 +16,6 @@
   "dependencies": {
     "parse5": "^8.0.1",
     "@mtpk/content-kit": "*"
-  }
+  },
+  "description": "Проверки сайта и админки: сверка с эталоном (HTML, данные, снимки), функциональная проверка в браузере, обход админки, скорость."
 }

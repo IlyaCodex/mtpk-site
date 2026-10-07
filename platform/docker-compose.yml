@@ -3,7 +3,6 @@
 #   cp .env.example .env  (заполнить секреты)
 #   docker compose build
 #   docker compose run --rm migrate
-#   docker compose --profile tools run --rm importer      # первичный перенос контента
 #   docker compose up -d
 #
 # Снаружи доступен только шлюз (gateway) на 127.0.0.1:${GATEWAY_PORT:-8080}:
@@ -271,23 +270,6 @@ services:
       <<: *node-env
     depends_on:
       postgres: { condition: service_healthy }
-    restart: "no"
-
-  # Перенос/синхронизация контента из Astro-проекта (репозиторий на сервере):
-  #   CONTENT_REPO_DIR=/srv/mtpk-site docker compose --profile tools run --rm importer
-  importer:
-    image: mtpk/tools:${IMAGE_TAG:-latest}
-    profiles: [tools]
-    command: ["node", "/app/tools/importer/dist/index.js"]
-    environment:
-      <<: *node-env
-      CONTENT_SOURCE_DIR: /source/astro
-      REDIRECTS_MAP_FILE: /source/server/redirects-legacy.map
-    volumes:
-      - ${CONTENT_REPO_DIR:-../}:/source:ro
-    depends_on:
-      postgres: { condition: service_healthy }
-      redis: { condition: service_healthy }
     restart: "no"
 
 volumes:

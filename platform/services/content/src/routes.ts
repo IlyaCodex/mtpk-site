@@ -311,7 +311,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     if (id) {
       const prev = await db.page.findUnique({ where: { id }, select: { path: true, extraMeta: true } });
       if (!prev) return null;
-      // правка в админке: повторный импорт из Astro страницу больше не перезапишет
+      // правка в админке — отметка для сводки «Изменено в админке»
       const extraMeta = { ...(prev.extraMeta as Record<string, unknown>), source: 'admin' };
       await db.page.update({ where: { id }, data: { ...values, extraMeta } });
       return { id, paths: prev.path === path ? [path] : [prev.path, path] };

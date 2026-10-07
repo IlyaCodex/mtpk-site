@@ -18,8 +18,7 @@ COPY services/search/package.json services/search/
 COPY services/leads/package.json services/leads/
 COPY apps/web/package.json apps/web/
 COPY apps/admin/package.json apps/admin/
-COPY tools/importer/package.json tools/importer/
-COPY tools/parity/package.json tools/parity/
+COPY tools/checks/package.json tools/checks/
 RUN --mount=type=cache,target=/root/.npm npm ci --ignore-scripts
 COPY tsconfig.base.json tsconfig.json ./
 COPY packages packages

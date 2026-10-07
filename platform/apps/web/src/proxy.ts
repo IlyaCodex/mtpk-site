@@ -82,5 +82,5 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
   // Статика и сервисные адреса мимо прокси (у них своих легаси-адресов нет)
-  matcher: ['/((?!_next/|img/|files/|docs/|og/|css/|js/|fonts/|brand/|_astro/|data/|api/).*)'],
+  matcher: ['/((?!_next/|img/|files/|docs/|og/|css/|js/|fonts/|brand/|data/|api/).*)'],
 };
