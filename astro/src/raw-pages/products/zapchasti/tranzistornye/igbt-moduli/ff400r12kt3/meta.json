@@ -1,9 +1,0 @@
-{
-  "title": "FF400R12KT3 — IGBT-модуль 1200 В, 400 А | УралИндуктор",
-  "description": "FF400R12KT3 — полумост IGBT3: 1200 В, 400 А при Tc = 80 °C. VCE(sat), заряд затвора, энергия переключения и параметры охлаждения.",
-  "inline_styles": [],
-  "css_templates": [
-    "/css/tpl/zapchasti-tranzistornye.css",
-    "/css/tpl/hub-compact.css"
-  ]
-}

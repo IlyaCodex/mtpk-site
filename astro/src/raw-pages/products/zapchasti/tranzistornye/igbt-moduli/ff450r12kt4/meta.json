@@ -1,9 +1,0 @@
-{
-  "title": "FF450R12KT4 — IGBT-модуль 1200 В, 450 А | УралИндуктор",
-  "description": "FF450R12KT4: полумост IGBT4, 1200 В, 450 А при Tc = 100 °C. Температура кристалла при коммутации до 150 °C, таблица характеристик.",
-  "inline_styles": [],
-  "css_templates": [
-    "/css/tpl/zapchasti-tranzistornye.css",
-    "/css/tpl/hub-compact.css"
-  ]
-}

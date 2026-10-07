@@ -1,9 +1,0 @@
-{
-  "title": "FZ300R12KE3G — IGBT-модуль 1200 В, 300 А | УралИндуктор",
-  "description": "FZ300R12KE3G — одиночный IGBT3: 1200 В, 300 А при Tc = 80 °C. Заряд затвора 2,8 мкКл, электрические параметры и условия измерения.",
-  "inline_styles": [],
-  "css_templates": [
-    "/css/tpl/zapchasti-tranzistornye.css",
-    "/css/tpl/hub-compact.css"
-  ]
-}

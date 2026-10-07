@@ -44,13 +44,13 @@ for (const p of PAGES) {
   console.log(`${p.padEnd(12)} ${Date.now() - t0} мс  ${await page.title()}`);
 }
 
-// карточка товара: первый товар раздела каталога, вкладка «Характеристики»
-await page.goto(`${base}/catalog?c=drobemetnoe-oborudovanie`, { waitUntil: 'networkidle' });
-const first = page.locator('table a[href^="/catalog/"]').first();
+// карточка товара: первый товар подкатегории каталога, вкладка «Описание и характеристики»
+await page.goto(`${base}/catalog?c=drobemetnoe-oborudovanie&s=kranovogo-tipa`, { waitUntil: 'networkidle' });
+const first = page.locator('table a[href^="/catalog/products/"]').first();
 if (await first.count()) {
   await first.click();
   await page.waitForLoadState('networkidle');
-  await page.getByRole('button', { name: /^Характеристики/ }).click();
+  await page.getByRole('button', { name: /^Описание и характеристики/ }).click();
   await page.waitForTimeout(2500);
   await page.screenshot({ path: path.join(outDir, 'editor.png') });
   console.log(`редактор: ${page.url()}`);

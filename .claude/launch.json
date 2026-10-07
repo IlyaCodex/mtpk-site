@@ -4,20 +4,10 @@
     {
       "name": "static",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["/Users/evgenii/Documents/Claude/МТПК/.claude/serve.py"],
+      "runtimeArgs": [
+        "/Users/evgenii/Documents/Claude/МТПК/.claude/serve.py"
+      ],
       "port": 8124
-    },
-    {
-      "name": "astro-preview",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "/Users/evgenii/Documents/Claude/МТПК/astro", "run", "preview", "--", "--port", "4399", "--host"],
-      "port": 4399
-    },
-    {
-      "name": "astro-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "/Users/evgenii/Documents/Claude/МТПК/astro", "run", "dev", "--", "--port", "4398", "--host"],
-      "port": 4398
     }
   ]
 }

@@ -1,9 +1,0 @@
-{
-  "title": "2MBI200PB-140 — IGBT-модуль 1400 В, 200 А | УралИндуктор",
-  "description": "2MBI200PB-140: полумост серии P, VCES 1400 В, 200 А при Tc = 80 °C. Токи при 25 и 80 °C, ёмкости и тепловые характеристики.",
-  "inline_styles": [],
-  "css_templates": [
-    "/css/tpl/zapchasti-tranzistornye.css",
-    "/css/tpl/hub-compact.css"
-  ]
-}
