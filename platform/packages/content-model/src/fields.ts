@@ -20,6 +20,9 @@ export const href = (label = 'Ссылка') => z.string().describe(label).meta(
 /** HTML-элемент целиком (иконка SVG, произвольная секция). Редактор — код. */
 export const element = (label: string) => z.string().describe(label).meta({ editor: 'code' });
 
+/** Код на другом языке (CSS, TypeScript): редактор кода с его подсветкой. */
+export const code = (label: string, lang: 'css' | 'ts') => z.string().describe(label).meta({ editor: 'code', lang });
+
 /** Атрибуты элемента, которые нужно сохранить как есть (data-*, aria-*, loading…). */
 export const attrs = () =>
   z.record(z.string(), z.string()).describe('Дополнительные атрибуты элемента').meta({ editor: 'attrs' }).optional();

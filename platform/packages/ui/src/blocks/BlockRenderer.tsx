@@ -13,7 +13,7 @@ import { Lightbox } from './Lightbox.tsx';
 import { Partner } from './Partner.tsx';
 import { ProductHero } from './ProductHero.tsx';
 import { ProductSpec } from './ProductSpec.tsx';
-import { Container, Faq, Stats, StyleLink } from './Simple.tsx';
+import { Container, Faq, ScriptLink, Stats, StyleLink } from './Simple.tsx';
 import { WhyUs } from './WhyUs.tsx';
 
 /** Один блок страницы → React-компонент. */
@@ -25,6 +25,8 @@ export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) 
       return <>{block.text}</>;
     case 'style':
       return <StyleLink block={block} />;
+    case 'script':
+      return <ScriptLink block={block} />;
     case 'container':
       return <Container block={block} render={(children) => <Blocks blocks={children} ctx={ctx} />} />;
     case 'leadgen':

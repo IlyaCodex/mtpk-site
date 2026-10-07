@@ -1,4 +1,5 @@
-import type { ContainerBlockData, FaqBlock, StatsBlock, StyleBlock, TextBlock } from '@mtpk/content-model';
+import type { ContainerBlockData, FaqBlock, ScriptBlock, StatsBlock, StyleBlock, TextBlock } from '@mtpk/content-model';
+import { scriptHash, scriptUrl } from '@mtpk/content-kit/scripts';
 import { cssFileRecord, externalStyleUrl } from '@mtpk/content-kit/styles';
 import { createElement, type ReactNode } from 'react';
 import { extra, Inline, RawElement } from '../primitives/Html.tsx';
@@ -12,6 +13,16 @@ import { toProps } from '../primitives/attrs.ts';
  */
 export function StyleLink({ block }: { block: StyleBlock }) {
   return <link rel="stylesheet" href={externalStyleUrl(cssFileRecord(block.css).hash)} />;
+}
+
+/**
+ * Скрипт страницы: подключаемый файл, собранный контент-сервисом из
+ * TypeScript/JavaScript блока. defer — выполняется после разбора страницы,
+ * когда разметка всех секций уже есть.
+ */
+export function ScriptLink({ block }: { block: ScriptBlock }) {
+  if (!block.code.trim()) return null;
+  return <script src={scriptUrl(scriptHash(block.code))} defer />;
 }
 
 /** Частые вопросы: раскрывающиеся <details>, ответы — в разметке FAQPage (JSON-LD). */

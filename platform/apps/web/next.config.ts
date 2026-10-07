@@ -52,6 +52,8 @@ const nextConfig: NextConfig = {
         { source: '/sitemap-index.xml', destination: '/api/sitemap?part=index' },
         { source: '/sitemap-0.xml', destination: '/api/sitemap' },
         { source: '/css/inline-extracted/:file', destination: `${CONTENT}/v1/styles/:file` },
+        // скрипты блоков «Скрипт» (собирает контент-сервис из TypeScript/JavaScript)
+        { source: '/js/page/:file', destination: `${CONTENT}/v1/scripts/:file` },
         { source: '/data/:file(stock\\.json|compare-index\\.json|compare-sections\\.json)', destination: `${CONTENT}/v1/data/:file` },
         { source: '/api/send.php', destination: `${LEADS}/api/send.php` },
         { source: '/api/leads', destination: `${LEADS}/api/leads` },

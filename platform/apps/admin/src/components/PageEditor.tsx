@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { BlockList, type BlockSchemas } from './BlockList';
+import { CodeEditor } from './CodeEditor';
 import { EditorContext } from './editor-context';
 import { EditorHeader, type Crumb } from './EditorHeader';
 import { PreviewPane, type Device } from './PreviewPane';
@@ -77,7 +78,7 @@ export function PageEditor({
             <>
               <p className="mb-3 text-sm text-slate-500">
                 Страница собрана из секций сверху вниз. Откройте секцию, чтобы изменить её; порядок — стрелками; новый блок — кнопкой «+» между секциями.
-                {htmlBlocks > 0 && ' В секциях со старого сайта тексты, ссылки и картинки правятся во вкладке «Поля», вёрстка целиком — в «HTML».'}
+                {htmlBlocks > 0 && ' В секциях тексты, ссылки и картинки правятся во вкладке «Тексты и картинки», вёрстка целиком — в «HTML-код».'}
               </p>
               <EditorContext.Provider value={{ pagePath: page.path }}>
                 <BlockList blocks={page.blocks} schemas={schemas} onChange={(blocks) => update({ blocks })} />
@@ -100,12 +101,7 @@ export function PageEditor({
               </Field>
               {page.inlineStyles.map((css, i) => (
                 <Field key={i} label={`Стили страницы · ${i + 1}`} hint={`${css.length.toLocaleString('ru-RU')} символов`}>
-                  <textarea
-                    className="field font-mono text-xs"
-                    rows={12}
-                    value={css}
-                    onChange={(e) => update({ inlineStyles: page.inlineStyles.map((x, j) => (j === i ? e.target.value : x)) })}
-                  />
+                  <CodeEditor lang="css" value={css} onChange={(v) => update({ inlineStyles: page.inlineStyles.map((x, j) => (j === i ? v : x)) })} />
                 </Field>
               ))}
               <Button size="sm" onClick={() => update({ inlineStyles: [...page.inlineStyles, ''] })}>

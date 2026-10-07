@@ -189,6 +189,19 @@ model StyleBlock {
   @@schema("content")
 }
 
+/// Скрипты блоков «Скрипт»: исходник (TypeScript/JavaScript) и собранный JS.
+/// Сайт подключает файл по хешу исходника: /js/page/<хеш>.js.
+model ScriptBlock {
+  hash      String   @id
+  source    String
+  js        String
+  bytes     Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("script_blocks")
+  @@schema("content")
+}
+
 /// 301-редиректы (наследие WordPress и добавленные вручную).
 model Redirect {
   id        Int      @id @default(autoincrement())

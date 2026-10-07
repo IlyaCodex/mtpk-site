@@ -6,6 +6,7 @@ import { ServiceRefusal, type ZodTypeProvider } from '@mtpk/shared';
 import { plainText } from './catalog.ts';
 import { catalogDependents, loadCatalog } from './catalog-data.ts';
 import { Prisma, type Db } from './db.ts';
+import { storeScripts } from './scripts.ts';
 import type { ContentStore } from './store.ts';
 
 /**
@@ -305,6 +306,7 @@ export async function catalogAdminRoutes(base: FastifyInstance, { db, store, cha
     const path = normalizePath(input.path);
     const crumb = orNull(input.crumb) ?? plainText(input.name);
     const blocksChanged = input.productBlocks !== undefined && JSON.stringify(input.productBlocks) !== JSON.stringify(prev.productBlocks);
+    if (blocksChanged) await storeScripts(db, input.productBlocks as Block[]);
     const before = await dependents(prev.pageId, { productBlocks: blocksChanged });
     await tx(async (t) => {
       if (path !== prev.page.path) {

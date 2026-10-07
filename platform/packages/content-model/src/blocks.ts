@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { attrs, crumb, element, href, image, inline, rich, text } from './fields.ts';
+import { attrs, code, crumb, element, href, image, inline, rich, text } from './fields.ts';
 
 /**
  * Блоки страниц. Страница сайта — упорядоченный список блоков; каждый блок
@@ -40,7 +40,15 @@ export const textBlock = z.object({ type: z.literal('text'), text: text('Тек�
  * Стили секций страницы (CSS). На сайте — подключаемый файл (кешируется
  * браузером), а не <style> в исходном коде страницы.
  */
-export const styleBlock = z.object({ type: z.literal('style'), css: element('CSS') }).describe('Стили (CSS)');
+export const styleBlock = z.object({ type: z.literal('style'), css: code('CSS', 'css') }).describe('Стили (CSS)');
+
+/**
+ * Скрипт страницы (анимации, поведение секций) на TypeScript или JavaScript.
+ * Контент-сервис при сохранении собирает его в JS; на сайте — подключаемый
+ * файл (/js/page/<хеш>.js, выполняется после разбора страницы), а не
+ * <script> в коде страницы.
+ */
+export const scriptBlock = z.object({ type: z.literal('script'), code: code('Код (TypeScript или JavaScript)', 'ts') }).describe('Скрипт (JS/TS)');
 
 export type ContainerBlockData = {
   type: 'container';
@@ -332,6 +340,7 @@ export const block: z.ZodType<Block> = z.lazy(() =>
     htmlBlock,
     textBlock,
     styleBlock,
+    scriptBlock,
     containerBlock,
     leadgenBlock,
     bestOfferBlock,
@@ -353,6 +362,7 @@ export const block: z.ZodType<Block> = z.lazy(() =>
 export type HtmlBlock = z.infer<typeof htmlBlock>;
 export type TextBlock = z.infer<typeof textBlock>;
 export type StyleBlock = z.infer<typeof styleBlock>;
+export type ScriptBlock = z.infer<typeof scriptBlock>;
 export type LeadgenBlock = z.infer<typeof leadgenBlock>;
 export type BestOfferBlock = z.infer<typeof bestOfferBlock>;
 export type CatalogCtaBlock = z.infer<typeof catalogCtaBlock>;
@@ -372,6 +382,7 @@ export type Block =
   | HtmlBlock
   | TextBlock
   | StyleBlock
+  | ScriptBlock
   | ContainerBlockData
   | LeadgenBlock
   | BestOfferBlock
@@ -395,6 +406,7 @@ export const BLOCK_SCHEMAS: Record<BlockType, z.ZodType> = {
   html: htmlBlock,
   text: textBlock,
   style: styleBlock,
+  script: scriptBlock,
   container: containerBlock,
   leadgen: leadgenBlock,
   bestOffer: bestOfferBlock,
@@ -417,6 +429,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   html: 'HTML как есть',
   text: 'Текст',
   style: 'Стили (CSS)',
+  script: 'Скрипт (JS/TS)',
   container: 'Контейнер',
   leadgen: 'Форма «Подбор и расчёт»',
   bestOffer: 'Лучшее предложение',

@@ -233,7 +233,7 @@ export function HtmlFieldsEditor({ html, onChange }: { html: string; onChange: (
   const [open, setOpen] = useState<string | null>(null);
   if (!parsed) return <p className="text-sm text-slate-400">Загружаем поля…</p>;
   const { fields, groups } = parsed;
-  if (!fields.length) return <p className="text-sm text-slate-500">В этой секции нет текстов и картинок для правки полями — откройте вкладку «HTML».</p>;
+  if (!fields.length) return <p className="text-sm text-slate-500">В этой секции нет текстов и картинок для правки полями — откройте вкладку «HTML-код».</p>;
 
   const renderField = (f: Field, i: number) => {
     const key = `${f.kind}:${f.path.join('.')}:${i}`;

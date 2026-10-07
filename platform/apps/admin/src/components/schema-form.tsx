@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
+import { CodeEditor } from './CodeEditor';
 import { GalleryField, type Photo } from './gallery-field';
 import { MediaInput } from './media';
 import { Button, cx } from './ui';
@@ -8,7 +9,7 @@ import { Button, cx } from './ui';
 /**
  * Форма по JSON-схеме (схемы приходят из zod-моделей контента через
  * z.toJSONSchema). Тип поля и редактор берутся из схемы: строка с
- * editor=code — моноширинное поле для HTML, media — выбор файла из
+ * editor=code — редактор кода (HTML, CSS, TypeScript), media — выбор файла из
  * медиатеки, массив — список с перестановкой, объект — группа полей.
  */
 export type JsonSchema = {
@@ -24,6 +25,8 @@ export type JsonSchema = {
   description?: string;
   title?: string;
   editor?: 'inline' | 'rich' | 'code' | 'link' | 'media' | 'attrs' | 'gallery';
+  /** язык редактора кода (.meta({ lang })): по умолчанию HTML */
+  lang?: 'css' | 'ts';
   /** подписи вариантов выбора (.meta({ enumLabels }) в модели) */
   enumLabels?: Record<string, string>;
   /** поле заполняет сервис (.meta({ hidden: true })) — в форме не показывается */
@@ -167,15 +170,23 @@ export function SchemaField({
         </div>
       );
     }
-    if (schema.editor === 'code' || schema.editor === 'rich') {
+    if (schema.editor === 'code') {
+      return (
+        <div>
+          <FieldLabel text={text} required={required} />
+          <CodeEditor value={v} onChange={setString} lang={schema.lang ?? 'html'} />
+        </div>
+      );
+    }
+    if (schema.editor === 'rich') {
       const rows = Math.min(24, Math.max(4, v.split('\n').length + 1));
       return (
         <div>
           <FieldLabel text={text} required={required} />
           <textarea
-            className={cx('field', schema.editor === 'code' && 'font-mono text-xs leading-5')}
+            className="field"
             rows={rows}
-            spellCheck={schema.editor === 'rich'}
+            spellCheck
             value={v}
             onChange={(e) => setString(e.target.value)}
           />

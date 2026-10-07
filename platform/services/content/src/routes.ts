@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { CONTENT_STREAM, isAuthorized, publishEvent, type Logger, type Redis, type ZodTypeProvider } from '@mtpk/shared';
 import { classifyStyleBlock, detectTemplate, normalizePath } from '@mtpk/content-kit';
 import { cssFileRecord } from '@mtpk/content-kit/styles';
+import { formatHtml } from '@mtpk/content-kit/format-html';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
 import { BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
@@ -11,6 +12,7 @@ import { catalogNodes } from './catalog.ts';
 import { catalogAdminRoutes, catalogPageGuard } from './catalog-admin.ts';
 import { catalogDependents, loadCatalog } from './catalog-data.ts';
 import { orNotFound, Prisma, type Db } from './db.ts';
+import { scriptJs, storeScripts } from './scripts.ts';
 import type { ContentStore } from './store.ts';
 
 interface Deps {
@@ -27,7 +29,7 @@ const idParam = z.object({ id: z.coerce.number().int().positive() });
 const ADMIN = [{ adminToken: [] }];
 
 /** Публичное API контента (для сайта и поиска): только чтение. */
-export async function publicRoutes(base: FastifyInstance, { store }: Deps) {
+export async function publicRoutes(base: FastifyInstance, { store, db }: Deps) {
   const app = base.withTypeProvider<ZodTypeProvider>();
 
   app.get(
@@ -66,6 +68,17 @@ export async function publicRoutes(base: FastifyInstance, { store }: Deps) {
       if (!css) return reply.code(404).type('text/plain').send('not found');
       reply.header('Cache-Control', 'public, max-age=31536000, immutable');
       return reply.type('text/css; charset=utf-8').send(css);
+    },
+  );
+  app.get(
+    '/v1/scripts/:file',
+    { schema: { tags: ['Сайт'], summary: 'Скрипт блока «Скрипт» (/js/page/<хеш>.js)', params: z.object({ file: z.string() }) } },
+    async (req, reply) => {
+      const m = req.params.file.match(/^([a-f0-9]{12}).js$/);
+      const js = m ? await scriptJs(db, m[1]) : null;
+      if (js === null) return reply.code(404).type('text/plain').send('not found');
+      reply.header('Cache-Control', 'public, max-age=31536000, immutable');
+      return reply.type('text/javascript; charset=utf-8').send(js);
     },
   );
 
@@ -286,6 +299,8 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       .map((css) => classifyStyleBlock(css.trim().startsWith('<style') ? css : `<style>${css}</style>`));
     // style="" в HTML-блоках → классы, их CSS — файлом стилей страницы (последним)
     const { blocks, rules } = extractBlocksInlineStyles(input.blocks);
+    // скрипты — собрать до записи страницы: ошибка в коде — отказ, страница не меняется
+    await storeScripts(db, blocks);
     if (rules.size) styleRows.push(classifyStyleBlock(`<style>${rulesToCss(rules)}</style>`));
     // CSS блоков «Стили» — тоже файлами (сайт подключает их ссылкой по хешу)
     const blockCss = [...walkBlocks(blocks)].flatMap((b) => (b.type === 'style' ? [cssFileRecord(b.css)] : []));
@@ -371,7 +386,11 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       schema: {
         tags: ['Админка: страницы'],
         summary: 'Отрисовать блоки в HTML (предпросмотр в редакторе)',
-        body: z.object({ path: z.string().default('/'), blocks: z.array(z.unknown()) }),
+        body: z.object({
+          path: z.string().default('/'),
+          blocks: z.array(z.unknown()),
+          pretty: z.boolean().optional().describe('С отступами — для правки кодом'),
+        }),
         security: ADMIN,
       },
     },
@@ -380,14 +399,13 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       const page = await db.page.findUnique({ where: { path: normalizePath(req.body.path) }, select: { id: true } });
       const blocks = page ? resolveCatalogBlocks(page, req.body.blocks as Block[], await store.catalog()) : (req.body.blocks as Block[]);
       const site = await store.siteData();
-      return {
-        html: renderBlocksToHtml(blocks, {
-          path: req.body.path,
-          stock: site.stock,
-          compareSections: site.compareSections,
-          hasLeadgenBlock: pageHasLeadgen(blocks),
-        }),
-      };
+      const html = renderBlocksToHtml(blocks, {
+        path: req.body.path,
+        stock: site.stock,
+        compareSections: site.compareSections,
+        hasLeadgenBlock: pageHasLeadgen(blocks),
+      });
+      return { html: req.body.pretty ? formatHtml(html) : html };
     },
   );
 

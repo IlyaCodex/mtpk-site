@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { HtmlFieldsEditor, sectionTitle } from './html-fields';
-import { defaultFor, ItemActions, move, ObjectFields, SchemaField, summarize, type JsonSchema } from './schema-form';
+import { BlockCode, HtmlSection, ModeTabs, ScriptSection } from './block-editors';
+import { sectionTitle } from './html-fields';
+import { defaultFor, ItemActions, move, ObjectFields, summarize, type JsonSchema } from './schema-form';
 import { Badge, cx } from './ui';
 
 export type BlockData = { type: string; [key: string]: unknown };
@@ -126,6 +127,80 @@ function BlockPicker({ schemas, onPick, onClose }: { schemas: BlockSchemas; onPi
   );
 }
 
+/**
+ * Блок с полями или общая секция: «Поля» — форма по схеме блока,
+ * «HTML-код» — разметка, которую блок выводит на сайте.
+ */
+function FieldsBlock({
+  block,
+  def,
+  onChange,
+  onConvert,
+}: {
+  block: BlockData;
+  def: BlockSchemas[string];
+  onChange: (b: BlockData) => void;
+  onConvert: (html: string) => void;
+}) {
+  const [mode, setMode] = useState<'fields' | 'code'>('fields');
+  const hasFields = Object.keys(def.schema.properties ?? {}).some((p) => p !== 'type');
+  return (
+    <div>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs text-slate-500">
+          {mode === 'code'
+            ? 'HTML-код, который блок выводит на сайте.'
+            : hasFields
+              ? 'Поля блока: вёрстка готова, меняются тексты и настройки.'
+              : 'Общая секция сайта: настроек нет, содержимое одинаково на всех страницах.'}
+        </p>
+        <ModeTabs
+          value={mode}
+          options={[
+            ['fields', hasFields ? 'Поля' : 'О блоке'],
+            ['code', 'HTML-код'],
+          ]}
+          onChange={setMode}
+        />
+      </div>
+      {mode === 'code' ? (
+        <BlockCode block={block} onConvert={onConvert} />
+      ) : (
+        <>
+          {(block.type === 'catalogCards' || (block.type === 'catalogList' && block.auto)) && (
+            <p className="mb-3 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-800">
+              Карточки собираются из каталога: добавить, убрать или поменять порядок — в разделе «Каталог продукции». Здесь — заголовок и оформление секции.
+            </p>
+          )}
+          {hasFields && (
+            <ObjectFields
+              schema={def.schema}
+              root={def.schema}
+              value={block}
+              onChange={(v) => onChange(v as BlockData)}
+              skip={block.type === 'catalogList' && block.auto ? ['type', 'cards'] : ['type']}
+            />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Подпись свёрнутого блока: заголовок секции, первая строка скрипта, поле блока. */
+function captionOf(block: BlockData): string {
+  if (block.type === 'html') return sectionTitle(String(block.html ?? ''));
+  if (block.type === 'container') return `<${String(block.tag)}> · ${(block.children as BlockData[]).length} блоков`;
+  if (block.type === 'script') {
+    const first = String(block.code ?? '')
+      .split('\n')
+      .map((l) => l.replace(/^\s*\/\/\s?/, '').trim())
+      .find(Boolean);
+    return first ?? 'пустой';
+  }
+  return summarize(block);
+}
+
 /** Место между блоками: «+» — вставить новый блок именно сюда. */
 function InsertLine({ onClick }: { onClick: () => void }) {
   return (
@@ -140,35 +215,6 @@ function InsertLine({ onClick }: { onClick: () => void }) {
       >
         +<span className="hidden group-hover:inline">Вставить блок сюда</span>
       </button>
-    </div>
-  );
-}
-
-/**
- * Секция, перенесённая со старого сайта: «Поля» — тексты, ссылки, картинки и
- * списки (карточки, пункты) подписанными полями; «HTML» — разметка целиком.
- */
-function HtmlSection({ block, schema, onChange }: { block: BlockData; schema: JsonSchema; onChange: (b: BlockData) => void }) {
-  const [mode, setMode] = useState<'fields' | 'html'>(() => (String(block.html ?? '').trimStart().startsWith('<script') ? 'html' : 'fields'));
-  return (
-    <div>
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="text-xs text-slate-500">
-          {mode === 'fields' ? 'Тексты, ссылки и картинки секции. Вёрстка целиком — во вкладке HTML.' : 'Разметка секции целиком — для тонкой правки.'}
-        </p>
-        <div className="flex shrink-0 overflow-hidden rounded-md border border-slate-200 text-xs">
-          {(['fields', 'html'] as const).map((m) => (
-            <button key={m} type="button" onClick={() => setMode(m)} className={cx('px-3 py-1', mode === m ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-50')}>
-              {m === 'fields' ? 'Поля' : 'HTML'}
-            </button>
-          ))}
-        </div>
-      </div>
-      {mode === 'fields' ? (
-        <HtmlFieldsEditor html={String(block.html ?? '')} onChange={(html) => onChange({ ...block, html })} />
-      ) : (
-        <SchemaField schema={schema.properties!.html} root={schema} value={block.html} label="" onChange={(html) => onChange({ ...block, html: html as string })} />
-      )}
     </div>
   );
 }
@@ -198,6 +244,8 @@ export function BlockList({
   const [open, setOpen] = useState<Set<string>>(() => new Set(blocks.length === 1 ? keys.current : []));
   // куда вставляем новый блок (индекс) — там открыто окно выбора
   const [inserting, setInserting] = useState<number | null>(null);
+  // вставленные сейчас блоки: HTML-секция открывается сразу в коде
+  const fresh = useRef(new Set<string>());
   const [focus, setFocus] = useState<string | null>(null);
 
   const toggle = (k: string) =>
@@ -212,6 +260,7 @@ export function BlockList({
     const k = `b${keySeq++}`;
     keys.current = [...keys.current.slice(0, at), k, ...keys.current.slice(at)];
     if (openIt) {
+      fresh.current.add(k);
       setOpen((s) => new Set(s).add(k));
       setFocus(k);
     }
@@ -239,12 +288,7 @@ export function BlockList({
         const k = keys.current[i];
         const def = schemas[block.type];
         const isOpen = open.has(k);
-        const caption =
-          block.type === 'html'
-            ? sectionTitle(String(block.html ?? ''))
-            : block.type === 'container'
-              ? `<${String(block.tag)}> · ${(block.children as BlockData[]).length} блоков`
-              : summarize(block);
+        const caption = captionOf(block);
         return (
           <div key={k}>
             {inserting === i ? picker : <InsertLine onClick={() => setInserting(i)} />}
@@ -260,8 +304,8 @@ export function BlockList({
               <div className="flex items-center gap-3 px-4 py-2.5">
                 <button type="button" onClick={() => toggle(k)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
                   <span className="w-4 text-xs text-slate-400">{isOpen ? '▾' : '▸'}</span>
-                  <Badge tone={block.type === 'html' || block.type === 'container' ? 'gray' : 'blue'}>
-                    {block.type === 'html' ? 'Секция' : (def?.label ?? (block.type === 'container' ? 'Контейнер' : block.type))}
+                  <Badge tone={block.type === 'script' ? 'amber' : block.type === 'html' || block.type === 'container' ? 'gray' : 'blue'}>
+                    {block.type === 'html' ? 'Секция' : block.type === 'script' ? 'Скрипт' : (def?.label ?? (block.type === 'container' ? 'Контейнер' : block.type))}
                   </Badge>
                   <span className="truncate text-sm text-slate-600">{caption}</span>
                 </button>
@@ -307,27 +351,22 @@ export function BlockList({
                         />
                       </div>
                     </div>
-                  ) : block.type === 'html' && def ? (
-                    <HtmlSection block={block} schema={def.schema} onChange={(b) => set(i, b)} />
+                  ) : block.type === 'html' ? (
+                    <HtmlSection block={block} fresh={fresh.current.has(k)} onChange={(v) => set(i, v)} />
+                  ) : block.type === 'script' ? (
+                    <ScriptSection block={block} onChange={(v) => set(i, v)} />
+                  ) : def && (block.type === 'style' || block.type === 'text') ? (
+                    <ObjectFields schema={def.schema} root={def.schema} value={block} onChange={(v) => set(i, v as BlockData)} skip={['type']} />
                   ) : def ? (
-                    <>
-                      {(block.type === 'catalogCards' || (block.type === 'catalogList' && block.auto)) && (
-                        <p className="mb-3 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-800">
-                          Карточки собираются из каталога: добавить, убрать или поменять порядок — в разделе «Каталог продукции». Здесь — заголовок и оформление секции.
-                        </p>
-                      )}
-                      {Object.keys(def.schema.properties ?? {}).filter((p) => p !== 'type').length ? (
-                        <ObjectFields
-                          schema={def.schema}
-                          root={def.schema}
-                          value={block}
-                          onChange={(v) => set(i, v as BlockData)}
-                          skip={block.type === 'catalogList' && block.auto ? ['type', 'cards'] : ['type']}
-                        />
-                      ) : (
-                        <p className="text-sm text-slate-500">Общий блок сайта: настроек нет, содержимое одинаково на всех страницах.</p>
-                      )}
-                    </>
+                    <FieldsBlock
+                      block={block}
+                      def={def}
+                      onChange={(v) => set(i, v)}
+                      onConvert={(html) => {
+                        fresh.current.add(k);
+                        set(i, { type: 'html', html });
+                      }}
+                    />
                   ) : (
                     <p className="text-sm text-red-600">Неизвестный тип блока «{block.type}».</p>
                   )}
