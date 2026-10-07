@@ -22,6 +22,8 @@ services:
       - "127.0.0.1:5442:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
+      # служебная база для Prisma (создаётся один раз, при первом запуске тома)
+      - ./infra/postgres/init-dev.sql:/docker-entrypoint-initdb.d/10-shadow-db.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U mtpk -d mtpk"]
       interval: 5s
