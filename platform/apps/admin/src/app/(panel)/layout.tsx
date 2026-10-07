@@ -5,18 +5,19 @@ import { env } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
+/** Меню: разделы по смыслу — содержимое сайта, его настройки, заявки, управление доступом. */
 const NAV: (NavItem & { area?: Area })[] = [
   { href: '/', label: 'Обзор', icon: 'home' },
-  { href: '/catalog', label: 'Каталог продукции', icon: 'catalog', area: 'content' },
-  { href: '/pages', label: 'Все страницы', icon: 'pages', area: 'content' },
-  { href: '/settings', label: 'Шапка, меню, контакты', icon: 'settings', area: 'content' },
-  { href: '/media', label: 'Медиатека', icon: 'media', area: 'media' },
-  { href: '/redirects', label: 'Редиректы', icon: 'redirects', area: 'content' },
-  { href: '/stock', label: 'Наличие на складе', icon: 'stock', area: 'content' },
-  { href: '/leads', label: 'Заявки', icon: 'leads', area: 'leads' },
-  { href: '/users', label: 'Пользователи', icon: 'users', area: 'users' },
-  { href: '/audit', label: 'Журнал действий', icon: 'audit', area: 'audit' },
-  { href: '/api-docs', label: 'API', icon: 'api' },
+  { href: '/catalog', label: 'Каталог продукции', icon: 'catalog', area: 'content', group: 'Сайт' },
+  { href: '/pages', label: 'Все страницы', icon: 'pages', area: 'content', group: 'Сайт' },
+  { href: '/media', label: 'Медиатека', icon: 'media', area: 'media', group: 'Сайт' },
+  { href: '/stock', label: 'Наличие на складе', icon: 'stock', area: 'content', group: 'Сайт' },
+  { href: '/settings', label: 'Шапка, меню, контакты', icon: 'settings', area: 'content', group: 'Настройки сайта' },
+  { href: '/redirects', label: 'Редиректы', icon: 'redirects', area: 'content', group: 'Настройки сайта' },
+  { href: '/leads', label: 'Заявки', icon: 'leads', area: 'leads', group: 'Продажи' },
+  { href: '/users', label: 'Пользователи', icon: 'users', area: 'users', group: 'Администрирование' },
+  { href: '/audit', label: 'Журнал действий', icon: 'audit', area: 'audit', group: 'Администрирование' },
+  { href: '/api-docs', label: 'API для разработчиков', icon: 'api', area: 'users', group: 'Администрирование' },
 ];
 
 /** Каркас админки: меню разделов по правам пользователя и область страницы. */

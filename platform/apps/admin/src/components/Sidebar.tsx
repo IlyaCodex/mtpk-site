@@ -20,7 +20,7 @@ const ICONS: Record<string, string> = {
   api: 'M8 6 2 12l6 6M16 6l6 6-6 6M14 4l-4 16',
 };
 
-export type NavItem = { href: string; label: string; icon: keyof typeof ICONS };
+export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; group?: string };
 
 function Icon({ name }: { name: string }) {
   return (
@@ -50,19 +50,23 @@ export function Sidebar({ items, user, siteUrl }: { items: NavItem[]; user: { na
           </a>
         </div>
       </div>
-      <nav className="flex-1 space-y-0.5 px-3" aria-label="Разделы админки">
-        {items.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cx(
-              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition',
-              active(item.href) ? 'bg-brand-700 font-medium text-white' : 'text-brand-100 hover:bg-brand-900 hover:text-white',
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3" aria-label="Разделы админки">
+        {items.map((item, i) => (
+          <div key={item.href}>
+            {item.group && item.group !== items[i - 1]?.group && (
+              <div className="mt-4 mb-1 px-3 text-[11px] font-semibold tracking-wider text-brand-300/80 uppercase">{item.group}</div>
             )}
-          >
-            <Icon name={item.icon} />
-            {item.label}
-          </Link>
+            <Link
+              href={item.href}
+              className={cx(
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition',
+                active(item.href) ? 'bg-brand-700 font-medium text-white' : 'text-brand-100 hover:bg-brand-900 hover:text-white',
+              )}
+            >
+              <Icon name={item.icon} />
+              {item.label}
+            </Link>
+          </div>
         ))}
       </nav>
       <div className="border-t border-brand-900 px-5 py-4 text-xs">
