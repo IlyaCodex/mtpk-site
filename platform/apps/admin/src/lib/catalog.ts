@@ -233,6 +233,7 @@ export interface ProductEntity extends Omit<CatProduct, 'path' | 'status' | 'upd
   caption: string | null;
   label: string | null;
   linkText: string | null;
+  warranty: string | null;
   specs: { label: string; value: string }[];
   actions: unknown[];
   attrs: Record<string, string>;

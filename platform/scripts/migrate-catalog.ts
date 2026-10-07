@@ -422,6 +422,7 @@ for (const p of productPages) {
       caption: c.caption ?? null,
       label: null,
       linkText: null,
+      warranty: null,
       specs: c.specs,
       actions: c.actions,
       attrs: c.attrs ?? {},
@@ -442,6 +443,7 @@ for (const p of productPages) {
       caption: it.caption ?? null,
       label: it.label ?? null,
       linkText: it.linkText ?? null,
+      warranty: null,
       specs: [],
       actions: [],
       attrs: {},
@@ -462,6 +464,7 @@ for (const p of productPages) {
       caption: null,
       label: null,
       linkText: null,
+      warranty: null,
       specs: [],
       actions: [],
       attrs: {},
@@ -476,6 +479,9 @@ for (const p of productPages) {
 const OWN = new Set(['productHero', 'productSpec', 'lightbox', 'style']);
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 const core = (blocks: Block[]) => (blocks.at(-1)?.type === 'lightbox' ? blocks.slice(0, -1) : blocks);
+/** Срок гарантии в «Преимуществах» — свойство товара (Product.warranty), в шаблоне категории его нет. */
+const general = (b: Block): Block => (b.type === 'adv' ? { type: 'adv' } : b);
+const alike = (a: Block, b: Block) => same(general(a), general(b));
 
 const templateReport: { category: string; template: string[]; products: number; variants: { tail: string; count: number }[] }[] = [];
 for (const cat of categories) {
@@ -486,13 +492,13 @@ for (const cat of categories) {
   for (const p of list.slice(1)) {
     const c = core(p.blocks);
     let n = 0;
-    while (n < tail.length && n < c.length && same(tail[tail.length - 1 - n], c[c.length - 1 - n])) n++;
+    while (n < tail.length && n < c.length && alike(tail[tail.length - 1 - n], c[c.length - 1 - n])) n++;
     tail = tail.slice(tail.length - n);
   }
   // своё содержимое товара (герой, характеристики) в шаблон не берём
   const firstOwn = tail.findLastIndex((b) => OWN.has(b.type));
   if (firstOwn >= 0) tail = tail.slice(firstOwn + 1);
-  cat.productBlocks = tail;
+  cat.productBlocks = tail.map(general);
   const variants = new Map<string, number>();
   for (const p of list) {
     const c = core(p.blocks);
@@ -612,11 +618,16 @@ for (const page of pages.filter((p) => touched.has(p.id))) {
   if (tpl.length) {
     const c = core(blocks);
     const at = c.length - tpl.length;
-    if (at >= 0 && same(c.slice(at), tpl)) {
+    if (at >= 0 && c.slice(at).every((b, i) => alike(b, tpl[i]))) {
+      // гарантия из «Преимуществ» страницы — в карточку товара
+      const adv = c.slice(at).find((b): b is Extract<Block, { type: 'adv' }> => b.type === 'adv');
+      product!.warranty = adv?.warranty ?? null;
       blocks = [...c.slice(0, at), ...blocks.slice(c.length)];
       res.stripped = tpl.length;
     } else res.error = 'хвост страницы не совпал с шаблоном категории';
   }
+  // пустые блоки «HTML как есть» (остались от старой вёрстки) ничего не выводят — в админке они только мешают
+  if (product) blocks = blocks.filter((b) => !(b.type === 'html' && !b.html.trim()));
   if (!res.converted.length && !res.stripped) {
     results.push(res);
     continue;
@@ -625,14 +636,19 @@ for (const page of pages.filter((p) => touched.has(p.id))) {
   const before = renderEach(page, page.blocks, false);
   const after = renderEach(page, blocks, true);
   let diff: string | undefined;
-  if (before.html.length !== after.html.length) diff = `число блоков ${before.html.length} → ${after.html.length}`;
-  for (let i = 0; !diff && i < before.html.length; i++) {
+  // блоки, которые ничего не выводят (пустой HTML), в сверке не участвуют
+  const was = before.html.map((html, i) => ({ html, i })).filter((x) => x.html !== '');
+  const now = after.html.filter((h) => h !== '');
+  if (was.length !== now.length) diff = `число блоков ${was.length} → ${now.length}`;
+  for (let k = 0; !diff && k < was.length; k++) {
+    const i = was[k].i;
     const lenient = lenientAt.has(String(i));
     const canon = (html: string) => {
-      const c = canonHtml(html, { stripEnhancements: lenient });
+      // «Сделано в России» на обложках раньше дорисовывал скрипт, теперь выводит сервер
+      const c = canonHtml(html, { stripEnhancements: lenient }).replace(/<span[^>]*class="made-badge"[^>]*><span[^>]*><\/span>[^<]*<\/span>/g, '');
       return lenient ? c.replace(/(<span class="cf-trigger__value" data-cf-value="">)[^<]*/g, '$1') : c;
     };
-    const d = firstDifference(canon(before.html[i]), canon(after.html[i]), 70);
+    const d = firstDifference(canon(was[k].html), canon(now[k]), 70);
     if (d) diff = `блок #${i} @${d.at}: «${d.a}» ≠ «${d.b}»`;
   }
   if (diff) {

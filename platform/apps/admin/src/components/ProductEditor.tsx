@@ -48,6 +48,7 @@ const cardDraft = (p: ProductEntity): ProductCardDraft => ({
   caption: p.caption ?? '',
   label: p.label ?? '',
   linkText: p.linkText ?? '',
+  warranty: p.warranty ?? '',
   specs: p.specs,
   listed: p.listed,
 });

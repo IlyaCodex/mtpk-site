@@ -80,6 +80,7 @@ const productInput = z.object({
   caption: optText('Подпись под названием'),
   label: optText('Надпись над названием (линейки ЛВМ/ЛГМ)'),
   linkText: optText('Надпись ссылки вместо «Подробнее»'),
+  warranty: optText('Гарантия в блоке «Преимущества» под товаром, если не 18 месяцев: «12 месяцев» (у нового товара по умолчанию — как у соседних)'),
   specs: z.array(z.object({ label: text('Параметр'), value: text('Значение') })).default([]).describe('Характеристики в карточке'),
   actions: z.array(action).optional().describe('Кнопки карточки (по умолчанию — «Запросить цену» и «Подробнее»)'),
   attrs: z.record(z.string(), z.string()).optional().describe('Значения для фильтра каталога: data-power, data-mass…'),
@@ -470,6 +471,7 @@ export async function catalogAdminRoutes(base: FastifyInstance, { db, store, cha
       });
       const fallback = sample ?? (await t.page.findFirst({ where: { template: 'product', product: { isNot: null } }, select: { blocks: true, cssTemplates: true }, orderBy: { id: 'asc' } }));
       const sampleHero = fallback ? (fallback.blocks as Block[]).find((b): b is Extract<Block, { type: 'productHero' }> => b.type === 'productHero') : undefined;
+      const neighbour = await t.product.findFirst({ where: sub ? { subcategoryId: sub.id } : { categoryId: category.id, subcategoryId: null }, select: { warranty: true }, orderBy: { sort: 'asc' } });
       const crumb = plainText(input.name);
       const blocks: Block[] = [
         {
@@ -516,6 +518,7 @@ export async function catalogAdminRoutes(base: FastifyInstance, { db, store, cha
           caption: orNull(input.caption),
           label: orNull(input.label),
           linkText: orNull(input.linkText),
+          warranty: input.warranty === undefined ? (neighbour?.warranty ?? null) : orNull(input.warranty),
           specs: json(input.specs),
           actions: json(
             input.actions ?? [
@@ -562,6 +565,7 @@ export async function catalogAdminRoutes(base: FastifyInstance, { db, store, cha
           caption: orNull(input.caption),
           label: orNull(input.label),
           linkText: orNull(input.linkText),
+          ...(input.warranty !== undefined ? { warranty: orNull(input.warranty) } : {}),
           specs: json(input.specs),
           ...(input.actions ? { actions: json(input.actions) } : {}),
           ...(input.attrs ? { attrs: json(input.attrs) } : {}),

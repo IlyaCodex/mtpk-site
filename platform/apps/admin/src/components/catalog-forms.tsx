@@ -416,6 +416,8 @@ export type ProductCardDraft = {
   caption: string;
   label: string;
   linkText: string;
+  /** гарантия в «Преимуществах» под товаром; пусто — 18 месяцев */
+  warranty: string;
   specs: { label: string; value: string }[];
   listed: boolean;
 };
@@ -432,6 +434,7 @@ export const productCardBody = (d: ProductCardDraft) => ({
   caption: d.caption || null,
   label: d.label || null,
   linkText: d.linkText || null,
+  warranty: d.warranty || null,
 });
 
 /** Где товар в каталоге: категория и подкатегория. */
@@ -525,7 +528,7 @@ export function ProductCardFields({
   const parent = (draft.subcategoryId ? subcategories.find((s) => s.id === draft.subcategoryId)?.path : categories.find((c) => c.id === draft.categoryId)?.path) ?? '/products/';
   // своя часть адреса (после раздела) — при переносе товара в другой раздел остаётся
   const own = draft.path.startsWith(parent) ? draft.path.slice(parent.length) : `${lastSegment(draft.path)}/`;
-  const [advanced, setAdvanced] = useState(Boolean(draft.badge || draft.origin || draft.caption || draft.label || draft.linkText || draft.nameNote));
+  const [advanced, setAdvanced] = useState(Boolean(draft.badge || draft.origin || draft.caption || draft.label || draft.linkText || draft.nameNote || draft.warranty));
   return (
     <div className="space-y-5">
       <FormSection title="Где товар в каталоге" hint="Карточка появится в списке выбранной подкатегории (или категории, если подкатегории нет).">
@@ -553,7 +556,7 @@ export function ProductCardFields({
           />
         </div>
         <button type="button" className="text-sm text-brand-600 hover:underline" onClick={() => setAdvanced((v) => !v)}>
-          {advanced ? '▾' : '▸'} Дополнительно: плашка, подпись, надпись ссылки
+          {advanced ? '▾' : '▸'} Дополнительно: плашка, подпись, надпись ссылки, гарантия
         </button>
         {advanced && (
           <div className="grid gap-4 sm:grid-cols-2">
@@ -580,6 +583,10 @@ export function ProductCardFields({
             <label className="block">
               <Label hint="(вместо «Подробнее»)">Надпись ссылки</Label>
               <TextInput value={draft.linkText} onChange={(linkText) => set({ linkText })} placeholder="Например: Получить расчёт" />
+            </label>
+            <label className="block">
+              <Label hint="(в блоке «Преимущества» под товаром; пусто — 18 месяцев)">Гарантия</Label>
+              <TextInput value={draft.warranty} onChange={(warranty) => set({ warranty })} placeholder="Например: 12 месяцев" />
             </label>
           </div>
         )}
@@ -621,6 +628,7 @@ export function NewProductForm({ categories, subcategories, categoryId, subcateg
     caption: '',
     label: '',
     linkText: '',
+    warranty: '',
     specs: [],
     listed: true,
   });
@@ -635,7 +643,9 @@ export function NewProductForm({ categories, subcategories, categoryId, subcateg
   };
   const create = () =>
     run(async () => {
-      const res = await api<{ id: number }>('content/catalog/products', { json: productCardBody(draft) });
+      const { warranty, ...body } = productCardBody(draft);
+      // гарантия не задана — у нового товара такая же, как у соседних
+      const res = await api<{ id: number }>('content/catalog/products', { json: warranty ? { ...body, warranty } : body });
       toast.ok('Товар создан черновиком. Заполните фото и описание и опубликуйте его.');
       router.push(`/catalog/products/${res.id}`);
     });

@@ -57,6 +57,8 @@ export interface CatalogProduct {
   caption: string | null;
   label: string | null;
   linkText: string | null;
+  /** срок гарантии в блоке «Преимущества» под товаром (если не 18 месяцев) */
+  warranty: string | null;
   specs: { label: string; value: string }[];
   actions: ProductCard['actions'];
   attrs: Record<string, string>;
@@ -157,7 +159,10 @@ export function resolveCatalogBlocks(page: { id: number }, blocks: Block[], data
   let out = blocks.map(resolve);
   // страница товара: общие блоки категории — перед просмотром фото (он в конце страницы)
   if (product) {
-    const shared = data.categories.find((c) => c.id === product.categoryId)?.productBlocks ?? [];
+    // «Преимущества» — с гарантией товара (у чиллеров, транзисторных печей — 12 месяцев)
+    const shared = (data.categories.find((c) => c.id === product.categoryId)?.productBlocks ?? []).map((b) =>
+      b.type === 'adv' && !b.warranty && product.warranty ? { ...b, warranty: product.warranty } : b,
+    );
     if (shared.length) {
       const at = out.length && out[out.length - 1].type === 'lightbox' ? out.length - 1 : out.length;
       out = [...out.slice(0, at), ...shared, ...out.slice(at)];
