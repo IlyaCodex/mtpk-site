@@ -4,12 +4,15 @@ import { typeLabel } from '@/lib/catalog';
 import type { EditablePage } from './use-page-draft';
 import { Field } from './ui';
 
-/** Вкладка «SEO и адрес»: адрес, title и description для поиска, публикация. */
-export function SeoFields({ page, update }: { page: EditablePage; update: (patch: Partial<EditablePage>) => void }) {
+/**
+ * Вкладка «SEO и адрес»: адрес, title и description для поиска, публикация.
+ * pathNote — адрес меняется в другом месте (у товаров каталога — вместе с местом в каталоге).
+ */
+export function SeoFields({ page, update, pathNote }: { page: EditablePage; update: (patch: Partial<EditablePage>) => void; pathNote?: string }) {
   return (
     <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
-      <Field label="Адрес страницы" hint="Со слешем на конце. При смене адреса добавьте редирект со старого (раздел «Редиректы»).">
-        <input className="field font-mono" value={page.path} onChange={(e) => update({ path: e.target.value })} />
+      <Field label="Адрес страницы" hint={pathNote ?? 'Со слешем на конце. При смене адреса добавьте редирект со старого (раздел «Редиректы»).'}>
+        <input className="field font-mono" value={page.path} readOnly={Boolean(pathNote)} disabled={Boolean(pathNote)} onChange={(e) => update({ path: e.target.value })} />
       </Field>
       <Field label="Заголовок для поисковиков (title)" hint={`${page.title.length} символов · вкладка браузера и заголовок в выдаче Яндекса и Google`}>
         <input className="field" value={page.title} onChange={(e) => update({ title: e.target.value })} />

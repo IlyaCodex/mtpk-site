@@ -26,6 +26,8 @@ export type JsonSchema = {
   editor?: 'inline' | 'rich' | 'code' | 'link' | 'media' | 'attrs' | 'gallery';
   /** подписи вариантов выбора (.meta({ enumLabels }) в модели) */
   enumLabels?: Record<string, string>;
+  /** поле заполняет сервис (.meta({ hidden: true })) — в форме не показывается */
+  hidden?: boolean;
   anyOf?: JsonSchema[];
   oneOf?: JsonSchema[];
   $ref?: string;
@@ -296,7 +298,7 @@ export function ObjectFields({
   onChange: (v: Record<string, Json>) => void;
   skip?: string[];
 }) {
-  const props = Object.entries(resolveSchema(schema, root).properties ?? {}).filter(([k]) => !skip.includes(k));
+  const props = Object.entries(resolveSchema(schema, root).properties ?? {}).filter(([k, p]) => !skip.includes(k) && !p.hidden);
   return (
     <div className="space-y-3">
       {props.map(([key, prop]) => (

@@ -166,8 +166,19 @@ export function BlockList({
                   <HtmlSection block={block} schema={def.schema} onChange={(b) => set(i, b)} />
                 ) : def ? (
                   <>
+                    {(block.type === 'catalogCards' || (block.type === 'catalogList' && block.auto)) && (
+                      <p className="mb-3 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-800">
+                        Карточки собираются из каталога: добавить, убрать или поменять порядок — в разделе «Каталог продукции». Здесь — заголовок и оформление секции.
+                      </p>
+                    )}
                     {Object.keys(def.schema.properties ?? {}).filter((k) => k !== 'type').length ? (
-                      <ObjectFields schema={def.schema} root={def.schema} value={block} onChange={(v) => set(i, v as BlockData)} skip={['type']} />
+                      <ObjectFields
+                        schema={def.schema}
+                        root={def.schema}
+                        value={block}
+                        onChange={(v) => set(i, v as BlockData)}
+                        skip={block.type === 'catalogList' && block.auto ? ['type', 'cards'] : ['type']}
+                      />
                     ) : (
                       <p className="text-sm text-slate-500">Общий блок сайта: настроек нет, содержимое одинаково на всех страницах.</p>
                     )}

@@ -103,6 +103,8 @@ function After({ html, ctx }: { html: string; ctx: RenderContext }) {
  */
 export function CatalogCards({ block, ctx }: { block: CatalogCardsBlock; ctx: RenderContext }) {
   const items = block.items ?? [];
+  // в новом разделе ещё нет опубликованных карточек — секции нет
+  if (!items.length) return null;
   const eager = ctx.eagerImages ?? [];
   if (block.design === 'home') {
     return (

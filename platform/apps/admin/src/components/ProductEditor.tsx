@@ -1,7 +1,10 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
+import { api } from '@/lib/client-api';
+import type { ProductEntity } from '@/lib/catalog';
 import { BlockList, type BlockData, type BlockSchemas } from './BlockList';
+import { ProductCardFields, productCardBody, type Option, type ProductCardDraft, type SubOption } from './catalog-forms';
 import { EditorContext } from './editor-context';
 import { EditorHeader, type Crumb } from './EditorHeader';
 import { GalleryField, type Photo } from './gallery-field';
@@ -10,8 +13,9 @@ import { SchemaField } from './schema-form';
 import { SeoFields } from './SeoFields';
 import { SpecPanelsEditor, type SpecBlock } from './SpecPanelsEditor';
 import { Label, RowsEditor, TextInput, type Row } from './text-fields';
+import { toast } from './toast';
 import { cx } from './ui';
-import { usePageDraft, type EditablePage } from './use-page-draft';
+import { usePageDraft, type EditablePage, type ExtraDraft } from './use-page-draft';
 
 type Hero = {
   type: 'productHero';
@@ -26,7 +30,27 @@ type Hero = {
   facts: unknown[];
 };
 
-type Tab = 'main' | 'spec' | 'sections' | 'seo';
+type Tab = 'card' | 'main' | 'spec' | 'sections' | 'seo';
+
+/** Товар в каталоге: его карточка (в списках) и где он — правится вместе со страницей. */
+export type CatalogProductProps = { product: ProductEntity; categories: Option[]; subcategories: SubOption[] };
+
+const cardDraft = (p: ProductEntity): ProductCardDraft => ({
+  categoryId: p.categoryId,
+  subcategoryId: p.subcategoryId,
+  name: p.name,
+  nameNote: p.nameNote ?? '',
+  path: p.page.path,
+  cover: p.cover ?? '',
+  coverAlt: p.coverAlt,
+  badge: p.badge ?? '',
+  origin: p.origin ?? '',
+  caption: p.caption ?? '',
+  label: p.label ?? '',
+  linkText: p.linkText ?? '',
+  specs: p.specs,
+  listed: p.listed,
+});
 const OWN = new Set(['productHero', 'productSpec']);
 
 /**
@@ -35,10 +59,54 @@ const OWN = new Set(['productHero', 'productSpec']);
  * SEO. Справа — предпросмотр страницы. Те же данные, что в общем редакторе
  * блоков, но разложенные по смыслу.
  */
-export function ProductEditor({ initial, schemas, siteUrl, crumbs }: { initial: EditablePage; schemas: BlockSchemas; siteUrl: string; crumbs: Crumb[] }) {
-  const { page, update, dirty, saving, save } = usePageDraft(initial);
-  const [tab, setTab] = useState<Tab>('main');
+export function ProductEditor({
+  initial,
+  schemas,
+  siteUrl,
+  crumbs,
+  catalog,
+}: {
+  initial: EditablePage;
+  schemas: BlockSchemas;
+  siteUrl: string;
+  crumbs: Crumb[];
+  catalog?: CatalogProductProps;
+}) {
+  const extra = useRef<ExtraDraft | null>(null);
+  const { page, update, dirty: pageDirty, saving: pageSaving, save, rebase } = usePageDraft(initial, extra);
+  const [tab, setTab] = useState<Tab>(catalog ? 'card' : 'main');
   const [device, setDevice] = useState<Device>('desktop');
+
+  // карточка в каталоге — отдельные данные, но та же кнопка «Сохранить»
+  const [card, setCard] = useState<ProductCardDraft | null>(() => (catalog ? cardDraft(catalog.product) : null));
+  const [savedCard, setSavedCard] = useState(() => JSON.stringify(card));
+  const [cardSaving, setCardSaving] = useState(false);
+  const cardDirty = JSON.stringify(card) !== savedCard;
+  const dirty = pageDirty || cardDirty;
+  const saving = pageSaving || cardSaving;
+  const saveAll = async () => {
+    if (card && catalog && cardDirty) {
+      setCardSaving(true);
+      try {
+        await api(`content/catalog/products/${catalog.product.id}`, { method: 'PUT', json: productCardBody(card) });
+        setSavedCard(JSON.stringify(card));
+      } catch (err) {
+        toast.error(err);
+        return;
+      } finally {
+        setCardSaving(false);
+      }
+      // адрес меняет сервер вместе с переносом товара — в черновике страницы он уже новый
+      if (card.path !== page.path) {
+        if (pageDirty) await save({ patch: { path: card.path }, quiet: true });
+        else rebase({ path: card.path });
+      } else if (pageDirty) await save({ quiet: true });
+      toast.ok('Сохранено — сайт обновится в течение минуты');
+      return;
+    }
+    if (pageDirty) await save();
+  };
+  extra.current = catalog ? { dirty: cardDirty, save: () => void saveAll() } : null;
 
   const heroAt = page.blocks.findIndex((b) => b.type === 'productHero');
   const specAt = page.blocks.findIndex((b) => b.type === 'productSpec');
@@ -62,10 +130,11 @@ export function ProductEditor({ initial, schemas, siteUrl, crumbs }: { initial: 
   const plain = (s: string) => s.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
 
   const tabs: [Tab, string][] = [
-    ['main', 'Товар'],
+    ...(catalog ? [['card', 'В каталоге'] as [Tab, string]] : []),
+    ['main', 'Страница товара'],
     ['spec', `Характеристики${spec ? ` (${spec.panels.length})` : ''}`],
-    ['sections', `Описание и секции (${others.length})`],
-    ['seo', 'SEO и адрес'],
+    ['sections', `Секции страницы (${others.length})`],
+    ['seo', 'SEO'],
   ];
 
   return (
@@ -79,18 +148,21 @@ export function ProductEditor({ initial, schemas, siteUrl, crumbs }: { initial: 
         siteHref={`${siteUrl}${page.path}`}
         dirty={dirty}
         saving={saving}
-        onSave={() => void save()}
+        onSave={() => void saveAll()}
       />
 
       <div className={cx('grid gap-6 px-8 py-6', device !== 'off' && '2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]')}>
         <div className="min-w-0">
-          <div className="mb-4 flex gap-1 border-b border-slate-200">
+          <div className="mb-4 flex gap-1 overflow-x-auto border-b border-slate-200">
             {tabs.map(([id, label]) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => setTab(id)}
-                className={cx('-mb-px border-b-2 px-4 py-2 text-sm', tab === id ? 'border-brand-600 font-medium text-brand-700' : 'border-transparent text-slate-500 hover:text-slate-800')}
+                className={cx(
+                  '-mb-px border-b-2 px-3 py-2 text-sm whitespace-nowrap',
+                  tab === id ? 'border-brand-600 font-medium text-brand-700' : 'border-transparent text-slate-500 hover:text-slate-800',
+                )}
               >
                 {label}
               </button>
@@ -98,6 +170,15 @@ export function ProductEditor({ initial, schemas, siteUrl, crumbs }: { initial: 
           </div>
 
           <EditorContext.Provider value={{ pagePath: page.path }}>
+            {tab === 'card' && card && catalog && (
+              <ProductCardFields
+                draft={card}
+                set={(patch) => setCard((c) => (c ? { ...c, ...patch } : c))}
+                categories={catalog.categories}
+                subcategories={catalog.subcategories}
+              />
+            )}
+
             {tab === 'main' && (
               <div className="space-y-5">
                 <Section title="Название, наличие и цена">
@@ -108,7 +189,7 @@ export function ProductEditor({ initial, schemas, siteUrl, crumbs }: { initial: 
                     </label>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <label className="block">
-                        <Label hint="(в каталоге)">Короткое название</Label>
+                        <Label hint="(в хлебных крошках)">Короткое название</Label>
                         <TextInput value={short} onChange={setShort} placeholder="Например: УИД-376" />
                       </label>
                       <label className="block">
@@ -198,13 +279,24 @@ export function ProductEditor({ initial, schemas, siteUrl, crumbs }: { initial: 
             {tab === 'sections' && (
               <>
                 <p className="mb-3 text-sm text-slate-500">
-                  Всё, что на странице ниже карточки товара: описание, формы заявки, преимущества, партнёры. В секциях со старого сайта тексты и картинки правятся во вкладке «Поля», вёрстка целиком — в «HTML».
+                  {catalog ? (
+                    <>
+                      Секции этой страницы ниже характеристик. Формы заявки, преимущества и партнёры — общие для всех товаров категории: они правятся в{' '}
+                      <a className="text-brand-600 underline" href={`/catalog/categories/${catalog.product.categoryId}`}>
+                        карточке категории
+                      </a>
+                      .
+                    </>
+                  ) : (
+                    'Всё, что на странице ниже карточки товара: описание, формы заявки, преимущества, партнёры.'
+                  )}{' '}
+                  В секциях со старого сайта тексты и картинки правятся во вкладке «Поля», вёрстка целиком — в «HTML».
                 </p>
                 <BlockList blocks={others} schemas={schemas} onChange={setOthers} />
               </>
             )}
 
-            {tab === 'seo' && <SeoFields page={page} update={update} />}
+            {tab === 'seo' && <SeoFields page={page} update={update} pathNote={catalog ? 'Адрес товара меняется во вкладке «В каталоге» — вместе с местом в каталоге.' : undefined} />}
           </EditorContext.Provider>
         </div>
 

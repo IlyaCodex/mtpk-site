@@ -34,6 +34,20 @@ export interface ServiceOptions {
  * (из zod-схем маршрутов), корректная остановка по SIGTERM —
  * Docker даёт контейнеру время закрыть соединения.
  */
+/**
+ * Понятный отказ сервиса: код для программ и текст для человека («Страница с
+ * таким адресом уже есть»). Брошенный из обработчика — ответ { error, message }.
+ */
+export class ServiceRefusal extends Error {
+  constructor(
+    readonly statusCode: number,
+    readonly code: string,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
 export async function startService(opts: ServiceOptions): Promise<FastifyInstance> {
   const app = Fastify({
     loggerInstance: opts.logger,
@@ -55,8 +69,9 @@ export async function startService(opts: ServiceOptions): Promise<FastifyInstanc
     transform: jsonSchemaTransform,
   });
 
-  // Ошибки валидации входа — 400 с перечнем полей, а не 500.
-  app.setErrorHandler((err: Error & { statusCode?: number; issues?: unknown }, req, reply) => {
+  // Ошибки валидации входа — 400 с перечнем полей, а не 500. Отказ с кодом
+  // (ServiceRefusal) — { error: код, message: текст для человека }.
+  app.setErrorHandler((err: Error & { statusCode?: number; issues?: unknown; code?: unknown }, req, reply) => {
     if (hasZodFastifySchemaValidationErrors(err)) {
       reply.code(400).send({ error: 'bad_request', issues: err.validation });
       return;
@@ -67,7 +82,9 @@ export async function startService(opts: ServiceOptions): Promise<FastifyInstanc
     }
     const status = err.statusCode && err.statusCode >= 400 ? err.statusCode : 500;
     if (status >= 500) req.log.error({ err }, 'ошибка обработки запроса');
-    reply.code(status).send({ error: status >= 500 ? 'internal_error' : err.message });
+    if (status >= 500) reply.code(status).send({ error: 'internal_error' });
+    else if (err instanceof ServiceRefusal) reply.code(status).send({ error: err.code, message: err.message });
+    else reply.code(status).send({ error: err.message });
   });
 
   const hidden = { schema: { hide: true } };

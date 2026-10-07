@@ -8,6 +8,8 @@ import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
 import { BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
 import { renderBlocksToHtml } from '@mtpk/ui/server';
 import { catalogNodes } from './catalog.ts';
+import { catalogAdminRoutes, catalogPageGuard } from './catalog-admin.ts';
+import { catalogDependents, loadCatalog } from './catalog-data.ts';
 import { orNotFound, Prisma, type Db } from './db.ts';
 import type { ContentStore } from './store.ts';
 
@@ -135,6 +137,9 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     await notifyWeb(paths);
   };
 
+  // ── Каталог: категории, подкатегории, товары ───────────────────────────
+  await catalogAdminRoutes(app, { db, store, changed });
+
   // ── Схемы блоков: по ним админка строит формы редактирования ──────────
   app.get(
     '/admin/v1/block-schemas',
@@ -248,8 +253,14 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     '/admin/v1/pages/:id',
     { schema: { tags: ['Админка: страницы'], summary: 'Страница для редактирования', params: idParam, security: ADMIN } },
     async (req, reply) => {
-      const row = await db.page.findUnique({ where: { id: req.params.id } });
-      if (!row) return reply.code(404).send({ error: 'not_found' });
+      const found = await db.page.findUnique({
+        where: { id: req.params.id },
+        include: { category: { select: { id: true } }, subcategory: { select: { id: true } }, product: { select: { id: true } } },
+      });
+      if (!found) return reply.code(404).send({ error: 'not_found' });
+      const { category, subcategory, product, ...row } = found;
+      // страница каталога: её карточка (категории, подкатегории, товара) правится в разделе «Каталог»
+      const catalog = category ? { kind: 'category', id: category.id } : subcategory ? { kind: 'subcategory', id: subcategory.id } : product ? { kind: 'product', id: product.id } : null;
       const styles = row.styleHashes.length
         ? await db.styleBlock.findMany({ where: { hash: { in: row.styleHashes } } })
         : [];
@@ -258,6 +269,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       const { body, ...page } = row;
       return {
         ...page,
+        catalog,
         body: row.kind === 'document' ? body : undefined,
         inlineStyles: row.styleHashes.flatMap((h) => {
           const s = byHash.get(h);
@@ -326,9 +338,14 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     async (req, reply) => {
       const dup = await db.page.findUnique({ where: { path: normalizePath(req.body.path) }, select: { id: true } });
       if (dup && dup.id !== req.params.id) return reply.code(409).send({ error: 'path_exists', id: dup.id });
+      // страница каталога: адрес раздела с товарами не меняется, старый адрес товара — редиректом
+      await catalogPageGuard(db, req.params.id, normalizePath(req.body.path));
+      // её карточка видна в списках — их кеш тоже сбрасывается (статус и адрес входят в карточку)
+      const before = catalogDependents(await loadCatalog(db), req.params.id);
       const res = await savePage(req.body, req.params.id);
       if (!res) return reply.code(404).send({ error: 'not_found' });
-      await changed(res.paths);
+      const after = catalogDependents(await loadCatalog(db), req.params.id);
+      await changed([...new Set([...res.paths, ...before, ...after])]);
       return { ok: true, id: req.params.id };
     },
   );
@@ -337,6 +354,10 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     '/admin/v1/pages/:id',
     { schema: { tags: ['Админка: страницы'], summary: 'Удалить страницу', params: idParam, security: ADMIN } },
     async (req, reply) => {
+      const owner = await db.page.findUnique({ where: { id: req.params.id }, select: { category: true, subcategory: true, product: true } });
+      if (owner && (owner.category || owner.subcategory || owner.product)) {
+        return reply.code(409).send({ error: 'in_catalog', message: 'Это страница каталога — удалите её в разделе «Каталог продукции»' });
+      }
       const row = await orNotFound(db.page.delete({ where: { id: req.params.id }, select: { path: true } }));
       if (!row) return reply.code(404).send({ error: 'not_found' });
       await changed([row.path], 'page.deleted');

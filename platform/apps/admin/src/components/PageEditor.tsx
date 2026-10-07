@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { BlockList, type BlockSchemas } from './BlockList';
 import { EditorContext } from './editor-context';
 import { EditorHeader, type Crumb } from './EditorHeader';
@@ -17,7 +17,23 @@ type Tab = 'blocks' | 'seo' | 'styles';
  * Редактор страницы: блоки (порядок и поля), SEO, стили и предпросмотр.
  * Для товаров — отдельная карточка (ProductEditor).
  */
-export function PageEditor({ initial, schemas, siteUrl, crumbs }: { initial: EditablePage; schemas: BlockSchemas; siteUrl: string; crumbs: Crumb[] }) {
+export function PageEditor({
+  initial,
+  schemas,
+  siteUrl,
+  crumbs,
+  notice,
+  pathNote,
+}: {
+  initial: EditablePage;
+  schemas: BlockSchemas;
+  siteUrl: string;
+  crumbs: Crumb[];
+  /** пояснение над вкладками (у страниц каталога — где их карточка) */
+  notice?: ReactNode;
+  /** адрес меняется в другом месте */
+  pathNote?: string;
+}) {
   const { page, update, dirty, saving, save } = usePageDraft(initial);
   const [tab, setTab] = useState<Tab>('blocks');
   const [device, setDevice] = useState<Device>('desktop');
@@ -39,6 +55,7 @@ export function PageEditor({ initial, schemas, siteUrl, crumbs }: { initial: Edi
 
       <div className={cx('grid gap-6 px-8 py-6', device !== 'off' && '2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]')}>
         <div className="min-w-0">
+          {notice}
           <div className="mb-4 flex gap-1 border-b border-slate-200">
             {(
               [
@@ -70,7 +87,7 @@ export function PageEditor({ initial, schemas, siteUrl, crumbs }: { initial: Edi
             </>
           )}
 
-          {tab === 'seo' && <SeoFields page={page} update={update} />}
+          {tab === 'seo' && <SeoFields page={page} update={update} pathNote={pathNote} />}
 
           {tab === 'styles' && (
             <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-xs">

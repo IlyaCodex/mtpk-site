@@ -1,197 +1,341 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { Badge, EmptyState, formatDate, LinkButton, PageHeader } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
-import { buildTree, isProduct, lineage, productsIn, thumbUrl, type CatalogNode, type TreeNode } from '@/lib/catalog';
+import {
+  lastSegment,
+  plain,
+  plural,
+  thumbUrl,
+  type CatalogNode,
+  type CatalogTree,
+  type CatCategory,
+  type CatProduct,
+  type CatSubcategory,
+} from '@/lib/catalog';
 import { env } from '@/lib/env';
 import { serviceJson } from '@/lib/services';
-import { CatalogFilters, type CatalogQuery } from './CatalogFilters';
+import { CatalogSearch, Reorder } from './CatalogParts';
+import { SparesView } from './SparesView';
 
 export const metadata: Metadata = { title: 'Каталог продукции' };
 
-const byName = (a: TreeNode, b: TreeNode) => a.short.localeCompare(b.short, 'ru');
+type Query = { c?: string; s?: string; g?: string; q?: string };
 
-/** Совпадение с поиском: название, короткое название (модель) или адрес. */
-function matches(n: TreeNode, q: string): boolean {
-  const s = q.toLowerCase().replace(/ё/g, 'е');
-  return [n.name, n.short, n.path].some((v) => v.toLowerCase().replace(/ё/g, 'е').includes(s));
-}
+/** Совпадение с поиском: название, адрес (без учёта регистра и «ё»). */
+const norm = (s: string) => plain(s).toLowerCase().replace(/ё/g, 'е');
 
-export default async function CatalogPage({ searchParams }: { searchParams: Promise<CatalogQuery> }) {
+/**
+ * Каталог продукции в три уровня, как на сайте: категории (карточки на
+ * главной) → подкатегории («Модельный ряд» категории) → товары. На каждом
+ * уровне — «Добавить», порядок карточек стрелками, переход к правке.
+ */
+export default async function CatalogPage({ searchParams }: { searchParams: Promise<Query> }) {
   const user = await requireUser('content');
   const sp = await searchParams;
-  const nodes = await serviceJson<CatalogNode[]>('content', 'catalog', { user });
-  const { root } = buildTree(nodes);
+  const tree = await serviceJson<CatalogTree>('content', 'catalog/tree', { user });
   const site = env().PUBLIC_SITE_URL;
-  if (!root) return <EmptyState>Каталог пуст: нет страницы /products/.</EmptyState>;
-
-  // Категории — разделы первого уровня; запчасти — последними
-  const categories = root.children.filter((n) => !isProduct(n)).sort((a, b) => Number(a.slug === 'zapchasti') - Number(b.slug === 'zapchasti') || byName(a, b));
-  const category = sp.c ? categories.find((n) => n.slug === sp.c) : undefined;
-  const subNodes = (category?.children ?? []).filter((n) => !isProduct(n));
-  const subcategories = subNodes.filter((n) => n.products > 0).sort(byName);
-  const infoPages = subNodes.filter((n) => n.products === 0).sort(byName);
-  const subcategory = category && sp.s ? subcategories.find((n) => n.slug === sp.s) : undefined;
-  // третий уровень — группы (у запчастей: «Тельферы и комплектующие»…)
-  const groups = (subcategory?.children ?? []).filter((n) => !isProduct(n) && n.products > 0).sort(byName);
-  const group = subcategory && sp.g ? groups.find((n) => n.slug === sp.g) : undefined;
-  const current = group ?? subcategory ?? category;
-  const scope = current ?? root;
-
   const q = sp.q?.trim() ?? '';
-  let products = productsIn(scope);
-  if (q) products = products.filter((n) => matches(n, q));
-  if (sp.status) products = products.filter((n) => n.status === sp.status);
-  const showCategoryCards = !category && !q && !sp.status;
+  const category = sp.c ? tree.categories.find((c) => lastSegment(c.path) === sp.c) : undefined;
+  const subcategory = category && sp.s ? tree.subcategories.find((s) => s.categoryId === category.id && lastSegment(s.path) === sp.s) : undefined;
 
+  if (q) {
+    const found = tree.products.filter((p) => norm(p.name).includes(norm(q)) || p.path.includes(q.toLowerCase()));
+    return (
+      <>
+        <Header />
+        <CatalogSearch value={q} />
+        <h2 className="mb-2 text-sm font-semibold text-slate-700">Найдено товаров: {found.length}</h2>
+        {found.length ? <ProductRows products={found} tree={tree} site={site} showWhere /> : <EmptyState>Ничего не нашлось.</EmptyState>}
+      </>
+    );
+  }
+
+  if (category?.kind === 'hub') {
+    // запчасти пока — страницами (их перевод в данные каталога — следующий этап)
+    const nodes = await serviceJson<CatalogNode[]>('content', 'catalog', { user });
+    return <SparesView category={category} nodes={nodes} query={sp} site={site} />;
+  }
+
+  if (subcategory && category) return <SubcategoryView category={category} subcategory={subcategory} tree={tree} site={site} />;
+  if (category) {
+    const nodes = await serviceJson<CatalogNode[]>('content', 'catalog', { user });
+    return <CategoryView category={category} tree={tree} nodes={nodes} site={site} />;
+  }
+
+  const ids = tree.categories.map((c) => c.id);
   return (
     <>
-      <PageHeader
-        title="Каталог продукции"
-        description="Категории, подкатегории и товары сайта. Откройте товар, чтобы изменить название, фото, параметры и описание."
+      <Header
         actions={
-          <LinkButton href={`/catalog/${root.id}`} variant="secondary">
-            Страница «Каталог»
+          <LinkButton variant="primary" href="/catalog/categories/new">
+            + Добавить категорию
           </LinkButton>
         }
       />
+      <CatalogSearch value="" />
+      <p className="mb-3 text-sm text-slate-500">Порядок карточек — как в сетке «Оборудование» на главной странице сайта. Нажмите на категорию, чтобы увидеть её подкатегории и товары.</p>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        {tree.categories.map((c, i) => (
+          <Tile
+            key={c.id}
+            href={`/catalog?c=${lastSegment(c.path)}`}
+            image={c.cover}
+            title={plain(c.name)}
+            meta={
+              c.kind === 'hub'
+                ? 'Запчасти: отдельный раздел'
+                : `${c.subcategories ? `${c.subcategories} ${plural(c.subcategories, 'подкатегория', 'подкатегории', 'подкатегорий')} · ` : ''}${c.products} ${plural(c.products, 'товар', 'товара', 'товаров')}`
+            }
+            badges={
+              <>
+                {c.status !== 'published' && <Badge tone="amber">Черновик</Badge>}
+                {!c.onHome && <Badge>Нет на главной</Badge>}
+              </>
+            }
+            actions={<Reorder kind="categories" ids={ids} index={i} label={plain(c.name)} />}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
 
-      <CatalogFilters
-        categories={categories.map((n) => ({ value: n.slug, label: n.short, count: n.products }))}
-        subcategories={subcategories.map((n) => ({ value: n.slug, label: n.short, count: n.products }))}
-        groups={groups.map((n) => ({ value: n.slug, label: n.short, count: n.products }))}
-        values={sp}
+function Header({ actions }: { actions?: ReactNode }) {
+  return (
+    <PageHeader
+      title="Каталог продукции"
+      description="Категории → подкатегории → товары. Здесь добавляются и меняются карточки каталога: название, обложка, описание, порядок. Тексты, фото и характеристики страниц — по кнопке «Изменить»."
+      actions={actions}
+    />
+  );
+}
+
+/** Где мы: Каталог / категория / подкатегория. */
+function Trail({ items }: { items: { href?: string; label: string }[] }) {
+  return (
+    <nav className="mb-3 flex flex-wrap items-center gap-1 text-sm text-slate-500" aria-label="Где в каталоге">
+      <Link href="/catalog" className="hover:text-brand-600">
+        Каталог
+      </Link>
+      {items.map((it) => (
+        <span key={it.label} className="flex items-center gap-1">
+          <span className="text-slate-300">/</span>
+          {it.href ? (
+            <Link href={it.href} className="hover:text-brand-600">
+              {it.label}
+            </Link>
+          ) : (
+            <span className="text-slate-800">{it.label}</span>
+          )}
+        </span>
+      ))}
+    </nav>
+  );
+}
+
+/** Карточка категории или подкатегории: обложка, название, счётчики, порядок. */
+function Tile({ href, image, title, text, meta, badges, actions }: { href: string; image: string | null; title: string; text?: string; meta: string; badges?: ReactNode; actions?: ReactNode }) {
+  return (
+    <div className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs transition hover:border-brand-300 hover:shadow-md">
+      <Link href={href} className="block">
+        <div className="aspect-[16/9] overflow-hidden bg-slate-100">
+          {image ? (
+            <img src={thumbUrl(image, 640)!} alt="" loading="lazy" className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
+          ) : (
+            <div className="flex h-full items-center justify-center text-xs text-slate-400">нет обложки</div>
+          )}
+        </div>
+        <div className="px-4 pt-3 pb-12">
+          <div className="font-semibold text-slate-900 group-hover:text-brand-700">{title}</div>
+          {text && <div className="mt-1 line-clamp-2 text-xs text-slate-500">{text}</div>}
+          <div className="mt-1 text-xs text-slate-500">{meta}</div>
+        </div>
+      </Link>
+      <div className="absolute right-3 bottom-3 left-4 flex items-center justify-between gap-2">
+        <span className="flex flex-wrap gap-1">{badges}</span>
+        {actions}
+      </div>
+    </div>
+  );
+}
+
+/** Шапка уровня: обложка, название, адрес, кнопки правки. */
+function Summary({ image, title, path, status, editHref, editLabel, pageId, site }: { image: string | null; title: string; path: string; status: string; editHref: string; editLabel: string; pageId: number; site: string }) {
+  return (
+    <section className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+      {image ? <img src={thumbUrl(image, 320)!} alt="" className="h-16 w-28 shrink-0 rounded-lg object-cover" /> : <div className="h-16 w-28 shrink-0 rounded-lg bg-slate-100" />}
+      <div className="min-w-0 flex-1">
+        <h1 className="truncate text-xl font-semibold text-slate-900">{title}</h1>
+        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          {status === 'published' ? <Badge tone="green">На сайте</Badge> : <Badge tone="amber">Черновик — на сайте не виден</Badge>}
+          <span className="font-mono">{path}</span>
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <LinkButton size="sm" variant="primary" href={editHref}>
+          {editLabel}
+        </LinkButton>
+        <LinkButton size="sm" href={`/catalog/${pageId}`}>
+          Тексты и SEO страницы
+        </LinkButton>
+        <a href={`${site}${path}`} target="_blank" rel="noopener" className="text-xs text-brand-600 hover:underline">
+          на сайте ↗
+        </a>
+      </div>
+    </section>
+  );
+}
+
+function SectionTitle({ title, hint, action }: { title: string; hint?: string; action?: ReactNode }) {
+  return (
+    <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        {hint && <p className="text-xs text-slate-500">{hint}</p>}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+function CategoryView({ category, tree, nodes, site }: { category: CatCategory; tree: CatalogTree; nodes: CatalogNode[]; site: string }) {
+  const subs = tree.subcategories.filter((s) => s.categoryId === category.id);
+  const direct = tree.products.filter((p) => p.categoryId === category.id && p.subcategoryId === null);
+  const c = lastSegment(category.path);
+  // страницы раздела вне каталога: подборки, статьи, опросные листы
+  const known = new Set([category.path, ...subs.map((s) => s.path), ...tree.products.filter((p) => p.categoryId === category.id).map((p) => p.path)]);
+  const other = nodes.filter((n) => n.path.startsWith(category.path) && !known.has(n.path));
+  const subIds = subs.map((s) => s.id);
+  return (
+    <>
+      <Trail items={[{ label: plain(category.name) }]} />
+      <Summary
+        image={category.cover}
+        title={plain(category.name)}
+        path={category.path}
+        status={category.status}
+        editHref={`/catalog/categories/${category.id}`}
+        editLabel="Изменить категорию"
+        pageId={category.pageId}
+        site={site}
       />
 
-      {showCategoryCards ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {categories.map((n) => {
-            const subs = n.children.filter((c) => !isProduct(c) && c.products > 0).length;
-            return (
-              <Link
-                key={n.id}
-                href={`/catalog?c=${n.slug}`}
-                className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs transition hover:border-brand-300 hover:shadow-md"
-              >
-                <div className="aspect-[16/9] overflow-hidden bg-slate-100">
-                  {n.image ? (
-                    <img src={thumbUrl(n.image, 640)!} alt="" loading="lazy" className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-xs text-slate-400">нет фото категории</div>
-                  )}
-                </div>
-                <div className="px-4 py-3">
-                  <div className="font-semibold text-slate-900 group-hover:text-brand-700">{n.short}</div>
-                  <div className="mt-0.5 text-xs text-slate-500">
-                    {subs ? `${subs} ${plural(subs, 'подкатегория', 'подкатегории', 'подкатегорий')} · ` : ''}
-                    {n.products} {plural(n.products, 'товар', 'товара', 'товаров')}
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+      <SectionTitle
+        title={`Подкатегории (${subs.length})`}
+        hint="Карточки «Модельного ряда» на странице категории — в этом порядке"
+        action={
+          <LinkButton variant="primary" size="sm" href={`/catalog/subcategories/new?category=${category.id}`}>
+            + Добавить подкатегорию
+          </LinkButton>
+        }
+      />
+      {subs.length ? (
+        <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          {subs.map((s, i) => (
+            <Tile
+              key={s.id}
+              href={`/catalog?c=${c}&s=${lastSegment(s.path)}`}
+              image={s.cover}
+              title={plain(s.name)}
+              text={plain(s.description)}
+              meta={`${s.products} ${plural(s.products, 'товар', 'товара', 'товаров')}`}
+              badges={
+                <>
+                  {s.status !== 'published' && <Badge tone="amber">Черновик</Badge>}
+                  {!s.listed && <Badge>Не в «Модельном ряду»</Badge>}
+                </>
+              }
+              actions={<Reorder kind="subcategories" ids={subIds} index={i} label={plain(s.name)} />}
+            />
+          ))}
         </div>
       ) : (
+        <div className="mb-8">
+          <EmptyState>Подкатегорий нет. Товары категории — в списке ниже.</EmptyState>
+        </div>
+      )}
+
+      {(direct.length > 0 || subs.length === 0) && (
         <>
-          {category && current && (
-            <section className="mb-5 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
-              {current.image && <img src={thumbUrl(current.image, 320)!} alt="" className="h-16 w-28 shrink-0 rounded-lg object-cover" />}
-              <div className="min-w-0 flex-1">
-                <div className="text-xs text-slate-500">
-                  <Link href="/catalog" className="hover:text-brand-600">
-                    Каталог
-                  </Link>
-                  {subcategory && (
-                    <>
-                      {' / '}
-                      <Link href={`/catalog?c=${category.slug}`} className="hover:text-brand-600">
-                        {category.short}
-                      </Link>
-                    </>
-                  )}
-                  {subcategory && group && (
-                    <>
-                      {' / '}
-                      <Link href={`/catalog?c=${category.slug}&s=${subcategory.slug}`} className="hover:text-brand-600">
-                        {subcategory.short}
-                      </Link>
-                    </>
-                  )}
-                </div>
-                <h2 className="truncate text-lg font-semibold text-slate-900">{current.short}</h2>
-                <div className="truncate text-xs text-slate-500">{current.name}</div>
-              </div>
-              <div className="flex gap-2">
-                <LinkButton size="sm" href={`/catalog/${current.id}`}>
-                  Изменить страницу {group ? 'группы' : subcategory ? 'подкатегории' : 'категории'}
-                </LinkButton>
-                <a href={`${site}${current.path}`} target="_blank" rel="noopener" className="self-center text-xs text-brand-600 hover:underline">
+          <SectionTitle
+            title={`Товары прямо в категории (${direct.length})`}
+            hint="Без подкатегории: карточки на странице категории"
+            action={
+              <LinkButton variant="primary" size="sm" href={`/catalog/products/new?category=${category.id}`}>
+                + Добавить товар
+              </LinkButton>
+            }
+          />
+          {direct.length ? <ProductRows products={direct} tree={tree} site={site} reorder /> : <EmptyState>Товаров пока нет.</EmptyState>}
+        </>
+      )}
+
+      {other.length > 0 && (
+        <section className="mt-8">
+          <SectionTitle title="Другие страницы раздела" hint="Подборки, статьи, опросные листы — без карточки в каталоге" />
+          <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-xs">
+            {other.map((n) => (
+              <li key={n.id} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm">
+                <Link href={`/catalog/${n.id}`} className="truncate font-medium text-slate-800 hover:text-brand-600">
+                  {n.short}
+                </Link>
+                <a href={`${site}${n.path}`} target="_blank" rel="noopener" className="shrink-0 text-xs text-brand-600 hover:underline">
                   на сайте ↗
                 </a>
-              </div>
-            </section>
-          )}
-
-          {category && !group && (subcategory ? groups : subcategories).length > 0 && !q && (
-            <div className="mb-5 flex flex-wrap gap-2">
-              {(subcategory ? groups : subcategories).map((n) => (
-                <Link
-                  key={n.id}
-                  href={subcategory ? `/catalog?c=${category.slug}&s=${subcategory.slug}&g=${n.slug}` : `/catalog?c=${category.slug}&s=${n.slug}`}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 shadow-xs hover:border-brand-300 hover:text-brand-700"
-                >
-                  {n.short} <span className="text-slate-400">{n.products}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          <div className="mb-2 flex items-baseline justify-between">
-            <h3 className="text-sm font-semibold text-slate-700">
-              {q ? `Найдено: ${products.length}` : `Товары: ${products.length}`}
-            </h3>
-          </div>
-          {products.length ? <ProductTable products={products} scope={scope} site={site} /> : <EmptyState>Товаров не нашлось.</EmptyState>}
-
-          {category && !subcategory && infoPages.length > 0 && !q && (
-            <section className="mt-8">
-              <h3 className="mb-2 text-sm font-semibold text-slate-700">Другие страницы категории</h3>
-              <p className="mb-3 text-xs text-slate-500">Подборки, статьи и посадочные страницы — без товаров внутри.</p>
-              <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-xs">
-                {infoPages.map((n) => (
-                  <li key={n.id} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm">
-                    <Link href={`/catalog/${n.id}`} className="truncate font-medium text-slate-800 hover:text-brand-600">
-                      {n.short}
-                    </Link>
-                    <a href={`${site}${n.path}`} target="_blank" rel="noopener" className="shrink-0 text-xs text-brand-600 hover:underline">
-                      на сайте ↗
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </>
   );
 }
 
-function ProductTable({ products, scope, site }: { products: TreeNode[]; scope: TreeNode; site: string }) {
-  // путь от текущего уровня просмотра до товара: «Кранового типа», «Для дробемётных / Тельферы»…
-  const where = new Map(
-    products.map((p) => {
-      const chain = lineage(p);
-      return [p.id, chain.slice(chain.indexOf(scope) + 1, -1).map((n) => n.short).join(' / ')];
-    }),
+function SubcategoryView({ category, subcategory, tree, site }: { category: CatCategory; subcategory: CatSubcategory; tree: CatalogTree; site: string }) {
+  const products = tree.products.filter((p) => p.subcategoryId === subcategory.id);
+  return (
+    <>
+      <Trail items={[{ href: `/catalog?c=${lastSegment(category.path)}`, label: plain(category.name) }, { label: plain(subcategory.name) }]} />
+      <Summary
+        image={subcategory.cover}
+        title={plain(subcategory.name)}
+        path={subcategory.path}
+        status={subcategory.status}
+        editHref={`/catalog/subcategories/${subcategory.id}`}
+        editLabel="Изменить подкатегорию"
+        pageId={subcategory.pageId}
+        site={site}
+      />
+      <SectionTitle
+        title={`Товары (${products.length})`}
+        hint="Карточки в списке на странице подкатегории — в этом порядке"
+        action={
+          <LinkButton variant="primary" size="sm" href={`/catalog/products/new?category=${category.id}&subcategory=${subcategory.id}`}>
+            + Добавить товар
+          </LinkButton>
+        }
+      />
+      {products.length ? <ProductRows products={products} tree={tree} site={site} reorder /> : <EmptyState>Товаров пока нет.</EmptyState>}
+    </>
   );
-  const showWhere = [...where.values()].some(Boolean);
+}
+
+/** Товары списком: фото, название, где в каталоге, статус, порядок, правка. */
+function ProductRows({ products, tree, site, reorder, showWhere }: { products: CatProduct[]; tree: CatalogTree; site: string; reorder?: boolean; showWhere?: boolean }) {
+  const ids = products.map((p) => p.id);
+  const where = (p: CatProduct) =>
+    [tree.categories.find((c) => c.id === p.categoryId)?.name, tree.subcategories.find((s) => s.id === p.subcategoryId)?.name]
+      .filter((x): x is string => Boolean(x))
+      .map(plain)
+      .join(' / ');
   return (
     <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
       <table className="w-full text-left text-sm">
         <thead className="border-b border-slate-200 bg-slate-50 text-xs font-medium text-slate-500">
           <tr>
-            <th className="w-20 px-4 py-2.5 font-medium">Фото</th>
+            <th className="w-20 px-4 py-2.5 font-medium">Обложка</th>
             <th className="px-4 py-2.5 font-medium">Товар</th>
             {showWhere && <th className="px-4 py-2.5 font-medium">Где в каталоге</th>}
             <th className="px-4 py-2.5 font-medium">Статус</th>
@@ -200,46 +344,43 @@ function ProductTable({ products, scope, site }: { products: TreeNode[]; scope: 
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
-          {products.map((p) => {
-            return (
-              <tr key={p.id} className="hover:bg-slate-50">
-                <td className="px-4 py-2">
-                  <div className="flex h-12 w-16 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-white">
-                    {p.image ? <img src={thumbUrl(p.image)!} alt="" loading="lazy" className="max-h-full max-w-full object-contain" /> : <span className="text-[10px] text-slate-400">нет фото</span>}
-                  </div>
-                </td>
-                <td className="max-w-xl px-4 py-2">
-                  <Link href={`/catalog/${p.id}`} className="block font-medium text-slate-900 hover:text-brand-600">
-                    {p.short !== p.name && p.short.length < 40 ? p.short : p.name}
-                  </Link>
-                  {p.short !== p.name && p.short.length < 40 && <span className="block truncate text-xs text-slate-500">{p.name}</span>}
-                </td>
-                {showWhere && <td className="px-4 py-2 text-xs text-slate-600">{where.get(p.id)}</td>}
-                <td className="px-4 py-2 whitespace-nowrap">
+          {products.map((p, i) => (
+            <tr key={p.id} className="hover:bg-slate-50">
+              <td className="px-4 py-2">
+                <div className="flex h-12 w-16 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-white">
+                  {p.cover ? <img src={thumbUrl(p.cover)!} alt="" loading="lazy" className="max-h-full max-w-full object-contain" /> : <span className="text-[10px] text-slate-400">нет</span>}
+                </div>
+              </td>
+              <td className="max-w-xl px-4 py-2">
+                <Link href={`/catalog/products/${p.id}`} className="font-medium text-slate-900 hover:text-brand-600">
+                  {plain(p.name)}
+                </Link>
+                {p.nameNote && <span className="ml-1 text-slate-500">{p.nameNote}</span>}
+                <span className="block truncate font-mono text-[11px] text-slate-400">{p.path}</span>
+              </td>
+              {showWhere && <td className="px-4 py-2 text-xs text-slate-600">{where(p)}</td>}
+              <td className="px-4 py-2">
+                <span className="flex flex-wrap gap-1">
                   {p.status === 'published' ? <Badge tone="green">На сайте</Badge> : <Badge tone="amber">Черновик</Badge>}
-                </td>
-                <td className="px-4 py-2 text-xs whitespace-nowrap text-slate-500">{formatDate(p.updatedAt)}</td>
-                <td className="px-4 py-2 text-right whitespace-nowrap">
-                  <LinkButton size="sm" href={`/catalog/${p.id}`}>
+                  {!p.listed && <Badge>Не в списке</Badge>}
+                </span>
+              </td>
+              <td className="px-4 py-2 text-xs whitespace-nowrap text-slate-500">{formatDate(p.updatedAt)}</td>
+              <td className="px-4 py-2 text-right whitespace-nowrap">
+                <span className="inline-flex items-center gap-3">
+                  {reorder && <Reorder kind="products" ids={ids} index={i} label={plain(p.name)} />}
+                  <LinkButton size="sm" href={`/catalog/products/${p.id}`}>
                     Изменить
                   </LinkButton>
-                  <a href={`${site}${p.path}`} target="_blank" rel="noopener" className="ml-3 text-xs text-brand-600 hover:underline" title="Открыть на сайте">
+                  <a href={`${site}${p.path}`} target="_blank" rel="noopener" className="text-xs text-brand-600 hover:underline" title="Открыть на сайте">
                     ↗
                   </a>
-                </td>
-              </tr>
-            );
-          })}
+                </span>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
   );
-}
-
-function plural(n: number, one: string, few: string, many: string): string {
-  const m10 = n % 10;
-  const m100 = n % 100;
-  if (m10 === 1 && m100 !== 11) return one;
-  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
-  return many;
 }

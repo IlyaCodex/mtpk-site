@@ -33,6 +33,15 @@ export function describeAction({ action, target, details }: Entry): string {
       return `Удалён пользователь ${t}`;
     case action.startsWith('content.') && t.startsWith('/pages'):
       return `${verb === 'post' ? 'Создана' : verb === 'delete' ? 'Удалена' : 'Изменена'} страница${title ? ` «${title}»` : ''}`;
+    case action.startsWith('content.') && t.startsWith('/catalog/reorder'):
+      return 'Изменён порядок карточек каталога';
+    case action.startsWith('content.') && /^\/catalog\/(categories|subcategories|products)/.test(t): {
+      const kind = t.split('/')[2];
+      const [noun, f] = kind === 'categories' ? ['категория', true] : kind === 'subcategories' ? ['подкатегория', true] : ['товар', false];
+      const name = plain(d.name);
+      const verbText = verb === 'post' ? (f ? 'Добавлена' : 'Добавлен') : verb === 'delete' ? (f ? 'Удалена' : 'Удалён') : f ? 'Изменена' : 'Изменён';
+      return `${verbText} ${noun} каталога${name ? ` «${name}»` : ''}`;
+    }
     case action.startsWith('content.') && t === '/settings':
       return 'Изменены шапка, меню и контакты';
     case action.startsWith('content.') && t.startsWith('/redirects'):

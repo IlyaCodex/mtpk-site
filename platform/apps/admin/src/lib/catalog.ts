@@ -165,3 +165,122 @@ export function editorCrumbs(path: string, blocks: CrumbBlock[]): { href: string
     }),
   ];
 }
+
+// ── Каталог как данные: категории, подкатегории, товары ────────────────────
+
+/** Категория (раздел на главной) — ответ GET /admin/v1/catalog/tree. */
+export interface CatCategory {
+  id: number;
+  pageId: number;
+  path: string;
+  status: string;
+  name: string;
+  crumb: string;
+  cover: string | null;
+  coverAlt: string;
+  sort: number;
+  onHome: boolean;
+  /** equipment — оборудование, hub — витрина запчастей */
+  kind: string;
+  subcategories: number;
+  products: number;
+  updatedAt: string;
+}
+
+export interface CatSubcategory {
+  id: number;
+  pageId: number;
+  categoryId: number;
+  path: string;
+  status: string;
+  name: string;
+  crumb: string;
+  description: string;
+  cover: string | null;
+  coverAlt: string;
+  sort: number;
+  listed: boolean;
+  products: number;
+  updatedAt: string;
+}
+
+export interface CatProduct {
+  id: number;
+  pageId: number;
+  categoryId: number;
+  subcategoryId: number | null;
+  path: string;
+  status: string;
+  name: string;
+  nameNote: string | null;
+  cover: string | null;
+  sort: number;
+  listed: boolean;
+  updatedAt: string;
+}
+
+export interface CatalogTree {
+  categories: CatCategory[];
+  subcategories: CatSubcategory[];
+  products: CatProduct[];
+}
+
+/** Карточка товара целиком — GET /admin/v1/catalog/products/:id. */
+export interface ProductEntity extends Omit<CatProduct, 'path' | 'status' | 'updatedAt'> {
+  coverAlt: string;
+  badge: string | null;
+  origin: string | null;
+  caption: string | null;
+  label: string | null;
+  linkText: string | null;
+  specs: { label: string; value: string }[];
+  actions: unknown[];
+  attrs: Record<string, string>;
+  page: { id: number; path: string; status: string; updatedAt: string };
+}
+
+/** Последний сегмент адреса: '/products/a/b/' → 'b' (так раздел выбирается в адресе каталога). */
+export const lastSegment = (path: string) => path.split('/').filter(Boolean).pop() ?? '';
+
+/** Название без разметки: «Дробемёт&nbsp;кранового типа» → «Дробемёт кранового типа». */
+export function plain(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&laquo;/g, '«')
+    .replace(/&raquo;/g, '»')
+    .replace(/&mdash;/g, '—')
+    .replace(/&ndash;/g, '–')
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const TRANSLIT: Record<string, string> = {
+  а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p',
+  р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
+};
+
+/** Адрес из названия: «Дробемёт УИД-376» → «drobemet-uid-376». */
+export function slugify(name: string): string {
+  return plain(name)
+    .toLowerCase()
+    .split('')
+    .map((c) => TRANSLIT[c] ?? c)
+    .join('')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60)
+    .replace(/-+$/, '');
+}
+
+/** Склонение: 1 товар, 2 товара, 5 товаров. */
+export function plural(n: number, one: string, few: string, many: string): string {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}

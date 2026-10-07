@@ -12,7 +12,7 @@ function summarize(contentType: string, body: ArrayBuffer | undefined): Record<s
   try {
     const data = JSON.parse(new TextDecoder().decode(body)) as Record<string, unknown>;
     if (Array.isArray(data)) return { items: data.length };
-    const pick = ['path', 'title', 'status', 'from', 'to', 'code'].filter((k) => data[k] !== undefined);
+    const pick = ['path', 'title', 'name', 'status', 'from', 'to', 'code'].filter((k) => data[k] !== undefined);
     return pick.length ? Object.fromEntries(pick.map((k) => [k, data[k]])) : { bytes: body.byteLength };
   } catch {
     return { bytes: body.byteLength };
