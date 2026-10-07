@@ -17,7 +17,6 @@ const NAV: (NavItem & { area?: Area })[] = [
   { href: '/leads', label: 'Заявки', icon: 'leads', area: 'leads', group: 'Продажи' },
   { href: '/users', label: 'Пользователи', icon: 'users', area: 'users', group: 'Администрирование' },
   { href: '/audit', label: 'Журнал действий', icon: 'audit', area: 'audit', group: 'Администрирование' },
-  { href: '/api-docs', label: 'API для разработчиков', icon: 'api', area: 'users', group: 'Администрирование' },
 ];
 
 /** Каркас админки: меню разделов по правам пользователя и область страницы. */

@@ -15,7 +15,7 @@ const password = process.env.ADMIN_SMOKE_PASSWORD ?? '';
 const outDir = process.argv[2] ?? path.resolve('tools/parity/report/admin');
 fs.mkdirSync(outDir, { recursive: true });
 
-const PAGES = ['/', '/catalog', '/pages', '/settings', '/media', '/redirects', '/stock', '/leads', '/users', '/audit', '/api-docs'];
+const PAGES = ['/', '/catalog', '/pages', '/settings', '/media', '/redirects', '/stock', '/leads', '/users', '/audit'];
 
 const browser = await chromium.launch({ executablePath: chromiumPath(), headless: true });
 const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });

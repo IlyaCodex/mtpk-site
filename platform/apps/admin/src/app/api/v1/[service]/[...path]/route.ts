@@ -23,7 +23,7 @@ function summarize(contentType: string, body: ArrayBuffer | undefined): Record<s
  * REST API админки для данных сервисов: /api/v1/<сервис>/<путь> →
  * <сервис>/admin/v1/<путь>. Проверяет вход и права на раздел, подписывает
  * запрос служебным токеном, изменения пишет в журнал действий.
- * Описание всех методов — /api/v1/openapi (страница «API» в админке).
+ * Описание всех методов (OpenAPI) — /api/v1/openapi.
  */
 async function proxy(req: Request, user: SessionUser, ctx: Ctx): Promise<Response> {
   const { service, path } = await ctx.params;
