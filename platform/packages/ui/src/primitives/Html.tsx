@@ -1,5 +1,27 @@
+import { parseFragment, serializeOuter, type DefaultTreeAdapterMap } from 'parse5';
 import { createElement, type ElementType, type ReactElement } from 'react';
 import { parseElement, toProps } from './attrs.ts';
+
+type Node = DefaultTreeAdapterMap['node'];
+const isElement = (n: Node): n is DefaultTreeAdapterMap['element'] => 'tagName' in n;
+const textOf = (n: Node) => (n.nodeName === '#text' ? (n as DefaultTreeAdapterMap['textNode']).value : '');
+
+/**
+ * HTML из нескольких элементов подряд — текст из редактора: абзацы, списки,
+ * подзаголовки, таблицы. Каждый элемент выводится как есть (RawElement),
+ * текст между ними — текстом. Один элемент — ровно как RawElement.
+ */
+export function RawFragment({ html }: { html: string }): ReactElement | null {
+  const nodes = parseFragment(html).childNodes as Node[];
+  const elements = nodes.filter(isElement);
+  const loose = nodes.some((n) => !isElement(n) && textOf(n).trim());
+  if (elements.length === 1 && !loose) return <RawElement html={html} />;
+  return (
+    <>
+      {nodes.map((n, i) => (isElement(n) ? <RawElement key={i} html={serializeOuter(n)} /> : textOf(n).trim() ? textOf(n) : null))}
+    </>
+  );
+}
 
 /**
  * Элемент, заданный HTML целиком (блок «HTML как есть», иконка SVG):

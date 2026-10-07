@@ -77,10 +77,10 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
               {t.label}
             </button>
           ))}
-        <div className="ml-auto flex overflow-hidden rounded-md border border-slate-200 text-xs">
+        <div className="ml-auto flex overflow-hidden rounded-md border border-slate-300 text-xs font-medium" role="group" aria-label="Режим редактора">
           {(['visual', 'html'] as const).map((m) => (
-            <button key={m} type="button" onClick={() => setMode(m)} className={cx('px-2 py-1', mode === m ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-50')}>
-              {m === 'visual' ? 'Визуально' : 'HTML'}
+            <button key={m} type="button" onClick={() => setMode(m)} className={cx('px-2.5 py-1.5', mode === m ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-50')}>
+              {m === 'visual' ? 'Визуальный редактор' : 'HTML-код'}
             </button>
           ))}
         </div>

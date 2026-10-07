@@ -1,5 +1,5 @@
 import type { ProductSpecBlock, SpecContent } from '@mtpk/content-model';
-import { Inline, RawElement } from '../primitives/Html.tsx';
+import { Inline, RawFragment } from '../primitives/Html.tsx';
 import { styleToObject } from '../primitives/attrs.ts';
 import { SpecNav } from './SpecNav.tsx';
 
@@ -20,7 +20,8 @@ export function SpecTable({ rows }: { rows: { label: string; value: string }[] }
 }
 
 function Content({ item }: { item: SpecContent }) {
-  if (item.kind === 'html') return <RawElement html={item.html} />;
+  // текст раздела: абзацы, списки, подзаголовки — сколько угодно элементов подряд
+  if (item.kind === 'html') return <RawFragment html={item.html} />;
   const table = <SpecTable rows={item.rows} />;
   return item.wrapStyle !== undefined ? <div style={styleToObject(item.wrapStyle)}>{table}</div> : table;
 }

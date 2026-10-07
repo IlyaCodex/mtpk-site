@@ -133,7 +133,7 @@ export function ProductEditor({
   const tabs: [Tab, string][] = [
     ...(catalog ? [['card', 'В каталоге'] as [Tab, string]] : []),
     ['main', 'Страница товара'],
-    ['spec', `Характеристики${spec ? ` (${spec.panels.length})` : ''}`],
+    ['spec', `Описание и характеристики${spec ? ` (${spec.panels.length})` : ''}`],
     ['sections', `Секции страницы (${others.length})`],
     ['seo', 'SEO'],
   ];
@@ -154,7 +154,7 @@ export function ProductEditor({
 
       <div className={cx('grid gap-6 px-8 py-6', device !== 'off' && '2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]')}>
         <div className="min-w-0">
-          <div className="mb-4 flex gap-1 overflow-x-auto border-b border-slate-200">
+          <div className="mb-4 flex flex-wrap gap-x-1 border-b border-slate-200">
             {tabs.map(([id, label]) => (
               <button
                 key={id}
@@ -270,7 +270,6 @@ export function ProductEditor({
             {tab === 'spec' &&
               (spec ? (
                 <>
-                  <p className="mb-3 text-sm text-slate-500">Разделы характеристик — вкладки под карточкой товара. Внутри — таблицы «Параметр — Значение» и тексты.</p>
                   <SpecPanelsEditor block={spec} onChange={(b) => setBlockAt(specAt, b)} />
                 </>
               ) : (
