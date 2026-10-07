@@ -6,6 +6,7 @@ import { cssFileRecord } from '@mtpk/content-kit/styles';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
 import { renderBlocksToHtml } from '@mtpk/ui/server';
+import { catalogNodes } from './catalog.ts';
 import { orNotFound, Prisma, type Db } from './db.ts';
 import type { ContentStore } from './store.ts';
 
@@ -224,6 +225,12 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
         stock: await db.stockItem.count(),
       };
     },
+  );
+
+  app.get(
+    '/admin/v1/catalog',
+    { schema: { tags: ['Админка: страницы'], summary: 'Каталог продукции: страницы /products/… с названием, фото и статусом', security: ADMIN } },
+    async () => catalogNodes(db),
   );
 
   app.get(

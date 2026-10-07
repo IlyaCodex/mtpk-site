@@ -7,7 +7,8 @@ export const dynamic = 'force-dynamic';
 
 const NAV: (NavItem & { area?: Area })[] = [
   { href: '/', label: 'Обзор', icon: 'home' },
-  { href: '/pages', label: 'Страницы', icon: 'pages', area: 'content' },
+  { href: '/catalog', label: 'Каталог продукции', icon: 'catalog', area: 'content' },
+  { href: '/pages', label: 'Все страницы', icon: 'pages', area: 'content' },
   { href: '/settings', label: 'Шапка, меню, контакты', icon: 'settings', area: 'content' },
   { href: '/media', label: 'Медиатека', icon: 'media', area: 'media' },
   { href: '/redirects', label: 'Редиректы', icon: 'redirects', area: 'content' },
