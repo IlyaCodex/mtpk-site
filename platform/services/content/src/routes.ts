@@ -263,6 +263,40 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
   );
 
   app.get(
+    '/admin/v1/pages/lookup',
+    { schema: { tags: ['Админка: страницы'], summary: 'Страница по адресу — для панели администратора на сайте', querystring: pathQuery, security: ADMIN } },
+    async (req, reply) => {
+      const path = req.query.path.endsWith('.html') ? req.query.path : normalizePath(req.query.path);
+      const found = await db.page.findUnique({
+        where: { path },
+        select: {
+          id: true,
+          path: true,
+          title: true,
+          description: true,
+          noindex: true,
+          status: true,
+          kind: true,
+          updatedAt: true,
+          category: { select: { id: true, name: true } },
+          subcategory: { select: { id: true, name: true, categoryId: true } },
+          product: { select: { id: true, name: true, categoryId: true, subcategoryId: true } },
+        },
+      });
+      if (!found) return reply.code(404).send({ error: 'not_found', path });
+      const { category, subcategory, product, ...page } = found;
+      const catalog = category
+        ? { kind: 'category' as const, id: category.id, name: category.name, categoryId: category.id }
+        : subcategory
+          ? { kind: 'subcategory' as const, id: subcategory.id, name: subcategory.name, categoryId: subcategory.categoryId }
+          : product
+            ? { kind: 'product' as const, id: product.id, name: product.name, categoryId: product.categoryId, subcategoryId: product.subcategoryId }
+            : null;
+      return { ...page, catalog };
+    },
+  );
+
+  app.get(
     '/admin/v1/pages/:id',
     { schema: { tags: ['Админка: страницы'], summary: 'Страница для редактирования', params: idParam, security: ADMIN } },
     async (req, reply) => {

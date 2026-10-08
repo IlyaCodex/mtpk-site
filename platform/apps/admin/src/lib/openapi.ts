@@ -22,6 +22,7 @@ const OWN_PATHS: OpenApi['paths'] = {
   },
   '/api/v1/audit': { get: { tags: ['Админка: журнал'], summary: 'Журнал действий (?search, offset, limit)' } },
   '/api/v1/preview': { post: { tags: ['Админка: страницы'], summary: 'Предпросмотр блоков страницы (HTML-документ)' } },
+  '/api/v1/site-bar': { get: { tags: ['Админка: страницы'], summary: 'Панель администратора на сайте: страница (?path), её редактор, SEO, заявки за сегодня' } },
 };
 
 /**

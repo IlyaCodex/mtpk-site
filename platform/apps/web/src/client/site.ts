@@ -18,4 +18,6 @@ ready(() => {
   initForms();
   initCompare();
   initConsent();
+  // вошли в админку — панель администратора (модуль грузится только им)
+  if (/(?:^|;\s*)mtpk_bar=1/.test(document.cookie)) void import('./admin-bar').then((m) => m.mountAdminBar());
 });

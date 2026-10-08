@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { BASE_PATH } from './base-path';
 import { db, redis } from './db';
 import { env } from './env';
+import { secureCookies } from './gate';
 
 /**
  * Роли:
@@ -39,6 +40,13 @@ export interface SessionUser {
 
 const COOKIE = 'mtpk_admin';
 const TTL = 7 * 24 * 3600; // неделя с последнего действия
+/**
+ * Флажок для сайта «вошли в админку»: по нему сайт запрашивает панель
+ * администратора (/api/v1/site-bar). Секретов в нём нет — доступ решает
+ * cookie сессии; без флажка посетители сайта лишних запросов не делают.
+ */
+export const BAR_COOKIE = 'mtpk_bar';
+export const barCookie = { path: '/', sameSite: 'lax' as const, maxAge: TTL };
 const sessionKey = (id: string) => `admin:sess:${id}`;
 const userSessionsKey = (userId: number) => `admin:user-sess:${userId}`;
 
@@ -58,6 +66,7 @@ export async function createSession(userId: number): Promise<void> {
     path: BASE_PATH,
     maxAge: TTL,
   });
+  (await cookies()).set(BAR_COOKIE, '1', { ...barCookie, secure: secureCookies() });
 }
 
 /**
@@ -92,6 +101,7 @@ export async function destroySession(): Promise<void> {
     if (userId) await redis().srem(userSessionsKey(Number(userId)), id);
   }
   jar.delete({ name: COOKIE, path: BASE_PATH });
+  jar.delete({ name: BAR_COOKIE, path: '/' });
 }
 
 /** Завершить все сессии пользователя (отключение, смена пароля). */

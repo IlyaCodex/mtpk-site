@@ -3,6 +3,7 @@ import { BASE_PATH } from '@/lib/base-path';
 import { GATE_COOKIE, GATE_TTL, gatePass, hasGate, loginToken, sameSecret, secureCookies } from '@/lib/gate';
 
 const SESSION_COOKIE = 'mtpk_admin';
+const BAR_COOKIE = 'mtpk_bar';
 
 /** Ответ «такой страницы нет» — без вёрстки админки: снаружи её не видно. */
 const notFound = () =>
@@ -38,7 +39,12 @@ export async function proxy(req: NextRequest) {
   const gate = await hasGate(req.cookies.get(GATE_COOKIE)?.value);
   if (isLogin || pathname === '/api/v1/auth/login') return gate ? NextResponse.next() : notFound();
   if (!gate && !req.cookies.has(SESSION_COOKIE) && !pathname.startsWith('/api/')) return notFound();
-  return NextResponse.next();
+  const res = NextResponse.next();
+  // вошли раньше, чем появился флажок панели на сайте, — поставить (см. BAR_COOKIE в lib/auth.ts)
+  if (req.cookies.has(SESSION_COOKIE) && !req.cookies.has(BAR_COOKIE)) {
+    res.cookies.set(BAR_COOKIE, '1', { path: '/', sameSite: 'lax', secure: secureCookies(), maxAge: 7 * 24 * 3600 });
+  }
+  return res;
 }
 
 export const config = {
