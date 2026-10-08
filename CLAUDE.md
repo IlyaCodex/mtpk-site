@@ -56,6 +56,9 @@
 - Иконки SVG в блоках — окно «Иконка и цвет» (`apps/admin/src/components/icon-picker.tsx`), набор Solar —
   `apps/admin/public/icons/solar-linear.json` (`scripts/icons-solar.ts`); цвет — `style="color:…"` у `<svg>`
   (в HTML-секциях при сохранении остаётся на месте, в класс не уходит).
+- Тёмная тема — `<html data-theme="dark">`: переключатель в шапке (`apps/web/src/client/theme.ts`), токены и свои
+  правила — `apps/web/src/styles/theme-dark.css`. Цвета в CSS (сайт, шаблоны, стили страниц) получают тёмные значения
+  сами (`packages/content-kit/src/dark.ts`: при сборке и при отдаче стилей страниц) — новый CSS пишется как обычно.
 - Виджеты конструктора (текст, сетка фото, карусель, бегущая строка, видео, колонки, призыв, отступ) —
   блоки `packages/ui/src/blocks/Widgets.tsx`, стили `apps/web/src/styles/widgets.css`; добавляются в админке
   панелью «Добавить блок» (`apps/admin/src/components/widgets.tsx`) или «+» у блока в предпросмотре.

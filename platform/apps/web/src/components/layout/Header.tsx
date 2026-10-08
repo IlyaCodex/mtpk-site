@@ -2,11 +2,11 @@ import { Fragment } from 'react';
 import type { NavItem, SiteSettings } from '@mtpk/content-model';
 import { ContactLink } from './ContactLink';
 import { QuickCallForm } from '@mtpk/ui';
-import { ClockIcon, MAIL_SVG, MaxLogo, MenuIcon, PHONE_SVG, SearchIcon, TelegramLogo } from './icons';
+import { ClockIcon, MAIL_SVG, MaxLogo, MenuIcon, PHONE_SVG, SearchIcon, TelegramLogo, ThemeIcons } from './icons';
 
 /**
  * Шапка сайта: строка контактов, логотип, главное меню с мегаменю, поиск,
- * мобильное меню и экспресс-звонок. Контакты и пункты меню — из настроек
+ * переключатель светлой и тёмной темы, мобильное меню и экспресс-звонок. Контакты и пункты меню — из настроек
  * сайта (админка → «Настройки»).
  */
 export function Header({ settings, activeNav }: { settings: SiteSettings; activeNav?: string }) {
@@ -71,6 +71,10 @@ export function Header({ settings, activeNav }: { settings: SiteSettings; active
             </button>
             <button className="icon-btn" aria-label="Поиск" data-search-open="">
               <SearchIcon />
+            </button>
+            {/* состояние (aria-pressed, подсказка) ставит client/theme.ts */}
+            <button type="button" className="icon-btn theme-toggle" aria-label="Тёмная тема" aria-pressed="false" title="Тёмная тема" data-theme-toggle="">
+              <ThemeIcons />
             </button>
             <QuickCallForm />
           </div>

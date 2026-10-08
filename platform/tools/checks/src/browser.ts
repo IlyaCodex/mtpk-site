@@ -75,6 +75,8 @@ export async function shot(browser: Browser, url: string, viewport: Viewport): P
   const page = await ctx.newPage();
   try {
     await prepare(page, url);
+    // CHECKS_HIDE=<селектор> — спрятать новое (например, кнопку, которой нет в эталоне), чтобы сверить остальное
+    if (process.env.CHECKS_HIDE) await page.addStyleTag({ content: `${process.env.CHECKS_HIDE}{display:none!important}` });
     return await page.screenshot({ fullPage: true, animations: 'disabled', caret: 'hide' });
   } finally {
     await ctx.close();

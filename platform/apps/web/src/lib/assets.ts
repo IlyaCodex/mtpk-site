@@ -7,11 +7,8 @@ export type ClientModule = 'site' | 'gallery' | 'lightbox' | 'spec-nav' | 'catal
 const MANIFEST = path.join(process.cwd(), 'public/assets/manifest.json');
 let cached: Record<string, string> | null = null;
 
-/**
- * Адреса собранных модулей с хешем в имени. В разработке манифест
- * перечитывается (сборщик в режиме watch пересобирает файлы).
- */
-export function clientModuleUrl(name: ClientModule): string | null {
+/** Манифест сборки; в разработке перечитывается (сборщик в режиме watch пересобирает файлы). */
+function manifest(): Record<string, string> {
   if (!cached || process.env.NODE_ENV !== 'production') {
     try {
       cached = JSON.parse(fs.readFileSync(MANIFEST, 'utf8')) as Record<string, string>;
@@ -19,5 +16,19 @@ export function clientModuleUrl(name: ClientModule): string | null {
       cached = {};
     }
   }
-  return cached[name] ?? null;
+  return cached;
+}
+
+/** Адреса собранных модулей с хешем в имени. */
+export function clientModuleUrl(name: ClientModule): string | null {
+  return manifest()[name] ?? null;
+}
+
+/**
+ * Шаблонные стили страницы (/css/tpl/имя.css): собранный файл с цветами
+ * тёмной темы (assets/tpl, адрес с хешем); нет сборки — исходный файл с версией.
+ */
+export function templateCssUrl(href: string, version: string): string {
+  const name = /^\/css\/tpl\/([\w.-]+\.css)$/.exec(href)?.[1];
+  return (name && manifest()[`tpl/${name}`]) || `${href}?v=${version}`;
 }

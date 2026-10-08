@@ -1,0 +1,95 @@
+/*
+ * Тёмная тема: <html data-theme="dark"> (переключатель в шапке, client/theme.ts;
+ * выбор ставит скрипт в <head> до отрисовки — без вспышки светлой темы).
+ *
+ * Как устроено:
+ *  - смысловые токены (tokens.css: фоны, текст, рамки, кнопки) — здесь, ниже;
+ *  - цвета, заданные в CSS напрямую (#fff, var(--neutral-0) в фоне, тёмный
+ *    текст), сборка и сервис стилей превращают в переменные --dk-… со
+ *    светлым значением по умолчанию (content-kit/src/dark.ts) — светлая тема
+ *    не меняется, а тёмные значения дописываются к каждому файлу;
+ *  - белый текст и тёмные фоны (подвал, герой на фото) одинаковы в обеих темах.
+ *
+ * Этот файл подключается последним и сборкой не переделывается: цвета в нём
+ * пишутся для тёмной темы как есть. Островок, который должен остаться светлым,
+ * возвращает свои цвета так: `.x { --dk-bg-ffffff: #fff; }`.
+ */
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* фоны */
+  --surface-page: #11181b;
+  --surface-subtle: #131a1d;
+  --surface-muted: #161d20;
+  --surface-deep: #0b1114;
+  --surface-overlay: rgba(5, 10, 12, 0.82);
+  --surface-brand-soft: #142329;
+
+  /* текст */
+  --text-primary: #dbe3e6;
+  --text-secondary: #a3abae;
+  --text-tertiary: #8f969a;
+  --text-disabled: #5f686c;
+  --text-brand: #7cafc8;
+  --text-success: #7ab275;
+
+  /* рамки */
+  --border-subtle: #2a3337;
+  --border-default: #3e4649;
+  --border-strong: #8f969a;
+  --border-brand: #5f9ab4;
+  --border-focus: #7cafc8;
+
+  /* кнопки */
+  --action-secondary-bg-hover: #16262d;
+  --action-secondary-fg: #8eb9ce;
+  --action-secondary-border: #5f9ab4;
+  --action-ghost-bg-hover: #1c2427;
+  --action-ghost-fg: #dbe3e6;
+  --action-dark-bg: #2a3337;
+  --action-dark-bg-hover: #36424a;
+  --action-disabled-bg: #232b2e;
+  --action-disabled-fg: #6b7377;
+
+  /* состояния */
+  --status-success-bg: #172318;
+  --status-success-fg: #7ab275;
+  --status-warning-bg: #211c08;
+  --status-warning-fg: #cf9a62;
+  --status-danger-bg: #281d1d;
+  --status-danger-fg: #de7f74;
+  --status-info-bg: #142329;
+  --status-info-fg: #8eb9ce;
+
+  --selection-bg: #1f4a5d;
+  --selection-fg: #e6f0f4;
+  --shadow-focus: 0 0 0 3px rgba(124, 175, 200, 0.45);
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 10px -2px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 28px -8px rgba(0, 0, 0, 0.55), 0 4px 8px -4px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+
+  /* компоненты */
+  --card-bg: #141c1f;
+  --field-bg: #141c20;
+  --field-border-hover: #8f969a;
+  --header-bg: rgba(17, 24, 27, 0.94);
+}
+
+/* переключение темы — без плавных переходов цвета (иначе страница «переливается») */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after { transition: none !important; }
+
+/* шапка: светлый вариант логотипа — тот же, что в подвале */
+html[data-theme="dark"] :is(.header__brand, .nav-drawer__brand) img { content: url("/brand/logo-footer-white.png"); }
+
+/* переключатель темы: в светлой — луна, в тёмной — солнце */
+.theme-toggle__sun { display: none; }
+html[data-theme="dark"] .theme-toggle__moon { display: none; }
+html[data-theme="dark"] .theme-toggle__sun { display: block; }
+
+/* номер текущей страницы (каталог запчастей): фон — цвет текста, в тёмной теме он светлый */
+html[data-theme="dark"] .pagination button.current { background: var(--teal-500); border-color: var(--teal-500); }

@@ -4,6 +4,9 @@
  *    ES-модули, общий код — в отдельных чанках;
  *  - общие стили → public/assets: два файла по месту в каскаде — core.css
  *    (до стилей страницы) и core-end.css (после них). В коде страниц <style> нет;
+ *  - шаблонные стили страниц (public/css/tpl) → public/assets/tpl с хешем.
+ *    Цвета в CSS — с переменными тёмной темы (content-kit/src/dark.ts):
+ *    светлая тема та же, у тёмной (html[data-theme=dark]) — свои значения;
  *  - старые скрипты страниц (src/legacy/*.ts) → public/js/<имя>.js: обычные
  *    скрипты (не модули), адреса прежние — на них ссылаются страницы.
  * manifest.json «имя → файл» читает сервер (src/lib/assets.ts).
@@ -16,6 +19,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build, context, transform, type BuildOptions, type Plugin } from 'esbuild';
+import { darkVars } from '@mtpk/content-kit/dark';
 import { ASSET_VERSIONS } from '../src/lib/site.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -46,8 +50,19 @@ const CSS_BUNDLES: Record<string, string[]> = {
     'public/css/praktikum-nav-v26.css',
     'public/css/audit-fixes-20261002.css',
   ],
-  'core-end': ['public/css/mobile-fixes.css', 'public/css/stock.css', 'public/css/base-layout.css', 'src/styles/components.css', 'src/styles/widgets.css'],
+  'core-end': [
+    'public/css/mobile-fixes.css',
+    'public/css/stock.css',
+    'public/css/base-layout.css',
+    'src/styles/components.css',
+    'src/styles/widgets.css',
+    'src/styles/theme-dark.css',
+  ],
 };
+/** Правила самой тёмной темы — как есть: цвета в них уже тёмные, переменные --dk-… им не нужны. */
+const AS_IS = new Set(['src/styles/theme-dark.css']);
+/** Шаблонные стили страниц (на них ссылаются страницы: page.cssTemplates). */
+const TPL_DIR = 'public/css/tpl';
 
 /** Старые скрипты страниц: каждый — отдельный файл public/js/<имя>.js. */
 const LEGACY_DIR = 'src/legacy';
@@ -59,14 +74,24 @@ const legacyEntries = () =>
 
 const hash = (s: string) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
 
+async function writeCss(name: string, source: string): Promise<string> {
+  const { code } = await transform(source, { loader: 'css', minify: !watch, legalComments: 'none' });
+  const file = `${name}-${hash(code)}.css`;
+  fs.mkdirSync(path.dirname(path.join(OUT, file)), { recursive: true });
+  fs.writeFileSync(path.join(OUT, file), code);
+  return `/assets/${file}`;
+}
+
 async function buildCss(): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
+  const read = (f: string) => fs.readFileSync(path.join(ROOT, f), 'utf8');
   for (const [name, files] of Object.entries(CSS_BUNDLES)) {
-    const source = files.map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
-    const { code } = await transform(source, { loader: 'css', minify: !watch, legalComments: 'none' });
-    const file = `${name}-${hash(code)}.css`;
-    fs.writeFileSync(path.join(OUT, file), code);
-    out[`${name}.css`] = `/assets/${file}`;
+    const own = files.filter((f) => !AS_IS.has(f)).map(read).join('\n');
+    const asIs = files.filter((f) => AS_IS.has(f)).map(read).join('\n');
+    out[`${name}.css`] = await writeCss(name, `${darkVars(own)}\n${asIs}`);
+  }
+  for (const f of fs.readdirSync(path.join(ROOT, TPL_DIR)).filter((x) => x.endsWith('.css'))) {
+    out[`tpl/${f}`] = await writeCss(`tpl/${f.slice(0, -4)}`, darkVars(read(`${TPL_DIR}/${f}`)));
   }
   return out;
 }

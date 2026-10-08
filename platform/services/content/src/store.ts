@@ -1,5 +1,6 @@
 import { buildCompareIndex, resolveStock, type StockConfigItem } from '@mtpk/content-kit';
 import { resolveCatalogBlocks, type CatalogData } from '@mtpk/content-kit/catalog';
+import { darkVars } from '@mtpk/content-kit/dark';
 import { styleFileCss } from '@mtpk/content-kit/styles';
 import { DEFAULT_SETTINGS, siteSettings, type Block, type SiteSettings } from '@mtpk/content-model';
 import { loadCatalog } from './catalog-data.ts';
@@ -23,6 +24,8 @@ function withCatalog<T extends { id: number; blocks: unknown }>(row: T, data: Ca
  */
 export class ContentStore {
   private styles: Map<string, StyleBlock> | null = null;
+  /** готовые CSS-файлы по хешу: блок стилей по хешу не меняется — переделку цветов делаем один раз */
+  private readonly styleFiles = new Map<string, string>();
 
   constructor(
     private readonly db: Db,
@@ -83,10 +86,19 @@ export class ContentStore {
     });
   }
 
-  /** CSS-файл стилей страницы по хешу (/css/inline-extracted/inline-<хеш>.css). */
+  /**
+   * CSS-файл стилей страницы по хешу (/css/inline-extracted/inline-<хеш>.css).
+   * Цвета — с переменными тёмной темы (content-kit/src/dark.ts): светлая тема
+   * та же, у тёмной — свои значения.
+   */
   async styleCss(hash: string): Promise<string | null> {
+    const ready = this.styleFiles.get(hash);
+    if (ready !== undefined) return ready;
     const block = (await this.styleMap()).get(hash);
-    return block ? styleFileCss(block) : null;
+    if (!block) return null;
+    const css = darkVars(styleFileCss(block));
+    this.styleFiles.set(hash, css);
+    return css;
   }
 
   /** /data/stock.json — тот же формат, что писал build-stock.mjs. */

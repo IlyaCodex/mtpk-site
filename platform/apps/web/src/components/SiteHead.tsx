@@ -1,7 +1,8 @@
 import type { PageDto } from '@mtpk/shared/contracts';
-import { clientModuleUrl } from '@/lib/assets';
+import { clientModuleUrl, templateCssUrl } from '@/lib/assets';
 import { jsonLdHtml, ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/lib/seo';
 import { ASSET_VERSIONS, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE } from '@/lib/site';
+import { THEME_INIT } from '@/lib/theme';
 
 export type HeadPage = Pick<
   PageDto,
@@ -26,6 +27,8 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
   const coreEnd = clientModuleUrl('core-end.css');
   return (
     <>
+      {/* тёмная тема — до стилей, чтобы страница не мигнула светлой (lib/theme.ts) */}
+      <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       <title>{page.title}</title>
       {page.description && <meta name="description" content={page.description} />}
       <link rel="canonical" href={canonical} />
@@ -75,7 +78,7 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
         <script key={`ld${i}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(json) }} />
       ))}
       {page.cssTemplates.map((href) => (
-        <link key={href} rel="stylesheet" href={`${href}?v=${ASSET_VERSIONS.tplCss}`} />
+        <link key={href} rel="stylesheet" href={templateCssUrl(href, ASSET_VERSIONS.tplCss)} />
       ))}
       {page.externalStyles.map((href) => (
         <link key={href} rel="stylesheet" href={href} />
