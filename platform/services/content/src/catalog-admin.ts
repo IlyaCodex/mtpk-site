@@ -304,6 +304,7 @@ export async function catalogAdminRoutes(base: FastifyInstance, { db, store, cha
     const prev = await db.category.findUnique({ where: { id: req.params.id }, include: { page: { select: { path: true, status: true } }, _count: { select: { subcategories: true, products: true } } } });
     if (!prev) return reply.code(404).send({ error: 'not_found' });
     const path = normalizePath(input.path);
+    if (prev.kind === 'hub' && path !== prev.page.path) reject(409, 'hub_path', 'Адрес раздела запчастей не меняется: с него начинаются адреса его разделов и позиций');
     const crumb = orNull(input.crumb) ?? plainText(input.name);
     const blocksChanged = input.productBlocks !== undefined && JSON.stringify(input.productBlocks) !== JSON.stringify(prev.productBlocks);
     if (blocksChanged) await storeScripts(db, input.productBlocks as Block[]);
@@ -336,6 +337,8 @@ export async function catalogAdminRoutes(base: FastifyInstance, { db, store, cha
     const prev = await db.category.findUnique({ where: { id: req.params.id }, include: { page: { select: { path: true } }, _count: { select: { subcategories: true, products: true } } } });
     if (!prev) return reply.code(404).send({ error: 'not_found' });
     if (prev._count.subcategories + prev._count.products > 0) return reply.code(409).send({ error: 'not_empty', message: 'В категории есть подкатегории или товары — сначала удалите или перенесите их' });
+    // запчасти пока — страницами внутри адреса раздела: удалить раздел — потерять их
+    if (prev.kind === 'hub') return reply.code(409).send({ error: 'hub', message: 'Раздел запчастей не удаляется: в нём сотни страниц позиций' });
     await tx((t) => deletePage(t, prev.pageId, prev.page.path, '/products/'));
     await changed([prev.page.path], 'page.deleted');
     await changed(['/']);

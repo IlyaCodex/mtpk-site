@@ -28,7 +28,11 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
       <CatalogFormHeader
         trail={catalogTrail(tree, category.id)}
         title={plain(category.name)}
-        description="Карточка категории на главной, адрес страницы и общие секции под товарами категории."
+        description={
+          category.kind === 'hub'
+            ? 'Раздел запчастей: карточка на главной (название, обложка) и страница раздела. Позиции правятся в каталоге запчастей.'
+            : 'Карточка категории на главной, адрес страницы и общие секции под товарами категории.'
+        }
         actions={
           <>
             <LinkButton size="sm" href={`/catalog/${category.page.id}`}>

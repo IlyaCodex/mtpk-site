@@ -175,6 +175,8 @@ export type CategoryEntity = {
 export function CategoryForm({ initial, childCount, schemas, products }: { initial?: CategoryEntity; childCount: number; schemas?: BlockSchemas; products: number }) {
   const router = useRouter();
   const isNew = !initial;
+  // раздел запчастей: его страницы — внутри адреса раздела, товаров каталога у него нет
+  const hub = initial?.kind === 'hub';
   const [pathTouched, setPathTouched] = useState(!isNew);
   const { draft, set, dirty, saving, run } = useDraft({
     name: initial?.name ?? '',
@@ -235,8 +237,12 @@ export function CategoryForm({ initial, childCount, schemas, products }: { initi
             setPathTouched(true);
             set({ path });
           }}
-          locked={!isNew && childCount > 0}
-          lockedHint="У категории есть подкатегории или товары — их адреса начинаются с адреса категории, поэтому он не меняется."
+          locked={!isNew && (childCount > 0 || hub)}
+          lockedHint={
+            hub
+              ? 'Раздел запчастей: адреса его разделов и позиций начинаются с адреса раздела, поэтому он не меняется.'
+              : 'У категории есть подкатегории или товары — их адреса начинаются с адреса категории, поэтому он не меняется.'
+          }
           isNew={isNew}
         />
         <label className="block">
@@ -247,7 +253,7 @@ export function CategoryForm({ initial, childCount, schemas, products }: { initi
         {isNew && <p className="text-xs text-slate-500">Категория создаётся черновиком: на сайте её не видно, пока вы не опубликуете её здесь же.</p>}
       </FormSection>
 
-      {!isNew && schemas && (
+      {!isNew && schemas && !hub && (
         <FormSection
           title="Общие секции под каждым товаром категории"
           hint={
@@ -268,8 +274,8 @@ export function CategoryForm({ initial, childCount, schemas, products }: { initi
         onSave={() => void save()}
         saveLabel={isNew ? 'Создать категорию' : 'Сохранить'}
         isNew={isNew}
-        onDelete={!isNew && childCount === 0 ? () => void remove() : undefined}
-        deleteHint={!isNew ? 'Удалить можно пустую категорию' : undefined}
+        onDelete={!isNew && childCount === 0 && !hub ? () => void remove() : undefined}
+        deleteHint={!isNew ? (hub ? 'Раздел запчастей не удаляется: в нём сотни страниц позиций' : 'Удалить можно пустую категорию') : undefined}
       />
     </div>
   );

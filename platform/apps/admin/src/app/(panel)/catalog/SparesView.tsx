@@ -70,12 +70,27 @@ export function SparesView({
       </nav>
 
       <section className="mb-5 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+        {scope === hub &&
+          (category.cover ? (
+            <img src={thumbUrl(category.cover, 320)!} alt="" className="h-16 w-28 shrink-0 rounded-lg object-cover" />
+          ) : (
+            <div className="h-16 w-28 shrink-0 rounded-lg bg-slate-100" />
+          ))}
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-xl font-semibold text-slate-900">{scope === hub ? plain(category.name) : scope.short}</h1>
-          <p className="text-xs text-slate-500">Запчасти пока правятся как страницы: откройте позицию или раздел и измените тексты, фото и таблицы.</p>
+          <p className="text-xs text-slate-500">
+            {scope === hub
+              ? 'Карточка раздела (название, обложка, показ на главной) — «Изменить категорию». Позиции пока правятся как страницы: откройте позицию или группу.'
+              : 'Запчасти пока правятся как страницы: откройте позицию или раздел и измените тексты, фото и таблицы.'}
+          </p>
         </div>
+        {scope === hub && (
+          <LinkButton size="sm" variant="primary" href={`/catalog/categories/${category.id}`}>
+            Изменить категорию
+          </LinkButton>
+        )}
         <LinkButton size="sm" href={`/catalog/${scope.id}`}>
-          Изменить страницу
+          {scope === hub ? 'Тексты и SEO страницы' : 'Изменить страницу'}
         </LinkButton>
         <a href={`${site}${scope.path}`} target="_blank" rel="noopener" className="text-xs text-brand-600 hover:underline">
           на сайте ↗
