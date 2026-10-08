@@ -216,7 +216,16 @@ function Tile({ svg, dark, size = 'lg' }: { svg: string; dark?: boolean; size?: 
 }
 
 /** Цвет: «как в дизайне», цвета дизайн-системы, свой (поле выбора цвета и #код). */
-export function ColorChooser({ value, onChange }: { value: string | null; onChange: (color: string | null) => void }) {
+export function ColorChooser({
+  value,
+  onChange,
+  designHint = 'Цвет задаёт оформление сайта (обычно фирменный бирюзовый)',
+}: {
+  value: string | null;
+  onChange: (color: string | null) => void;
+  /** подсказка у «Как в дизайне» */
+  designHint?: string;
+}) {
   const [draft, setDraft] = useState(value ?? '');
   useEffect(() => setDraft(value ?? ''), [value]);
   const preset = ICON_COLORS.some(([c]) => c === value);
@@ -226,7 +235,7 @@ export function ColorChooser({ value, onChange }: { value: string | null; onChan
         type="button"
         onClick={() => onChange(null)}
         className={cx('h-8 rounded-full border px-3 text-xs', value === null ? 'border-brand-500 bg-brand-50 font-medium text-brand-700' : 'border-slate-300 text-slate-600 hover:bg-slate-50')}
-        title="Цвет задаёт оформление сайта (обычно фирменный бирюзовый)"
+        title={designHint}
       >
         Как в дизайне
       </button>

@@ -14,6 +14,7 @@
     "./scripts": "./src/scripts.ts",
     "./section": "./src/section.ts",
     "./dark": "./src/dark.ts",
+    "./design": "./src/design.ts",
     "./format-html": "./src/format-html.ts",
     "./inline-styles": "./src/inline-styles.ts",
     "./catalog": "./src/catalog.ts"

@@ -5,6 +5,7 @@ import { classifyStyleBlock, detectTemplate, normalizePath } from '@mtpk/content
 import { sectionParts } from '@mtpk/content-kit/section';
 import { cssFileRecord } from '@mtpk/content-kit/styles';
 import { formatHtml } from '@mtpk/content-kit/format-html';
+import { buttonDesignAttrs } from '@mtpk/content-kit/design';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
 import { block as blockSchema, BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
@@ -458,7 +459,9 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
         preview: Boolean(req.body.mark),
       };
       const html = req.body.mark ? renderBlocksMarked(blocks, marks, ctx) : renderBlocksToHtml(blocks, ctx);
-      return { html: req.body.pretty ? formatHtml(html) : html };
+      // оформление кнопок из настроек сайта — атрибуты <html> документа предпросмотра (как на сайте)
+      const htmlAttrs = buttonDesignAttrs((await store.settings()).design);
+      return { html: req.body.pretty ? formatHtml(html) : html, htmlAttrs };
     },
   );
 

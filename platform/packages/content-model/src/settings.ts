@@ -93,6 +93,22 @@ const footerColumn = z.object({
   links: z.array(link).describe('Ссылки'),
 });
 
+// ── Оформление: кнопки ───────────────────────────────────────────────────
+
+const hexColor = (label: string) => z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Цвет — в виде #rrggbb').describe(label);
+
+/**
+ * Скругление и цвета кнопок на всех страницах (админка: вкладка «Оформление:
+ * кнопки»). Не задано — как в дизайне сайта; вывод — content-kit/src/design.ts.
+ */
+export const designSettings = z.object({
+  buttonRadius: z.number().int().min(0).max(30).optional().describe('Скругление углов кнопок, px (30 — «таблетка»)'),
+  buttonColor: hexColor('Цвет кнопок').optional(),
+  buttonTextColor: hexColor('Цвет текста на кнопках').optional(),
+  buttonOutlineColor: hexColor('Цвет контурных кнопок (рамка и текст)').optional(),
+});
+export type DesignSettings = z.infer<typeof designSettings>;
+
 export const siteSettings = z.object({
   contacts: contactsSettings.describe('Контакты'),
   company: companySettings.describe('Компания'),
@@ -104,6 +120,7 @@ export const siteSettings = z.object({
       bottomLinks: z.array(link).describe('Ссылки внизу (документы)'),
     })
     .describe('Подвал'),
+  design: designSettings.optional().describe('Оформление: кнопки'),
 });
 export type SiteSettings = z.infer<typeof siteSettings>;
 

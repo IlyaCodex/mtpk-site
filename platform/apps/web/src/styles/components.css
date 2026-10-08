@@ -72,3 +72,24 @@
   .to-top svg { width: 22px; height: 22px; }
 }
 @media print { .to-top { display: none; } }
+
+/* ── Кнопки: скругление и цвета из админки («Шапка, меню, контакты» → «Оформление: кнопки»).
+   Заданы — на <html> атрибуты data-btn-* и переменные --design-* (content-kit/src/design.ts);
+   не заданы — правила ниже не действуют, кнопки как в дизайне. */
+html[data-btn-radius] :is(.btn, .form__submit, .header-quick-form__btn, .hero-quick-card__btn, .button, .cmp-btn, .cookie-consent__accept, .best-offer__file-btn) {
+  border-radius: var(--design-radius);
+}
+html[data-btn-color] :is(.btn--primary, .btn--green, .btn--cta, .form__submit, .header-quick-form__btn, .hero-quick-card__btn, .button, .cookie-consent__accept) {
+  background-color: var(--design-primary);
+  border-color: var(--design-primary);
+  color: var(--design-primary-text);
+  --btn-green-glow: 0 8px 20px -4px var(--design-primary-glow);
+  --btn-green-glow-hover: 0 12px 28px -4px var(--design-primary-glow);
+}
+html[data-btn-color] :is(.btn--primary, .btn--green, .btn--cta, .form__submit, .header-quick-form__btn, .hero-quick-card__btn, .button, .cookie-consent__accept):hover {
+  background-color: var(--design-primary-hover);
+  border-color: var(--design-primary-hover);
+}
+html[data-btn-outline] .btn--secondary { color: var(--design-outline); border-color: var(--design-outline); }
+html[data-btn-outline] .btn--secondary:hover { background-color: var(--design-outline-soft); }
+html[data-theme="dark"][data-btn-outline] .btn--secondary { color: var(--design-outline-dark); border-color: var(--design-outline-dark); }

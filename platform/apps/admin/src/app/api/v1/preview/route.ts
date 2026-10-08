@@ -48,8 +48,10 @@ export const POST = route('content', async (req, user) => {
   const site = env().PUBLIC_SITE_URL.replace(/\/$/, '');
 
   let body: string;
+  // оформление кнопок из настроек сайта (атрибуты <html>, как на сайте)
+  let htmlAttrs = '';
   try {
-    ({ html: body } = await serviceJson<{ html: string }>('content', 'render', { method: 'POST', json: { path: page.path, blocks: page.blocks, mark: true }, user }));
+    ({ html: body, htmlAttrs = '' } = await serviceJson<{ html: string; htmlAttrs?: string }>('content', 'render', { method: 'POST', json: { path: page.path, blocks: page.blocks, mark: true }, user }));
   } catch (err) {
     const why = err instanceof ServiceError ? JSON.stringify(err.body).slice(0, 600) : (err as Error).message;
     body = `<div style="padding:24px;font:14px/1.5 system-ui;color:#b42318">Блоки не отрисовались: ${escapeAttr(why)}</div>`;
@@ -61,7 +63,7 @@ export const POST = route('content', async (req, user) => {
   const before = [...(built['core.css'] ? [built['core.css']] : CORE), ...page.cssTemplates.map((href) => (version ? `${href}?v=${version}` : href))];
   const after = built['core-end.css'] ? [built['core-end.css']] : CORE_END;
   const html = `<!doctype html>
-<html lang="ru">
+<html lang="ru"${htmlAttrs}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

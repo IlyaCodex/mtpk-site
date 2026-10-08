@@ -5,8 +5,9 @@ import { resolveSchema, SchemaField, type JsonSchema } from '@/components/schema
 import { toast } from '@/components/toast';
 import { Button, cx } from '@/components/ui';
 import { api } from '@/lib/client-api';
+import { ButtonDesignEditor, type ButtonDesign } from './ButtonDesignEditor';
 
-/** Настройки сайта по разделам схемы siteSettings: контакты, компания, меню, подвал. */
+/** Настройки сайта по разделам схемы siteSettings: контакты, компания, меню, подвал, оформление кнопок. */
 export function SettingsEditor({ initial, schema }: { initial: Record<string, unknown>; schema: JsonSchema }) {
   const [value, setValue] = useState(initial);
   const [saved, setSaved] = useState(() => JSON.stringify(initial));
@@ -47,7 +48,9 @@ export function SettingsEditor({ initial, schema }: { initial: Record<string, un
         </Button>
       </nav>
       <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-5">
-        {current && (
+        {current?.[0] === 'design' ? (
+          <ButtonDesignEditor value={value.design as ButtonDesign | undefined} onChange={(v) => setValue((s) => ({ ...s, design: v }))} />
+        ) : current && (
           <SchemaField
             schema={current[1]}
             root={schema}
