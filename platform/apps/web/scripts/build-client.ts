@@ -16,6 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build, context, transform, type BuildOptions, type Plugin } from 'esbuild';
+import { ASSET_VERSIONS } from '../src/lib/site.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'public/assets');
@@ -87,6 +88,8 @@ const writeManifest: Plugin = {
         if (name) manifest[name] = `/${path.relative(path.join(ROOT, 'public'), path.resolve(ROOT, file)).split(path.sep).join('/')}`;
       }
       Object.assign(manifest, await buildCss());
+      // версия /css/tpl/*.css — её берёт предпросмотр в админке (те же адреса, что у страниц)
+      manifest['tpl-css-version'] = ASSET_VERSIONS.tplCss;
       fs.writeFileSync(path.join(OUT, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
       console.log(`статика сайта: модулей ${Object.keys(ENTRIES).length}, JS ${(bytes / 1024).toFixed(1)} КБ, стили ${Object.keys(CSS_BUNDLES).length} файла`);
     });
