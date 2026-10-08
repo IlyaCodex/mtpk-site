@@ -49,3 +49,26 @@
 /* своя подложка: у body сайта тёмный фон (цвет подвала) — секция без фона была бы тёмной */
 .cms-section { padding: var(--section-py-base, 96px) 0; background: var(--neutral-0); }
 .cms-section--subtle { background: var(--surface-subtle); }
+
+/* Кнопка «Наверх» (client/to-top.ts): круглая, справа внизу; появляется после
+   полутора экранов прокрутки и встаёт над нижними панелями (--to-top-lift) */
+.to-top {
+  position: fixed; right: 24px; bottom: calc(24px + var(--to-top-lift, 0px)); z-index: 890;
+  display: flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--teal-600); color: #fff; cursor: pointer;
+  box-shadow: 0 10px 24px -8px rgba(16, 31, 38, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  opacity: 0; visibility: hidden; transform: translateY(14px) scale(0.9);
+  transition: opacity 0.22s var(--ease-out), transform 0.22s var(--ease-out), visibility 0s linear 0.22s,
+    background-color 0.15s, bottom 0.2s var(--ease-out);
+}
+.to-top.is-visible { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.to-top:hover { background: var(--teal-700); transform: translateY(-2px); }
+.to-top:active { transform: translateY(0) scale(0.96); }
+.to-top:focus-visible { outline: 3px solid var(--green-400); outline-offset: 3px; box-shadow: none; border-radius: 50%; }
+.to-top svg { width: 24px; height: 24px; }
+@media (max-width: 640px) {
+  .to-top { right: 16px; bottom: calc(16px + var(--to-top-lift, 0px)); width: 46px; height: 46px; }
+  .to-top svg { width: 22px; height: 22px; }
+}
+@media print { .to-top { display: none; } }
