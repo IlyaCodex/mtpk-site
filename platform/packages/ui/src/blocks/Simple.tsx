@@ -11,8 +11,11 @@ import { toProps } from '../primitives/attrs.ts';
  * файл отдаёт контент-сервис), а не <style> в коде страницы. Стоит там же,
  * где стоял <style>, — порядок каскада не меняется.
  */
-export function StyleLink({ block }: { block: StyleBlock }) {
-  return <link rel="stylesheet" href={externalStyleUrl(cssFileRecord(block.css).hash)} />;
+export function StyleLink({ block, preview }: { block: StyleBlock; preview?: boolean }) {
+  const file = cssFileRecord(block.css);
+  // в предпросмотре — сразу CSS: файла несохранённых стилей ещё нет
+  if (preview) return <style dangerouslySetInnerHTML={{ __html: file.css }} />;
+  return <link rel="stylesheet" href={externalStyleUrl(file.hash)} />;
 }
 
 /**

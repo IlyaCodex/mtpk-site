@@ -6,6 +6,7 @@ import type { BlockData } from './BlockList';
 import { CodeEditor } from './CodeEditor';
 import { useEditorContext } from './editor-context';
 import { HtmlFieldsEditor } from './html-fields';
+import { newSectionId } from './section-id';
 import { Icon } from './icons';
 import { Button, cx } from './ui';
 
@@ -29,7 +30,7 @@ export function ModeTabs<T extends string>({ value, options, onChange }: { value
   );
 }
 
-type SectionMode = 'fields' | 'code';
+type SectionMode = 'fields' | 'code' | 'css' | 'script';
 // последняя выбранная вкладка секций — следующие открываются на ней же
 const MODE_KEY = 'admin:section-mode';
 function storedMode(): SectionMode | null {
@@ -46,8 +47,46 @@ function storedMode(): SectionMode | null {
  * картинки, карточки); «HTML-код» — вся разметка секции в редакторе кода.
  * Новая секция открывается сразу в коде.
  */
+const CSS_EXAMPLE = `/* Стили только этой секции: «&» — сама секция, остальное — внутри неё */
+& {
+  background: var(--neutral-100);
+}
+
+.s-title em {
+  color: var(--green-500);
+}
+
+@media (max-width: 640px) {
+  .s-title {
+    font-size: 30px;
+  }
+}
+`;
+
+const SECTION_SCRIPT_EXAMPLE = `// section — элемент этой секции. Пример: секция плавно появляется,
+// когда до неё долистали (кто отключил анимацию в системе — видит сразу).
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  section.style.opacity = '0';
+  new IntersectionObserver((entries, observer) => {
+    if (!entries[0].isIntersecting) return;
+    section.animate(
+      [
+        { opacity: 0, transform: 'translateY(24px)' },
+        { opacity: 1, transform: 'none' },
+      ],
+      { duration: 600, easing: 'ease-out', fill: 'forwards' },
+    );
+    observer.disconnect();
+  }).observe(section);
+}
+`;
+
 export function HtmlSection({ block, fresh, onChange }: { block: BlockData; fresh?: boolean; onChange: (b: BlockData) => void }) {
   const html = String(block.html ?? '');
+  const css = String(block.css ?? '');
+  const script = String(block.script ?? '');
+  // свой CSS или скрипт — секции нужна метка (атрибут data-s у корня)
+  const setOwn = (patch: { css?: string; script?: string }) => onChange({ ...block, ...patch, sid: block.sid ?? newSectionId() });
   const onlyCode = fresh || html.trimStart().startsWith('<script');
   const [mode, setMode] = useState<SectionMode>(onlyCode ? 'code' : 'fields');
   // выбор из прошлого раза — после монтирования (на сервере localStorage нет)
@@ -58,6 +97,8 @@ export function HtmlSection({ block, fresh, onChange }: { block: BlockData; fres
   }, []);
   const choose = (m: SectionMode) => {
     setMode(m);
+    // запоминаем только «тексты» или «HTML» — с них открываются следующие секции
+    if (m !== 'fields' && m !== 'code') return;
     try {
       localStorage.setItem(MODE_KEY, m);
     } catch {
@@ -68,21 +109,47 @@ export function HtmlSection({ block, fresh, onChange }: { block: BlockData; fres
     <div>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs text-slate-500">
-          {mode === 'fields' ? 'Тексты, ссылки и картинки секции — подписанными полями.' : 'Весь HTML-код секции. Изменения сразу видны в предпросмотре.'}
+          {mode === 'fields'
+            ? 'Тексты, ссылки и картинки секции — подписанными полями.'
+            : mode === 'code'
+              ? 'Весь HTML-код секции. Изменения сразу видны в предпросмотре.'
+              : mode === 'css'
+                ? 'Стили только этой секции: «.title { … }» — элемент внутри неё, «& { … }» — сама секция; @media работает. Видно сразу в предпросмотре, на сайте — отдельным файлом.'
+                : 'Код только для этой секции (TypeScript или JavaScript): переменная section — её элемент. Выполняется на сайте после загрузки страницы; в предпросмотре скрипты не запускаются.'}
         </p>
         <ModeTabs
           value={mode}
           options={[
             ['fields', 'Тексты и картинки'],
             ['code', 'HTML-код'],
+            ['css', css.trim() ? 'CSS •' : 'CSS'],
+            ['script', script.trim() ? 'Скрипт •' : 'Скрипт'],
           ]}
           onChange={choose}
         />
       </div>
       {mode === 'fields' ? (
         <HtmlFieldsEditor html={html} onChange={(v) => onChange({ ...block, html: v })} />
-      ) : (
+      ) : mode === 'code' ? (
         <CodeEditor value={html} onChange={(v) => onChange({ ...block, html: v })} lang="html" />
+      ) : mode === 'css' ? (
+        <>
+          <CodeEditor value={css} onChange={(v) => setOwn({ css: v })} lang="css" />
+          {!css.trim() && (
+            <button type="button" onClick={() => setOwn({ css: CSS_EXAMPLE })} className="mt-2 text-xs font-medium text-brand-700 hover:underline">
+              Вставить пример: фон секции и заголовок
+            </button>
+          )}
+        </>
+      ) : (
+        <>
+          <CodeEditor value={script} onChange={(v) => setOwn({ script: v })} lang="ts" />
+          {!script.trim() && (
+            <button type="button" onClick={() => setOwn({ script: SECTION_SCRIPT_EXAMPLE })} className="mt-2 text-xs font-medium text-brand-700 hover:underline">
+              Вставить пример: секция плавно появляется при прокрутке
+            </button>
+          )}
+        </>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import { scriptHash } from '@mtpk/content-kit/scripts';
+import { SECTION_SCRIPT_LINES, sectionParts } from '@mtpk/content-kit/section';
 import { walkBlocks, type Block } from '@mtpk/content-model';
 import { ServiceRefusal } from '@mtpk/shared';
 import { transform, type TransformFailure } from 'esbuild';
@@ -20,17 +21,24 @@ export async function compileScript(source: string): Promise<string> {
   return code;
 }
 
-/** Ошибка сборки → понятное сообщение для редактора: строка, столбец, что не так. */
-function compileError(err: unknown): string {
+/** Ошибка сборки → понятное сообщение для редактора: строка, столбец, что не так. skip — строк обёртки до кода (скрипт секции). */
+function compileError(err: unknown, skip = 0): string {
   const first = (err as Partial<TransformFailure>).errors?.[0];
   if (!first) return `Ошибка в скрипте: ${err instanceof Error ? err.message : String(err)}`;
-  const at = first.location ? `строка ${first.location.line}, столбец ${first.location.column + 1}: ` : '';
+  const at = first.location ? `строка ${Math.max(1, first.location.line - skip)}, столбец ${first.location.column + 1}: ` : '';
   return `Ошибка в скрипте — ${at}${first.text}`;
 }
 
 async function record(source: string) {
   const js = await compileScript(source);
   return { hash: scriptHash(source), source, js, bytes: Buffer.byteLength(js) };
+}
+
+/** Исходник для сборки: блок «Скрипт» или свой скрипт HTML-секции (обёрнутый — section её элемент). */
+function sourceOf(b: Block): string | null {
+  if (b.type === 'script') return b.code.trim() ? b.code : null;
+  if (b.type === 'html') return sectionParts(b)?.script || null;
+  return null;
 }
 
 /**
@@ -40,11 +48,12 @@ async function record(source: string) {
 export async function storeScripts(db: Db, blocks: Block[]): Promise<void> {
   const rows = [];
   for (const b of walkBlocks(blocks)) {
-    if (b.type !== 'script' || !b.code.trim()) continue;
+    const source = sourceOf(b);
+    if (!source) continue;
     try {
-      rows.push(await record(b.code));
+      rows.push(await record(source));
     } catch (err) {
-      throw new ServiceRefusal(400, 'script_error', compileError(err));
+      throw new ServiceRefusal(400, 'script_error', b.type === 'html' ? `Скрипт секции: ${compileError(err, SECTION_SCRIPT_LINES)}` : compileError(err));
     }
   }
   if (rows.length) await db.scriptBlock.createMany({ data: rows, skipDuplicates: true });
@@ -63,9 +72,10 @@ export async function scriptJs(db: Db, hash: string): Promise<string | null> {
   ]);
   for (const blocks of [...pages.map((p) => p.blocks), ...categories.map((c) => c.productBlocks)]) {
     for (const b of walkBlocks((blocks ?? []) as Block[])) {
-      if (b.type !== 'script' || scriptHash(b.code) !== hash) continue;
+      const source = sourceOf(b);
+      if (!source || scriptHash(source) !== hash) continue;
       try {
-        const row = await record(b.code);
+        const row = await record(source);
         await db.scriptBlock.createMany({ data: [row], skipDuplicates: true });
         return row.js;
       } catch {

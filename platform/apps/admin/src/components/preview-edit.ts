@@ -753,6 +753,18 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     }
   };
 
+  /** Текст под точкой: сам элемент под мышью или — если поверх лежит слой без текста (декор, затемнение) — текст под ним. */
+  const textAt = (t: Element, x: number, y: number): Element | null => {
+    const own = textElement(t);
+    if (own || t.closest('.mtpk-tools, .mtpk-plus, .mtpk-end, .mtpk-pop')) return own;
+    for (const el of doc.elementsFromPoint(x, y)) {
+      if (el === t || !el.closest('main')) continue;
+      const found = textElement(el);
+      if (found) return found;
+    }
+    return null;
+  };
+
   const onOver = (e: Event) => {
     const target = e.target as Element;
     if (builder && !active && target.nodeType === 1 && !target.closest('.mtpk-tools, .mtpk-plus, .mtpk-end')) {
@@ -762,7 +774,7 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     }
     if (active) return;
     const t = e.target as Element;
-    const el = t.nodeType === 1 ? textElement(t) : null;
+    const el = t.nodeType === 1 ? textAt(t, (e as MouseEvent).clientX, (e as MouseEvent).clientY) : null;
     if (el) return setHover(verdict(el).ok ? el : null);
     setHover(t.tagName === 'IMG' && t.closest('main') && imageVerdict(t).ok ? t : null);
   };
@@ -800,7 +812,7 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     if (t.closest('a[href]')) e.preventDefault();
     if (active && active.el.contains(t)) return;
     if (active) finish(true);
-    const el = textElement(t);
+    const el = textAt(t, e.clientX, e.clientY);
     if (!el) {
       // не текст — картинка или фон под точкой: предложить замену
       const hit = imageAt(doc, e.clientX, e.clientY);

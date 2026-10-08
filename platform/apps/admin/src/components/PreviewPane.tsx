@@ -6,6 +6,7 @@ import type { BlockData } from './BlockList';
 import { MediaBrowser, Modal } from './media';
 import { attachPreviewEditor, patchMain, type BlockAction, type PagePatch, type PickRequest, type PreviewEditor } from './preview-edit';
 import { move } from './schema-form';
+import { cloneBlock } from './section-id';
 import type { EditablePage } from './use-page-draft';
 import { cx } from './ui';
 import { createBlock, useBuilder, widgetLabel } from './widgets';
@@ -125,7 +126,7 @@ export function PreviewPane({
     const list = current.current.blocks;
     if (act === 'up' && i > 0) setBlocks(move(list, i, i - 1), i - 1);
     else if (act === 'down' && i < list.length - 1) setBlocks(move(list, i, i + 1), i + 1);
-    else if (act === 'copy') setBlocks([...list.slice(0, i + 1), structuredClone(list[i]), ...list.slice(i + 1)], i + 1);
+    else if (act === 'copy') setBlocks([...list.slice(0, i + 1), cloneBlock(list[i]), ...list.slice(i + 1)], i + 1);
     else if (act === 'remove' && window.confirm(`Удалить блок «${build.current ? widgetLabel(list[i].type, build.current.schemas) : list[i].type}»?`)) {
       setBlocks(
         list.filter((_, j) => j !== i),
@@ -134,9 +135,16 @@ export function PreviewPane({
     } else if (act === 'settings') focusBlock.current?.(i, list[i].type);
   };
 
-  const onLoad = () => {
+  /**
+   * Подключить правку к загруженному документу предпросмотра. Сразу, как только
+   * разобран HTML: событие load ждёт все картинки, а на страницах с сотнями фото
+   * (запчасти) это десятки секунд, пока медиасервис готовит копии.
+   */
+  const attached = useRef<Document | null>(null);
+  const attach = () => {
     const d = frame.current?.contentDocument;
-    if (!d || !doc) return;
+    if (!d || !doc || d === attached.current || d.readyState === 'loading' || !d.querySelector('main')) return;
+    attached.current = d;
     loaded.current = { head: headOf(doc), main: mainOf(doc) };
     if (scroll.current) d.defaultView?.scrollTo(0, scroll.current);
     scroll.current = 0;
@@ -164,10 +172,24 @@ export function PreviewPane({
       : null;
     apply();
   };
+  const attachRef = useRef(attach);
+  attachRef.current = attach;
+
+  // новый документ (srcdoc): ждём разбора HTML, не картинок
+  useEffect(() => {
+    if (!doc || device === 'off') return;
+    const timer = setInterval(() => attachRef.current(), 50);
+    const stop = setTimeout(() => clearInterval(timer), 30_000);
+    return () => {
+      clearInterval(timer);
+      clearTimeout(stop);
+    };
+  }, [doc, device]);
 
   useEffect(() => {
     if (device !== 'off') return;
     editor.current = null;
+    attached.current = null;
     loaded.current = null;
     editing.current = false;
   }, [device]);
@@ -206,7 +228,7 @@ export function PreviewPane({
             title="Предпросмотр страницы"
             srcDoc={doc}
             sandbox="allow-same-origin"
-            onLoad={onLoad}
+            onLoad={attach}
             className={cx('mx-auto h-full origin-top', device === 'mobile' ? 'w-[390px] border-x border-slate-200' : 'w-full')}
           />
         </div>

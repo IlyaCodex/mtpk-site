@@ -31,7 +31,16 @@ export type SectionHead = z.infer<typeof sectionHead>;
 // ── Универсальные ─────────────────────────────────────────────────────────
 
 export const htmlBlock = z
-  .object({ type: z.literal('html'), html: element('HTML секции') })
+  .object({
+    type: z.literal('html'),
+    html: element('HTML секции'),
+    /** свой CSS секции: селекторы — внутри неё, «&» — она сама (content-kit/section) */
+    css: code('CSS секции', 'css').optional(),
+    /** свой скрипт секции (TypeScript/JavaScript): section — её элемент */
+    script: code('Скрипт секции (TypeScript или JavaScript)', 'ts').optional(),
+    /** метка секции для её CSS и скрипта: атрибут data-s у корня */
+    sid: z.string().regex(/^[a-z0-9]{4,16}$/).optional().describe('Метка секции'),
+  })
   .describe('HTML как есть');
 
 export const textBlock = z.object({ type: z.literal('text'), text: text('Текст') }).describe('Текст');

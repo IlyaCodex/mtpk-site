@@ -46,5 +46,6 @@
 
 /* Секция, добавленная в админке («+ Вставить блок» → «HTML-секция»):
    отступы сверху и снизу — как у секций сайта; --subtle — светлый фон */
-.cms-section { padding: var(--section-py-base, 96px) 0; }
+/* своя подложка: у body сайта тёмный фон (цвет подвала) — секция без фона была бы тёмной */
+.cms-section { padding: var(--section-py-base, 96px) 0; background: var(--neutral-0); }
 .cms-section--subtle { background: var(--surface-subtle); }

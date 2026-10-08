@@ -1,3 +1,5 @@
+import { sectionParts, withSectionAttr } from '@mtpk/content-kit/section';
+import { cssFileRecord, externalStyleUrl } from '@mtpk/content-kit/styles';
 import type { Block } from '@mtpk/content-model';
 import type { RenderContext } from '../context.ts';
 import { RawElement } from '../primitives/Html.tsx';
@@ -22,14 +24,25 @@ import { WhyUs } from './WhyUs.tsx';
 export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) {
   switch (block.type) {
     case 'html': {
-      const html = enhanceImages(block.html, ctx.eagerImages);
+      // свой CSS и скрипт секции — у корня метка data-s (content-kit/section)
+      const own = sectionParts(block);
+      const html = own ? withSectionAttr(enhanceImages(block.html, ctx.eagerImages), own.sid) : enhanceImages(block.html, ctx.eagerImages);
       // формы в секции — тегом <ui-form>: на их месте компоненты форм
-      return hasFormSlots(html) ? <HtmlWithForms html={html} /> : <RawElement html={html} />;
+      const section = hasFormSlots(html) ? <HtmlWithForms html={html} /> : <RawElement html={html} />;
+      if (!own) return section;
+      return (
+        <>
+          {own.css &&
+            (ctx.preview ? <style dangerouslySetInnerHTML={{ __html: own.css }} /> : <link rel="stylesheet" href={externalStyleUrl(cssFileRecord(own.css).hash)} />)}
+          {section}
+          {own.script && <ScriptLink block={{ type: 'script', code: own.script }} />}
+        </>
+      );
     }
     case 'text':
       return <>{block.text}</>;
     case 'style':
-      return <StyleLink block={block} />;
+      return <StyleLink block={block} preview={ctx.preview} />;
     case 'script':
       return <ScriptLink block={block} />;
     case 'container':

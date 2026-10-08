@@ -6,6 +6,7 @@ import { sectionTitle } from './html-fields';
 import { Icon } from './icons';
 import { defaultFor, ItemActions, move, ObjectFields, summarize, type JsonSchema } from './schema-form';
 import { Badge, cx } from './ui';
+import { cloneBlock } from './section-id';
 import { createBlock, useBuilder, WidgetPanel } from './widgets';
 
 export type BlockData = { type: string; [key: string]: unknown };
@@ -111,7 +112,10 @@ function widgetCaption(block: BlockData): string | null {
 function captionOf(block: BlockData): string {
   const widget = widgetCaption(block);
   if (widget !== null) return widget;
-  if (block.type === 'html') return sectionTitle(String(block.html ?? ''));
+  if (block.type === 'html') {
+    const own = [String(block.css ?? '').trim() && 'CSS', String(block.script ?? '').trim() && 'скрипт'].filter(Boolean);
+    return sectionTitle(String(block.html ?? '')) + (own.length ? ` · свой ${own.join(' и ')}` : '');
+  }
   if (block.type === 'container') return `<${String(block.tag)}> · ${(block.children as BlockData[]).length} блоков`;
   if (block.type === 'script') {
     const first = String(block.code ?? '')
@@ -254,7 +258,7 @@ export function BlockList({
                       className="rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700"
                       title="Дублировать"
                       aria-label="Дублировать"
-                      onClick={() => insert(i + 1, structuredClone(block), false)}
+                      onClick={() => insert(i + 1, cloneBlock(block), false)}
                     >
                       <Icon name="copy" className="h-4 w-4" />
                     </button>

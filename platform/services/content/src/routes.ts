@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { CONTENT_STREAM, isAuthorized, publishEvent, type Logger, type Redis, type ZodTypeProvider } from '@mtpk/shared';
 import { classifyStyleBlock, detectTemplate, normalizePath } from '@mtpk/content-kit';
+import { sectionParts } from '@mtpk/content-kit/section';
 import { cssFileRecord } from '@mtpk/content-kit/styles';
 import { formatHtml } from '@mtpk/content-kit/format-html';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
@@ -336,8 +337,12 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     // скрипты — собрать до записи страницы: ошибка в коде — отказ, страница не меняется
     await storeScripts(db, blocks);
     if (rules.size) styleRows.push(classifyStyleBlock(`<style>${rulesToCss(rules)}</style>`));
-    // CSS блоков «Стили» — тоже файлами (сайт подключает их ссылкой по хешу)
-    const blockCss = [...walkBlocks(blocks)].flatMap((b) => (b.type === 'style' ? [cssFileRecord(b.css)] : []));
+    // CSS блоков «Стили» и свой CSS HTML-секций — тоже файлами (сайт подключает их ссылкой по хешу)
+    const blockCss = [...walkBlocks(blocks)].flatMap((b) => {
+      if (b.type === 'style') return [cssFileRecord(b.css)];
+      const own = b.type === 'html' ? sectionParts(b) : null;
+      return own?.css ? [cssFileRecord(own.css)] : [];
+    });
     if (styleRows.length || blockCss.length) await db.styleBlock.createMany({ data: [...styleRows, ...blockCss], skipDuplicates: true });
     const now = new Date();
     const values = {
@@ -449,6 +454,8 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
         stock: site.stock,
         compareSections: site.compareSections,
         hasLeadgenBlock: pageHasLeadgen(blocks),
+        // предпросмотр: CSS блоков и секций — сразу в разметке
+        preview: Boolean(req.body.mark),
       };
       const html = req.body.mark ? renderBlocksMarked(blocks, marks, ctx) : renderBlocksToHtml(blocks, ctx);
       return { html: req.body.pretty ? formatHtml(html) : html };

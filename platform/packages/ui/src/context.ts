@@ -25,6 +25,8 @@ export interface RenderContext {
   lightboxTotal?: number;
   /** первые картинки страницы: грузятся сразу, не лениво (могут быть на первом экране) */
   eagerImages?: string[];
+  /** предпросмотр в админке: CSS блоков и секций — сразу в разметке (несохранённого файла ещё нет) */
+  preview?: boolean;
 }
 
 export const EMPTY_CONTEXT: RenderContext = { path: '/', stock: {}, compareSections: [], hasLeadgenBlock: false };
