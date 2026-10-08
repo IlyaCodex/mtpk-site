@@ -6,7 +6,7 @@ import { cssFileRecord } from '@mtpk/content-kit/styles';
 import { formatHtml } from '@mtpk/content-kit/format-html';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
-import { BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
+import { block as blockSchema, BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
 import { renderBlocksMarked, renderBlocksToHtml } from '@mtpk/ui/server';
 import { catalogNodes } from './catalog.ts';
 import { catalogAdminRoutes, catalogPageGuard } from './catalog-admin.ts';
@@ -433,7 +433,12 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       // как на сайте: карточки из каталога, у товара — общие блоки категории.
       // Метка — номер блока в странице: блоки, добавленные каталогом, её не получают.
       const MARK = '__mtpk';
-      const own = (req.body.blocks as Block[]).map((b, i) => (req.body.mark ? ({ ...b, [MARK]: String(i) } as unknown as Block) : b));
+      // как при сохранении: схема блока подставляет значения по умолчанию (несохранённый черновик их ещё не получил)
+      const own = (req.body.blocks as unknown[]).map((raw, i) => {
+        const parsed = blockSchema.safeParse(raw);
+        const b = (parsed.success ? parsed.data : raw) as Block;
+        return req.body.mark ? ({ ...b, [MARK]: String(i) } as unknown as Block) : b;
+      });
       const page = await db.page.findUnique({ where: { path: normalizePath(req.body.path) }, select: { id: true } });
       const resolved = page ? resolveCatalogBlocks(page, own, await store.catalog()) : own;
       const marks = resolved.map((b) => ((b as Record<string, unknown>)[MARK] as string | undefined) ?? null);

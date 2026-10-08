@@ -15,6 +15,7 @@ import { Partner } from './Partner.tsx';
 import { ProductHero } from './ProductHero.tsx';
 import { ProductSpec } from './ProductSpec.tsx';
 import { Container, Faq, ScriptLink, Stats, StyleLink } from './Simple.tsx';
+import { Carousel, Cta, Features, Gallery, Marquee, RichText, Spacer, Video } from './Widgets.tsx';
 import { WhyUs } from './WhyUs.tsx';
 
 /** Один блок страницы → React-компонент. */
@@ -61,6 +62,22 @@ export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) 
       return <Faq block={block} />;
     case 'stats':
       return <Stats block={block} />;
+    case 'richText':
+      return <RichText block={block} />;
+    case 'gallery':
+      return <Gallery block={block} />;
+    case 'carousel':
+      return <Carousel block={block} />;
+    case 'marquee':
+      return <Marquee block={block} />;
+    case 'video':
+      return <Video block={block} />;
+    case 'features':
+      return <Features block={block} />;
+    case 'cta':
+      return <Cta block={block} />;
+    case 'spacer':
+      return <Spacer block={block} />;
     default:
       return null;
   }

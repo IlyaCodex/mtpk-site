@@ -235,7 +235,10 @@ export function SchemaField({
 
   if (type === 'array') {
     if (schema.editor === 'gallery') {
-      return <GalleryField label={text} value={(Array.isArray(value) ? value : []) as Photo[]} onChange={onChange} />;
+      // у фото товара есть отдельная миниатюра, у фото виджетов — подпись и ссылка
+      const props = schema.items?.properties ?? {};
+      const fields = (['caption', 'href'] as const).filter((k) => props[k]).map((k) => ({ key: k, placeholder: props[k].description ?? k }));
+      return <GalleryField label={text} value={(Array.isArray(value) ? value : []) as Photo[]} onChange={onChange} primary={Boolean(props.thumb)} fields={fields} />;
     }
     if (schema.prefixItems) {
       const tuple = Array.isArray(value) ? value : [];

@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/client-api';
+import type { BlockData } from './BlockList';
 import { MediaBrowser, Modal } from './media';
-import { attachPreviewEditor, patchMain, type PagePatch, type PickRequest } from './preview-edit';
+import { attachPreviewEditor, patchMain, type BlockAction, type PagePatch, type PickRequest, type PreviewEditor } from './preview-edit';
+import { move } from './schema-form';
 import type { EditablePage } from './use-page-draft';
 import { cx } from './ui';
+import { createBlock, useBuilder, widgetLabel } from './widgets';
 
 export type Device = 'desktop' | 'mobile' | 'off';
 
@@ -17,35 +20,47 @@ const folderOf = (url: string) => (url.startsWith('/') ? url.slice(1).split('?')
 /**
  * Предпросмотр страницы так, как её увидит посетитель: перерисовывается
  * через полсекунды после последней правки — на месте, без перезагрузки (не
- * прыгает к началу). Компьютер / телефон / скрыть. С onUpdate текст, картинки
- * и фоны можно править прямо в предпросмотре (preview-edit.ts).
+ * прыгает к началу). Компьютер / телефон / скрыть. С onUpdate это ещё и
+ * конструктор (preview-edit.ts): текст, картинки и фоны правятся щелчком, у
+ * блока — панель (выше, ниже, копия, удалить, настроить) и «+» для нового
+ * блока из панели «Добавить блок».
  */
 export function PreviewPane({
   page,
   device,
   onDevice,
   onUpdate,
+  onFocusBlock,
 }: {
   page: EditablePage;
   device: Device;
   onDevice: (d: Device) => void;
   onUpdate?: (patch: PagePatch) => void;
+  /** «Настроить» у блока в предпросмотре (и новый блок): открыть его слева. */
+  onFocusBlock?: (index: number, type: string) => void;
 }) {
   const [doc, setDoc] = useState('');
   const [picking, setPicking] = useState<PickRequest | null>(null);
+  const builder = useBuilder();
   const seq = useRef(0);
   const frame = useRef<HTMLIFrameElement>(null);
   const latest = useRef('');
   const loaded = useRef<{ head: string; main: string } | null>(null);
   const editing = useRef(false);
   const scroll = useRef(0);
-  const detach = useRef<(() => void) | null>(null);
+  const editor = useRef<PreviewEditor | null>(null);
+  /** после перерисовки — показать этот блок (новый, перемещённый) */
+  const reveal = useRef<number | null>(null);
   const current = useRef(page);
   current.current = page;
   const update = useRef(onUpdate);
   update.current = onUpdate;
+  const focusBlock = useRef(onFocusBlock);
+  focusBlock.current = onFocusBlock;
+  const build = useRef(builder);
+  build.current = builder;
 
-  /** Показать последнюю отрисовку: та же шапка — заменить содержимое на месте, иначе загрузить заново. */
+  /** Показать последнюю отрисовку: та же шапка — заменить изменившиеся блоки на месте, иначе загрузить заново. */
   const apply = useCallback(() => {
     const html = latest.current;
     // идёт правка в предпросмотре — покажем после неё
@@ -57,6 +72,11 @@ export function PreviewPane({
       if (loaded.current.main !== next) {
         patchMain(main, loaded.current.main, next);
         loaded.current.main = next;
+        editor.current?.refresh();
+      }
+      if (reveal.current !== null) {
+        editor.current?.reveal(reveal.current);
+        reveal.current = null;
       }
       return;
     }
@@ -83,14 +103,45 @@ export function PreviewPane({
     return () => clearTimeout(t);
   }, [page.path, page.title, page.blocks, page.cssTemplates, page.inlineStyles, device, apply]);
 
+  /** Блоки страницы после действия; show — какой блок показать после перерисовки. */
+  const setBlocks = (blocks: BlockData[], show: number | null) => {
+    reveal.current = show;
+    update.current?.({ blocks });
+  };
+  const insertAt = (at: number) => {
+    const b = build.current;
+    if (!b) return;
+    const blocks = current.current.blocks;
+    b.open({
+      title: at < blocks.length ? `Перед блоком ${at + 1} — «${widgetLabel(blocks[at].type, b.schemas)}»` : 'В конец страницы',
+      onPick: (type) => {
+        const list = current.current.blocks;
+        setBlocks([...list.slice(0, at), createBlock(type, b.schemas), ...list.slice(at)], at);
+        focusBlock.current?.(at, type);
+      },
+    });
+  };
+  const blockAction = (i: number, act: BlockAction) => {
+    const list = current.current.blocks;
+    if (act === 'up' && i > 0) setBlocks(move(list, i, i - 1), i - 1);
+    else if (act === 'down' && i < list.length - 1) setBlocks(move(list, i, i + 1), i + 1);
+    else if (act === 'copy') setBlocks([...list.slice(0, i + 1), structuredClone(list[i]), ...list.slice(i + 1)], i + 1);
+    else if (act === 'remove' && window.confirm(`Удалить блок «${build.current ? widgetLabel(list[i].type, build.current.schemas) : list[i].type}»?`)) {
+      setBlocks(
+        list.filter((_, j) => j !== i),
+        null,
+      );
+    } else if (act === 'settings') focusBlock.current?.(i, list[i].type);
+  };
+
   const onLoad = () => {
     const d = frame.current?.contentDocument;
     if (!d || !doc) return;
     loaded.current = { head: headOf(doc), main: mainOf(doc) };
     if (scroll.current) d.defaultView?.scrollTo(0, scroll.current);
     scroll.current = 0;
-    detach.current?.();
-    detach.current = update.current
+    editor.current?.detach();
+    editor.current = update.current
       ? attachPreviewEditor(d, {
           getBlocks: () => current.current.blocks,
           getStyles: () => current.current.inlineStyles,
@@ -102,6 +153,13 @@ export function PreviewPane({
             // правка ушла в черновик — следом придёт новая отрисовка, старую не показываем
             if (!active && !changed) apply();
           },
+          ...(build.current
+            ? {
+                onInsert: insertAt,
+                onBlockAction: blockAction,
+                labelOf: (i: number) => widgetLabel(current.current.blocks[i]?.type ?? '', build.current?.schemas ?? {}),
+              }
+            : {}),
         })
       : null;
     apply();
@@ -109,7 +167,7 @@ export function PreviewPane({
 
   useEffect(() => {
     if (device !== 'off') return;
-    detach.current = null;
+    editor.current = null;
     loaded.current = null;
     editing.current = false;
   }, [device]);
@@ -127,7 +185,7 @@ export function PreviewPane({
         <div className="mb-2 flex items-center justify-between gap-3">
           <span className="min-w-0 truncate text-xs text-slate-500">
             <span className="font-medium tracking-wide uppercase">Предпросмотр</span>
-            {onUpdate && <span className="ml-2 text-slate-400">щёлкните по тексту, картинке или фону — правка прямо здесь</span>}
+            {onUpdate && <span className="ml-2 text-slate-400">щёлкните по тексту, картинке или фону; «+» у блока — новый блок</span>}
           </span>
           <div className="flex shrink-0 gap-1">
             {(['desktop', 'mobile', 'off'] as const).map((d) => (

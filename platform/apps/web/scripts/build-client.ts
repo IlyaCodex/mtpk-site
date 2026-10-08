@@ -30,6 +30,7 @@ const ENTRIES: Record<string, string> = {
   lightbox: 'src/client/lightbox.ts',
   'spec-nav': 'src/client/spec-nav.ts',
   'catalog-filter': 'src/client/catalog-filter.ts',
+  carousel: 'src/client/carousel.ts',
 };
 
 /**
@@ -45,7 +46,7 @@ const CSS_BUNDLES: Record<string, string[]> = {
     'public/css/praktikum-nav-v26.css',
     'public/css/audit-fixes-20261002.css',
   ],
-  'core-end': ['public/css/mobile-fixes.css', 'public/css/stock.css', 'public/css/base-layout.css', 'src/styles/components.css'],
+  'core-end': ['public/css/mobile-fixes.css', 'public/css/stock.css', 'public/css/base-layout.css', 'src/styles/components.css', 'src/styles/widgets.css'],
 };
 
 /** Старые скрипты страниц: каждый — отдельный файл public/js/<имя>.js. */

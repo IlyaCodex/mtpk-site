@@ -33,6 +33,8 @@ export function pageModules(blocks: Block[]): string[] {
     if (b.type === 'lightbox') need.add('lightbox');
     if (b.type === 'productSpec') need.add('spec-nav');
     if (b.type === 'catalogList') need.add('catalog-filter');
+    if (b.type === 'carousel' && b.slides.length > 1) need.add('carousel');
+    if (b.type === 'gallery' && b.zoom && b.photos.length) need.add('lightbox');
   }
   return [...need].map((m) => clientModuleUrl(m)).filter((u): u is string => Boolean(u));
 }

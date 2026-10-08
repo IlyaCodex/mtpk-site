@@ -6,148 +6,10 @@ import { sectionTitle } from './html-fields';
 import { Icon } from './icons';
 import { defaultFor, ItemActions, move, ObjectFields, summarize, type JsonSchema } from './schema-form';
 import { Badge, cx } from './ui';
+import { createBlock, useBuilder, WidgetPanel } from './widgets';
 
 export type BlockData = { type: string; [key: string]: unknown };
 export type BlockSchemas = Record<string, { label: string; schema: JsonSchema }>;
-
-/** Окно «Какой блок вставить?»: группы, в них — тип блока и пояснение, когда он нужен. */
-const PICKER: { title: string; note?: string; items: [type: string, hint: string][] }[] = [
-  {
-    title: 'Своя секция',
-    items: [
-      ['html', 'Любая вёрстка: HTML-код целиком — тексты, картинки, кнопки'],
-      ['form-section', 'Заголовок, текст и форма заявки (имя, телефон, задача) — тексты формы правятся полями'],
-      ['script', 'Код для анимаций и поведения страницы (JavaScript или TypeScript)'],
-      ['style', 'CSS-оформление для секций этой страницы'],
-    ],
-  },
-  {
-    title: 'Общие секции сайта',
-    note: 'Сверстаны один раз и одинаковы на всех страницах',
-    items: [
-      ['leadgen', 'Большая форма заявки «Подбор и расчёт»'],
-      ['bestOffer', 'Короткая форма «Лучшее коммерческое предложение»'],
-      ['catalogCta', 'Призыв запросить КП по каталогу'],
-      ['adv', 'Преимущества собственного производства'],
-      ['whyUs', '«Почему выбирают УралИндуктор»'],
-      ['partner', '«Один партнёр для любой задачи»'],
-    ],
-  },
-  {
-    title: 'Секции с полями',
-    note: 'Вёрстка готова — заполняете только тексты и картинки',
-    items: [
-      ['faq', 'Вопросы и ответы, раскрываются по клику'],
-      ['stats', 'Цифры с иконками: годы, проекты, регионы'],
-      ['catalogList', 'Сетка карточек товаров с фильтром'],
-      ['catalogCards', 'Карточки разделов каталога — из данных каталога'],
-      ['categoryHero', 'Шапка раздела: заголовок, фон, экспресс-заявка'],
-      ['productHero', 'Шапка товара: фото, название, ключевые характеристики'],
-      ['productSpec', 'Характеристики и описание товара'],
-    ],
-  },
-  {
-    title: 'Служебные',
-    items: [
-      ['container', 'Обёртка, внутри которой стоят другие блоки'],
-      ['lightbox', 'Просмотр фото на весь экран (для галереи товара)'],
-      ['text', 'Простой текст без оформления'],
-    ],
-  },
-];
-
-/** Подписи в окне выбора, где название типа для списка блоков не подходит. */
-const PICKER_LABELS: Record<string, string> = { html: 'HTML-секция', 'form-section': 'Секция с формой заявки', container: 'Контейнер' };
-
-/** Заготовка новой HTML-секции: отступы и заголовок — как у секций сайта. */
-const STARTER_HTML = `<section class="cms-section" aria-label="Новая секция">
-  <div class="container">
-    <div class="s-head">
-      <div class="s-eyebrow">Надзаголовок</div>
-      <h2 class="s-title">Заголовок <em>секции</em></h2>
-      <p class="s-lead">Текст секции.</p>
-    </div>
-  </div>
-</section>`;
-
-/**
- * Секция с формой заявки: вёрстка блока «Подбор и расчёт», форма — тег
- * <ui-form> (компонент формы; отправка на /api/send.php). Своё название формы —
- * источник заявки в CRM, свой якорь — чтобы не повторять id="leadgen".
- */
-const FORM_SECTION_HTML = `<section class="leadgen" id="zayavka">
-  <div class="container">
-    <div class="leadgen__grid">
-      <div class="leadgen__intro">
-        <div class="leadgen__eyebrow">Подбор и&nbsp;расчёт</div>
-        <h2 class="leadgen__title">Обсудим вашу задачу — <em>заполните форму</em></h2>
-        <p class="leadgen__lead">Инженер свяжется с&nbsp;вами в&nbsp;течение рабочего дня и&nbsp;уточнит детали.</p>
-      </div>
-      <ui-form type="request" name="Заявка со страницы" title="Запрос расчёта" ids="zf" marks task-placeholder="Например: нужна индукционная печь для чугуна на 1 т" submit="Отправить заявку"></ui-form>
-    </div>
-  </div>
-</section>`;
-
-function createBlock(type: string, schemas: BlockSchemas): BlockData {
-  if (type === 'container') return { type: 'container', tag: 'div', children: [] };
-  if (type === 'form-section') return { type: 'html', html: FORM_SECTION_HTML };
-  if (type === 'html') return { type: 'html', html: STARTER_HTML };
-  return defaultFor(schemas[type].schema, schemas[type].schema) as BlockData;
-}
-
-function BlockPicker({ schemas, onPick, onClose }: { schemas: BlockSchemas; onPick: (type: string) => void; onClose: () => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    ref.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-  // типы, которых нет в списке выше (появятся позже), — к служебным
-  const listed = new Set(PICKER.flatMap((g) => g.items.map(([t]) => t)));
-  const groups = PICKER.map((g, i) => ({
-    ...g,
-    items: [
-      ...g.items.filter(([t]) => t === 'container' || t === 'form-section' || schemas[t]),
-      ...(i === PICKER.length - 1 ? Object.keys(schemas).filter((t) => !listed.has(t)).map((t): [string, string] => [t, '']) : []),
-    ],
-  }));
-  return (
-    <div ref={ref} className="my-2 rounded-xl border border-brand-200 bg-white p-4 shadow-lg ring-4 ring-brand-50">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-slate-800">Какой блок вставить сюда?</h3>
-        <button type="button" onClick={onClose} className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 hover:text-slate-800">
-          Отмена
-          <Icon name="close" className="h-3.5 w-3.5" />
-        </button>
-      </div>
-      <div className="space-y-4">
-        {groups.map(
-          (g) =>
-            g.items.length > 0 && (
-              <div key={g.title}>
-                <div className="text-xs font-medium tracking-wide text-slate-400 uppercase">{g.title}</div>
-                {g.note && <p className="text-xs text-slate-400">{g.note}</p>}
-                <div className="mt-1.5 grid gap-2 sm:grid-cols-2 2xl:grid-cols-3">
-                  {g.items.map(([t, hint]) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => onPick(t)}
-                      className="rounded-lg border border-slate-200 px-3 py-2 text-left transition hover:border-brand-300 hover:bg-brand-50"
-                    >
-                      <div className="text-sm font-medium text-slate-800">{PICKER_LABELS[t] ?? schemas[t]?.label ?? t}</div>
-                      {hint && <div className="mt-0.5 text-xs text-slate-500">{hint}</div>}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ),
-        )}
-      </div>
-    </div>
-  );
-}
 
 /**
  * Блок с полями или общая секция: «Поля» — форма по схеме блока,
@@ -209,8 +71,46 @@ function FieldsBlock({
   );
 }
 
+const plainText = (s: unknown) =>
+  String(s ?? '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+const count = (n: number, one: string, few: string, many: string) =>
+  `${n} ${n % 10 === 1 && n % 100 !== 11 ? one : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? few : many}`;
+const SPACER_PX: Record<string, number> = { small: 32, medium: 64, large: 96, xlarge: 128 };
+
+/** Подпись виджета: по чему его узнают в списке (заголовок, сколько фото, ссылка на видео). */
+function widgetCaption(block: BlockData): string | null {
+  const title = plainText((block.head as { title?: string } | undefined)?.title);
+  const list = (key: string) => (Array.isArray(block[key]) ? (block[key] as Record<string, unknown>[]) : []);
+  switch (block.type) {
+    case 'gallery':
+      return `${title || 'Без заголовка'} · ${count(list('photos').length, 'фото', 'фото', 'фото')}`;
+    case 'carousel':
+      return `${title || 'Без заголовка'} · ${count(list('slides').length, 'слайд', 'слайда', 'слайдов')}`;
+    case 'marquee':
+      return list('items').map((i) => plainText(i.text)).filter(Boolean).join(' • ') || 'логотипы';
+    case 'video':
+      return String(block.url ?? '') || 'ссылка на видео не указана';
+    case 'spacer':
+      return `${SPACER_PX[String(block.size)] ?? 64} px${block.line ? ' · с линией' : ''}`;
+    case 'features':
+      return title || list('items').map((i) => plainText(i.title)).join(', ');
+    case 'richText':
+      return title || plainText(block.body);
+    case 'cta':
+      return plainText(block.title);
+    default:
+      return null;
+  }
+}
+
 /** Подпись свёрнутого блока: заголовок секции, первая строка скрипта, поле блока. */
 function captionOf(block: BlockData): string {
+  const widget = widgetCaption(block);
+  if (widget !== null) return widget;
   if (block.type === 'html') return sectionTitle(String(block.html ?? ''));
   if (block.type === 'container') return `<${String(block.tag)}> · ${(block.children as BlockData[]).length} блоков`;
   if (block.type === 'script') {
@@ -254,18 +154,22 @@ export function BlockList({
   schemas,
   onChange,
   depth = 0,
+  focusRequest,
 }: {
   blocks: BlockData[];
   schemas: BlockSchemas;
   onChange: (blocks: BlockData[]) => void;
   depth?: number;
+  /** открыть блок с этим номером и прокрутить к нему (щелчок «Настроить» в предпросмотре) */
+  focusRequest?: { index: number; nonce: number };
 }) {
   // ключи блоков переживают вставку и перестановку: открытые блоки остаются открытыми
   const keys = useRef<string[]>([]);
   if (keys.current.length !== blocks.length) keys.current = blocks.map(() => `b${keySeq++}`);
   // единственную секцию (страницы запчастей) сразу открываем
   const [open, setOpen] = useState<Set<string>>(() => new Set(blocks.length === 1 ? keys.current : []));
-  // куда вставляем новый блок (индекс) — там открыто окно выбора
+  // куда вставляем новый блок (индекс): панель «Добавить блок» — общая в редакторе или своя
+  const builder = useBuilder();
   const [inserting, setInserting] = useState<number | null>(null);
   // вставленные сейчас блоки: HTML-секция открывается сразу в коде
   const fresh = useRef(new Set<string>());
@@ -298,12 +202,20 @@ export function BlockList({
     keys.current = keys.current.filter((_, j) => j !== i);
     onChange(blocks.filter((_, j) => j !== i));
   };
-  const pick = (type: string) => {
-    if (inserting === null) return;
-    insert(inserting, createBlock(type, schemas), true);
-    setInserting(null);
+  const where = (at: number) => (at < blocks.length ? `Перед блоком: ${captionOf(blocks[at]) || blocks[at].type}` : blocks.length ? 'В конец страницы' : 'Первый блок страницы');
+  const openPanel = (at: number) => {
+    if (builder) builder.open({ title: where(at), onPick: (type) => insert(at, createBlock(type, schemas), true) });
+    else setInserting(at);
   };
-  const picker = <BlockPicker schemas={schemas} onPick={pick} onClose={() => setInserting(null)} />;
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    const k = keys.current[focusRequest.index];
+    if (!k) return;
+    setOpen((s) => new Set(s).add(k));
+    setFocus(k);
+    // только по новой просьбе (nonce), не при каждой правке блоков
+  }, [focusRequest?.nonce]);
 
   return (
     <div>
@@ -314,7 +226,7 @@ export function BlockList({
         const caption = captionOf(block);
         return (
           <div key={k}>
-            {inserting === i ? picker : <InsertLine onClick={() => setInserting(i)} />}
+            <InsertLine onClick={() => openPanel(i)} />
             <div
               ref={(el) => {
                 if (el && focus === k) {
@@ -400,20 +312,27 @@ export function BlockList({
           </div>
         );
       })}
-      {!blocks.length && inserting === null && (
+      {!blocks.length && (
         <p className="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-500">Блоков нет.</p>
       )}
-      {inserting === blocks.length ? (
-        picker
-      ) : (
-        <button
-          type="button"
-          onClick={() => setInserting(blocks.length)}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-slate-300 px-4 py-2.5 text-sm text-slate-500 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
-        >
-          <Icon name="add" className="h-4 w-4" />
-          Добавить блок {blocks.length ? 'в конец' : ''}
-        </button>
+      <button
+        type="button"
+        onClick={() => openPanel(blocks.length)}
+        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-slate-300 px-4 py-2.5 text-sm text-slate-500 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+      >
+        <Icon name="add" className="h-4 w-4" />
+        Добавить блок {blocks.length ? 'в конец' : ''}
+      </button>
+      {inserting !== null && (
+        <WidgetPanel
+          schemas={schemas}
+          title={where(inserting)}
+          onClose={() => setInserting(null)}
+          onPick={(type) => {
+            insert(inserting, createBlock(type, schemas), true);
+            setInserting(null);
+          }}
+        />
       )}
     </div>
   );

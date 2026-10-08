@@ -7,7 +7,9 @@ import { fileSrc, isImage, MediaBrowser, MediaInput, Modal, uploadFile } from '.
 import { toast } from './toast';
 import { Button, cx } from './ui';
 
-export type Photo = { src: string; alt: string; thumb?: string };
+export type Photo = { src: string; alt: string; thumb?: string; caption?: string; href?: string };
+/** Дополнительные поля фото (у виджетов): подпись, ссылка. */
+export type PhotoField = { key: 'caption' | 'href'; placeholder: string };
 
 const move = <T,>(list: T[], from: number, to: number): T[] => {
   if (to < 0 || to >= list.length || from === to) return list;
@@ -22,8 +24,22 @@ const move = <T,>(list: T[], from: number, to: number): T[] => {
  * перетаскиванием или стрелками; фото добавляются загрузкой с компьютера
  * (кнопкой или перетаскиванием файлов на галерею) и выбором из медиатеки.
  * Новые файлы кладутся в папку товара: img/products/<адрес>/.
+ * Фото виджетов (сетка, карусель): primary=false — без «главного» и
+ * миниатюры, fields — подпись и ссылка под каждым фото.
  */
-export function GalleryField({ value, onChange, label }: { value: Photo[]; onChange: (v: Photo[]) => void; label?: string }) {
+export function GalleryField({
+  value,
+  onChange,
+  label,
+  primary = true,
+  fields = [],
+}: {
+  value: Photo[];
+  onChange: (v: Photo[]) => void;
+  label?: string;
+  primary?: boolean;
+  fields?: PhotoField[];
+}) {
   const { pagePath } = useEditorContext();
   const folder = uploadFolderFor(pagePath);
   const [picking, setPicking] = useState(false);
@@ -71,7 +87,7 @@ export function GalleryField({ value, onChange, label }: { value: Photo[]; onCha
       <div className="mb-2 flex items-center justify-between">
         <span className="text-xs font-medium text-slate-600">{label ?? 'Фотографии'}</span>
         <span className="text-[11px] text-slate-400">
-          {value.length} фото · первое — главное · порядок меняется перетаскиванием
+          {value.length} фото{primary ? ' · первое — главное' : ''} · порядок меняется перетаскиванием
         </span>
       </div>
 
@@ -111,7 +127,7 @@ export function GalleryField({ value, onChange, label }: { value: Photo[]; onCha
               onDrop={(e) => onDropCard(e, i)}
               className={cx(
                 'group relative overflow-hidden rounded-lg border bg-white shadow-xs transition',
-                i === 0 ? 'border-accent-500' : 'border-slate-200',
+                primary && i === 0 ? 'border-accent-500' : 'border-slate-200',
                 dragOver === i && dragFrom !== i && 'ring-2 ring-brand-400',
                 dragFrom === i && 'opacity-40',
               )}
@@ -125,10 +141,10 @@ export function GalleryField({ value, onChange, label }: { value: Photo[]; onCha
                 <span
                   className={cx(
                     'absolute top-1.5 left-1.5 rounded px-1.5 py-0.5 text-[10px] font-semibold',
-                    i === 0 ? 'bg-accent-600 text-white' : 'bg-white/90 text-slate-600',
+                    primary && i === 0 ? 'bg-accent-600 text-white' : 'bg-white/90 text-slate-600',
                   )}
                 >
-                  {i === 0 ? 'Главное' : i + 1}
+                  {primary && i === 0 ? 'Главное' : i + 1}
                 </span>
                 <button
                   type="button"
@@ -147,6 +163,15 @@ export function GalleryField({ value, onChange, label }: { value: Photo[]; onCha
                   value={p.alt}
                   onChange={(e) => set(i, { alt: e.target.value })}
                 />
+                {fields.map((f) => (
+                  <input
+                    key={f.key}
+                    className="w-full rounded border border-slate-200 px-2 py-1 text-xs outline-none focus:border-brand-500"
+                    placeholder={f.placeholder}
+                    value={p[f.key] ?? ''}
+                    onChange={(e) => set(i, { [f.key]: e.target.value || undefined })}
+                  />
+                ))}
                 <div className="flex items-center justify-between text-[11px] text-slate-500">
                   <span className="flex gap-1">
                     <button type="button" className="rounded px-1 py-0.5 hover:bg-slate-100" title="Левее" aria-label="Левее" onClick={() => onChange(move(value, i, i - 1))}>
@@ -156,7 +181,7 @@ export function GalleryField({ value, onChange, label }: { value: Photo[]; onCha
                       <Icon name="right" className="h-3.5 w-3.5" />
                     </button>
                   </span>
-                  {i > 0 ? (
+                  {primary && i > 0 ? (
                     <button type="button" className="hover:text-accent-700" onClick={() => onChange(move(value, i, 0))}>
                       сделать главным
                     </button>
@@ -189,10 +214,12 @@ export function GalleryField({ value, onChange, label }: { value: Photo[]; onCha
         <div className="mt-3 space-y-3 rounded-lg border border-slate-200 bg-white p-3">
           <div className="text-xs font-medium text-slate-600">Фото {details + 1}: файлы</div>
           <MediaInput value={value[details].src} onChange={(src) => set(details, { src })} />
-          <div>
-            <div className="mb-1 text-xs text-slate-500">Отдельная миниатюра (необязательно — у новых фото не нужна)</div>
-            <MediaInput value={value[details].thumb ?? ''} onChange={(thumb) => set(details, { thumb: thumb || undefined })} />
-          </div>
+          {primary && (
+            <div>
+              <div className="mb-1 text-xs text-slate-500">Отдельная миниатюра (необязательно — у новых фото не нужна)</div>
+              <MediaInput value={value[details].thumb ?? ''} onChange={(thumb) => set(details, { thumb: thumb || undefined })} />
+            </div>
+          )}
         </div>
       )}
 

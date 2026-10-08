@@ -333,6 +333,183 @@ export const statsBlock = z
   })
   .describe('Ключевые показатели');
 
+// ── Виджеты конструктора (панель «Добавить блок» в админке) ───────────────
+
+/** Фон секции виджета. */
+const widgetTheme = z
+  .enum(['light', 'muted', 'dark'])
+  .default('light')
+  .describe('Фон секции')
+  .meta({ enumLabels: { light: 'Белый', muted: 'Светло-серый', dark: 'Тёмный' } });
+const widgetCompact = z.boolean().default(false).describe('Меньше отступов сверху и снизу');
+const widgetRatio = z
+  .enum(['1:1', '4:3', '3:2', '16:9', '3:4', 'auto'])
+  .default('4:3')
+  .describe('Пропорции фото')
+  .meta({ enumLabels: { '1:1': 'Квадрат', '4:3': '4 : 3', '3:2': '3 : 2', '16:9': '16 : 9 — широкие', '3:4': '3 : 4 — вертикальные', auto: 'Как у самих фото' } });
+
+/** Фото сетки и карусели: подпись и ссылка — по желанию. */
+export const widgetPhoto = z.object({
+  src: z.string().describe('Фото').meta({ editor: 'media' }),
+  alt: z.string().default('').describe('Что на фото (alt)'),
+  caption: inline('Подпись под фото').optional(),
+  href: href('Ссылка при щелчке').optional(),
+});
+export type WidgetPhoto = z.infer<typeof widgetPhoto>;
+
+export const richTextBlock = z
+  .object({
+    type: z.literal('richText'),
+    head: sectionHead.optional(),
+    body: rich('Текст'),
+    align: z.enum(['left', 'center']).default('left').describe('Выравнивание').meta({ enumLabels: { left: 'По левому краю', center: 'По центру' } }),
+    width: z
+      .enum(['narrow', 'wide'])
+      .default('narrow')
+      .describe('Ширина текста')
+      .meta({ enumLabels: { narrow: 'Колонка для чтения', wide: 'Во всю ширину' } }),
+    theme: widgetTheme,
+    compact: widgetCompact,
+    attrs: attrs(),
+  })
+  .describe('Текст');
+
+export const galleryBlock = z
+  .object({
+    type: z.literal('gallery'),
+    head: sectionHead.optional(),
+    photos: z.array(widgetPhoto).describe('Фотографии').meta({ editor: 'gallery' }),
+    columns: z.number().int().min(2).max(6).default(3).describe('Колонок на компьютере (на телефоне — две или одна)'),
+    ratio: widgetRatio,
+    gap: z
+      .enum(['none', 'small', 'medium', 'large'])
+      .default('medium')
+      .describe('Промежутки между фото')
+      .meta({ enumLabels: { none: 'Без промежутков', small: 'Узкие', medium: 'Средние', large: 'Широкие' } }),
+    zoom: z.boolean().default(true).describe('Открывать фото на весь экран по щелчку'),
+    theme: widgetTheme,
+    compact: widgetCompact,
+    attrs: attrs(),
+  })
+  .describe('Сетка фото');
+
+export const carouselBlock = z
+  .object({
+    type: z.literal('carousel'),
+    head: sectionHead.optional(),
+    slides: z.array(widgetPhoto).describe('Слайды').meta({ editor: 'gallery' }),
+    perView: z.number().int().min(1).max(4).default(3).describe('Слайдов на экране (компьютер; на телефоне — один)'),
+    ratio: widgetRatio,
+    autoplay: z.number().int().min(0).max(30).default(0).describe('Автопрокрутка через, секунд (0 — выключена)'),
+    arrows: z.boolean().default(true).describe('Стрелки'),
+    dots: z.boolean().default(true).describe('Точки под слайдами'),
+    theme: widgetTheme,
+    compact: widgetCompact,
+    attrs: attrs(),
+  })
+  .describe('Карусель');
+
+export const marqueeBlock = z
+  .object({
+    type: z.literal('marquee'),
+    items: z
+      .array(
+        z.object({
+          text: inline('Текст').optional(),
+          image: z.string().optional().describe('Или картинка (логотип)').meta({ editor: 'media' }),
+        }),
+      )
+      .describe('Что бежит по строке'),
+    separator: z
+      .enum(['dot', 'slash', 'star', 'none'])
+      .default('dot')
+      .describe('Разделитель')
+      .meta({ enumLabels: { dot: 'Точка •', slash: 'Косая черта /', star: 'Звёздочка ✦', none: 'Без разделителя' } }),
+    speed: z.enum(['slow', 'normal', 'fast']).default('normal').describe('Скорость').meta({ enumLabels: { slow: 'Медленно', normal: 'Обычно', fast: 'Быстро' } }),
+    direction: z.enum(['left', 'right']).default('left').describe('Направление').meta({ enumLabels: { left: 'Влево', right: 'Вправо' } }),
+    size: z.enum(['small', 'large']).default('large').describe('Размер').meta({ enumLabels: { small: 'Мелкий текст', large: 'Крупный текст' } }),
+    pause: z.boolean().default(true).describe('Останавливать при наведении мыши'),
+    theme: z
+      .enum(['light', 'muted', 'dark', 'brand'])
+      .default('dark')
+      .describe('Фон')
+      .meta({ enumLabels: { light: 'Белый', muted: 'Светло-серый', dark: 'Тёмный', brand: 'Фирменный бирюзовый' } }),
+    attrs: attrs(),
+  })
+  .describe('Бегущая строка');
+
+export const videoBlock = z
+  .object({
+    type: z.literal('video'),
+    head: sectionHead.optional(),
+    url: href('Ссылка на видео: YouTube, RuTube, VK Видео или файл .mp4'),
+    poster: z.string().optional().describe('Обложка до запуска (для файла .mp4)').meta({ editor: 'media' }),
+    caption: inline('Подпись под видео').optional(),
+    width: z.enum(['narrow', 'wide']).default('wide').describe('Ширина').meta({ enumLabels: { narrow: 'Узкая колонка', wide: 'Во всю ширину контейнера' } }),
+    theme: widgetTheme,
+    compact: widgetCompact,
+    attrs: attrs(),
+  })
+  .describe('Видео');
+
+export const featuresBlock = z
+  .object({
+    type: z.literal('features'),
+    head: sectionHead.optional(),
+    items: z
+      .array(
+        z.object({
+          icon: element('Иконка (SVG)').optional(),
+          image: z.string().optional().describe('Или картинка').meta({ editor: 'media' }),
+          title: inline('Заголовок'),
+          text: inline('Текст').optional(),
+          href: href('Ссылка').optional(),
+        }),
+      )
+      .describe('Колонки'),
+    columns: z.number().int().min(2).max(4).default(3).describe('Колонок на компьютере'),
+    look: z
+      .enum(['cards', 'plain', 'numbered'])
+      .default('cards')
+      .describe('Вид')
+      .meta({ enumLabels: { cards: 'Карточки с рамкой', plain: 'Без рамок', numbered: 'С номерами 01, 02…' } }),
+    theme: widgetTheme,
+    compact: widgetCompact,
+    attrs: attrs(),
+  })
+  .describe('Колонки с преимуществами');
+
+export const ctaBlock = z
+  .object({
+    type: z.literal('cta'),
+    title: inline('Заголовок (акцент — курсивом)'),
+    text: inline('Текст').optional(),
+    button: z.object({ label: inline('Подпись'), href: href() }).describe('Кнопка'),
+    secondary: z.object({ label: inline('Подпись'), href: href() }).optional().describe('Вторая кнопка'),
+    image: z.string().optional().describe('Фоновая картинка').meta({ editor: 'media' }),
+    align: z.enum(['left', 'center']).default('left').describe('Выравнивание').meta({ enumLabels: { left: 'По левому краю', center: 'По центру' } }),
+    theme: z
+      .enum(['dark', 'brand', 'light'])
+      .default('dark')
+      .describe('Фон')
+      .meta({ enumLabels: { dark: 'Тёмный', brand: 'Фирменный бирюзовый', light: 'Светлый' } }),
+    attrs: attrs(),
+  })
+  .describe('Призыв с кнопкой');
+
+export const spacerBlock = z
+  .object({
+    type: z.literal('spacer'),
+    size: z
+      .enum(['small', 'medium', 'large', 'xlarge'])
+      .default('medium')
+      .describe('Высота')
+      .meta({ enumLabels: { small: '32 px', medium: '64 px', large: '96 px', xlarge: '128 px' } }),
+    line: z.boolean().default(false).describe('Тонкая линия посередине'),
+    theme: widgetTheme,
+  })
+  .describe('Отступ');
+
 // ── Объединение ───────────────────────────────────────────────────────────
 
 export const block: z.ZodType<Block> = z.lazy(() =>
@@ -356,6 +533,14 @@ export const block: z.ZodType<Block> = z.lazy(() =>
     categoryHeroBlock,
     faqBlock,
     statsBlock,
+    richTextBlock,
+    galleryBlock,
+    carouselBlock,
+    marqueeBlock,
+    videoBlock,
+    featuresBlock,
+    ctaBlock,
+    spacerBlock,
   ]),
 );
 
@@ -377,6 +562,14 @@ export type CatalogCardsBlock = z.infer<typeof catalogCardsBlock>;
 export type CategoryHeroBlock = z.infer<typeof categoryHeroBlock>;
 export type FaqBlock = z.infer<typeof faqBlock>;
 export type StatsBlock = z.infer<typeof statsBlock>;
+export type RichTextBlock = z.infer<typeof richTextBlock>;
+export type GalleryBlock = z.infer<typeof galleryBlock>;
+export type CarouselBlock = z.infer<typeof carouselBlock>;
+export type MarqueeBlock = z.infer<typeof marqueeBlock>;
+export type VideoBlock = z.infer<typeof videoBlock>;
+export type FeaturesBlock = z.infer<typeof featuresBlock>;
+export type CtaBlock = z.infer<typeof ctaBlock>;
+export type SpacerBlock = z.infer<typeof spacerBlock>;
 
 export type Block =
   | HtmlBlock
@@ -397,7 +590,15 @@ export type Block =
   | CatalogCardsBlock
   | CategoryHeroBlock
   | FaqBlock
-  | StatsBlock;
+  | StatsBlock
+  | RichTextBlock
+  | GalleryBlock
+  | CarouselBlock
+  | MarqueeBlock
+  | VideoBlock
+  | FeaturesBlock
+  | CtaBlock
+  | SpacerBlock;
 
 export type BlockType = Block['type'];
 
@@ -422,6 +623,14 @@ export const BLOCK_SCHEMAS: Record<BlockType, z.ZodType> = {
   categoryHero: categoryHeroBlock,
   faq: faqBlock,
   stats: statsBlock,
+  richText: richTextBlock,
+  gallery: galleryBlock,
+  carousel: carouselBlock,
+  marquee: marqueeBlock,
+  video: videoBlock,
+  features: featuresBlock,
+  cta: ctaBlock,
+  spacer: spacerBlock,
 };
 
 /** Подписи типов блоков для админки. */
@@ -445,6 +654,14 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   categoryHero: 'Обложка раздела',
   faq: 'Частые вопросы',
   stats: 'Показатели',
+  richText: 'Текст',
+  gallery: 'Сетка фото',
+  carousel: 'Карусель',
+  marquee: 'Бегущая строка',
+  video: 'Видео',
+  features: 'Колонки с преимуществами',
+  cta: 'Призыв с кнопкой',
+  spacer: 'Отступ',
 };
 
 /**

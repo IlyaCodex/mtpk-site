@@ -14,6 +14,7 @@
  *    каталога здесь не правятся — подсказка, где их менять.
  */
 import type { BlockData } from './BlockList';
+import { iconSvg } from './icons';
 
 /** Строчные элементы: текст с ними правится одним куском (как в html-fields). */
 const INLINE = new Set(['em', 'strong', 'b', 'i', 'u', 's', 'br', 'span', 'small', 'sup', 'sub', 'mark', 'abbr', 'a', 'code', 'nobr', 'wbr', 'time']);
@@ -49,6 +50,23 @@ export type PreviewEditorOptions = {
   onSave: () => void;
   /** Идёт правка: обновлять предпросмотр нельзя — сотрётся набранное. changed — правка ушла в черновик. */
   onEditing: (active: boolean, changed: boolean) => void;
+  /** Вставить блок перед блоком index (index = число блоков — в конец): «+» у блока. */
+  onInsert?: (index: number) => void;
+  /** Действие с блоком из его панели в предпросмотре. */
+  onBlockAction?: (index: number, action: BlockAction) => void;
+  /** Подпись блока на его панели. */
+  labelOf?: (index: number) => string;
+};
+
+export type BlockAction = 'up' | 'down' | 'copy' | 'remove' | 'settings';
+
+/** Подключённый к предпросмотру редактор. */
+export type PreviewEditor = {
+  detach: () => void;
+  /** Содержимое перерисовано — спрятать рамку (элементы под ней сменились). */
+  refresh: () => void;
+  /** Прокрутить к блоку index и подсветить его (новый, перемещённый). */
+  reveal: (index: number) => void;
 };
 
 const norm = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').trim();
@@ -432,7 +450,51 @@ html.mtpk-live [data-mtpk="pick"]{outline:2px solid #0d6e8c;outline-offset:-2px}
 .mtpk-pop button:hover{background:#0b5d77}
 .mtpk-pop button.mtpk-pop__cancel{background:transparent;color:#cbd5e1;font-weight:400}
 .mtpk-pop button.mtpk-pop__cancel:hover{background:rgba(255,255,255,.08)}
+.mtpk-frame{position:absolute;z-index:2147483600;display:none;pointer-events:none;outline:2px solid rgba(13,110,140,.6);outline-offset:-2px}
+.mtpk-frame.is-shared{outline:2px dashed rgba(100,116,139,.7)}
+.mtpk-tools{position:absolute;z-index:2147483601;display:none;align-items:center;gap:1px;padding:3px;border-radius:9px;background:#0d6e8c;color:#fff;box-shadow:0 6px 18px rgba(15,23,42,.28);font:600 12px/1 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:0;text-transform:none}
+.mtpk-tools.is-shared{background:#64748b}
+.mtpk-tools__label{padding:0 8px 0 6px;white-space:nowrap}
+.mtpk-tools button{all:unset;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;color:#fff;cursor:pointer}
+.mtpk-tools button:hover{background:rgba(255,255,255,.2)}
+.mtpk-tools button[data-act="remove"]:hover{background:#dc2626}
+.mtpk-tools svg,.mtpk-plus svg{display:block}
+.mtpk-plus{all:unset;position:absolute;z-index:2147483601;display:none;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#0d6e8c;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(15,23,42,.3);transition:transform .15s}
+.mtpk-plus:hover{transform:scale(1.15);background:#0b5d77}
+.mtpk-end{all:unset;display:flex;align-items:center;justify-content:center;gap:8px;box-sizing:border-box;width:calc(100% - 48px);margin:24px;padding:18px;border:2px dashed #94a3b8;border-radius:12px;color:#475569;font:600 14px/1 system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer}
+.mtpk-end:hover{border-color:#0d6e8c;color:#0d6e8c;background:rgba(13,110,140,.05)}
+[data-mtpk-flash]{animation:mtpk-flash 1.8s ease-out}
+@keyframes mtpk-flash{0%,30%{outline:3px solid #4fab3a;outline-offset:-3px}100%{outline:3px solid transparent;outline-offset:-3px}}
 `;
+
+/** Блок верхнего уровня под элементом: его метка и комментарий-метка (ребёнок <main>). */
+function topBlock(el: Element): { mark: string; marker: Comment } | null {
+  let e: Element | null = el;
+  while (e?.parentElement && e.parentElement.tagName !== 'MAIN') e = e.parentElement;
+  if (!e || e.parentElement?.tagName !== 'MAIN') return null;
+  for (let s = e.previousSibling; s; s = s.previousSibling) {
+    const m = s.nodeType === 8 ? /^mtpk:([\w.]+)$/.exec((s as Comment).data) : null;
+    if (m) return { mark: m[1], marker: s as Comment };
+  }
+  return null;
+}
+
+/** Где на странице блок: общий прямоугольник его элементов (невидимые — мимо). */
+function blockRect(marker: Comment): { x: number; y: number; w: number; h: number } | null {
+  let top = Infinity;
+  let left = Infinity;
+  let right = -Infinity;
+  let bottom = -Infinity;
+  for (const el of blockElements(marker)) {
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    top = Math.min(top, r.top);
+    left = Math.min(left, r.left);
+    right = Math.max(right, r.right);
+    bottom = Math.max(bottom, r.bottom);
+  }
+  return top === Infinity ? null : { x: left, y: top, w: right - left, h: bottom - top };
+}
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -481,9 +543,9 @@ export function patchMain(main: Element, before: string, after: string): void {
 }
 
 /** Подключить правку к документу предпросмотра. Возвращает отключение. */
-export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): () => void {
+export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): PreviewEditor {
   const win = doc.defaultView;
-  if (!win) return () => {};
+  if (!win) return { detach: () => {}, refresh: () => {}, reveal: () => {} };
   const style = doc.createElement('style');
   style.textContent = STYLE;
   doc.head.append(style);
@@ -577,6 +639,7 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
       sel?.addRange(range);
     }
     h.addEventListener('blur', onBlur);
+    hideBlock();
     opts.onEditing(true, false);
   };
 
@@ -626,14 +689,87 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     return v;
   };
 
+  // рамка блока, его панель и «+» сверху и снизу — в теле документа, вне <main>
+  const builder = Boolean(opts.onBlockAction && opts.onInsert);
+  const frame = doc.createElement('div');
+  frame.className = 'mtpk-frame';
+  const tools = doc.createElement('div');
+  tools.className = 'mtpk-tools';
+  const plusBefore = doc.createElement('button');
+  const plusAfter = doc.createElement('button');
+  for (const [b, at] of [
+    [plusBefore, 'before'],
+    [plusAfter, 'after'],
+  ] as const) {
+    b.type = 'button';
+    b.className = 'mtpk-plus';
+    b.dataset.at = at;
+    b.title = at === 'before' ? 'Добавить блок над этим' : 'Добавить блок под этим';
+    b.innerHTML = iconSvg('plus', 16);
+  }
+  const endBtn = doc.createElement('button');
+  endBtn.type = 'button';
+  endBtn.className = 'mtpk-end';
+  endBtn.innerHTML = `${iconSvg('add', 18)}<span>Добавить блок в конец страницы</span>`;
+  if (builder) doc.body.append(frame, tools, plusBefore, plusAfter, endBtn);
+  let shown: { index: number; shared: boolean } | null = null;
+  const hideBlock = () => {
+    shown = null;
+    for (const el of [frame, tools, plusBefore, plusAfter]) el.style.display = 'none';
+  };
+  const showBlock = (b: { mark: string; marker: Comment }) => {
+    const r = blockRect(b.marker);
+    const shared = b.mark === 'shared';
+    const index = shared ? -1 : Number(b.mark);
+    if (!r || (!shared && Number.isNaN(index))) return hideBlock();
+    if (shown && shown.index === index && shown.shared === shared && frame.style.display === 'block') return;
+    shown = { index, shared };
+    const x = r.x + win.scrollX;
+    const y = r.y + win.scrollY;
+    Object.assign(frame.style, { display: 'block', left: `${x}px`, top: `${y}px`, width: `${r.w}px`, height: `${r.h}px` });
+    frame.classList.toggle('is-shared', shared);
+    tools.classList.toggle('is-shared', shared);
+    tools.innerHTML = shared
+      ? '<span class="mtpk-tools__label">Общий блок категории — меняется в каталоге</span>'
+      : `<span class="mtpk-tools__label">${(opts.labelOf?.(index) ?? 'Блок').replace(/</g, '&lt;')}</span>` +
+        ([
+          ['up', 'up', 'Выше'],
+          ['down', 'down', 'Ниже'],
+          ['copy', 'copy', 'Копия блока'],
+          ['remove', 'trash', 'Удалить блок'],
+          ['settings', 'settings', 'Настроить слева'],
+        ] as const)
+          .map(([act, icon, title]) => `<button type="button" data-act="${act}" title="${title}" aria-label="${title}">${iconSvg(icon, 16)}</button>`)
+          .join('');
+    tools.style.display = 'flex';
+    const tw = tools.offsetWidth;
+    tools.style.left = `${Math.max(x + 8, x + r.w - tw - 10)}px`;
+    tools.style.top = `${Math.max(win.scrollY + 6, y + 10)}px`;
+    for (const [b, top] of [
+      [plusBefore, y - 14],
+      [plusAfter, y + r.h - 14],
+    ] as const) {
+      Object.assign(b.style, { display: shared ? 'none' : 'flex', left: `${x + r.w / 2 - 14}px`, top: `${Math.max(0, top)}px` });
+    }
+  };
+
   const onOver = (e: Event) => {
+    const target = e.target as Element;
+    if (builder && !active && target.nodeType === 1 && !target.closest('.mtpk-tools, .mtpk-plus, .mtpk-end')) {
+      const b = topBlock(target);
+      if (b) showBlock(b);
+      else if (!target.closest('main')) hideBlock();
+    }
     if (active) return;
     const t = e.target as Element;
     const el = t.nodeType === 1 ? textElement(t) : null;
     if (el) return setHover(verdict(el).ok ? el : null);
     setHover(t.tagName === 'IMG' && t.closest('main') && imageVerdict(t).ok ? t : null);
   };
-  const onLeave = () => setHover(null);
+  const onLeave = () => {
+    setHover(null);
+    hideBlock();
+  };
   const onClick = (e: MouseEvent) => {
     const t = e.target as Element;
     if (t.nodeType !== 1) return;
@@ -645,6 +781,21 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
       return;
     }
     closePop();
+    const plus = t.closest<HTMLElement>('.mtpk-plus');
+    const act = t.closest<HTMLElement>('.mtpk-tools button')?.dataset.act as BlockAction | undefined;
+    if (t.closest('.mtpk-end')) {
+      e.preventDefault();
+      return opts.onInsert?.(opts.getBlocks().length);
+    }
+    if ((plus || act) && shown && !shown.shared) {
+      e.preventDefault();
+      const index = shown.index;
+      if (plus) opts.onInsert?.(plus.dataset.at === 'after' ? index + 1 : index);
+      else if (act) opts.onBlockAction?.(index, act);
+      hideBlock();
+      return;
+    }
+    if (t.closest('.mtpk-tools')) return;
     // по ссылкам в предпросмотре не переходим
     if (t.closest('a[href]')) e.preventDefault();
     if (active && active.el.contains(t)) return;
@@ -699,10 +850,20 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
   doc.addEventListener('dragstart', stop, true);
   doc.addEventListener('drop', stop, true);
   doc.addEventListener('keydown', onKey, true);
-  return () => {
+  const reveal = (index: number) => {
+    const marker = [...(doc.querySelector('main')?.childNodes ?? [])].find((n) => n.nodeType === 8 && (n as Comment).data === `mtpk:${index}`) as Comment | undefined;
+    const el = marker ? blockElements(marker).find((x) => x.getBoundingClientRect().height > 0) : undefined;
+    if (!el) return;
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    el.setAttribute('data-mtpk-flash', '');
+    setTimeout(() => el.removeAttribute('data-mtpk-flash'), 1900);
+  };
+  const detach = () => {
     finish(true);
     closePop();
     setHover(null);
+    hideBlock();
+    for (const el of [frame, tools, plusBefore, plusAfter, endBtn]) el.remove();
     tipEl?.remove();
     clearTimeout(tipTimer);
     doc.removeEventListener('mouseover', onOver);
@@ -716,4 +877,5 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     style.remove();
     doc.documentElement.classList.remove('mtpk-live');
   };
+  return { detach, refresh: hideBlock, reveal };
 }
