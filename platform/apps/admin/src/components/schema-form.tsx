@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from 'react';
 import { CodeEditor } from './CodeEditor';
 import { GalleryField, type Photo } from './gallery-field';
+import { IconField } from './icon-picker';
 import { Icon } from './icons';
 import { MediaInput } from './media';
 import { Button, cx } from './ui';
@@ -25,7 +26,7 @@ export type JsonSchema = {
   default?: unknown;
   description?: string;
   title?: string;
-  editor?: 'inline' | 'rich' | 'code' | 'link' | 'media' | 'attrs' | 'gallery';
+  editor?: 'inline' | 'rich' | 'code' | 'link' | 'media' | 'attrs' | 'gallery' | 'icon';
   /** язык редактора кода (.meta({ lang })): по умолчанию HTML */
   lang?: 'css' | 'ts';
   /** подписи вариантов выбора (.meta({ enumLabels }) в модели) */
@@ -168,6 +169,14 @@ export function SchemaField({
         <div>
           <FieldLabel text={text} required={required} />
           <MediaInput value={v} onChange={setString} />
+        </div>
+      );
+    }
+    if (schema.editor === 'icon') {
+      return (
+        <div>
+          <FieldLabel text={text} required={required} />
+          <IconField value={v} onChange={setString} removable={!required} />
         </div>
       );
     }

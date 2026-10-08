@@ -82,8 +82,17 @@ export function extractInlineStyles(html: string): { html: string; rules: Map<st
       if (n.tagName === 'span' && getAttr(n, 'data-pagefind-meta') !== undefined) return false;
       const style = getAttr(n, 'style');
       if (style !== undefined) {
-        const decls = normalizeDecls(style);
+        let decls = normalizeDecls(style);
         n.attrs = n.attrs.filter((a) => a.name !== 'style');
+        // цвет иконки (окно «Иконка и цвет» в админке) остаётся у <svg>: админка его читает и меняет
+        const color = n.tagName === 'svg' ? decls.split(';').find((d) => /^color:/i.test(d)) : undefined;
+        if (color) {
+          n.attrs.push({ name: 'style', value: color });
+          decls = decls
+            .split(';')
+            .filter((d) => d !== color)
+            .join(';');
+        }
         const classes = (getAttr(n, 'class') ?? '').split(/\s+/).filter(Boolean);
         const cover = coverSource(n, decls);
         if (decls === 'display:none' && classes.includes('js-form-status')) {

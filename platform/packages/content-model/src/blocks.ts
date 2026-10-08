@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { attrs, code, crumb, element, href, image, inline, rich, text } from './fields.ts';
+import { attrs, code, crumb, element, href, image, inline, rich, svgIcon, text } from './fields.ts';
 
 /**
  * Блоки страниц. Страница сайта — упорядоченный список блоков; каждый блок
@@ -140,7 +140,7 @@ export const productHeroBlock = z
     price: inline('Цена').optional(),
     keyspecs: z.array(z.object({ num: inline('Значение'), label: inline('Параметр') })).describe('Ключевые характеристики'),
     actions: z.array(action).describe('Кнопки'),
-    facts: z.array(z.object({ icon: element('Иконка (SVG)'), text: inline('Текст') })).describe('Факты (доставка, гарантия…)'),
+    facts: z.array(z.object({ icon: svgIcon(), text: inline('Текст') })).describe('Факты (доставка, гарантия…)'),
   })
   .describe('Карточка товара: фото, название, характеристики, кнопки');
 
@@ -331,7 +331,7 @@ export const statsBlock = z
     items: z
       .array(
         z.object({
-          icon: element('Иконка (SVG)').optional(),
+          icon: svgIcon().optional(),
           label: inline('Подпись сверху'),
           num: inline('Число'),
           text: inline('Пояснение'),
@@ -468,7 +468,7 @@ export const featuresBlock = z
     items: z
       .array(
         z.object({
-          icon: element('Иконка (SVG)').optional(),
+          icon: svgIcon().optional(),
           image: z.string().optional().describe('Или картинка').meta({ editor: 'media' }),
           title: inline('Заголовок'),
           text: inline('Текст').optional(),

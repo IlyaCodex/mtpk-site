@@ -1,7 +1,8 @@
 /**
  * Правка текста прямо в предпросмотре: щелчок по тексту — он выделяется и
  * правится на месте; Enter или щелчок мимо — правка уходит в черновик страницы
- * (как если бы её сделали слева), Esc — отмена.
+ * (как если бы её сделали слева), Esc — отмена. Щелчок по картинке или фону —
+ * замена из медиатеки, по иконке SVG — окно «Иконка и цвет».
  *
  * Предпросмотр — iframe без скриптов (sandbox без allow-scripts): обработчики
  * вешает админка на его документ. Какой блок под щелчком — по меткам
@@ -15,6 +16,7 @@
  */
 import type { BlockData } from './BlockList';
 import { iconSvg } from './icons';
+import { sameIcon } from './svg-icon';
 
 /** Строчные элементы: текст с ними правится одним куском (как в html-fields). */
 const INLINE = new Set(['em', 'strong', 'b', 'i', 'u', 's', 'br', 'span', 'small', 'sup', 'sub', 'mark', 'abbr', 'a', 'code', 'nobr', 'wbr', 'time']);
@@ -29,6 +31,7 @@ const REASONS = {
   notFound: 'Этот текст не нашёлся в полях блока — поправьте его слева.',
   mismatch: 'Не удалось сопоставить текст с HTML секции — поправьте его слева.',
   changed: 'Секция изменилась, пока правился текст, — повторите правку.',
+  icon: 'Эта иконка — часть оформления блока, а не его поле: здесь она не меняется.',
 };
 
 type Plan = { ok: true; apply: (inner: string, text: string, blocks: BlockData[]) => BlockData[] | null } | { ok: false; reason: string };
@@ -39,6 +42,9 @@ export type PagePatch = { blocks?: BlockData[]; inlineStyles?: string[] };
 /** Запрос «выбрать картинку»: что меняем, текущий адрес и что сделать с выбранной. */
 export type PickRequest = { what: 'картинку' | 'фон'; current: string; choose: (url: string) => void };
 
+/** Запрос «сменить иконку»: текущая (<svg> из данных страницы), что сделать с новой, как убрать. */
+export type IconRequest = { current: string; choose: (svg: string) => void; remove: () => void };
+
 export type PreviewEditorOptions = {
   getBlocks: () => BlockData[];
   /** Стили страницы (вкладка «Стили»): в них обычно задан фон секций. */
@@ -46,6 +52,8 @@ export type PreviewEditorOptions = {
   onUpdate: (patch: PagePatch) => void;
   /** Открыть медиатеку и вызвать choose с выбранным адресом. */
   onPick: (request: PickRequest) => void;
+  /** Открыть окно «Иконка и цвет» и вызвать choose с новой иконкой. */
+  onIcon?: (request: IconRequest) => void;
   /** Ctrl+S в предпросмотре — сохранить страницу, как Ctrl+S в редакторе. */
   onSave: () => void;
   /** Идёт правка: обновлять предпросмотр нельзя — сотрётся набранное. changed — правка ушла в черновик. */
@@ -398,6 +406,99 @@ function imagePlan(hit: ImageHit, blocks: BlockData[]): ImagePlan {
   };
 }
 
+/** Иконка: сам <svg> (внешний, если вложены) или рамка вокруг одной иконки — маленький блок без текста. */
+function iconOf(el: Element): Element | null {
+  let svg = el.closest('svg');
+  if (svg) {
+    while (svg.parentElement?.closest('svg')) svg = svg.parentElement.closest('svg')!;
+    return svg;
+  }
+  if (el.tagName === 'MAIN' || el.textContent?.trim()) return null;
+  const inner = el.querySelectorAll('svg');
+  const r = el.getBoundingClientRect();
+  return inner.length === 1 && r.width <= 160 && r.height <= 160 ? inner[0] : null;
+}
+
+/** Иконка под точкой: по слоям сверху вниз до первого элемента с текстом. */
+function iconAt(doc: Document, x: number, y: number): Element | null {
+  for (const el of doc.elementsFromPoint(x, y)) {
+    if (el.tagName === 'MAIN' || !el.closest('main')) continue;
+    const svg = iconOf(el);
+    if (svg) return svg;
+    if (el.textContent?.trim()) return null;
+  }
+  return null;
+}
+
+type IconPlan = { ok: true; current: string; apply: (svg: string, blocks: BlockData[]) => BlockData[] | null } | { ok: false; reason: string };
+
+/** Заменить элемент разметкой html (пусто — убрать элемент). */
+function replaceElement(el: Element, html: string): void {
+  if (!html) return el.remove();
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html;
+  el.replaceWith(...tpl.content.childNodes);
+}
+
+/** Куда записать новую иконку: тот же <svg> в HTML секции или поле блока с этой иконкой. */
+function iconPlan(svg: Element, blocks: BlockData[]): IconPlan {
+  const deny = (reason: string): IconPlan => ({ ok: false, reason });
+  if (svg.closest('form, .js-lead-form')) return deny(REASONS.form);
+  const at = blockAt(svg);
+  if (!at) return deny(REASONS.icon);
+  if (at.mark === 'shared') return deny(REASONS.shared);
+  const path = at.mark.split('.').map(Number);
+  const block = blockByMark(blocks, path);
+  if (!block) return deny(REASONS.icon);
+  if (COMPONENTS.has(block.type)) return deny(REASONS.component);
+  const shown = svg.outerHTML;
+
+  if (block.type === 'html') {
+    const route = routeOf(at.root, svg);
+    const locate = (html: string) => {
+      const tpl = document.createElement('template');
+      tpl.innerHTML = html;
+      const root = tpl.content.firstElementChild;
+      const found = route && root ? follow(root, route) : null;
+      return found?.tagName.toLowerCase() === 'svg' && sameIcon(found.outerHTML, shown) ? { tpl, found } : null;
+    };
+    const first = locate(String(block.html));
+    if (!first) return deny(REASONS.mismatch);
+    return {
+      ok: true,
+      current: first.found.outerHTML,
+      apply: (next, now) => {
+        const current = blockByMark(now, path);
+        const hit = current?.type === 'html' ? locate(String(current.html)) : null;
+        if (!current || !hit) return null;
+        replaceElement(hit.found, next);
+        return replaceByMark(now, path, { ...current, html: hit.tpl.innerHTML });
+      },
+    };
+  }
+
+  // блок с полями: поле-иконка с тем же рисунком; одинаковые — по порядку в блоке
+  const hits = leaves(block).filter((l) => /^\s*<svg[\s>]/i.test(l.value) && sameIcon(l.value, shown));
+  if (!hits.length) return deny(REASONS.icon);
+  let leaf = hits[0];
+  if (hits.length > 1) {
+    const same = blockElements(at.marker)
+      .flatMap((e) => [...e.querySelectorAll<Element>('svg')])
+      .filter((e) => sameIcon(e.outerHTML, shown));
+    leaf = hits[Math.min(Math.max(same.indexOf(svg), 0), hits.length - 1)];
+  }
+  const was = leaf.value;
+  return {
+    ok: true,
+    current: was,
+    apply: (next, now) => {
+      const current = blockByMark(now, path);
+      if (!current || leafAt(current, leaf.path) !== was) return null;
+      return replaceByMark(now, path, setLeaf(current, leaf.path, next) as BlockData);
+    },
+  };
+}
+
 /**
  * Пробелы и редактор браузера: набранный пробел он часто ставит неразрывным, а
  * неразрывный рядом с местом правки сам делает обычным. Сравниваем изменённый
@@ -442,7 +543,7 @@ const cleanText = (t: string) => t.replace(/\u00a0 | \u00a0/g, ' ').trim();
 const STYLE = `
 html.mtpk-live [data-mtpk="can"]{outline:1.5px dashed rgba(13,110,140,.7);outline-offset:3px;cursor:text}
 html.mtpk-live [data-mtpk="edit"]{outline:2px solid #0d6e8c;outline-offset:3px;box-shadow:0 0 0 7px rgba(13,110,140,.14);cursor:text}
-html.mtpk-live img[data-mtpk="can"]{cursor:pointer}
+html.mtpk-live img[data-mtpk="can"],html.mtpk-live svg[data-mtpk="can"]{cursor:pointer}
 html.mtpk-live [data-mtpk="pick"]{outline:2px solid #0d6e8c;outline-offset:-2px}
 .mtpk-tip{position:fixed;z-index:2147483647;max-width:340px;padding:9px 12px;border-radius:10px;background:#0f172a;color:#fff;font:13px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 10px 30px rgba(15,23,42,.3);pointer-events:none}
 .mtpk-pop{position:fixed;z-index:2147483647;display:flex;gap:4px;padding:5px;border-radius:12px;background:#0f172a;box-shadow:0 10px 30px rgba(15,23,42,.35);font:13px/1 system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -654,15 +755,15 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     if (picked?.getAttribute('data-mtpk') === 'pick') picked.removeAttribute('data-mtpk');
     picked = null;
   };
-  const showPop = (hit: ImageHit, p: Extract<ImagePlan, { ok: true }>, x: number, y: number) => {
+  const showPop = (el: Element, label: string, action: () => void, x: number, y: number) => {
     closePop();
-    picked = hit.el;
-    hit.el.setAttribute('data-mtpk', 'pick');
+    picked = el;
+    el.setAttribute('data-mtpk', 'pick');
     pop = doc.createElement('div');
     pop.className = 'mtpk-pop';
     const go = doc.createElement('button');
     go.type = 'button';
-    go.textContent = `Заменить ${p.what}…`;
+    go.textContent = label;
     const cancel = doc.createElement('button');
     cancel.type = 'button';
     cancel.className = 'mtpk-pop__cancel';
@@ -671,18 +772,40 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     doc.body.append(pop);
     pop.style.left = `${Math.max(8, Math.min(x - pop.offsetWidth / 2, win.innerWidth - pop.offsetWidth - 8))}px`;
     pop.style.top = `${y + 12 + pop.offsetHeight > win.innerHeight ? y - pop.offsetHeight - 12 : y + 12}px`;
-    popAction = () =>
-      opts.onPick({
-        what: p.what,
-        current: p.current,
-        choose: (url) => {
-          const patch = p.apply(url, opts.getBlocks(), opts.getStyles());
-          if (patch) opts.onUpdate(patch);
-          else tip(REASONS.changed, x, y);
-        },
-      });
+    popAction = action;
+  };
+  const pickImage = (hit: ImageHit, p: Extract<ImagePlan, { ok: true }>, x: number, y: number) =>
+    showPop(
+      hit.el,
+      `Заменить ${p.what}…`,
+      () =>
+        opts.onPick({
+          what: p.what,
+          current: p.current,
+          choose: (url) => {
+            const patch = p.apply(url, opts.getBlocks(), opts.getStyles());
+            if (patch) opts.onUpdate(patch);
+            else tip(REASONS.changed, x, y);
+          },
+        }),
+      x,
+      y,
+    );
+  const pickIcon = (svg: Element, p: Extract<IconPlan, { ok: true }>, x: number, y: number) => {
+    const put = (next: string) => {
+      const blocks = p.apply(next, opts.getBlocks());
+      if (blocks) opts.onUpdate({ blocks });
+      else tip(REASONS.changed, x, y);
+    };
+    showPop(svg, 'Иконка и цвет…', () => opts.onIcon?.({ current: p.current, choose: put, remove: () => put('') }), x, y);
   };
   const images = new WeakMap<Element, ImagePlan>();
+  const icons = new WeakMap<Element, IconPlan>();
+  const iconVerdict = (svg: Element) => {
+    let v = icons.get(svg);
+    if (!v) icons.set(svg, (v = iconPlan(svg, opts.getBlocks())));
+    return v;
+  };
   const imageVerdict = (img: Element) => {
     let v = images.get(img);
     if (!v) images.set(img, (v = imagePlan({ kind: 'img', el: img, src: img.getAttribute('src') ?? '' }, opts.getBlocks())));
@@ -776,6 +899,8 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     const t = e.target as Element;
     const el = t.nodeType === 1 ? textAt(t, (e as MouseEvent).clientX, (e as MouseEvent).clientY) : null;
     if (el) return setHover(verdict(el).ok ? el : null);
+    const svg = opts.onIcon && t.nodeType === 1 && t.closest('main') ? iconOf(t) : null;
+    if (svg) return setHover(iconVerdict(svg).ok ? svg : null);
     setHover(t.tagName === 'IMG' && t.closest('main') && imageVerdict(t).ok ? t : null);
   };
   const onLeave = () => {
@@ -814,15 +939,27 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     if (active) finish(true);
     const el = textAt(t, e.clientX, e.clientY);
     if (!el) {
-      // не текст — картинка или фон под точкой: предложить замену
+      // не текст — иконка: окно «Иконка и цвет»
+      const svg = opts.onIcon ? iconAt(doc, e.clientX, e.clientY) : null;
+      const icp = svg ? iconPlan(svg, opts.getBlocks()) : null;
+      if (svg && icp?.ok) {
+        tipEl?.remove();
+        setHover(null);
+        pickIcon(svg, icp, e.clientX, e.clientY);
+        return;
+      }
+      // картинка или фон под точкой: предложить замену
       const hit = imageAt(doc, e.clientX, e.clientY);
-      if (!hit) return;
+      if (!hit) {
+        if (icp && !icp.ok) tip(icp.reason, e.clientX, e.clientY);
+        return;
+      }
       const ip = imagePlan(hit, opts.getBlocks());
       if (!ip.ok) tip(ip.reason, e.clientX, e.clientY);
       else {
         tipEl?.remove();
         setHover(null);
-        showPop(hit, ip, e.clientX, e.clientY);
+        pickImage(hit, ip, e.clientX, e.clientY);
       }
       return;
     }

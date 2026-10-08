@@ -20,6 +20,9 @@ export const href = (label = 'Ссылка') => z.string().describe(label).meta(
 /** HTML-элемент целиком (иконка SVG, произвольная секция). Редактор — код. */
 export const element = (label: string) => z.string().describe(label).meta({ editor: 'code' });
 
+/** Иконка SVG (<svg>…</svg> целиком). В админке — окно «Иконка и цвет»: библиотека, свой SVG, цвет. */
+export const svgIcon = (label = 'Иконка (SVG)') => z.string().describe(label).meta({ editor: 'icon' });
+
 /** Код на другом языке (CSS, TypeScript): редактор кода с его подсветкой. */
 export const code = (label: string, lang: 'css' | 'ts') => z.string().describe(label).meta({ editor: 'code', lang });
 

@@ -611,6 +611,10 @@ section.hero--home { min-height: 44vh; }
 .stat {
   padding: var(--sp-6) var(--sp-8);
   display: flex;
+  /* узкая колонка (4 в ряд на 1025–1280 px, 2 в ряд на ~650 px) — текст под
+     иконкой во всю ширину: фразы со склейкой неразрывными пробелами («и литейном
+     производстве») иначе рвались посередине слова */
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: var(--sp-5);
   border-right: 1px solid var(--border-subtle);
@@ -649,7 +653,7 @@ section.hero--home { min-height: 44vh; }
   border: 2px solid var(--neutral-0);
   border-radius: 50%;
 }
-.stat__body { display: flex; flex-direction: column; gap: var(--sp-1); }
+.stat__body { flex: 1 1 160px; display: flex; flex-direction: column; gap: var(--sp-1); }
 .stat__num {
   font-family: var(--font-display);
   font-size: 44px;
@@ -680,6 +684,19 @@ section.hero--home { min-height: 44vh; }
   font-size: var(--fs-small);
   color: var(--text-primary);
   line-height: 1.4;
+}
+/* по 2 в ряд на планшете, столбиком на телефоне — у всех страниц: раньше эти
+   правила были только в CSS шаблонов (/css/tpl), и у страниц без них (новые из
+   админки) показатели оставались в 4 колонки на любом экране */
+@media (max-width: 1024px) {
+  .stats__grid { grid-template-columns: repeat(2, 1fr); }
+  .stat:nth-child(2) { border-right: 0; }
+  .stat:nth-child(-n+2) { border-bottom: 1px solid var(--border-subtle); }
+}
+@media (max-width: 640px) {
+  .stats__grid { grid-template-columns: 1fr; }
+  .stat { border-right: 0 !important; border-bottom: 1px solid var(--border-subtle); }
+  .stat:last-child { border-bottom: 0; }
 }
 .leadgen__intro { padding-right: var(--sp-8); }
 .leadgen__eyebrow {

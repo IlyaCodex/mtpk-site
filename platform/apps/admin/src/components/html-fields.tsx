@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { IconField } from './icon-picker';
 import { Icon } from './icons';
 import { MediaInput } from './media';
 import { ItemActions } from './schema-form';
@@ -10,14 +11,15 @@ import { cx } from './ui';
 /**
  * «Поля» секции, перенесённой со старого сайта как HTML: тексты (заголовки,
  * абзацы, подписи, кнопки), ссылки и картинки показываются подписанными
- * полями, повторяющиеся элементы (карточки, пункты, строки таблиц) — списком
+ * полями, иконки SVG — полем «Иконка» (окно «Иконка и цвет»), повторяющиеся
+ * элементы (карточки, пункты, строки таблиц) — списком
  * с дублированием, перестановкой и удалением. Источник — сам HTML: правка
  * поля меняет только свой кусок разметки, остальное не трогается.
  */
 
 /** Строчные элементы: внутри «текста» допустимы только они. */
 const INLINE = new Set(['em', 'strong', 'b', 'i', 'u', 's', 'br', 'span', 'small', 'sup', 'sub', 'mark', 'abbr', 'a', 'code', 'nobr', 'wbr', 'time']);
-/** Что не показываем: служебное, формы заявок (стандартные), иконки. */
+/** Что не показываем: служебное, формы заявок (стандартные). Иконки SVG — отдельным полем. */
 const SKIP_TAGS = new Set(['script', 'style', 'noscript', 'svg', 'template', 'input', 'select', 'textarea', 'option', 'dialog', 'iframe', 'video', 'source', 'picture']);
 const SKIP_CLASSES = ['breadcrumbs', 'js-form-status', 'hp-field', 'visually-hidden', 'sr-only'];
 
@@ -167,7 +169,8 @@ type Field =
   | { kind: 'text'; path: Path; label: string; value: string; multiline: boolean; item: Path | null }
   | { kind: 'textNode'; path: Path; label: string; value: string; item: Path | null }
   | { kind: 'href'; path: Path; label: string; value: string; item: Path | null }
-  | { kind: 'image'; path: Path; label: string; src: string; alt: string; item: Path | null };
+  | { kind: 'image'; path: Path; label: string; src: string; alt: string; item: Path | null }
+  | { kind: 'icon'; path: Path; label: string; value: string; item: Path | null };
 
 type ItemGroup = { list: Path; items: Path[]; role: string };
 
@@ -203,9 +206,15 @@ function collect(html: string): { fields: Field[]; groups: Map<string, ItemGroup
     return pathOf(item, root);
   };
 
+  const icon = (svg: Element) => fields.push({ kind: 'icon', path: pathOf(svg, root), label: 'Иконка', value: svg.outerHTML, item: itemPath(svg) });
   const walk = (el: Element) => {
-    if (skipped(el)) return;
     const tag = el.tagName.toLowerCase();
+    if (tag === 'svg') return icon(el);
+    if (skipped(el)) {
+      // обёртка иконки, скрытая от скринридеров (aria-hidden): сама иконка правится
+      if (el.getAttribute('aria-hidden') === 'true' && !SKIP_TAGS.has(tag)) el.querySelectorAll('svg').forEach((svg) => !svg.parentElement?.closest('svg') && icon(svg));
+      return;
+    }
     if (tag === 'ui-form') {
       for (const [attr, label, multiline] of FORM_ATTRS) {
         const value = el.getAttribute(attr);
@@ -241,6 +250,14 @@ function patch(html: string, path: Path, mutate: (node: Node) => void): string {
   const root = parse(html);
   mutate(locate(root, path));
   return serialize(root);
+}
+
+/** Заменить элемент разметкой html (пусто — убрать элемент). */
+function replaceElement(el: Element, html: string): void {
+  if (!html) return el.remove();
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html;
+  el.replaceWith(...tpl.content.childNodes);
 }
 
 const plain = (s: string) => s.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
@@ -318,6 +335,13 @@ export function HtmlFieldsEditor({ html, onChange }: { html: string; onChange: (
               onChange={(e) => onChange(patch(html, f.path, (n) => (n as Element).setAttribute('href', e.target.value)))}
             />
           </label>
+        );
+      case 'icon':
+        return (
+          <div key={key}>
+            <span className="mb-1 block text-xs font-medium text-slate-600">{f.label}</span>
+            <IconField value={f.value} removable onChange={(svg) => onChange(patch(html, f.path, (n) => replaceElement(n as Element, svg)))} />
+          </div>
         );
       case 'image':
         return (

@@ -53,6 +53,9 @@
   У HTML-секции — свои вкладки «CSS» и «Скрипт» только для неё (`&` — сама секция, `section` — её
   элемент; метка `data-s`, логика — `packages/content-kit/src/section.ts`), на сайте — тоже файлами.
 - Шапка, меню, контакты, подвал — админка «Шапка, меню, контакты».
+- Иконки SVG в блоках — окно «Иконка и цвет» (`apps/admin/src/components/icon-picker.tsx`), набор Solar —
+  `apps/admin/public/icons/solar-linear.json` (`scripts/icons-solar.ts`); цвет — `style="color:…"` у `<svg>`
+  (в HTML-секциях при сохранении остаётся на месте, в класс не уходит).
 - Виджеты конструктора (текст, сетка фото, карусель, бегущая строка, видео, колонки, призыв, отступ) —
   блоки `packages/ui/src/blocks/Widgets.tsx`, стили `apps/web/src/styles/widgets.css`; добавляются в админке
   панелью «Добавить блок» (`apps/admin/src/components/widgets.tsx`) или «+» у блока в предпросмотре.

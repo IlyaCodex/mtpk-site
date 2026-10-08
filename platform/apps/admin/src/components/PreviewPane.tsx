@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/client-api';
 import type { BlockData } from './BlockList';
+import { IconPicker } from './icon-picker';
 import { MediaBrowser, Modal } from './media';
-import { attachPreviewEditor, patchMain, type BlockAction, type PagePatch, type PickRequest, type PreviewEditor } from './preview-edit';
+import { attachPreviewEditor, patchMain, type BlockAction, type IconRequest, type PagePatch, type PickRequest, type PreviewEditor } from './preview-edit';
 import { move } from './schema-form';
 import { cloneBlock } from './section-id';
 import type { EditablePage } from './use-page-draft';
@@ -22,7 +23,7 @@ const folderOf = (url: string) => (url.startsWith('/') ? url.slice(1).split('?')
  * Предпросмотр страницы так, как её увидит посетитель: перерисовывается
  * через полсекунды после последней правки — на месте, без перезагрузки (не
  * прыгает к началу). Компьютер / телефон / скрыть. С onUpdate это ещё и
- * конструктор (preview-edit.ts): текст, картинки и фоны правятся щелчком, у
+ * конструктор (preview-edit.ts): текст, картинки, фоны и иконки правятся щелчком, у
  * блока — панель (выше, ниже, копия, удалить, настроить) и «+» для нового
  * блока из панели «Добавить блок».
  */
@@ -42,6 +43,7 @@ export function PreviewPane({
 }) {
   const [doc, setDoc] = useState('');
   const [picking, setPicking] = useState<PickRequest | null>(null);
+  const [icon, setIcon] = useState<IconRequest | null>(null);
   const builder = useBuilder();
   const seq = useRef(0);
   const frame = useRef<HTMLIFrameElement>(null);
@@ -155,6 +157,7 @@ export function PreviewPane({
           getStyles: () => current.current.inlineStyles,
           onUpdate: (patch) => update.current?.(patch),
           onPick: setPicking,
+          onIcon: setIcon,
           onSave: () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true })),
           onEditing: (active, changed) => {
             editing.current = active;
@@ -207,7 +210,7 @@ export function PreviewPane({
         <div className="mb-2 flex items-center justify-between gap-3">
           <span className="min-w-0 truncate text-xs text-slate-500">
             <span className="font-medium tracking-wide uppercase">Предпросмотр</span>
-            {onUpdate && <span className="ml-2 text-slate-400">щёлкните по тексту, картинке или фону; «+» у блока — новый блок</span>}
+            {onUpdate && <span className="ml-2 text-slate-400">щёлкните по тексту, картинке, фону или иконке; «+» у блока — новый блок</span>}
           </span>
           <div className="flex shrink-0 gap-1">
             {(['desktop', 'mobile', 'off'] as const).map((d) => (
@@ -244,6 +247,20 @@ export function PreviewPane({
             }}
           />
         </Modal>
+      )}
+      {icon && (
+        <IconPicker
+          value={icon.current}
+          onClose={() => setIcon(null)}
+          onChoose={(svg) => {
+            icon.choose(svg);
+            setIcon(null);
+          }}
+          onRemove={() => {
+            icon.remove();
+            setIcon(null);
+          }}
+        />
       )}
     </aside>
   );
