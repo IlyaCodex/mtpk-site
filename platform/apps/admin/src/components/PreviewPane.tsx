@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/client-api';
-import type { BlockData } from './BlockList';
-import { attachPreviewEditor, patchMain } from './preview-edit';
+import { MediaBrowser, Modal } from './media';
+import { attachPreviewEditor, patchMain, type PagePatch, type PickRequest } from './preview-edit';
 import type { EditablePage } from './use-page-draft';
 import { cx } from './ui';
 
@@ -11,41 +11,46 @@ export type Device = 'desktop' | 'mobile' | 'off';
 
 const headOf = (html: string) => html.slice(0, html.indexOf('<body>'));
 const mainOf = (html: string) => html.slice(html.indexOf('<main>') + 6, html.lastIndexOf('</main>'));
+/** Папка медиатеки, где лежит картинка: /img/drobemet/x.webp → img/drobemet/. */
+const folderOf = (url: string) => (url.startsWith('/') ? url.slice(1).split('?')[0].replace(/[^/]+$/, '') : '') || 'img/';
 
 /**
  * Предпросмотр страницы так, как её увидит посетитель: перерисовывается
  * через полсекунды после последней правки — на месте, без перезагрузки (не
- * прыгает к началу). Компьютер / телефон / скрыть. С onBlocks текст можно
- * править прямо в предпросмотре (preview-edit.ts).
+ * прыгает к началу). Компьютер / телефон / скрыть. С onUpdate текст, картинки
+ * и фоны можно править прямо в предпросмотре (preview-edit.ts).
  */
 export function PreviewPane({
   page,
   device,
   onDevice,
-  onBlocks,
+  onUpdate,
 }: {
   page: EditablePage;
   device: Device;
   onDevice: (d: Device) => void;
-  onBlocks?: (blocks: BlockData[]) => void;
+  onUpdate?: (patch: PagePatch) => void;
 }) {
   const [doc, setDoc] = useState('');
+  const [picking, setPicking] = useState<PickRequest | null>(null);
   const seq = useRef(0);
   const frame = useRef<HTMLIFrameElement>(null);
   const latest = useRef('');
   const loaded = useRef<{ head: string; main: string } | null>(null);
   const editing = useRef(false);
+  const scroll = useRef(0);
   const detach = useRef<(() => void) | null>(null);
-  const blocks = useRef(page.blocks);
-  blocks.current = page.blocks;
-  const setBlocks = useRef(onBlocks);
-  setBlocks.current = onBlocks;
+  const current = useRef(page);
+  current.current = page;
+  const update = useRef(onUpdate);
+  update.current = onUpdate;
 
   /** Показать последнюю отрисовку: та же шапка — заменить содержимое на месте, иначе загрузить заново. */
   const apply = useCallback(() => {
     const html = latest.current;
     // идёт правка в предпросмотре — покажем после неё
     if (!html || editing.current) return;
+    const win = frame.current?.contentWindow;
     const main = frame.current?.contentDocument?.querySelector('main');
     if (main && loaded.current && loaded.current.head === headOf(html)) {
       const next = mainOf(html);
@@ -55,6 +60,8 @@ export function PreviewPane({
       }
       return;
     }
+    // другие стили страницы — загрузить заново, но остаться на том же месте
+    scroll.current = loaded.current ? (win?.scrollY ?? 0) : 0;
     setDoc(html);
   }, []);
 
@@ -80,11 +87,15 @@ export function PreviewPane({
     const d = frame.current?.contentDocument;
     if (!d || !doc) return;
     loaded.current = { head: headOf(doc), main: mainOf(doc) };
+    if (scroll.current) d.defaultView?.scrollTo(0, scroll.current);
+    scroll.current = 0;
     detach.current?.();
-    detach.current = setBlocks.current
+    detach.current = update.current
       ? attachPreviewEditor(d, {
-          getBlocks: () => blocks.current,
-          onBlocks: (next) => setBlocks.current?.(next),
+          getBlocks: () => current.current.blocks,
+          getStyles: () => current.current.inlineStyles,
+          onUpdate: (patch) => update.current?.(patch),
+          onPick: setPicking,
           onSave: () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true })),
           onEditing: (active, changed) => {
             editing.current = active;
@@ -116,7 +127,7 @@ export function PreviewPane({
         <div className="mb-2 flex items-center justify-between gap-3">
           <span className="min-w-0 truncate text-xs text-slate-500">
             <span className="font-medium tracking-wide uppercase">Предпросмотр</span>
-            {onBlocks && <span className="ml-2 text-slate-400">щёлкните по тексту — он правится прямо здесь</span>}
+            {onUpdate && <span className="ml-2 text-slate-400">щёлкните по тексту, картинке или фону — правка прямо здесь</span>}
           </span>
           <div className="flex shrink-0 gap-1">
             {(['desktop', 'mobile', 'off'] as const).map((d) => (
@@ -142,6 +153,18 @@ export function PreviewPane({
           />
         </div>
       </div>
+      {picking && (
+        <Modal title={`Заменить ${picking.what} — выберите в медиатеке или загрузите новую`} onClose={() => setPicking(null)}>
+          <MediaBrowser
+            mode="pick"
+            initialPrefix={folderOf(picking.current)}
+            onPick={(url) => {
+              picking.choose(url);
+              setPicking(null);
+            }}
+          />
+        </Modal>
+      )}
     </aside>
   );
 }

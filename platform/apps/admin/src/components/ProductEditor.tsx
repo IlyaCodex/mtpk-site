@@ -301,7 +301,7 @@ export function ProductEditor({
           </EditorContext.Provider>
         </div>
 
-        <PreviewPane page={page} device={device} onDevice={setDevice} onBlocks={(blocks) => update({ blocks })} />
+        <PreviewPane page={page} device={device} onDevice={setDevice} onUpdate={update} />
       </div>
     </div>
   );

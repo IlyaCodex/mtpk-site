@@ -32,9 +32,19 @@ const REASONS = {
 
 type Plan = { ok: true; apply: (inner: string, text: string, blocks: BlockData[]) => BlockData[] | null } | { ok: false; reason: string };
 
+/** Что меняется в черновике: блоки и/или стили страницы. */
+export type PagePatch = { blocks?: BlockData[]; inlineStyles?: string[] };
+
+/** Запрос «выбрать картинку»: что меняем, текущий адрес и что сделать с выбранной. */
+export type PickRequest = { what: 'картинку' | 'фон'; current: string; choose: (url: string) => void };
+
 export type PreviewEditorOptions = {
   getBlocks: () => BlockData[];
-  onBlocks: (blocks: BlockData[]) => void;
+  /** Стили страницы (вкладка «Стили»): в них обычно задан фон секций. */
+  getStyles: () => string[];
+  onUpdate: (patch: PagePatch) => void;
+  /** Открыть медиатеку и вызвать choose с выбранным адресом. */
+  onPick: (request: PickRequest) => void;
   /** Ctrl+S в предпросмотре — сохранить страницу, как Ctrl+S в редакторе. */
   onSave: () => void;
   /** Идёт правка: обновлять предпросмотр нельзя — сотрётся набранное. changed — правка ушла в черновик. */
@@ -235,12 +245,149 @@ function plan(el: Element, blocks: BlockData[]): Plan {
   };
 }
 
+/** Картинка под точкой: <img> или фон (background-image у элемента, его ::before/::after). */
+type ImageHit = { kind: 'img'; el: Element; src: string } | { kind: 'bg'; el: Element; pseudo: '' | '::before' | '::after'; url: string };
+type ImagePlan = { ok: true; what: PickRequest['what']; current: string; apply: (url: string, blocks: BlockData[], styles: string[]) => PagePatch | null } | { ok: false; reason: string };
+
+/** Адрес картинки на сайте: /img/… (computed style отдаёт полный адрес). */
+function sitePath(raw: string, doc: Document): string {
+  try {
+    const u = new URL(raw, doc.baseURI);
+    return u.origin === new URL(doc.baseURI).origin ? u.pathname + u.search : raw;
+  } catch {
+    return raw;
+  }
+}
+
+function imageAt(doc: Document, x: number, y: number): ImageHit | null {
+  const win = doc.defaultView;
+  if (!win) return null;
+  // сверху вниз по слоям: оверлеи-градиенты пропускаем, картинка может быть под ними
+  for (const el of doc.elementsFromPoint(x, y)) {
+    if (el.tagName === 'MAIN' || !el.closest('main')) continue;
+    if (el.tagName === 'IMG') return { kind: 'img', el, src: el.getAttribute('src') ?? '' };
+    for (const pseudo of ['', '::before', '::after'] as const) {
+      const m = /url\(["']?([^"')]+)["']?\)/.exec(win.getComputedStyle(el, pseudo || null).backgroundImage);
+      if (m) return { kind: 'bg', el, pseudo, url: sitePath(m[1], doc) };
+    }
+  }
+  return null;
+}
+
+/** Селектор для правила поверх общих стилей: свои классы элемента, иначе путь от ближайшего с классом. */
+function selectorOf(el: Element): string {
+  const classes = (e: Element) => [...e.classList].map((c) => `.${CSS.escape(c)}`).join('');
+  if (el.classList.length) return classes(el);
+  const parent = el.parentElement;
+  const nth = parent ? `${el.tagName.toLowerCase()}:nth-child(${[...parent.children].indexOf(el) + 1})` : el.tagName.toLowerCase();
+  return parent && parent.tagName !== 'MAIN' ? `${selectorOf(parent)} > ${nth}` : nth;
+}
+
+/** Куда записать новую картинку. */
+function imagePlan(hit: ImageHit, blocks: BlockData[]): ImagePlan {
+  const deny = (reason: string): ImagePlan => ({ ok: false, reason });
+  const at = blockAt(hit.el);
+  if (at?.mark === 'shared') return deny(REASONS.shared);
+
+  if (hit.kind === 'bg') {
+    const { url, el, pseudo } = hit;
+    return {
+      ok: true,
+      what: 'фон',
+      current: url,
+      apply: (next, now, styles) => {
+        // адрес фона — в стилях страницы, блоках «Стили» или HTML секций: заменить там
+        const swap = (s: string) => s.split(url).join(next);
+        let found = false;
+        const inlineStyles = styles.map((css) => {
+          if (!css.includes(url)) return css;
+          found = true;
+          return swap(css);
+        });
+        const walk = (list: BlockData[]): BlockData[] =>
+          list.map((b) => {
+            if (b.type === 'container') return { ...b, children: walk(b.children as BlockData[]) };
+            const key = b.type === 'style' ? 'css' : b.type === 'html' ? 'html' : null;
+            if (!key || !String(b[key]).includes(url)) return b;
+            found = true;
+            return { ...b, [key]: swap(String(b[key])) };
+          });
+        const nextBlocks = walk(now);
+        if (found) return { blocks: nextBlocks, inlineStyles };
+        // фон из общих стилей сайта — правило поверх них, только на этой странице
+        return { inlineStyles: [...styles, `${selectorOf(el)}${pseudo} { background-image: url('${next}') !important; }`] };
+      },
+    };
+  }
+
+  if (!at) return deny(REASONS.notFound);
+  const path = at.mark.split('.').map(Number);
+  const block = blockByMark(blocks, path);
+  if (!block) return deny(REASONS.notFound);
+  if (COMPONENTS.has(block.type)) return deny(REASONS.component);
+
+  if (block.type === 'html') {
+    const route = routeOf(at.root, hit.el);
+    const locate = (html: string) => {
+      const tpl = document.createElement('template');
+      tpl.innerHTML = html;
+      const root = tpl.content.firstElementChild;
+      const found = route && root ? follow(root, route) : null;
+      return found?.tagName === 'IMG' && found.getAttribute('src') === hit.src ? { tpl, found } : null;
+    };
+    if (!locate(String(block.html))) return deny(REASONS.mismatch);
+    return {
+      ok: true,
+      what: 'картинку',
+      current: hit.src,
+      apply: (url, now) => {
+        const current = blockByMark(now, path);
+        const h = current?.type === 'html' ? locate(String(current.html)) : null;
+        if (!current || !h) return null;
+        h.found.setAttribute('src', url);
+        // уменьшенные копии и WebP медиасервис делает сам — старые варианты убрать
+        h.found.removeAttribute('srcset');
+        h.found.removeAttribute('sizes');
+        if (h.found.parentElement?.tagName === 'PICTURE') h.found.parentElement.querySelectorAll('source').forEach((s) => s.remove());
+        return { blocks: replaceByMark(now, path, { ...current, html: h.tpl.innerHTML }) };
+      },
+    };
+  }
+
+  // блок с полями: поля с этим адресом; у фото галереи — и картинка, и миниатюра
+  const hits = leaves(block).filter((l) => l.value === hit.src);
+  if (!hits.length) return deny(block.type === 'catalogCards' || block.type === 'catalogList' ? REASONS.catalog : REASONS.notFound);
+  return {
+    ok: true,
+    what: 'картинку',
+    current: hit.src,
+    apply: (url, now) => {
+      let next: unknown = blockByMark(now, path);
+      if (!next) return null;
+      for (const l of hits) {
+        const was = leafAt(next, l.path);
+        if (was === url) continue; // уже заменено вместе с парой «картинка — миниатюра»
+        if (was !== hit.src) return null;
+        next = setLeaf(next, l.path, url);
+        const parent = l.path.slice(0, -1);
+        const photo = leafAt(next, parent) as Record<string, unknown> | undefined;
+        if ((l.path.at(-1) === 'src' || l.path.at(-1) === 'thumb') && typeof photo?.src === 'string' && typeof photo.thumb === 'string') {
+          next = setLeaf(setLeaf(next, [...parent, 'src'], url), [...parent, 'thumb'], url);
+        }
+      }
+      return { blocks: replaceByMark(now, path, next as BlockData) };
+    },
+  };
+}
+
 /**
- * Пробел, набранный в редакторе браузера, часто становится неразрывным. В изменённом
- * куске (между общим началом и общим концом «было» и «стало») неразрывный — обычный;
- * неразрывные пробелы текста вокруг (после предлогов) остаются.
+ * Пробелы и редактор браузера: набранный пробел он часто ставит неразрывным, а
+ * неразрывный рядом с местом правки сам делает обычным. Сравниваем изменённый
+ * кусок (между общим началом и общим концом «было» и «стало»): отличается только
+ * видом пробела — правки нет; иначе набранные неразрывные — обычные, а
+ * неразрывный на краю куска, который был в тексте (после предлога), остаётся.
  */
-function typedSpaces(before: string, after: string, nbsp: '&nbsp;' | '\u00a0'): string {
+export function typedSpaces(before: string, after: string, nbsp: '&nbsp;' | '\u00a0'): string {
   const max = Math.min(before.length, after.length);
   let start = 0;
   while (start < max && before[start] === after[start]) start++;
@@ -254,7 +401,13 @@ function typedSpaces(before: string, after: string, nbsp: '&nbsp;' | '\u00a0'): 
     const last = after.lastIndexOf('&', end - 1);
     if (last >= start && after.indexOf(';', last) >= end) end = after.indexOf(';', last) + 1;
   }
-  return after.slice(0, start) + after.slice(start, end).split(nbsp).join(' ') + after.slice(end);
+  const plain = (s: string) => s.split(nbsp).join(' ');
+  const was = before.slice(start, before.length - (after.length - end));
+  if (plain(was) === plain(after.slice(start, end))) return before;
+  let typed = plain(after.slice(start, end));
+  if (was.startsWith(nbsp) && typed.startsWith(' ')) typed = nbsp + typed.slice(1);
+  if (was.endsWith(nbsp) && typed.endsWith(' ')) typed = typed.slice(0, -1) + nbsp;
+  return after.slice(0, start) + typed + after.slice(end);
 }
 
 /** Набранное: без пробелов по краям; пара «пробел + неразрывный» от редактора браузера — обычный пробел. */
@@ -271,7 +424,14 @@ const cleanText = (t: string) => t.replace(/\u00a0 | \u00a0/g, ' ').trim();
 const STYLE = `
 html.mtpk-live [data-mtpk="can"]{outline:1.5px dashed rgba(13,110,140,.7);outline-offset:3px;cursor:text}
 html.mtpk-live [data-mtpk="edit"]{outline:2px solid #0d6e8c;outline-offset:3px;box-shadow:0 0 0 7px rgba(13,110,140,.14);cursor:text}
+html.mtpk-live img[data-mtpk="can"]{cursor:pointer}
+html.mtpk-live [data-mtpk="pick"]{outline:2px solid #0d6e8c;outline-offset:-2px}
 .mtpk-tip{position:fixed;z-index:2147483647;max-width:340px;padding:9px 12px;border-radius:10px;background:#0f172a;color:#fff;font:13px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 10px 30px rgba(15,23,42,.3);pointer-events:none}
+.mtpk-pop{position:fixed;z-index:2147483647;display:flex;gap:4px;padding:5px;border-radius:12px;background:#0f172a;box-shadow:0 10px 30px rgba(15,23,42,.35);font:13px/1 system-ui,-apple-system,"Segoe UI",sans-serif}
+.mtpk-pop button{all:unset;cursor:pointer;padding:9px 12px;border-radius:8px;color:#fff;background:#0d6e8c;font-weight:600}
+.mtpk-pop button:hover{background:#0b5d77}
+.mtpk-pop button.mtpk-pop__cancel{background:transparent;color:#cbd5e1;font-weight:400}
+.mtpk-pop button.mtpk-pop__cancel:hover{background:rgba(255,255,255,.08)}
 `;
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -386,7 +546,7 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
       if (inner !== cleanInner(original)) {
         const next = p.apply(inner, typedSpaces(originalText, el.textContent ?? '', '\u00a0'), opts.getBlocks());
         if (next) {
-          opts.onBlocks(next);
+          opts.onUpdate({ blocks: next });
           changed = true;
         } else {
           el.innerHTML = original;
@@ -420,22 +580,89 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     opts.onEditing(true, false);
   };
 
+  // замена картинки: меню у точки щелчка, картинка (или элемент с фоном) обведена
+  let pop: HTMLElement | null = null;
+  let popAction: (() => void) | null = null;
+  let picked: Element | null = null;
+  const closePop = () => {
+    pop?.remove();
+    pop = null;
+    popAction = null;
+    if (picked?.getAttribute('data-mtpk') === 'pick') picked.removeAttribute('data-mtpk');
+    picked = null;
+  };
+  const showPop = (hit: ImageHit, p: Extract<ImagePlan, { ok: true }>, x: number, y: number) => {
+    closePop();
+    picked = hit.el;
+    hit.el.setAttribute('data-mtpk', 'pick');
+    pop = doc.createElement('div');
+    pop.className = 'mtpk-pop';
+    const go = doc.createElement('button');
+    go.type = 'button';
+    go.textContent = `Заменить ${p.what}…`;
+    const cancel = doc.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'mtpk-pop__cancel';
+    cancel.textContent = 'Отмена';
+    pop.append(go, cancel);
+    doc.body.append(pop);
+    pop.style.left = `${Math.max(8, Math.min(x - pop.offsetWidth / 2, win.innerWidth - pop.offsetWidth - 8))}px`;
+    pop.style.top = `${y + 12 + pop.offsetHeight > win.innerHeight ? y - pop.offsetHeight - 12 : y + 12}px`;
+    popAction = () =>
+      opts.onPick({
+        what: p.what,
+        current: p.current,
+        choose: (url) => {
+          const patch = p.apply(url, opts.getBlocks(), opts.getStyles());
+          if (patch) opts.onUpdate(patch);
+          else tip(REASONS.changed, x, y);
+        },
+      });
+  };
+  const images = new WeakMap<Element, ImagePlan>();
+  const imageVerdict = (img: Element) => {
+    let v = images.get(img);
+    if (!v) images.set(img, (v = imagePlan({ kind: 'img', el: img, src: img.getAttribute('src') ?? '' }, opts.getBlocks())));
+    return v;
+  };
+
   const onOver = (e: Event) => {
     if (active) return;
     const t = e.target as Element;
     const el = t.nodeType === 1 ? textElement(t) : null;
-    setHover(el && verdict(el).ok ? el : null);
+    if (el) return setHover(verdict(el).ok ? el : null);
+    setHover(t.tagName === 'IMG' && t.closest('main') && imageVerdict(t).ok ? t : null);
   };
   const onLeave = () => setHover(null);
   const onClick = (e: MouseEvent) => {
     const t = e.target as Element;
     if (t.nodeType !== 1) return;
+    if (t.closest('.mtpk-pop')) {
+      e.preventDefault();
+      const act = t.closest('button') && !t.closest('.mtpk-pop__cancel') ? popAction : null;
+      closePop();
+      act?.();
+      return;
+    }
+    closePop();
     // по ссылкам в предпросмотре не переходим
     if (t.closest('a[href]')) e.preventDefault();
     if (active && active.el.contains(t)) return;
     if (active) finish(true);
     const el = textElement(t);
-    if (!el) return;
+    if (!el) {
+      // не текст — картинка или фон под точкой: предложить замену
+      const hit = imageAt(doc, e.clientX, e.clientY);
+      if (!hit) return;
+      const ip = imagePlan(hit, opts.getBlocks());
+      if (!ip.ok) tip(ip.reason, e.clientX, e.clientY);
+      else {
+        tipEl?.remove();
+        setHover(null);
+        showPop(hit, ip, e.clientX, e.clientY);
+      }
+      return;
+    }
     const p = plan(el, opts.getBlocks());
     if (!p.ok) {
       tip(p.reason, e.clientX, e.clientY);
@@ -452,6 +679,7 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
       setTimeout(opts.onSave, 60);
       return;
     }
+    if (pop && e.key === 'Escape') return closePop();
     if (!active) return;
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -473,6 +701,7 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
   doc.addEventListener('keydown', onKey, true);
   return () => {
     finish(true);
+    closePop();
     setHover(null);
     tipEl?.remove();
     clearTimeout(tipTimer);
