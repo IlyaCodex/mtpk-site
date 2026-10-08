@@ -47,7 +47,7 @@ export function Drawer({ items, contacts }: { items: DrawerItem[]; contacts: Con
                 ])}
                 {item.all && (
                   <a className="nav-drawer__sublink nav-drawer__sublink--all" href={item.all.href}>
-                    {item.all.label}
+                    <ArrowLabel label={item.all.label} />
                   </a>
                 )}
               </div>
@@ -73,5 +73,19 @@ export function Drawer({ items, contacts }: { items: DrawerItem[]; contacts: Con
         <ContactLink href={`mailto:${contacts.email}`} icon={contactIcon(DRAWER_ICONS.mail)} text={contacts.email} />
       </div>
     </aside>
+  );
+}
+
+/** Подпись ссылки из настроек: «→» в конце — иконкой, как у кнопок (стили .btn__arrow). */
+function ArrowLabel({ label }: { label: string }) {
+  const m = /^([\s\S]*?)[\s\u00a0]*→\s*$/.exec(label);
+  if (!m) return <>{label}</>;
+  return (
+    <>
+      {`${m[1]} `}
+      <span className="btn__arrow" aria-hidden="true">
+        →
+      </span>
+    </>
   );
 }

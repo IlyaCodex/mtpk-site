@@ -1,5 +1,5 @@
-/** Стрелка «→» в подписях кнопок (сдвигается при наведении — стили .btn__arrow). */
-export const ARROW = '<span class="btn__arrow">→</span>';
+/** Стрелка в подписях кнопок: символ «→» для разметки, на экране — SVG-иконка (стили .btn__arrow), сдвигается при наведении. */
+export const ARROW = '<span class="btn__arrow" aria-hidden="true">→</span>';
 
 /**
  * Адрес приёма заявок — прежний /api/send.php: на него отправляют все формы.

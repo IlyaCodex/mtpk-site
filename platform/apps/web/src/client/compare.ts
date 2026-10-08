@@ -32,7 +32,7 @@ function renderBar(): void {
     bar.className = 'cmp-bar';
     document.body.appendChild(bar);
   }
-  bar.innerHTML = `<div class="cmp-bar__inner"><span class="cmp-bar__count">Сравнение: <b>${items.length}</b> / ${COMPARE_LIMIT}</span><a class="btn btn--primary cmp-bar__go" href="${COMPARE_PAGE}">Сравнить <span class="btn__arrow">→</span></a><button type="button" class="cmp-bar__clear">Очистить</button></div>`;
+  bar.innerHTML = `<div class="cmp-bar__inner"><span class="cmp-bar__count">Сравнение: <b>${items.length}</b> / ${COMPARE_LIMIT}</span><a class="btn btn--primary cmp-bar__go" href="${COMPARE_PAGE}">Сравнить <span class="btn__arrow" aria-hidden="true">→</span></a><button type="button" class="cmp-bar__clear">Очистить</button></div>`;
   liftAboveCookie(bar);
 }
 

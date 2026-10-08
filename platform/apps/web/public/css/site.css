@@ -389,11 +389,39 @@ body { margin: 0; }
 }
 .btn--dark { background: var(--neutral-900); color: var(--neutral-0); }
 .btn--dark:hover { background: var(--neutral-800); }
-.btn__arrow {
+/* Стрелка в кнопках и ссылках-призывах — SVG-иконка цвета текста (маска).
+   В разметке остаётся символ «→» (aria-hidden): его не видно, рисуется иконка. */
+.btn__arrow,
+.scard__meta-arrow,
+.cat-index__all-arrow,
+.pr-card-link > span[aria-hidden="true"],
+.cat-card__link::after,
+.prod-card__link::after,
+.megamenu__feature-link::after,
+.catalog-lvm-card__action::after,
+.catalog-lgm-card__action::after,
+.tech-visual__cta::after {
   display: inline-block;
+  /* ниже строки текста: высота кнопок не меняется */
+  width: 0.8em;
+  height: 0.7em;
+  vertical-align: -0.05em;
+  align-self: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-indent: 200%;
+  background-color: currentColor;
+  -webkit-mask: var(--icon-arrow) center / contain no-repeat;
+  mask: var(--icon-arrow) center / contain no-repeat;
   transition: transform var(--duration-base) var(--ease-out);
 }
+.btn__arrow--back { -webkit-mask-image: var(--icon-arrow-back); mask-image: var(--icon-arrow-back); }
+:root {
+  --icon-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='4 5 16 14' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E");
+  --icon-arrow-back: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='4 5 16 14' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 6l-6 6 6 6'/%3E%3C/svg%3E");
+}
 .btn:hover .btn__arrow { transform: translateX(4px); }
+.btn:hover .btn__arrow--back { transform: translateX(-4px); }
 /* Hero CTA — усиленная primary-кнопка с inline-SVG стрелкой */
 .btn--cta {
   padding: var(--btn-padding-y-lg, 16px) var(--btn-padding-x-lg, 32px);

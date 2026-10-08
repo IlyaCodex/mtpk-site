@@ -26,7 +26,7 @@ export function Breadcrumbs({ items, className = 'breadcrumb' }: { items: Crumb[
 
 /** Подпись кнопки со стрелкой «→» (стрелка двигается при наведении — стили .btn__arrow). */
 export function withArrow(label: string, arrow: boolean): string {
-  return arrow ? `${label} <span class="btn__arrow">→</span>` : label;
+  return arrow ? `${label} <span class="btn__arrow" aria-hidden="true">→</span>` : label;
 }
 
 /** Кнопка-ссылка в фирменном стиле (.btn). */

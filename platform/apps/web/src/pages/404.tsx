@@ -49,7 +49,9 @@ export default function NotFound({ settings }: Props) {
             <div className="nf__actions">
               <a href="/" className="btn btn--primary">
                 {'На\u00A0главную '}
-                <span className="btn__arrow">→</span>
+                <span className="btn__arrow" aria-hidden="true">
+                  →
+                </span>
               </a>
               <button type="button" className="btn btn--secondary" data-search-open="">
                 {'Поиск по\u00A0сайту'}

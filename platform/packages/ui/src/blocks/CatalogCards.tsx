@@ -63,7 +63,7 @@ function TeaserCard({ item, eager }: { item: CatalogCardItem; eager: readonly st
       <div className="teaser-card__body">
         <Inline as="h3" className="teaser-card__title" html={item.title} />
         {item.caption !== undefined && <Inline as="p" className="teaser-card__caption" html={item.caption} />}
-        <Inline className="teaser-card__more" html={`${item.linkText ?? 'Подробнее'} <span class="btn__arrow">→</span>`} />
+        <Inline className="teaser-card__more" html={`${item.linkText ?? 'Подробнее'} <span class="btn__arrow" aria-hidden="true">→</span>`} />
       </div>
     </a>
   );

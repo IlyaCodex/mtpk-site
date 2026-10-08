@@ -55,7 +55,7 @@ type CompareIndex = { sections: Record<string, CompareSection> };
       '<div class="cmp-empty">'
       + '<p class="cmp-empty__text">' + esc(message) + '</p>'
       + '<a class="btn btn--primary" href="/products/">Перейти в каталог '
-      + '<span class="btn__arrow">→</span></a>'
+      + '<span class="btn__arrow" aria-hidden="true">→</span></a>'
       + '</div>';
   }
 
@@ -174,7 +174,7 @@ type CompareIndex = { sections: Record<string, CompareSection> };
       + 'Инженер уточнит задачу и предложит решение под ваше производство.';
     var submit = wrap.querySelector('.form__submit');
     if (submit) submit.innerHTML = 'Отправить менеджеру на&nbsp;просчёт '
-      + '<span class="btn__arrow">→</span>';
+      + '<span class="btn__arrow" aria-hidden="true">→</span>';
     var form = wrap.querySelector('form.js-lead-form');
     if (form) form.setAttribute('data-form', 'Сравнение товаров');
   }

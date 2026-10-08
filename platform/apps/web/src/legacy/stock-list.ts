@@ -139,7 +139,7 @@ type StockItem = {
   }
 
   /* ── Кнопки действий карточки (единые для fallback и каталожных) ── */
-  function arrow() { return el('span', { class: 'btn__arrow', text: '→' }); }
+  function arrow() { return el('span', { class: 'btn__arrow', 'aria-hidden': 'true', text: '→' }); }
   function quoteBtn() {
     return el('a', { href: '#leadgen', class: 'btn btn--primary btn--block js-quote-btn' },
       [document.createTextNode('Запросить цену '), arrow()]);
