@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Icon } from '@/components/icons';
 import { toast } from '@/components/toast';
 import { api } from '@/lib/client-api';
 
@@ -32,10 +33,10 @@ export function Reorder({ kind, ids, index, label }: { kind: Kind; ids: number[]
   return (
     <span className="inline-flex gap-1" onClick={(e) => e.preventDefault()}>
       <button type="button" className={btn} disabled={busy || index === 0} onClick={() => void move(index - 1)} title={`${label}: выше`} aria-label={`${label}: выше`}>
-        ↑
+        <Icon name="up" className="h-4 w-4" />
       </button>
       <button type="button" className={btn} disabled={busy || index === ids.length - 1} onClick={() => void move(index + 1)} title={`${label}: ниже`} aria-label={`${label}: ниже`}>
-        ↓
+        <Icon name="down" className="h-4 w-4" />
       </button>
     </span>
   );

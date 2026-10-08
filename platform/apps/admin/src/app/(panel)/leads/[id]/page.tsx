@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Icon } from '@/components/icons';
 import { Badge, Card, formatDate, PageHeader } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
 import { ServiceError, serviceJson } from '@/lib/services';
@@ -42,8 +43,9 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
 
   return (
     <>
-      <Link href="/leads" className="text-sm text-slate-500 hover:text-brand-600">
-        ← Заявки
+      <Link href="/leads" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-600">
+        <Icon name="left" className="h-4 w-4" />
+        Заявки
       </Link>
       <PageHeader
         title={`Заявка №${lead.id}`}

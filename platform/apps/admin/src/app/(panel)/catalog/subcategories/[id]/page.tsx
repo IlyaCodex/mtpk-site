@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SubcategoryForm, type SubcategoryEntity } from '@/components/catalog-forms';
 import { catalogTrail, CatalogFormHeader } from '@/components/catalog-trail';
+import { Icon } from '@/components/icons';
 import { LinkButton } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
 import { plain, type CatalogTree } from '@/lib/catalog';
@@ -32,8 +33,9 @@ export default async function SubcategoryPage({ params }: { params: Promise<{ id
             <LinkButton size="sm" href={`/catalog/${sub.page.id}`}>
               Тексты и SEO страницы
             </LinkButton>
-            <a href={`${env().PUBLIC_SITE_URL}${sub.page.path}`} target="_blank" rel="noopener" className="text-sm text-brand-600 hover:underline">
-              на сайте ↗
+            <a href={`${env().PUBLIC_SITE_URL}${sub.page.path}`} target="_blank" rel="noopener" className="inline-flex items-center gap-1 text-sm text-brand-600 hover:underline">
+              на сайте
+              <Icon name="external" className="h-4 w-4" />
             </a>
           </>
         }

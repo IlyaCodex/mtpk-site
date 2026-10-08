@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from 'react';
 import { CodeEditor } from './CodeEditor';
 import { GalleryField, type Photo } from './gallery-field';
+import { Icon } from './icons';
 import { MediaInput } from './media';
 import { Button, cx } from './ui';
 
@@ -374,7 +375,10 @@ function ArrayField({
                 </div>
               ) : (
                 <button type="button" className="min-w-0 flex-1 truncate text-left text-sm text-slate-700" onClick={() => setOpen(open === i ? null : i)}>
-                  <span className="mr-2 text-xs text-slate-400">{open === i ? '▾' : '▸'} {i + 1}</span>
+                  <span className="mr-2 inline-flex items-center gap-1 align-middle text-xs text-slate-400">
+                    <Icon name={open === i ? 'chevronDown' : 'chevronRight'} className="h-3.5 w-3.5" />
+                    {i + 1}
+                  </span>
                   {summarize(item) || <span className="text-slate-400">пусто</span>}
                 </button>
               )}
@@ -398,7 +402,8 @@ function ArrayField({
             if (!simple) setOpen(value.length);
           }}
         >
-          + Добавить
+          <Icon name="plus" className="h-4 w-4" />
+          Добавить
         </Button>
       </div>
     </div>
@@ -410,21 +415,22 @@ export function ItemActions({ onUp, onDown, onRemove, extra }: { onUp: () => voi
   return (
     <div className="flex shrink-0 items-center gap-0.5">
       {extra}
-      <button type="button" className={btn} title="Выше" onClick={onUp}>
-        ↑
+      <button type="button" className={btn} title="Выше" aria-label="Выше" onClick={onUp}>
+        <Icon name="up" className="h-4 w-4" />
       </button>
-      <button type="button" className={btn} title="Ниже" onClick={onDown}>
-        ↓
+      <button type="button" className={btn} title="Ниже" aria-label="Ниже" onClick={onDown}>
+        <Icon name="down" className="h-4 w-4" />
       </button>
       <button
         type="button"
         className="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600"
         title="Удалить"
+        aria-label="Удалить"
         onClick={() => {
           if (window.confirm('Удалить элемент?')) onRemove();
         }}
       >
-        ✕
+        <Icon name="trash" className="h-4 w-4" />
       </button>
     </div>
   );
@@ -442,13 +448,14 @@ function KeyValueField({ label, value, onChange }: { label?: string; value: Reco
           <div key={i} className="flex gap-2">
             <input className="field max-w-48 font-mono text-xs" value={k} onChange={(e) => update(entries.map((p, j) => (j === i ? [e.target.value, p[1]] : p)))} />
             <input className="field font-mono text-xs" value={v} onChange={(e) => update(entries.map((p, j) => (j === i ? [p[0], e.target.value] : p)))} />
-            <button type="button" className="px-2 text-slate-400 hover:text-red-600" onClick={() => update(entries.filter((_, j) => j !== i))}>
-              ✕
+            <button type="button" className="px-2 text-slate-400 hover:text-red-600" title="Убрать" aria-label="Убрать" onClick={() => update(entries.filter((_, j) => j !== i))}>
+              <Icon name="close" className="h-4 w-4" />
             </button>
           </div>
         ))}
         <Button size="sm" variant="ghost" onClick={() => onChange({ ...value, [`data-new-${entries.length + 1}`]: '' })}>
-          + атрибут
+          <Icon name="plus" className="h-4 w-4" />
+          атрибут
         </Button>
       </div>
     </div>

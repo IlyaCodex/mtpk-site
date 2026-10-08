@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Icon } from '@/components/icons';
 import { Badge, EmptyState, formatDate, LinkButton } from '@/components/ui';
 import { buildTree, isProduct, lineage, plain, plural, productsIn, thumbUrl, type CatalogNode, type CatCategory, type TreeNode } from '@/lib/catalog';
 
@@ -92,8 +93,9 @@ export function SparesView({
         <LinkButton size="sm" href={`/catalog/${scope.id}`}>
           {scope === hub ? 'Тексты и SEO страницы' : 'Изменить страницу'}
         </LinkButton>
-        <a href={`${site}${scope.path}`} target="_blank" rel="noopener" className="text-xs text-brand-600 hover:underline">
-          на сайте ↗
+        <a href={`${site}${scope.path}`} target="_blank" rel="noopener" className="inline-flex items-center gap-0.5 text-xs text-brand-600 hover:underline">
+          на сайте
+          <Icon name="external" className="h-3.5 w-3.5" />
         </a>
       </section>
 

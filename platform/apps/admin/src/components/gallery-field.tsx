@@ -2,6 +2,7 @@
 
 import { useRef, useState, type DragEvent } from 'react';
 import { uploadFolderFor, useEditorContext } from './editor-context';
+import { Icon } from './icons';
 import { fileSrc, isImage, MediaBrowser, MediaInput, Modal, uploadFile } from './media';
 import { toast } from './toast';
 import { Button, cx } from './ui';
@@ -133,9 +134,10 @@ export function GalleryField({ value, onChange, label }: { value: Photo[]; onCha
                   type="button"
                   title="Убрать из галереи"
                   className="absolute top-1.5 right-1.5 hidden h-6 w-6 items-center justify-center rounded-full bg-white/95 text-slate-500 shadow hover:text-red-600 group-hover:flex"
+                  aria-label="Убрать из галереи"
                   onClick={() => window.confirm('Убрать фото из галереи? Файл останется в медиатеке.') && onChange(value.filter((_, j) => j !== i))}
                 >
-                  ✕
+                  <Icon name="close" className="h-3.5 w-3.5" />
                 </button>
               </div>
               <div className="space-y-1.5 p-2">
@@ -147,11 +149,11 @@ export function GalleryField({ value, onChange, label }: { value: Photo[]; onCha
                 />
                 <div className="flex items-center justify-between text-[11px] text-slate-500">
                   <span className="flex gap-1">
-                    <button type="button" className="rounded px-1 hover:bg-slate-100" title="Левее" onClick={() => onChange(move(value, i, i - 1))}>
-                      ←
+                    <button type="button" className="rounded px-1 py-0.5 hover:bg-slate-100" title="Левее" aria-label="Левее" onClick={() => onChange(move(value, i, i - 1))}>
+                      <Icon name="left" className="h-3.5 w-3.5" />
                     </button>
-                    <button type="button" className="rounded px-1 hover:bg-slate-100" title="Правее" onClick={() => onChange(move(value, i, i + 1))}>
-                      →
+                    <button type="button" className="rounded px-1 py-0.5 hover:bg-slate-100" title="Правее" aria-label="Правее" onClick={() => onChange(move(value, i, i + 1))}>
+                      <Icon name="right" className="h-3.5 w-3.5" />
                     </button>
                   </span>
                   {i > 0 ? (

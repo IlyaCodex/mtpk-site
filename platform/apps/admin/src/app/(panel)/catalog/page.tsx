@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { Icon } from '@/components/icons';
 import { Badge, EmptyState, formatDate, LinkButton, PageHeader } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
 import {
@@ -70,7 +71,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
       <Header
         actions={
           <LinkButton variant="primary" href="/catalog/categories/new">
-            + Добавить категорию
+            <Icon name="plus" className="h-4 w-4" />
+            Добавить категорию
           </LinkButton>
         }
       />
@@ -180,8 +182,9 @@ function Summary({ image, title, path, status, editHref, editLabel, pageId, site
         <LinkButton size="sm" href={`/catalog/${pageId}`}>
           Тексты и SEO страницы
         </LinkButton>
-        <a href={`${site}${path}`} target="_blank" rel="noopener" className="text-xs text-brand-600 hover:underline">
-          на сайте ↗
+        <a href={`${site}${path}`} target="_blank" rel="noopener" className="inline-flex items-center gap-0.5 text-xs text-brand-600 hover:underline">
+          на сайте
+          <Icon name="external" className="h-3.5 w-3.5" />
         </a>
       </div>
     </section>
@@ -227,7 +230,8 @@ function CategoryView({ category, tree, nodes, site }: { category: CatCategory; 
         hint="Карточки «Модельного ряда» на странице категории — в этом порядке"
         action={
           <LinkButton variant="primary" size="sm" href={`/catalog/subcategories/new?category=${category.id}`}>
-            + Добавить подкатегорию
+            <Icon name="plus" className="h-4 w-4" />
+            Добавить подкатегорию
           </LinkButton>
         }
       />
@@ -264,7 +268,8 @@ function CategoryView({ category, tree, nodes, site }: { category: CatCategory; 
             hint="Без подкатегории: карточки на странице категории"
             action={
               <LinkButton variant="primary" size="sm" href={`/catalog/products/new?category=${category.id}`}>
-                + Добавить товар
+                <Icon name="plus" className="h-4 w-4" />
+                Добавить товар
               </LinkButton>
             }
           />
@@ -281,8 +286,9 @@ function CategoryView({ category, tree, nodes, site }: { category: CatCategory; 
                 <Link href={`/catalog/${n.id}`} className="truncate font-medium text-slate-800 hover:text-brand-600">
                   {n.short}
                 </Link>
-                <a href={`${site}${n.path}`} target="_blank" rel="noopener" className="shrink-0 text-xs text-brand-600 hover:underline">
-                  на сайте ↗
+                <a href={`${site}${n.path}`} target="_blank" rel="noopener" className="inline-flex shrink-0 items-center gap-0.5 text-xs text-brand-600 hover:underline">
+                  на сайте
+                  <Icon name="external" className="h-3.5 w-3.5" />
                 </a>
               </li>
             ))}
@@ -313,7 +319,8 @@ function SubcategoryView({ category, subcategory, tree, site }: { category: CatC
         hint="Карточки в списке на странице подкатегории — в этом порядке"
         action={
           <LinkButton variant="primary" size="sm" href={`/catalog/products/new?category=${category.id}&subcategory=${subcategory.id}`}>
-            + Добавить товар
+            <Icon name="plus" className="h-4 w-4" />
+            Добавить товар
           </LinkButton>
         }
       />
@@ -372,8 +379,8 @@ function ProductRows({ products, tree, site, reorder, showWhere }: { products: C
                   <LinkButton size="sm" href={`/catalog/products/${p.id}`}>
                     Изменить
                   </LinkButton>
-                  <a href={`${site}${p.path}`} target="_blank" rel="noopener" className="text-xs text-brand-600 hover:underline" title="Открыть на сайте">
-                    ↗
+                  <a href={`${site}${p.path}`} target="_blank" rel="noopener" className="rounded p-1 text-brand-600 hover:bg-brand-50" title="Открыть на сайте" aria-label="Открыть на сайте">
+                    <Icon name="external" className="h-4 w-4" />
                   </a>
                 </span>
               </td>

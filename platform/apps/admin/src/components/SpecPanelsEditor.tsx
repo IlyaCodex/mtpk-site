@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
+import { Icon } from './icons';
 import { ItemActions, move } from './schema-form';
 import { RichTextEditor } from './RichTextEditor';
 import { RowsEditor, TextInput, type Row } from './text-fields';
@@ -55,12 +56,13 @@ function Guide({ onAdd, onExpand, onCollapse }: { onAdd: () => void; onExpand: (
           <p>
             Блок под фото товара. <b>Слева — меню «Содержание»</b>: это названия разделов. <b>Справа — сами разделы</b>: текст и таблицы «Параметр — Значение».
           </p>
-          <p>Новый раздел = новый пункт меню. Внутри раздела — «+ Текст» (как в Word, есть режим HTML-кода) и «+ Таблица».</p>
+          <p>Новый раздел = новый пункт меню. Внутри раздела — кнопки «Текст» (как в Word, есть режим HTML-кода) и «Таблица».</p>
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
-        <button type="button" onClick={onAdd} className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-brand-700">
-          + Добавить раздел
+        <button type="button" onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-brand-700">
+          <Icon name="plus" className="h-4 w-4" />
+          Добавить раздел
         </button>
         <button type="button" onClick={onExpand} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50">
           Развернуть все
@@ -75,15 +77,17 @@ function Guide({ onAdd, onExpand, onCollapse }: { onAdd: () => void; onExpand: (
 
 /** Добавить в раздел текст или таблицу. */
 function AddContent({ title, onText, onTable }: { title: string; onText: () => void; onTable: () => void }) {
-  const btn = 'rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-xs hover:border-brand-400 hover:text-brand-700';
+  const btn = 'inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-xs hover:border-brand-400 hover:text-brand-700';
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5">
       <span className="text-sm text-slate-500">Добавить в раздел «{plain(title) || 'без названия'}»:</span>
       <button type="button" className={btn} onClick={onText}>
-        + Текст
+        <Icon name="plus" className="h-4 w-4" />
+        Текст
       </button>
       <button type="button" className={btn} onClick={onTable}>
-        + Таблица
+        <Icon name="plus" className="h-4 w-4" />
+        Таблица
       </button>
     </div>
   );
@@ -165,7 +169,7 @@ export function SpecPanelsEditor({ block, onChange }: { block: SpecBlock; onChan
           <section key={p.id} className={cx('rounded-xl border bg-white shadow-xs', isOpen ? 'border-brand-200' : 'border-slate-200')}>
             <div className="flex items-center gap-3 px-4 py-3">
               <button type="button" className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => toggle(i)}>
-                <span className="w-4 text-xs text-slate-400">{isOpen ? '▾' : '▸'}</span>
+                <Icon name={isOpen ? 'chevronDown' : 'chevronRight'} className="h-4 w-4 text-slate-400" />
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">{i + 1}</span>
                 <span className="truncate font-medium text-slate-800">{plain(p.title) || 'Без названия'}</span>
                 <span className="shrink-0 text-xs text-slate-400">
@@ -198,7 +202,7 @@ export function SpecPanelsEditor({ block, onChange }: { block: SpecBlock; onChan
                           { key: 'label', label: 'Параметр', placeholder: 'Например: Мощность' },
                           { key: 'value', label: 'Значение', placeholder: 'Например: 24,9 кВт', wide: true },
                         ]}
-                        addLabel="+ Строка"
+                        addLabel="Строка"
                         empty="В таблице пока нет строк"
                         onChange={(rows) => setContent(i, p.content.map((x, j) => (j === k ? { ...c, rows: rows as { label: string; value: string }[] } : x)))}
                       />
@@ -222,9 +226,10 @@ export function SpecPanelsEditor({ block, onChange }: { block: SpecBlock; onChan
       <button
         type="button"
         onClick={add}
-        className="w-full rounded-xl border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-medium text-slate-600 hover:border-brand-400 hover:text-brand-700"
+        className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-medium text-slate-600 hover:border-brand-400 hover:text-brand-700"
       >
-        + Добавить раздел (новый пункт в меню «Содержание»)
+        <Icon name="add" className="h-4 w-4" />
+        Добавить раздел (новый пункт в меню «Содержание»)
       </button>
     </div>
   );

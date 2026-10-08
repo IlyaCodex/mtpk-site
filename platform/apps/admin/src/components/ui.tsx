@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { Icon } from './icons';
 
 /** Склейка классов без пустых значений. */
 export const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -137,7 +138,8 @@ export function Pager({ total, offset, limit, href }: { total: number; offset: n
       <div className="flex gap-2">
         {page > 1 && (
           <LinkButton size="sm" href={href(Math.max(0, offset - limit))}>
-            ← Назад
+            <Icon name="chevronLeft" className="h-4 w-4" />
+            Назад
           </LinkButton>
         )}
         <span className="px-2 py-1.5">
@@ -145,7 +147,8 @@ export function Pager({ total, offset, limit, href }: { total: number; offset: n
         </span>
         {page < pages && (
           <LinkButton size="sm" href={href(offset + limit)}>
-            Вперёд →
+            Вперёд
+            <Icon name="chevronRight" className="h-4 w-4" />
           </LinkButton>
         )}
       </div>

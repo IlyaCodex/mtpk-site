@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { Icon } from './icons';
 import { ItemActions, move } from './schema-form';
 import { Button, cx } from './ui';
 
@@ -80,7 +81,7 @@ export function RowsEditor({
   rows,
   onChange,
   columns,
-  addLabel = '+ Строка',
+  addLabel = 'Строка',
   empty = 'Строк нет',
 }: {
   rows: Row[];
@@ -116,6 +117,7 @@ export function RowsEditor({
         <p className="rounded-lg border border-dashed border-slate-300 px-3 py-3 text-center text-sm text-slate-500">{empty}</p>
       )}
       <Button size="sm" className="mt-2" onClick={() => onChange([...rows, Object.fromEntries(columns.map((c) => [c.key, '']))])}>
+        <Icon name="plus" className="h-4 w-4" />
         {addLabel}
       </Button>
     </div>

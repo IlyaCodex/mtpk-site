@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { lastSegment, plain, type CatalogTree } from '@/lib/catalog';
+import { Icon } from './icons';
 
 /** Ссылки «где в каталоге» для формы: Каталог / категория / подкатегория. */
 export function catalogTrail(tree: CatalogTree, categoryId?: number | null, subcategoryId?: number | null): { href: string; label: string }[] {
@@ -21,8 +22,9 @@ export function CatalogFormHeader({ trail, title, description, actions }: { trai
         {trail.map((t, i) => (
           <span key={t.href} className="flex items-center gap-1">
             {i > 0 && <span className="text-slate-300">/</span>}
-            <Link href={t.href} className="hover:text-brand-600">
-              {i === 0 ? `← ${t.label}` : t.label}
+            <Link href={t.href} className="inline-flex items-center gap-1 hover:text-brand-600">
+              {i === 0 && <Icon name="left" className="h-4 w-4" />}
+              {t.label}
             </Link>
           </span>
         ))}

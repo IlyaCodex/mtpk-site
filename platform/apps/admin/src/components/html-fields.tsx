@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { Icon } from './icons';
 import { MediaInput } from './media';
 import { ItemActions } from './schema-form';
 import { fromHtml, TextInput } from './text-fields';
@@ -378,8 +379,9 @@ export function HtmlFieldsEditor({ html, onChange }: { html: string; onChange: (
               <div key={itemKey} className={cx('rounded-lg border bg-white', isOpen ? 'border-brand-200' : 'border-slate-200')}>
                 <div className="flex items-center gap-2 px-3 py-1.5">
                   <button type="button" className="min-w-0 flex-1 truncate text-left text-sm text-slate-700" onClick={() => setOpen(isOpen ? null : itemKey)}>
-                    <span className="mr-2 text-xs text-slate-400">
-                      {isOpen ? '▾' : '▸'} {n + 1}
+                    <span className="mr-2 inline-flex items-center gap-1 align-middle text-xs text-slate-400">
+                      <Icon name={isOpen ? 'chevronDown' : 'chevronRight'} className="h-3.5 w-3.5" />
+                      {n + 1}
                     </span>
                     {title}
                   </button>
@@ -390,11 +392,12 @@ export function HtmlFieldsEditor({ html, onChange }: { html: string; onChange: (
                     extra={
                       <button
                         type="button"
-                        className="rounded p-1 text-xs text-slate-400 hover:bg-slate-200 hover:text-slate-700"
+                        className="rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700"
                         title="Дублировать"
+                        aria-label="Дублировать"
                         onClick={() => onChange(patch(html, item, (el) => (el as Element).after(el.cloneNode(true))))}
                       >
-                        ⧉
+                        <Icon name="copy" className="h-4 w-4" />
                       </button>
                     }
                   />

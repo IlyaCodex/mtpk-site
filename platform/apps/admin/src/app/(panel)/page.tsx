@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { BLOCK_LABELS, type Block } from '@mtpk/content-model';
 import { AreaChart, BarList, Donut, PALETTE, Sparkline, StackBar } from '@/components/charts';
-import { Icon, type DashIcon } from '@/components/dashboard-icons';
+import { Icon, type IconName } from '@/components/icons';
 import { Badge, cx, formatBytes, formatDate, Stat } from '@/components/ui';
 import { actionTone, describeAction } from '@/lib/audit-labels';
 import { can, requireUser } from '@/lib/auth';
@@ -76,8 +76,9 @@ function Panel({ title, action, children, className }: { title: string; action?:
 }
 
 const More = ({ href, children }: { href: string; children: ReactNode }) => (
-  <Link href={href} className="text-xs font-medium text-brand-600 hover:text-brand-800">
-    {children} →
+  <Link href={href} className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-800">
+    {children}
+    <Icon name="right" className="h-3.5 w-3.5" />
   </Link>
 );
 
@@ -92,7 +93,7 @@ function Kpi({
   tone = 'brand',
   href,
 }: {
-  icon: DashIcon;
+  icon: IconName;
   label: string;
   value: ReactNode;
   sub?: ReactNode;
@@ -112,7 +113,7 @@ function Kpi({
     <>
       <div className="flex items-start justify-between gap-3">
         <span className={cx('inline-flex h-10 w-10 items-center justify-center rounded-xl', tones[tone])}>
-          <Icon name={icon} />
+          <Icon name={icon} duotone className="h-[22px] w-[22px]" />
         </span>
         {spark && <span className={tone === 'red' ? 'text-red-500' : 'text-brand-500'}>{spark}</span>}
       </div>
@@ -144,11 +145,11 @@ function Kpi({
 }
 
 /** Быстрый переход в раздел. */
-function Shortcut({ href, icon, title, text }: { href: string; icon: DashIcon; title: string; text: ReactNode }) {
+function Shortcut({ href, icon, title, text }: { href: string; icon: IconName; title: string; text: ReactNode }) {
   return (
     <Link href={href} className="group flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs transition hover:border-brand-200 hover:shadow-md">
       <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500 transition group-hover:bg-brand-50 group-hover:text-brand-600">
-        <Icon name={icon} className="h-[18px] w-[18px]" />
+        <Icon name={icon} duotone className="h-5 w-5" />
       </span>
       <span className="min-w-0">
         <span className="block truncate text-sm font-medium text-slate-900">{title}</span>
@@ -354,7 +355,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
               </div>
               <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
                 <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-brand-600 shadow-xs">
-                  <Icon name="shield" className="h-[18px] w-[18px]" />
+                  <Icon name="shield" duotone className="h-5 w-5" />
                 </span>
                 <div className="text-sm">
                   <div className="font-medium text-slate-900">

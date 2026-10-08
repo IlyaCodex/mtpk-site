@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { Icon } from '@/components/icons';
 import { toast } from '@/components/toast';
 import { Badge, Button, Table } from '@/components/ui';
 import { api } from '@/lib/client-api';
@@ -107,10 +108,12 @@ export function RedirectsManager() {
       {data && data.total > LIMIT && (
         <div className="flex gap-2">
           <Button size="sm" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - LIMIT))}>
-            ← Назад
+            <Icon name="chevronLeft" className="h-4 w-4" />
+            Назад
           </Button>
           <Button size="sm" disabled={offset + LIMIT >= data.total} onClick={() => setOffset(offset + LIMIT)}>
-            Вперёд →
+            Вперёд
+            <Icon name="chevronRight" className="h-4 w-4" />
           </Button>
         </div>
       )}

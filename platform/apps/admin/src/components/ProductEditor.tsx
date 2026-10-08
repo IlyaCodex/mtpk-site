@@ -250,7 +250,7 @@ export function ProductEditor({
                       { key: 'label', label: 'Параметр', placeholder: 'Например: Мощность установки' },
                       { key: 'num', label: 'Значение', placeholder: 'Например: 24,9 кВт' },
                     ]}
-                    addLabel="+ Параметр"
+                    addLabel="Параметр"
                     empty="Ключевых параметров нет"
                     onChange={(rows: Row[]) => setHero({ keyspecs: rows.map((r) => ({ num: r.num ?? '', label: r.label ?? '' })) })}
                   />

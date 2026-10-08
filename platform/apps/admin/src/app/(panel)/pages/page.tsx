@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AutoSubmitForm } from '@/components/AutoSubmitForm';
+import { Icon } from '@/components/icons';
 import { Badge, EmptyState, formatDate, LinkButton, PageHeader, Pager } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
 import { withBase } from '@/lib/base-path';
@@ -60,7 +61,8 @@ export default async function PagesList({ searchParams }: { searchParams: Promis
         description="Все страницы сайта по разделам. Товары и запчасти удобнее искать в «Каталоге продукции»."
         actions={
           <LinkButton href="/pages/new" variant="primary">
-            + Новая страница
+            <Icon name="plus" className="h-4 w-4" />
+            Новая страница
           </LinkButton>
         }
       />
@@ -156,8 +158,8 @@ export default async function PagesList({ searchParams }: { searchParams: Promis
                         только просмотр
                       </span>
                     )}
-                    <a href={`${site}${p.path}`} target="_blank" rel="noopener" className="ml-3 text-xs text-brand-600 hover:underline" title="Открыть на сайте">
-                      ↗
+                    <a href={`${site}${p.path}`} target="_blank" rel="noopener" className="ml-2 inline-flex rounded p-1 align-middle text-brand-600 hover:bg-brand-50" title="Открыть на сайте" aria-label="Открыть на сайте">
+                      <Icon name="external" className="h-4 w-4" />
                     </a>
                   </td>
                 </tr>

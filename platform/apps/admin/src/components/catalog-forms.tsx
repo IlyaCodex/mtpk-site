@@ -6,6 +6,7 @@ import { api } from '@/lib/client-api';
 import { lastSegment, plain, slugify } from '@/lib/catalog';
 import { BlockList, type BlockData, type BlockSchemas } from './BlockList';
 import { EditorContext } from './editor-context';
+import { Icon } from './icons';
 import { MediaInput } from './media';
 import { Label, RowsEditor, TextInput, type Row } from './text-fields';
 import { toast } from './toast';
@@ -556,13 +557,14 @@ export function ProductCardFields({
           <RowsEditor
             rows={draft.specs as Row[]}
             columns={SPEC_COLUMNS}
-            addLabel="+ Характеристика"
+            addLabel="Характеристика"
             empty="Характеристик в карточке нет"
             onChange={(rows) => set({ specs: rows.map((r) => ({ label: r.label ?? '', value: r.value ?? '' })) })}
           />
         </div>
-        <button type="button" className="text-sm text-brand-600 hover:underline" onClick={() => setAdvanced((v) => !v)}>
-          {advanced ? '▾' : '▸'} Дополнительно: плашка, подпись, надпись ссылки, гарантия
+        <button type="button" className="inline-flex items-center gap-1 text-sm text-brand-600 hover:underline" onClick={() => setAdvanced((v) => !v)}>
+          <Icon name={advanced ? 'chevronDown' : 'chevronRight'} className="h-4 w-4" />
+          Дополнительно: плашка, подпись, надпись ссылки, гарантия
         </button>
         {advanced && (
           <div className="grid gap-4 sm:grid-cols-2">

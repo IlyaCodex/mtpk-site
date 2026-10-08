@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { BlockCode, HtmlSection, ModeTabs, ScriptSection } from './block-editors';
 import { sectionTitle } from './html-fields';
+import { Icon } from './icons';
 import { defaultFor, ItemActions, move, ObjectFields, summarize, type JsonSchema } from './schema-form';
 import { Badge, cx } from './ui';
 
@@ -115,8 +116,9 @@ function BlockPicker({ schemas, onPick, onClose }: { schemas: BlockSchemas; onPi
     <div ref={ref} className="my-2 rounded-xl border border-brand-200 bg-white p-4 shadow-lg ring-4 ring-brand-50">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold text-slate-800">Какой блок вставить сюда?</h3>
-        <button type="button" onClick={onClose} className="rounded px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 hover:text-slate-800">
-          Отмена ✕
+        <button type="button" onClick={onClose} className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 hover:text-slate-800">
+          Отмена
+          <Icon name="close" className="h-3.5 w-3.5" />
         </button>
       </div>
       <div className="space-y-4">
@@ -233,7 +235,8 @@ function InsertLine({ onClick }: { onClick: () => void }) {
         aria-label="Вставить блок сюда"
         className="relative inline-flex h-5 items-center gap-1 rounded-full border border-slate-200 bg-white px-2 text-xs leading-none text-slate-400 transition hover:border-brand-300 hover:text-brand-700 group-hover:border-brand-300 group-hover:text-brand-700"
       >
-        +<span className="hidden group-hover:inline">Вставить блок сюда</span>
+        <Icon name="plus" className="h-3.5 w-3.5" />
+        <span className="hidden group-hover:inline">Вставить блок сюда</span>
       </button>
     </div>
   );
@@ -323,7 +326,7 @@ export function BlockList({
             >
               <div className="flex items-center gap-3 px-4 py-2.5">
                 <button type="button" onClick={() => toggle(k)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
-                  <span className="w-4 text-xs text-slate-400">{isOpen ? '▾' : '▸'}</span>
+                  <Icon name={isOpen ? 'chevronDown' : 'chevronRight'} className="h-4 w-4 text-slate-400" />
                   <Badge tone={block.type === 'script' ? 'amber' : block.type === 'html' || block.type === 'container' ? 'gray' : 'blue'}>
                     {block.type === 'html' ? 'Секция' : block.type === 'script' ? 'Скрипт' : (def?.label ?? (block.type === 'container' ? 'Контейнер' : block.type))}
                   </Badge>
@@ -336,11 +339,12 @@ export function BlockList({
                   extra={
                     <button
                       type="button"
-                      className="rounded p-1 text-xs text-slate-400 hover:bg-slate-200 hover:text-slate-700"
+                      className="rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700"
                       title="Дублировать"
+                      aria-label="Дублировать"
                       onClick={() => insert(i + 1, structuredClone(block), false)}
                     >
-                      ⧉
+                      <Icon name="copy" className="h-4 w-4" />
                     </button>
                   }
                 />
@@ -405,9 +409,10 @@ export function BlockList({
         <button
           type="button"
           onClick={() => setInserting(blocks.length)}
-          className="mt-3 w-full rounded-xl border border-dashed border-slate-300 px-4 py-2.5 text-sm text-slate-500 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-slate-300 px-4 py-2.5 text-sm text-slate-500 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
         >
-          + Добавить блок {blocks.length ? 'в конец' : ''}
+          <Icon name="add" className="h-4 w-4" />
+          Добавить блок {blocks.length ? 'в конец' : ''}
         </button>
       )}
     </div>

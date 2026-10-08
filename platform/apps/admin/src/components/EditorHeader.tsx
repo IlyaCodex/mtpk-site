@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { Icon } from './icons';
 import { Badge, Button, formatDate } from './ui';
 
 export type Crumb = { href: string; label: string };
@@ -39,8 +40,9 @@ export function EditorHeader({
         {crumbs.map((c, i) => (
           <span key={c.href} className="flex items-center gap-1">
             {i > 0 && <span className="text-slate-300">/</span>}
-            <Link href={c.href} className="hover:text-brand-600">
-              {i === 0 ? `← ${c.label}` : c.label}
+            <Link href={c.href} className="inline-flex items-center gap-1 hover:text-brand-600">
+              {i === 0 && <Icon name="left" className="h-3.5 w-3.5" />}
+              {c.label}
             </Link>
           </span>
         ))}
@@ -55,8 +57,9 @@ export function EditorHeader({
           </div>
         </div>
         {extra}
-        <a href={siteHref} target="_blank" rel="noopener" className="text-sm text-brand-600 hover:underline">
-          Открыть на сайте ↗
+        <a href={siteHref} target="_blank" rel="noopener" className="inline-flex items-center gap-1 text-sm text-brand-600 hover:underline">
+          Открыть на сайте
+          <Icon name="external" className="h-4 w-4" />
         </a>
         <Button variant="primary" onClick={onSave} disabled={!dirty || saving}>
           {saving ? 'Сохраняем…' : dirty ? 'Сохранить' : 'Сохранено'}

@@ -6,6 +6,7 @@ import type { BlockData } from './BlockList';
 import { CodeEditor } from './CodeEditor';
 import { useEditorContext } from './editor-context';
 import { HtmlFieldsEditor } from './html-fields';
+import { Icon } from './icons';
 import { Button, cx } from './ui';
 
 /** Вкладки внутри открытого блока. */
@@ -184,7 +185,8 @@ export function BlockCode({ block, onConvert }: { block: BlockData; onConvert: (
             if (window.confirm('Перевести блок в HTML-секцию? Дальше он правится HTML-кодом и во вкладке «Тексты и картинки», поля этого блока исчезнут.')) onConvert(html);
           }}
         >
-          Править как HTML-код →
+          Править как HTML-код
+          <Icon name="right" className="h-4 w-4" />
         </Button>
       )}
     </div>

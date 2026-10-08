@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Icon } from '@/components/icons';
 import { ItemActions, move } from '@/components/schema-form';
 import { toast } from '@/components/toast';
 import { Button } from '@/components/ui';
@@ -93,7 +94,10 @@ export function StockEditor({ initial }: { initial: StockRow[] }) {
         </table>
       </div>
       <div className="flex gap-2">
-        <Button onClick={() => setRows([...rows, { ...empty }])}>+ Позиция</Button>
+        <Button onClick={() => setRows([...rows, { ...empty }])}>
+          <Icon name="plus" className="h-4 w-4" />
+          Позиция
+        </Button>
         <Button variant="primary" onClick={() => void save()} disabled={!dirty || saving}>
           {saving ? 'Сохраняем…' : dirty ? 'Сохранить' : 'Сохранено'}
         </Button>

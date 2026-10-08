@@ -6,6 +6,7 @@ import { BlockList, type BlockSchemas } from './BlockList';
 import { CodeEditor } from './CodeEditor';
 import { EditorContext } from './editor-context';
 import { EditorHeader, type Crumb } from './EditorHeader';
+import { Icon } from './icons';
 import { PreviewPane, type Device } from './PreviewPane';
 import { SeoFields } from './SeoFields';
 import { Button, cx, Field } from './ui';
@@ -105,7 +106,8 @@ export function PageEditor({
                 </Field>
               ))}
               <Button size="sm" onClick={() => update({ inlineStyles: [...page.inlineStyles, ''] })}>
-                + Блок стилей
+                <Icon name="plus" className="h-4 w-4" />
+                Блок стилей
               </Button>
             </div>
           )}
