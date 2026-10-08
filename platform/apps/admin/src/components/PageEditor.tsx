@@ -113,7 +113,7 @@ export function PageEditor({
           )}
         </div>
 
-        <PreviewPane page={page} device={device} onDevice={setDevice} />
+        <PreviewPane page={page} device={device} onDevice={setDevice} onBlocks={(blocks) => update({ blocks })} />
       </div>
     </div>
   );

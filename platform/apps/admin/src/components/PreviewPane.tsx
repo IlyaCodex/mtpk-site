@@ -1,19 +1,63 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/client-api';
+import type { BlockData } from './BlockList';
+import { attachPreviewEditor, patchMain } from './preview-edit';
 import type { EditablePage } from './use-page-draft';
 import { cx } from './ui';
 
 export type Device = 'desktop' | 'mobile' | 'off';
 
+const headOf = (html: string) => html.slice(0, html.indexOf('<body>'));
+const mainOf = (html: string) => html.slice(html.indexOf('<main>') + 6, html.lastIndexOf('</main>'));
+
 /**
  * Предпросмотр страницы так, как её увидит посетитель: перерисовывается
- * через полсекунды после последней правки. Компьютер / телефон / скрыть.
+ * через полсекунды после последней правки — на месте, без перезагрузки (не
+ * прыгает к началу). Компьютер / телефон / скрыть. С onBlocks текст можно
+ * править прямо в предпросмотре (preview-edit.ts).
  */
-export function PreviewPane({ page, device, onDevice }: { page: EditablePage; device: Device; onDevice: (d: Device) => void }) {
-  const [html, setHtml] = useState('');
+export function PreviewPane({
+  page,
+  device,
+  onDevice,
+  onBlocks,
+}: {
+  page: EditablePage;
+  device: Device;
+  onDevice: (d: Device) => void;
+  onBlocks?: (blocks: BlockData[]) => void;
+}) {
+  const [doc, setDoc] = useState('');
   const seq = useRef(0);
+  const frame = useRef<HTMLIFrameElement>(null);
+  const latest = useRef('');
+  const loaded = useRef<{ head: string; main: string } | null>(null);
+  const editing = useRef(false);
+  const detach = useRef<(() => void) | null>(null);
+  const blocks = useRef(page.blocks);
+  blocks.current = page.blocks;
+  const setBlocks = useRef(onBlocks);
+  setBlocks.current = onBlocks;
+
+  /** Показать последнюю отрисовку: та же шапка — заменить содержимое на месте, иначе загрузить заново. */
+  const apply = useCallback(() => {
+    const html = latest.current;
+    // идёт правка в предпросмотре — покажем после неё
+    if (!html || editing.current) return;
+    const main = frame.current?.contentDocument?.querySelector('main');
+    if (main && loaded.current && loaded.current.head === headOf(html)) {
+      const next = mainOf(html);
+      if (loaded.current.main !== next) {
+        patchMain(main, loaded.current.main, next);
+        loaded.current.main = next;
+      }
+      return;
+    }
+    setDoc(html);
+  }, []);
+
   useEffect(() => {
     if (device === 'off') return;
     const my = ++seq.current;
@@ -22,13 +66,42 @@ export function PreviewPane({ page, device, onDevice }: { page: EditablePage; de
         const res = await api<string>('preview', {
           json: { path: page.path, title: page.title, blocks: page.blocks, cssTemplates: page.cssTemplates, inlineStyles: page.inlineStyles },
         });
-        if (my === seq.current) setHtml(res);
+        if (my !== seq.current) return;
+        latest.current = res;
+        apply();
       } catch {
         /* ошибка предпросмотра не мешает редактированию */
       }
     }, 600);
     return () => clearTimeout(t);
-  }, [page.path, page.title, page.blocks, page.cssTemplates, page.inlineStyles, device]);
+  }, [page.path, page.title, page.blocks, page.cssTemplates, page.inlineStyles, device, apply]);
+
+  const onLoad = () => {
+    const d = frame.current?.contentDocument;
+    if (!d || !doc) return;
+    loaded.current = { head: headOf(doc), main: mainOf(doc) };
+    detach.current?.();
+    detach.current = setBlocks.current
+      ? attachPreviewEditor(d, {
+          getBlocks: () => blocks.current,
+          onBlocks: (next) => setBlocks.current?.(next),
+          onSave: () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true })),
+          onEditing: (active, changed) => {
+            editing.current = active;
+            // правка ушла в черновик — следом придёт новая отрисовка, старую не показываем
+            if (!active && !changed) apply();
+          },
+        })
+      : null;
+    apply();
+  };
+
+  useEffect(() => {
+    if (device !== 'off') return;
+    detach.current = null;
+    loaded.current = null;
+    editing.current = false;
+  }, [device]);
 
   if (device === 'off') {
     return (
@@ -40,9 +113,12 @@ export function PreviewPane({ page, device, onDevice }: { page: EditablePage; de
   return (
     <aside className="min-w-0">
       <div className="sticky top-20">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs font-medium tracking-wide text-slate-500 uppercase">Предпросмотр</span>
-          <div className="flex gap-1">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <span className="min-w-0 truncate text-xs text-slate-500">
+            <span className="font-medium tracking-wide uppercase">Предпросмотр</span>
+            {onBlocks && <span className="ml-2 text-slate-400">щёлкните по тексту — он правится прямо здесь</span>}
+          </span>
+          <div className="flex shrink-0 gap-1">
             {(['desktop', 'mobile', 'off'] as const).map((d) => (
               <button
                 key={d}
@@ -57,9 +133,11 @@ export function PreviewPane({ page, device, onDevice }: { page: EditablePage; de
         </div>
         <div className="h-[calc(100vh-8rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
           <iframe
+            ref={frame}
             title="Предпросмотр страницы"
-            srcDoc={html}
+            srcDoc={doc}
             sandbox="allow-same-origin"
+            onLoad={onLoad}
             className={cx('mx-auto h-full origin-top', device === 'mobile' ? 'w-[390px] border-x border-slate-200' : 'w-full')}
           />
         </div>

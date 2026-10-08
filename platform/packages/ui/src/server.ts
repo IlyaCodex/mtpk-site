@@ -16,6 +16,24 @@ export function renderBlocksToHtml(blocks: Block[], ctx: Partial<RenderContext> 
   return renderToStaticMarkup(createElement(Blocks, { blocks, ctx: { ...EMPTY_CONTEXT, ...ctx } }));
 }
 
+/**
+ * Блоки для правки прямо в предпросмотре админки: перед каждым блоком —
+ * комментарий <!--mtpk:метка-->. Метка — номер блока на странице («3»), у блоков
+ * внутри контейнера — «3.0», «3.1»; null — блок не из самой страницы (общий блок
+ * категории под товаром) → «shared». Разметка блоков та же, что на сайте:
+ * комментарии на вёрстку не влияют.
+ */
+export function renderBlocksMarked(blocks: Block[], marks: (string | null)[], ctx: Partial<RenderContext> = {}): string {
+  const token = (mark: string | null): Block => ({ type: 'text', text: `@@mtpk:${mark ?? 'shared'}@@` });
+  const withTokens = (list: Block[], keys: (string | null)[]): Block[] =>
+    list.flatMap((b, i) => {
+      const mark = keys[i] ?? null;
+      const block = b.type === 'container' ? { ...b, children: withTokens(b.children, b.children.map((_, j) => (mark === null ? null : `${mark}.${j}`))) } : b;
+      return [token(mark), block];
+    });
+  return renderBlocksToHtml(withTokens(blocks, marks), ctx).replace(/@@mtpk:([\w.]+)@@/g, '<!--mtpk:$1-->');
+}
+
 export function renderBlockToHtml(block: Block, ctx: Partial<RenderContext> = {}): string {
   return renderToStaticMarkup(createElement(BlockView, { block, ctx: { ...EMPTY_CONTEXT, ...ctx } }));
 }

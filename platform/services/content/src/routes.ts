@@ -7,7 +7,7 @@ import { formatHtml } from '@mtpk/content-kit/format-html';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
 import { BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
-import { renderBlocksToHtml } from '@mtpk/ui/server';
+import { renderBlocksMarked, renderBlocksToHtml } from '@mtpk/ui/server';
 import { catalogNodes } from './catalog.ts';
 import { catalogAdminRoutes, catalogPageGuard } from './catalog-admin.ts';
 import { catalogDependents, loadCatalog } from './catalog-data.ts';
@@ -390,21 +390,28 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
           path: z.string().default('/'),
           blocks: z.array(z.unknown()),
           pretty: z.boolean().optional().describe('С отступами — для правки кодом'),
+          mark: z.boolean().optional().describe('С метками блоков <!--mtpk:N--> — для правки текста в предпросмотре'),
         }),
         security: ADMIN,
       },
     },
     async (req) => {
-      // как на сайте: карточки из каталога, у товара — общие блоки категории
+      // как на сайте: карточки из каталога, у товара — общие блоки категории.
+      // Метка — номер блока в странице: блоки, добавленные каталогом, её не получают.
+      const MARK = '__mtpk';
+      const own = (req.body.blocks as Block[]).map((b, i) => (req.body.mark ? ({ ...b, [MARK]: String(i) } as unknown as Block) : b));
       const page = await db.page.findUnique({ where: { path: normalizePath(req.body.path) }, select: { id: true } });
-      const blocks = page ? resolveCatalogBlocks(page, req.body.blocks as Block[], await store.catalog()) : (req.body.blocks as Block[]);
+      const resolved = page ? resolveCatalogBlocks(page, own, await store.catalog()) : own;
+      const marks = resolved.map((b) => ((b as Record<string, unknown>)[MARK] as string | undefined) ?? null);
+      const blocks = req.body.mark ? resolved.map((b) => Object.fromEntries(Object.entries(b).filter(([k]) => k !== MARK)) as Block) : resolved;
       const site = await store.siteData();
-      const html = renderBlocksToHtml(blocks, {
+      const ctx = {
         path: req.body.path,
         stock: site.stock,
         compareSections: site.compareSections,
         hasLeadgenBlock: pageHasLeadgen(blocks),
-      });
+      };
+      const html = req.body.mark ? renderBlocksMarked(blocks, marks, ctx) : renderBlocksToHtml(blocks, ctx);
       return { html: req.body.pretty ? formatHtml(html) : html };
     },
   );
