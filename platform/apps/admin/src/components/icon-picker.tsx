@@ -182,6 +182,9 @@ const RU: [stem: string, names: string[]][] = [
   ['наук', ['atom', 'test-tube']],
 ];
 
+/** В названии иконки есть часть part целиком: plane — в plane-2, но не в planet. */
+const hasPart = (name: string, part: string) => `-${name}-`.includes(`-${part}-`);
+
 /** Названия иконок по запросу (по-русски или по-английски, слова через пробел — все). */
 function search(names: string[], query: string): string[] {
   const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
@@ -189,7 +192,7 @@ function search(names: string[], query: string): string[] {
   return names.filter((name) =>
     words.every((w) => {
       if (!/[а-яё]/.test(w)) return name.includes(w);
-      return RU.some(([stem, parts]) => (w.startsWith(stem) || (w.length >= 3 && stem.startsWith(w))) && parts.some((p) => name.includes(p)));
+      return RU.some(([stem, parts]) => (w.startsWith(stem) || (w.length >= 3 && stem.startsWith(w))) && parts.some((p) => hasPart(name, p)));
     }),
   );
 }
@@ -355,7 +358,7 @@ export function IconPicker({ value, onChoose, onRemove, onClose }: { value: stri
               <input
                 className="field pl-9"
                 autoFocus
-                placeholder="Поиск: доставка, гарантия, нагрев, срок, телефон… или по-английски: truck, shield"
+                placeholder="Поиск: доставка, гарантия, нагрев, срок, телефон… или по-английски: delivery, shield"
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
