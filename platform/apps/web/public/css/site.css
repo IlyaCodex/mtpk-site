@@ -3201,3 +3201,18 @@ body.nav-open { overflow: hidden; }
    по тёмному. Ритм и отступы — как у .catalog-list.
    ============================================================ */
 .section-models { background: var(--surface-page); padding: var(--section-py-base, 96px) 0; }
+
+/* ============================================================
+   Надзаголовки и метки — без декоративной черты перед текстом
+   (решение Евгения 08.10.2026): у всех видов надзаголовков
+   (s-eyebrow, hero__eyebrow, cat-hero__eyebrow, partner__eyebrow…),
+   меток категорий проектов и плашек. !important — стили шаблонов
+   и страниц подключаются позже и снова включали черту.
+   ============================================================ */
+[class*="eyebrow"]::before,
+.project__category::before,
+.case-feature__category::before,
+.puskonaladka__warn-label::before,
+.partner__hero-marker::before {
+  content: none !important;
+}
