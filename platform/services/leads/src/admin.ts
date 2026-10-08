@@ -67,20 +67,68 @@ export async function adminRoutes(base: FastifyInstance, { db, queue, adminToken
     return { total, items: rows.map(({ attachmentName, ...r }) => ({ ...r, hasAttachment: attachmentName !== null })) };
   });
 
-  app.get('/admin/v1/leads/stats', { schema: { tags: TAGS, summary: 'Сводка: по статусам и по дням (14 дней)', security: ADMIN } }, async () => {
-    const byStatus = await db.lead.groupBy({ by: ['status'], _count: { _all: true } });
-    const byDay = await db.$queryRaw<{ day: string; count: number }[]>`
-      select to_char(date_trunc('day', created_at at time zone 'Asia/Yekaterinburg'), 'YYYY-MM-DD') as day, count(*)::int as count
-      from leads.leads
-      where created_at > now() - interval '14 days'
-      group by 1 order by 1`;
-    const rejects = await db.leadReject.count({ where: { createdAt: { gt: new Date(Date.now() - 14 * 24 * 3600 * 1000) } } });
-    return {
-      byStatus: Object.fromEntries(byStatus.map((r) => [r.status, r._count._all])),
-      byDay,
-      rejects14d: rejects,
-    };
-  });
+  app.get(
+    '/admin/v1/leads/stats',
+    {
+      schema: {
+        tags: TAGS,
+        summary: 'Сводка для обзора: по дням за период, сравнение с прошлым периодом, формы, страницы, доставка, спам',
+        querystring: z.object({ days: z.coerce.number().int().min(1).max(365).default(14).describe('Период, дней') }),
+        security: ADMIN,
+      },
+    },
+    async (req) => {
+      const days = req.query.days;
+      const since = new Date(Date.now() - days * 24 * 3600 * 1000);
+      const prevSince = new Date(Date.now() - 2 * days * 24 * 3600 * 1000);
+      const TZ = 'Asia/Yekaterinburg';
+      const [byStatus, byDay, rejects14d, total, period, previous, today, bySource, byPage, mail, b24, rejects] = await Promise.all([
+        db.lead.groupBy({ by: ['status'], _count: { _all: true } }),
+        db.$queryRaw<{ day: string; count: number }[]>`
+          select to_char(date_trunc('day', created_at at time zone ${TZ}), 'YYYY-MM-DD') as day, count(*)::int as count
+          from leads.leads where created_at > ${since}
+          group by 1 order by 1`,
+        db.leadReject.count({ where: { createdAt: { gt: new Date(Date.now() - 14 * 24 * 3600 * 1000) } } }),
+        db.lead.count(),
+        db.lead.count({ where: { createdAt: { gt: since } } }),
+        db.lead.count({ where: { createdAt: { gt: prevSince, lte: since } } }),
+        db.$queryRaw<{ count: number }[]>`
+          select count(*)::int as count from leads.leads
+          where created_at >= (date_trunc('day', now() at time zone ${TZ}) at time zone ${TZ})`,
+        // источник — «Название формы · /адрес/»: группируем по названию формы
+        db.$queryRaw<{ name: string; count: number }[]>`
+          select coalesce(nullif(split_part(source, ' · ', 1), ''), 'Без названия') as name, count(*)::int as count
+          from leads.leads where created_at > ${since}
+          group by 1 order by 2 desc limit 8`,
+        db.$queryRaw<{ page: string; count: number }[]>`
+          select coalesce(nullif(regexp_replace(page_url, '^https?://[^/]+', ''), ''), '—') as page, count(*)::int as count
+          from leads.leads where created_at > ${since}
+          group by 1 order by 2 desc limit 8`,
+        db.lead.groupBy({ by: ['mailStatus'], where: { createdAt: { gt: since } }, _count: { _all: true } }),
+        db.lead.groupBy({ by: ['b24Status'], where: { createdAt: { gt: since } }, _count: { _all: true } }),
+        db.$queryRaw<{ reason: string; count: number }[]>`
+          select split_part(reason, ':', 1) as reason, count(*)::int as count
+          from leads.lead_rejects where created_at > ${since}
+          group by 1 order by 2 desc`,
+      ]);
+      return {
+        days,
+        byStatus: Object.fromEntries(byStatus.map((r) => [r.status, r._count._all])),
+        byDay,
+        /** прежнее поле (14 дней) — для совместимости */
+        rejects14d,
+        total,
+        period,
+        previous,
+        today: today[0]?.count ?? 0,
+        bySource,
+        byPage,
+        mail: Object.fromEntries(mail.map((r) => [r.mailStatus, r._count._all])),
+        b24: Object.fromEntries(b24.map((r) => [r.b24Status, r._count._all])),
+        rejects,
+      };
+    },
+  );
 
   app.get('/admin/v1/leads/:id', { schema: { tags: TAGS, summary: 'Заявка целиком', params: idParam, security: ADMIN } }, async (req, reply) => {
     const row = await db.lead.findUnique({ where: { id: req.params.id } });
