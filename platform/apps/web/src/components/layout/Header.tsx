@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import type { NavItem, SiteSettings } from '@mtpk/content-model';
 import { ContactLink } from './ContactLink';
-import { HeaderQuickForm } from './HeaderQuickForm';
+import { QuickCallForm } from '@mtpk/ui';
 import { ClockIcon, MAIL_SVG, MaxLogo, MenuIcon, PHONE_SVG, SearchIcon, TelegramLogo } from './icons';
 
 /**
@@ -72,7 +72,7 @@ export function Header({ settings, activeNav }: { settings: SiteSettings; active
             <button className="icon-btn" aria-label="Поиск" data-search-open="">
               <SearchIcon />
             </button>
-            <HeaderQuickForm />
+            <QuickCallForm />
           </div>
         </div>
       </header>

@@ -1,8 +1,7 @@
 import type { CategoryHeroBlock } from '@mtpk/content-model';
 import { extra, Inline } from '../primitives/Html.tsx';
 import { ActionLink, Breadcrumbs } from '../primitives/common.tsx';
-import { FormStatus, LeadForm, PhoneInput, SubmitButton } from '../forms/LeadForm.tsx';
-import { ARROW } from '../forms/constants.ts';
+import { ExpressForm } from '../forms/ExpressForm.tsx';
 
 type QuickCard = NonNullable<CategoryHeroBlock['quickCard']>;
 
@@ -13,25 +12,7 @@ function QuickLeadCard({ card }: { card: QuickCard }) {
       <Inline as="div" className="hero-quick-card__badge" html={card.badge} />
       <Inline as="h2" className="hero-quick-card__title" html={card.title} />
       <Inline as="p" className="hero-quick-card__subtitle" html={card.subtitle} />
-      <LeadForm className="hero-quick-card__form" formName={card.formName}>
-        <input type="text" name="hp_token" className="hp-field" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-        <input type="hidden" name="form_ts" className="js-form-ts" />
-        <input type="hidden" name="source" className="js-form-source" />
-        <PhoneInput
-          name="phone"
-          className="hero-quick-card__input"
-          placeholder="+7 (___) ___-__-__"
-          required
-          autoComplete="tel"
-          aria-label={card.phoneLabel}
-        />
-        <SubmitButton className="btn btn--primary hero-quick-card__btn" html={`${card.buttonLabel} ${ARROW}`} />
-        <label className="hero-quick-card__consent">
-          <input type="checkbox" name="consent" defaultValue="v2026.1" required />
-          <span dangerouslySetInnerHTML={{ __html: card.consent }} />
-        </label>
-        <FormStatus />
-      </LeadForm>
+      <ExpressForm formName={card.formName} buttonLabel={card.buttonLabel} consent={card.consent} phoneLabel={card.phoneLabel} />
     </div>
   );
 }

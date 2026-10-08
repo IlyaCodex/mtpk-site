@@ -1,15 +1,13 @@
-import { FormStatus, LeadForm, PhoneInput, SubmitButton } from '@mtpk/ui';
+import { AntiSpamFields, FormStatus, LeadForm, PhoneInput, SubmitButton } from './LeadForm.tsx';
 
 /**
- * Экспресс-звонок в шапке (на широких экранах). Антиспам-поля hp_token и
- * form_ts и источник заявки обязательны — на них держатся защита и атрибуция.
+ * Экспресс-звонок в шапке (на широких экранах): телефон, согласие,
+ * «Перезвонить». Источник заявки — «Шапка: быстрый звонок».
  */
-export function HeaderQuickForm() {
+export function QuickCallForm() {
   return (
     <LeadForm className="header-quick-form" formName="Шапка: быстрый звонок">
-      <input type="text" name="hp_token" className="hp-field" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-      <input type="hidden" name="form_ts" className="js-form-ts" />
-      <input type="hidden" name="source" className="js-form-source" />
+      <AntiSpamFields />
       <PhoneInput
         name="phone"
         className="header-quick-form__input"
@@ -27,7 +25,7 @@ export function HeaderQuickForm() {
         </span>
       </label>
       <SubmitButton className="header-quick-form__btn" html="Перезвонить" />
-      <span className="header-quick-form__hint">{'Перезвоним в\u00A0течение 10\u00A0минут'}</span>
+      <span className="header-quick-form__hint">{'Перезвоним в течение 10 минут'}</span>
       <FormStatus as="span" />
     </LeadForm>
   );

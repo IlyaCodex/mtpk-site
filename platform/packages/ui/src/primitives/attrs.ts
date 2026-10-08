@@ -175,6 +175,7 @@ export function parseElement(html: string): ParsedElement | null {
   const attrs = parseAttrString(attrStr);
   if (VOID_TAGS.has(tag.toLowerCase())) return { tag, attrs, inner: '' };
   const close = s.toLowerCase().lastIndexOf(`</${tag.toLowerCase()}`);
-  const inner = close > m[0].length ? s.slice(m[0].length, close) : s.slice(m[0].length);
+  // закрывающий тег сразу после открывающего — пустой элемент (<div class="x"></div>)
+  const inner = close >= m[0].length ? s.slice(m[0].length, close) : s.slice(m[0].length);
   return { tag, attrs, inner };
 }

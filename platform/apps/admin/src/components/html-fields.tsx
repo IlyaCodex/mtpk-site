@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { MediaInput } from './media';
 import { ItemActions } from './schema-form';
-import { TextInput } from './text-fields';
+import { fromHtml, TextInput } from './text-fields';
 import { cx } from './ui';
 
 /**
@@ -145,7 +145,24 @@ function locate(root: Node, path: Path): Node {
   return path.reduce<Node>((n, i) => n.childNodes[i], root);
 }
 
+/**
+ * Форма заявки в секции — тег <ui-form> (компонент packages/ui/src/forms): её
+ * тексты — атрибуты тега. Какие показывать полями и как подписывать.
+ */
+const FORM_ATTRS: [attr: string, label: string, multiline?: boolean][] = [
+  ['title', 'Форма: заголовок'],
+  ['task-label', 'Форма: подпись поля задачи'],
+  ['task-placeholder', 'Форма: пример в поле задачи', true],
+  ['model-label', 'Форма: подпись поля модели'],
+  ['model-placeholder', 'Форма: пример модели'],
+  ['file', 'Форма: кнопка файла («нет» — без файла)'],
+  ['submit', 'Форма: подпись кнопки'],
+  ['button', 'Форма: подпись кнопки'],
+  ['name', 'Форма: название (источник заявки в CRM)'],
+];
+
 type Field =
+  | { kind: 'formAttr'; path: Path; label: string; attr: string; value: string; multiline: boolean; item: Path | null }
   | { kind: 'text'; path: Path; label: string; value: string; multiline: boolean; item: Path | null }
   | { kind: 'textNode'; path: Path; label: string; value: string; item: Path | null }
   | { kind: 'href'; path: Path; label: string; value: string; item: Path | null }
@@ -188,6 +205,13 @@ function collect(html: string): { fields: Field[]; groups: Map<string, ItemGroup
   const walk = (el: Element) => {
     if (skipped(el)) return;
     const tag = el.tagName.toLowerCase();
+    if (tag === 'ui-form') {
+      for (const [attr, label, multiline] of FORM_ATTRS) {
+        const value = el.getAttribute(attr);
+        if (value !== null && value !== '') fields.push({ kind: 'formAttr', path: pathOf(el, root), label, attr, value, multiline: Boolean(multiline), item: itemPath(el) });
+      }
+      return;
+    }
     if (tag === 'img') {
       fields.push({ kind: 'image', path: pathOf(el, root), label: 'Картинка', src: el.getAttribute('src') ?? '', alt: el.getAttribute('alt') ?? '', item: itemPath(el) });
       return;
@@ -238,6 +262,13 @@ export function HtmlFieldsEditor({ html, onChange }: { html: string; onChange: (
   const renderField = (f: Field, i: number) => {
     const key = `${f.kind}:${f.path.join('.')}:${i}`;
     switch (f.kind) {
+      case 'formAttr':
+        return (
+          <label key={key} className="block">
+            <span className="mb-1 block text-xs font-medium text-brand-700">{f.label}</span>
+            <TextInput value={f.value} multiline={f.multiline} onChange={(v) => onChange(patch(html, f.path, (n) => (n as Element).setAttribute(f.attr, fromHtml(v))))} />
+          </label>
+        );
       case 'text':
         return (
           <label key={key} className="block">

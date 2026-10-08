@@ -9,7 +9,7 @@ import {
   stripHtmlComments,
 } from '@mtpk/content-kit';
 import { walkBlocks, type Block } from '@mtpk/content-model';
-import { renderBlocksToHtml } from '@mtpk/ui/server';
+import { renderBlocksToHtml, renderFormSlots } from '@mtpk/ui/server';
 import type { Page, StyleBlock } from '@mtpk/db';
 import type { PageDto } from '@mtpk/shared';
 
@@ -64,7 +64,8 @@ export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: st
     return {
       ...base,
       blocks: [],
-      bodyHtml: stripHtmlComments(page.body ?? ''),
+      // формы — тегом <ui-form>: на их месте разметка компонента формы
+      bodyHtml: renderFormSlots(stripHtmlComments(page.body ?? '')),
       cssTemplates: [],
       externalStyles: [],
       inlineStyles: [],

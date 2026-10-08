@@ -3,7 +3,7 @@
  *
  *   blocks/   блоки страниц (карточка товара, характеристики, каталог, FAQ…)
  *   catalog/  карточки товаров, фильтр, сравнение, правила бейджей
- *   forms/    формы заявок (разметка; отправка — клиентский модуль forms)
+ *   forms/    формы обратной связи — по компоненту на вид формы (отправка на /api/send.php — клиентский модуль forms)
  *   browser/  общая логика клиентских модулей сайта (без React)
  *   primitives/ крошки, кнопки, заголовки секций, вывод HTML
  *
@@ -31,7 +31,6 @@ export { ProductCard } from './catalog/ProductCard.tsx';
 export { CatalogGrid } from './catalog/CatalogGrid.tsx';
 export { CompareButton } from './catalog/Compare.tsx';
 export { isMadeInRussia, productSlug } from './catalog/rules.ts';
-export { FileField, FormStatus, LeadForm, PhoneInput, SubmitButton } from './forms/LeadForm.tsx';
-export { ARROW, LEAD_ENDPOINT } from './forms/constants.ts';
+export * from './forms/index.ts';
 export { RawElement, Inline } from './primitives/Html.tsx';
 export { ActionLink, Breadcrumbs, SectionHead } from './primitives/common.tsx';

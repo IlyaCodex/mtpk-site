@@ -1,5 +1,4 @@
-import { FileField, FormStatus, LeadForm, PhoneInput, SubmitButton } from "../forms/LeadForm.tsx";
-import { ARROW } from "../forms/constants.ts";
+import { ShortForm } from "../forms/ShortForm.tsx";
 // Блок «Лучшее коммерческое предложение» (маркер best-offer) — короткая форма заявки.
 // Разметка совпадает с прежней вёрсткой сайта до пробела: пробелы между тегами влияют на отрисовку inline-элементов.
 // anchorId — якорь секции: leadgen, если отдельного блока заявки на странице нет (на него ведут
@@ -179,53 +178,7 @@ export function BestOffer({ anchorId = 'leadgen' }: { anchorId?: string }) {
               {"Пришлите коммерческое предложение от\u00A0другой компании — рассчитаем более выгодную стоимость с\u00A0учётом нашей складской базы и\u00A0собственного производства."}
             </p>
             {" "}
-            <LeadForm className="best-offer__form" formName="Лучшее предложение">
-              {" "}
-              <input type="text" name="hp_token" className="hp-field" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-              {" "}
-              <input type="hidden" name="form_ts" className="js-form-ts" />
-              {" "}
-              <input type="hidden" name="source" className="js-form-source" />
-              {" "}
-              <div className="best-offer__form-row">
-                {" "}
-                <PhoneInput name="phone" className="best-offer__phone-input" placeholder="+7 (___) ___-__-__" required autoComplete="tel" aria-label="Контактный телефон" />
-                {" "}
-                <FileField
-                labelClassName="best-offer__file-btn"
-                icon={<>{" "}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg></>}
-                label={"\nПрикрепить КП\n"}
-                input={{ id: "bo-file", name: "file", accept: ".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png", className: "audit-file-input" }}
-              />
-                {" "}
-              </div>
-              {" "}
-              <label className="best-offer__consent">
-                {" "}
-                <input type="checkbox" name="consent" defaultValue="v2026.1" required />
-                {" "}
-                <span>
-                  {"Я\u00A0соглашаюсь с\u00A0"}
-                  <a href="/policy/" target="_blank" rel="noopener">
-                    политикой обработки персональных данных
-                  </a>
-                  {" и\u00A0"}
-                  <a href="/soglasie/" target="_blank" rel="noopener">
-                    {"даю согласие на\u00A0их\u00A0обработку"}
-                  </a>
-                </span>
-                {" "}
-              </label>
-              {" "}
-              <SubmitButton className="btn btn--primary best-offer__submit" html={"Получить лучшее предложение " + ARROW} />
-              {" "}
-              <FormStatus />
-              {" "}
-            </LeadForm>
+            <ShortForm formName="Лучшее предложение" submit="Получить лучшее предложение" />
             {" "}
             <div className="best-offer__phone-fallback">
               {"\nИли звоните: "}

@@ -1,7 +1,7 @@
-import { FileField, FormStatus, LeadForm, PhoneInput, SubmitButton } from "../forms/LeadForm.tsx";
+import { RequestForm } from "../forms/RequestForm.tsx";
 // Блок заявки «Подбор и расчёт» (маркер leadgen) — общая секция сайта.
 // Разметка совпадает с прежней вёрсткой сайта до пробела: пробелы между тегами влияют на отрисовку inline-элементов.
-// Форма — React-компонент LeadForm (отправка в сервис заявок, статусы, цели Метрики).
+// Форма — компонент RequestForm из packages/ui/src/forms (отправка на /api/send.php, статусы, цели Метрики).
 export function Leadgen() {
   return (
     <>
@@ -71,118 +71,14 @@ export function Leadgen() {
             {" "}
           </div>
           {" "}
-          <LeadForm className="form" formName="Подбор и расчёт">
-            {" "}
-            <h3 className="form__title">
-              {"Запрос подбора и\u00A0расчёта"}
-            </h3>
-            {" "}
-            <input type="text" name="hp_token" className="hp-field" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-            {" "}
-            <input type="hidden" name="form_ts" className="js-form-ts" />
-            {" "}
-            <input type="hidden" name="source" className="js-form-source" />
-            {" "}
-            <div className="form__field">
-              {" "}
-              <label className="form__label" htmlFor="cat-name">
-                {"Имя "}
-                <span aria-hidden="true">
-                  *
-                </span>
-              </label>
-              {" "}
-              <input className="form__input" type="text" name="name" id="cat-name" placeholder="Иван Петров" autoComplete="name" required />
-              {" "}
-            </div>
-            {" "}
-            <div className="form__row">
-              {" "}
-              <div className="form__field">
-                {" "}
-                <label className="form__label" htmlFor="cat-email">
-                  Эл. почта
-                </label>
-                {" "}
-                <input className="form__input" type="email" name="email" id="cat-email" placeholder="ivan@company.ru" autoComplete="email" />
-                {" "}
-              </div>
-              {" "}
-              <div className="form__field">
-                {" "}
-                <label className="form__label" htmlFor="cat-phone">
-                  {"Телефон "}
-                  <span aria-hidden="true">
-                    *
-                  </span>
-                </label>
-                {" "}
-                <PhoneInput className="form__input" name="phone" id="cat-phone" placeholder="+7 (___) ___-__-__" autoComplete="tel" required />
-                {" "}
-              </div>
-              {" "}
-            </div>
-            {" "}
-            <div className="form__field">
-              {" "}
-              <label className="form__label" htmlFor="cat-task">
-                Описание задачи
-              </label>
-              {" "}
-              <textarea className="form__textarea" name="task" id="cat-task" rows={3} placeholder="Например: индукционная плавильная печь для чугуна, 1 т, 750 кВт; нужны пусконаладка и обучение персонала" />
-              {" "}
-            </div>
-            {" "}
-            <div className="form__field">
-              {" "}
-              <span className="form__label">
-                Техническое задание или паспорт
-              </span>
-              {" "}
-              <FileField
-                labelClassName="form__file"
-                icon={
-                  <>
-                    {" "}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                  </>
-                }
-                label={"\nПрикрепить файл\n"}
-                input={{ name: "file", id: "cat-file", accept: ".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png", className: "audit-file-input" }}
-              />
-              {" "}
-              <span className="form__hint">
-                {"PDF, DOC, XLS, JPG или PNG, до\u00A010\u00A0МБ"}
-              </span>
-              {" "}
-            </div>
-            {" "}
-            <label className="form__check">
-              {" "}
-              <input type="checkbox" name="consent" defaultValue="v2026.1" required />
-              {" "}
-              <span>
-                {"Я\u00A0соглашаюсь с\u00A0"}
-                <a href="/policy/" target="_blank" rel="noopener">
-                  политикой обработки персональных данных
-                </a>
-                {" и\u00A0"}
-                <a href="/soglasie/" target="_blank" rel="noopener">
-                  {"даю согласие на\u00A0их\u00A0обработку"}
-                </a>
-              </span>
-              {" "}
-            </label>
-            {" "}
-            <SubmitButton className="form__submit" html={'Получить подбор или&nbsp;расчёт проекта <span class="btn__arrow">→</span>'} />
-            {" "}
-            <FormStatus />
-            {" "}
-          </LeadForm>
+          <RequestForm
+            formName="Подбор и расчёт"
+            title={"Запрос подбора и\u00A0расчёта"}
+            idPrefix="cat"
+            taskPlaceholder="Например: индукционная плавильная печь для чугуна, 1 т, 750 кВт; нужны пусконаладка и обучение персонала"
+            file
+            submit={"Получить подбор или&nbsp;расчёт проекта"}
+          />
           {" "}
         </div>
         {" "}

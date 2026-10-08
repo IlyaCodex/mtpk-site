@@ -2,6 +2,7 @@ import type { Block } from '@mtpk/content-model';
 import type { RenderContext } from '../context.ts';
 import { RawElement } from '../primitives/Html.tsx';
 import { enhanceImages } from '../primitives/images-html.ts';
+import { hasFormSlots, HtmlWithForms } from '../forms/FormSlot.tsx';
 import { Adv } from './Adv.tsx';
 import { BestOffer } from './BestOffer.tsx';
 import { CatalogCta } from './CatalogCta.tsx';
@@ -19,8 +20,11 @@ import { WhyUs } from './WhyUs.tsx';
 /** Один блок страницы → React-компонент. */
 export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) {
   switch (block.type) {
-    case 'html':
-      return <RawElement html={enhanceImages(block.html, ctx.eagerImages)} />;
+    case 'html': {
+      const html = enhanceImages(block.html, ctx.eagerImages);
+      // формы в секции — тегом <ui-form>: на их месте компоненты форм
+      return hasFormSlots(html) ? <HtmlWithForms html={html} /> : <RawElement html={html} />;
+    }
     case 'text':
       return <>{block.text}</>;
     case 'style':

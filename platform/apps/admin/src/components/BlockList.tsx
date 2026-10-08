@@ -15,6 +15,7 @@ const PICKER: { title: string; note?: string; items: [type: string, hint: string
     title: 'Своя секция',
     items: [
       ['html', 'Любая вёрстка: HTML-код целиком — тексты, картинки, кнопки'],
+      ['form-section', 'Заголовок, текст и форма заявки (имя, телефон, задача) — тексты формы правятся полями'],
       ['script', 'Код для анимаций и поведения страницы (JavaScript или TypeScript)'],
       ['style', 'CSS-оформление для секций этой страницы'],
     ],
@@ -55,7 +56,7 @@ const PICKER: { title: string; note?: string; items: [type: string, hint: string
 ];
 
 /** Подписи в окне выбора, где название типа для списка блоков не подходит. */
-const PICKER_LABELS: Record<string, string> = { html: 'HTML-секция', container: 'Контейнер' };
+const PICKER_LABELS: Record<string, string> = { html: 'HTML-секция', 'form-section': 'Секция с формой заявки', container: 'Контейнер' };
 
 /** Заготовка новой HTML-секции: отступы и заголовок — как у секций сайта. */
 const STARTER_HTML = `<section class="cms-section" aria-label="Новая секция">
@@ -68,8 +69,27 @@ const STARTER_HTML = `<section class="cms-section" aria-label="Новая сек
   </div>
 </section>`;
 
+/**
+ * Секция с формой заявки: вёрстка блока «Подбор и расчёт», форма — тег
+ * <ui-form> (компонент формы; отправка на /api/send.php). Своё название формы —
+ * источник заявки в CRM, свой якорь — чтобы не повторять id="leadgen".
+ */
+const FORM_SECTION_HTML = `<section class="leadgen" id="zayavka">
+  <div class="container">
+    <div class="leadgen__grid">
+      <div class="leadgen__intro">
+        <div class="leadgen__eyebrow">Подбор и&nbsp;расчёт</div>
+        <h2 class="leadgen__title">Обсудим вашу задачу — <em>заполните форму</em></h2>
+        <p class="leadgen__lead">Инженер свяжется с&nbsp;вами в&nbsp;течение рабочего дня и&nbsp;уточнит детали.</p>
+      </div>
+      <ui-form type="request" name="Заявка со страницы" title="Запрос расчёта" ids="zf" marks task-placeholder="Например: нужна индукционная печь для чугуна на 1 т" submit="Отправить заявку"></ui-form>
+    </div>
+  </div>
+</section>`;
+
 function createBlock(type: string, schemas: BlockSchemas): BlockData {
   if (type === 'container') return { type: 'container', tag: 'div', children: [] };
+  if (type === 'form-section') return { type: 'html', html: FORM_SECTION_HTML };
   if (type === 'html') return { type: 'html', html: STARTER_HTML };
   return defaultFor(schemas[type].schema, schemas[type].schema) as BlockData;
 }
@@ -87,7 +107,7 @@ function BlockPicker({ schemas, onPick, onClose }: { schemas: BlockSchemas; onPi
   const groups = PICKER.map((g, i) => ({
     ...g,
     items: [
-      ...g.items.filter(([t]) => t === 'container' || schemas[t]),
+      ...g.items.filter(([t]) => t === 'container' || t === 'form-section' || schemas[t]),
       ...(i === PICKER.length - 1 ? Object.keys(schemas).filter((t) => !listed.has(t)).map((t): [string, string] => [t, '']) : []),
     ],
   }));
