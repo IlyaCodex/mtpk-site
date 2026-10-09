@@ -1,204 +1,102 @@
-import { ShortForm } from "../forms/ShortForm.tsx";
-// Блок «Лучшее коммерческое предложение» (маркер best-offer) — короткая форма заявки.
-// Разметка совпадает с прежней вёрсткой сайта до пробела: пробелы между тегами влияют на отрисовку inline-элементов.
-// anchorId — якорь секции: leadgen, если отдельного блока заявки на странице нет (на него ведут
-// кнопки «Обсудить задачу»), иначе best-offer — чтобы не было двух id=leadgen.
-export function BestOffer({ anchorId = 'leadgen' }: { anchorId?: string }) {
-  return (
+import type { BestOfferBlock, ContactItem } from '@mtpk/content-model';
+import { ShortForm } from '../forms/ShortForm.tsx';
+
+/** Иконки Solar (линии 1.5) — содержимое <svg viewBox="0 0 24 24">. */
+const ICONS = {
+  phone:
+    '<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M18.68 19.96C19.19 19.91 19.64 19.63 20 19.25L21.42 17.76C22.38 16.75 22.11 15.02 20.88 14.31L18.97 13.21C18.17 12.75 17.19 12.88 16.56 13.55L16.1 14.03C16.1 14.03 15.02 15.17 12.06 12.06C9.11 8.94 10.19 7.81 10.19 7.81L10.48 7.5C11.18 6.76 11.25 5.56 10.63 4.69L9.37 2.91C8.61 1.83 7.14 1.69 6.26 2.61L4.69 4.26C4.26 4.72 3.97 5.31 4 5.97C4.09 7.65 4.81 11.26 8.82 15.48C13.06 19.95 17.05 20.12 18.68 19.96Z"/>',
+  letter:
+    '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M2 12C2 8.23 2 6.34 3.17 5.17C4.34 4 6.23 4 10 4H14C17.77 4 19.66 4 20.83 5.17C22 6.34 22 8.23 22 12C22 15.77 22 17.66 20.83 18.83C19.66 20 17.77 20 14 20H10C6.23 20 4.34 20 3.17 18.83C2 17.66 2 15.77 2 12Z"/><path d="M6 8L8.16 9.8C10 11.33 10.91 12.09 12 12.09C13.09 12.09 14 11.33 15.84 9.8L18 8"/></g>',
+  pin: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M4 10.14C4 5.65 7.58 2 12 2C16.42 2 20 5.65 20 10.14C20 14.61 17.45 19.81 13.46 21.67C12.53 22.11 11.47 22.11 10.54 21.67C6.55 19.81 4 14.61 4 10.14Z"/><circle cx="12" cy="10" r="3"/></g>',
+  clock: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path stroke-linejoin="round" d="M12 8V12L14.5 14.5"/></g>',
+  documents:
+    '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M5 8C5 6.18 5 4.95 5.23 4.07C5.36 3.58 5.56 3.19 5.88 2.88C6.76 2 8.17 2 11 2H13C15.83 2 17.24 2 18.12 2.88C19 3.76 19 5.17 19 8V16C19 18.83 19 20.24 18.12 21.12C17.24 22 15.83 22 13 22H11C8.17 22 6.76 22 5.88 21.12C5.56 20.81 5.36 20.42 5.23 19.93C5 19.05 5 17.82 5 16V8Z"/><path d="M5.23 19.93L5 19.92C4.02 19.83 3.37 19.61 2.88 19.12C2 18.24 2 16.83 2 14V10C2 7.17 2 5.76 2.88 4.88C3.37 4.39 4.02 4.17 5 4.08C5.07 4.07 5.15 4.07 5.23 4.07"/><path d="M18.77 19.93L19 19.92C19.98 19.83 20.63 19.61 21.12 19.12C22 18.24 22 16.83 22 14V10C22 7.17 22 5.76 21.12 4.88C20.63 4.39 19.98 4.17 19 4.08C18.93 4.07 18.85 4.07 18.77 4.07"/><path d="M9 13H15"/><path d="M9 9H15"/><path d="M9 17H12"/></g>',
+};
+
+const Icon = ({ name, className }: { name: keyof typeof ICONS; className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className} dangerouslySetInnerHTML={{ __html: ICONS[name] }} />
+);
+
+/** Контакты компании — по умолчанию (свои у блока — поле contacts). Адрес начинает вторую группу (линия над ним). */
+const CONTACTS: ContactItem[] = [
+  { icon: 'phone', label: 'Телефон (бесплатно по России)', value: '8&nbsp;800&nbsp;351-34-01', meta: 'Звонок из любого региона', href: 'tel:+78003513401' },
+  { icon: 'phone', label: 'Телефон офиса', value: '+7&nbsp;(351)&nbsp;211-65-97', meta: 'Отдел продаж и инженерный центр', href: 'tel:+73512116597' },
+  { icon: 'letter', label: 'Электронная почта', value: 'info@uralinduktor.ru', meta: 'Ответ в течение рабочего дня', href: 'mailto:info@uralinduktor.ru' },
+  { icon: 'pin', label: 'Главный офис', value: 'Челябинская область, г.&nbsp;Миасс,<br>ул.&nbsp;Уральских Добровольцев,&nbsp;1в' },
+  { icon: 'clock', label: 'График работы', value: 'Пн&nbsp;—&nbsp;Пт, 9:00&nbsp;—&nbsp;18:00', meta: 'МСК+2 · время ЕКБ' },
+];
+
+/** Строка контакта: значок, подпись, значение, пояснение; телефон и почта — ссылки. */
+function Item({ icon, label, value, meta, href }: ContactItem) {
+  const body = (
     <>
-    <section className="best-offer" id={anchorId} aria-label="Лучшее коммерческое предложение">
-      {" "}
-      <div className="container">
-        {" "}
-        <div className="best-offer__card">
-          {" "}
-          <div className="best-offer__contacts" id="contacts">
-            {" "}
-            <div className="bo-contact-eyebrow">
-              Контакты
-            </div>
-            {" "}
-            <a href="tel:+78003513401" className="bo-contact">
-              {" "}
-              <div className="bo-contact__icon">
-                {" "}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                </svg>
-                {" "}
-              </div>
-              {" "}
-              <div className="bo-contact__body">
-                {" "}
-                <div className="bo-contact__label">
-                  {"Бесплатно по\u00A0России"}
-                </div>
-                {" "}
-                <div className="bo-contact__value">
-                  {"8\u00A0800\u00A0351-34-01"}
-                </div>
-                {" "}
-                <div className="bo-contact__meta">
-                  {"Звонок из\u00A0любого региона"}
-                </div>
-                {" "}
-              </div>
-              {" "}
-            </a>
-            {" "}
-            <a href="tel:+73512116597" className="bo-contact">
-              {" "}
-              <div className="bo-contact__icon">
-                {" "}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                </svg>
-                {" "}
-              </div>
-              {" "}
-              <div className="bo-contact__body">
-                {" "}
-                <div className="bo-contact__label">
-                  Телефон офиса
-                </div>
-                {" "}
-                <div className="bo-contact__value">
-                  +7 (351) 211-65-97
-                </div>
-                {" "}
-                <div className="bo-contact__meta">
-                  {"Отдел продаж и\u00A0инженерный центр"}
-                </div>
-                {" "}
-              </div>
-              {" "}
-            </a>
-            {" "}
-            <a href="mailto:info@uralinduktor.ru" className="bo-contact">
-              {" "}
-              <div className="bo-contact__icon">
-                {" "}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="5" width="18" height="14" rx="1" />
-                  <path d="m3 7 9 6 9-6" />
-                </svg>
-                {" "}
-              </div>
-              {" "}
-              <div className="bo-contact__body">
-                {" "}
-                <div className="bo-contact__label">
-                  Электронная почта
-                </div>
-                {" "}
-                <div className="bo-contact__value">
-                  info@uralinduktor.ru
-                </div>
-                {" "}
-                <div className="bo-contact__meta">
-                  {"Ответ в\u00A0течение рабочего дня"}
-                </div>
-                {" "}
-              </div>
-              {" "}
-            </a>
-            {" "}
-            <div className="bo-contact">
-              {" "}
-              <div className="bo-contact__icon">
-                {" "}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z" />
-                  <circle cx="12" cy="9" r="2.5" />
-                </svg>
-                {" "}
-              </div>
-              {" "}
-              <div className="bo-contact__body">
-                {" "}
-                <div className="bo-contact__label">
-                  Адрес главного офиса
-                </div>
-                {" "}
-                <div className="bo-contact__value bo-contact__value--sm">
-                  {"Челябинская область, г.\u00A0Миасс,"}
-                  <br />
-                  {"ул.\u00A0Уральских Добровольцев, 1в"}
-                </div>
-                {" "}
-              </div>
-              {" "}
-            </div>
-            {" "}
-            <div className="bo-contact">
-              {" "}
-              <div className="bo-contact__icon">
-                {" "}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 7v5l3 2" />
-                </svg>
-                {" "}
-              </div>
-              {" "}
-              <div className="bo-contact__body">
-                {" "}
-                <div className="bo-contact__label">
-                  График работы
-                </div>
-                {" "}
-                <div className="bo-contact__value">
-                  {"Пн\u00A0— Пт, 9:00 — 18:00"}
-                </div>
-                {" "}
-                <div className="bo-contact__meta">
-                  МСК+2 (время ЕКБ)
-                </div>
-                {" "}
-              </div>
-              {" "}
-            </div>
-            {" "}
-          </div>
-          {" "}
-          <div>
-            {" "}
-            <div className="s-eyebrow">
-              {"Сравним и\u00A0улучшим"}
-            </div>
-            {" "}
-            <h2 className="s-title best-offer__title">
-              {"Подготовим "}
-              <em>
-                лучшее предложение
-              </em>
-            </h2>
-            {" "}
-            <p className="s-lead best-offer__lead">
-              {"Пришлите коммерческое предложение от\u00A0другой компании — рассчитаем более выгодную стоимость с\u00A0учётом нашей складской базы и\u00A0собственного производства."}
-            </p>
-            {" "}
-            <ShortForm formName="Лучшее предложение" submit="Получить лучшее предложение" />
-            {" "}
-            <div className="best-offer__phone-fallback">
-              {"\nИли звоните: "}
-              <a href="tel:+78003513401">
-                {"8\u00A0800\u00A0351-34-01"}
-              </a>
-              {" · "}
-              <a href="tel:+73512116597">
-                {"+7\u00A0(351)\u00A0211-65-97"}
-              </a>
-              {" "}
-            </div>
-            {" "}
-          </div>
-          {" "}
-        </div>
-        {" "}
-      </div>
-      {" "}
-    </section>
+      <span className="bo-item__icon">
+        <Icon name={icon} />
+      </span>
+      <span className="bo-item__body">
+        <span className="bo-item__label">{label}</span>
+        <span className="bo-item__value" dangerouslySetInnerHTML={{ __html: value }} />
+        {meta !== undefined && <span className="bo-item__meta">{meta}</span>}
+      </span>
     </>
+  );
+  return href ? (
+    <a className="bo-item" href={href}>
+      {body}
+    </a>
+  ) : (
+    <div className="bo-item">{body}</div>
+  );
+}
+
+/**
+ * Блок «Контакты» (общая секция): слева «Обсудим вашу задачу» — телефоны,
+ * почта, адрес и график; справа карточка «Сравним КП»: прикрепить
+ * коммерческое предложение (выбор или перетаскивание файла), телефон,
+ * согласие, отправка (сервис заявок, форма «Лучшее предложение»).
+ * anchorId — якорь секции: leadgen, если отдельного блока заявки на странице
+ * нет (на него ведут кнопки «Обсудить задачу»), иначе best-offer — чтобы не
+ * было двух id=leadgen.
+ */
+export function BestOffer({ block = { type: 'bestOffer' }, anchorId = 'leadgen' }: { block?: BestOfferBlock; anchorId?: string }) {
+  const contacts = block.contacts?.length ? block.contacts : CONTACTS;
+  const firstPin = contacts.findIndex((c) => c.icon === 'pin');
+  const form = block.form ?? { name: 'Лучшее предложение', submit: 'Отправить КП на&nbsp;сравнение', file: 'Прикрепите коммерческое предложение.', fileHint: 'Выберите файл или перетащите его сюда.' };
+  return (
+    <section className="best-offer best-offer--v2" id={anchorId} aria-label="Контакты и сравнение коммерческих предложений">
+      <div className="container">
+        <div className="bo-layout">
+          <div className="bo-info" id="contacts">
+            <div className="bo-info__eyebrow">На&nbsp;связи с&nbsp;вами</div>
+            <h2 className="bo-info__title">Обсудим вашу задачу</h2>
+            <ul className="bo-info__list">
+              {contacts.map((c, i) => (
+                <li key={i} className={i > 0 && i === firstPin ? 'bo-info__group' : undefined}>
+                  <Item {...c} />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="bo-panel">
+            <Icon name="documents" className="bo-panel__deco" />
+            <div className="bo-panel__card">
+              <div className="bo-panel__eyebrow" dangerouslySetInnerHTML={{ __html: block.eyebrow ?? 'Сравнение предложений' }} />
+              <h2 className="bo-panel__title" dangerouslySetInnerHTML={{ __html: block.title ?? 'Сравним КП<br><em>и&nbsp;предложим наш вариант.</em>' }} />
+              <p
+                className="bo-panel__lead"
+                dangerouslySetInnerHTML={{ __html: block.lead ?? 'Пришлите предложение другой компании — сравним состав оборудования, комплектацию и&nbsp;стоимость.' }}
+              />
+              <ShortForm
+                variant="card"
+                formName={form.name}
+                submit={form.submit}
+                phoneId="bo-card-phone"
+                file={form.file ? { label: form.file, hint: form.fileHint ?? 'Выберите файл или перетащите его сюда.', id: 'bo-card-file' } : null}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

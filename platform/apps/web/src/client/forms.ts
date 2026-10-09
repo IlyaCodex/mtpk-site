@@ -35,12 +35,23 @@ function randomId(): string | null {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-/** «Прикрепить файл»: имя файла на кнопке, лимит 10 МБ. */
+/**
+ * «Прикрепить файл»: имя файла на кнопке (или в элементе [data-file-name]
+ * зоны файла), лимит 10 МБ. Зона файла принимает и перетаскивание: поле
+ * выбора файла лежит поверх неё, на время перетаскивания — класс is-dragover.
+ */
 function fileField(form: HTMLFormElement, status: HTMLElement | null) {
   const input = $<HTMLInputElement>('input[type="file"]', form);
   const label = input?.closest('label');
-  const textNode = label ? Array.from(label.childNodes).find((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim()) : undefined;
+  const named = label?.querySelector('[data-file-name]');
+  const textNode = named ?? (label ? Array.from(label.childNodes).find((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim()) : undefined);
   if (!input || !label || !textNode) return { file: () => input?.files?.[0] };
+  if (named) {
+    const over = (on: boolean) => () => label.classList.toggle('is-dragover', on);
+    input.addEventListener('dragenter', over(true));
+    input.addEventListener('dragleave', over(false));
+    input.addEventListener('drop', over(false));
+  }
   const defaultText = textNode.textContent ?? '';
   const reset = () => {
     textNode.textContent = defaultText;

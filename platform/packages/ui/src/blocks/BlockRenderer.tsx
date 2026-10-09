@@ -51,7 +51,7 @@ export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) 
     case 'leadgen':
       return <Leadgen />;
     case 'bestOffer':
-      return <BestOffer anchorId={ctx.hasLeadgenBlock ? 'best-offer' : 'leadgen'} />;
+      return <BestOffer block={block} anchorId={ctx.hasLeadgenBlock ? 'best-offer' : 'leadgen'} />;
     case 'catalogCta':
       return <CatalogCta />;
     case 'partner':

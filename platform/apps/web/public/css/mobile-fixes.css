@@ -274,20 +274,10 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
 .case-feature__counter { min-width: 0; }
 
 /* ------------------------------------------------------------
- * 7. Блок «Лучшее предложение» (.best-offer__card) — тот же grid-баг.
- *    Колонка grid не сжималась (min-width:auto у grid-элементов) → контакты
- *    и форма становились шире карточки, текст резался справа на мобильном.
- *    minmax(0,1fr) + min-width:0 у вложенных flex/grid элементов.
+ * 7. Короткая форма «Лучшее предложение» (.best-offer__form): flex-элемент
+ *    не сжимался (min-width:auto) и распирал колонку на мобильном.
  * ------------------------------------------------------------ */
-.best-offer__card { grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 1025px) {
-  .best-offer__card { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
-}
-.best-offer__contacts,
-.best-offer__form,
-.bo-contact,
-.bo-contact__body { min-width: 0; }
-.bo-contact__value { overflow-wrap: anywhere; }
+.best-offer__form { min-width: 0; }
 
 /* ------------------------------------------------------------
  * 9. Hero scroll-индикатор перекрывает кнопку «Подобрать оборудование»

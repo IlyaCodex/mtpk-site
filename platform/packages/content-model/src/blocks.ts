@@ -79,7 +79,43 @@ export const containerBlock: z.ZodType<ContainerBlockData> = z.lazy(() =>
 // ── Общие блоки сайта (бывшие маркеры <!--C:…-->) ──────────────────────────
 
 export const leadgenBlock = z.object({ type: z.literal('leadgen') }).describe('Форма «Подбор и расчёт»');
-export const bestOfferBlock = z.object({ type: z.literal('bestOffer') }).describe('Лучшее коммерческое предложение (короткая форма)');
+/** Строка контакта в блоке «Контакты»: значок, подпись, значение, пояснение, ссылка (tel:, mailto:). */
+export const contactItem = z.object({
+  icon: z
+    .enum(['phone', 'letter', 'pin', 'clock'])
+    .describe('Значок')
+    .meta({ enumLabels: { phone: 'Телефон', letter: 'Почта', pin: 'Адрес', clock: 'График' } }),
+  label: text('Подпись'),
+  value: inline('Значение'),
+  meta: text('Пояснение').optional(),
+  href: href('Ссылка (tel:…, mailto:…)').optional(),
+});
+export type ContactItem = z.infer<typeof contactItem>;
+
+/**
+ * «Контакты» (общий блок): слева контакты компании, справа карточка с формой
+ * (по умолчанию — «Сравним КП»: файл КП, телефон). Все поля необязательные:
+ * пустое — как на главной; на страницах услуг и разделов свои заголовок,
+ * текст и форма (её название — источник заявки в CRM).
+ */
+export const bestOfferBlock = z
+  .object({
+    type: z.literal('bestOffer'),
+    eyebrow: inline('Надзаголовок карточки').optional(),
+    title: inline('Заголовок карточки (акцент — курсивом)').optional(),
+    lead: inline('Текст под заголовком').optional(),
+    form: z
+      .object({
+        name: text('Название формы (источник заявки в CRM)'),
+        submit: inline('Кнопка'),
+        file: text('Зона файла (пусто — без файла)').optional(),
+        fileHint: text('Подсказка под зоной файла').optional(),
+      })
+      .optional()
+      .describe('Форма'),
+    contacts: z.array(contactItem).optional().describe('Свои контакты слева (пусто — телефоны, почта, адрес и график компании)'),
+  })
+  .describe('Контакты и форма «Сравним КП»');
 export const catalogCtaBlock = z.object({ type: z.literal('catalogCta') }).describe('Призыв: запрос КП по каталогу');
 export const partnerBlock = z.object({ type: z.literal('partner') }).describe('Партнёры и лизинг');
 export const advBlock = z
@@ -750,7 +786,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   script: 'Скрипт (JS/TS)',
   container: 'Контейнер',
   leadgen: 'Форма «Подбор и расчёт»',
-  bestOffer: 'Лучшее предложение',
+  bestOffer: 'Контакты и форма КП',
   catalogCta: 'Запрос КП по каталогу',
   partner: 'Партнёры и лизинг',
   adv: 'Преимущества производства',

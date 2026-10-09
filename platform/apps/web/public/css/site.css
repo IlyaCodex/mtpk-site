@@ -2036,97 +2036,12 @@ section.hero--home { min-height: 44vh; }
   backdrop-filter: blur(4px);
 }
 /* ============================================================
-   BLOCK 15 — «Подготовим лучшее предложение»
+   BLOCK 15 — «Контакты» (новая раскладка — components.css: .best-offer--v2);
+   здесь — короткая форма «телефон + файл» в строку (тег <ui-form type="short">)
    ============================================================ */
 .best-offer {
   background: var(--surface-subtle);
   padding: var(--section-py-base, 96px) 0;
-}
-.best-offer__card {
-  background: var(--surface-page);
-  border: 1px solid var(--border-subtle);
-  padding: var(--sp-12) var(--sp-10);
-  display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: var(--sp-12);
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
-.best-offer__card::before {
-  content: ""; position: absolute;
-  top: 0; left: 0; width: 4px; height: 96px;
-  background: var(--teal-600);
-}
-/* Контактный блок (заменил PDF-mock иллюстрацию) */
-.best-offer__contacts {
-  display: flex; flex-direction: column;
-  gap: var(--sp-2);
-  padding: var(--sp-3);
-}
-.bo-contact-eyebrow {
-  font-family: var(--font-display);
-  font-size: var(--fs-micro);
-  font-weight: var(--fw-bold);
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--text-brand);
-  margin: 0 0 var(--sp-3) var(--sp-3);
-  padding-bottom: var(--sp-3);
-  border-bottom: 1px solid var(--border-subtle);
-  display: inline-flex; align-items: center; gap: var(--sp-3);
-}
-.bo-contact-eyebrow::before {
-  content: ""; width: 24px; height: 2px; background: var(--teal-600);
-}
-.bo-contact {
-  display: flex; gap: var(--sp-4); align-items: flex-start;
-  padding: var(--sp-3);
-  text-decoration: none;
-  color: inherit;
-  border-left: 2px solid transparent;
-  transition: border-color var(--duration-fast) var(--ease-out),
-              background var(--duration-fast) var(--ease-out);
-}
-a.bo-contact:hover {
-  border-left-color: var(--teal-600);
-  background: var(--surface-subtle);
-}
-.bo-contact__icon {
-  width: 36px; height: 36px;
-  flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--teal-50);
-  color: var(--teal-700);
-}
-.bo-contact__icon svg { width: 20px; height: 20px; }
-.bo-contact__body { flex: 1; min-width: 0; }
-.bo-contact__label {
-  font-family: var(--font-display);
-  font-size: var(--fs-micro);
-  font-weight: var(--fw-bold);
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  margin-bottom: 2px;
-}
-.bo-contact__value {
-  font-family: var(--font-display);
-  font-size: var(--fs-lead);
-  font-weight: var(--fw-semibold);
-  color: var(--text-primary);
-  line-height: 1.25;
-  letter-spacing: -0.005em;
-}
-a.bo-contact:hover .bo-contact__value { color: var(--text-brand); }
-.bo-contact__value--sm {
-  font-size: var(--fs-body);
-  line-height: 1.35;
-}
-.bo-contact__meta {
-  font-size: var(--fs-caption);
-  color: var(--text-secondary);
-  margin-top: 2px;
 }
 .best-offer__form {
   display: flex; flex-direction: column; gap: var(--sp-4);
@@ -2176,17 +2091,6 @@ a.bo-contact:hover .bo-contact__value { color: var(--text-brand); }
 .best-offer__consent a { color: var(--teal-600); text-decoration: underline; }
 /* ссылка в согласии тёмного CTA-блока каталога (.catalog-cta__consent — в tpl/inline CSS) */
 .catalog-cta__consent a { color: var(--green-400); text-decoration: underline; }
-.best-offer__phone-fallback {
-  font-size: var(--fs-small);
-  color: var(--text-tertiary);
-  margin-top: var(--sp-3);
-}
-.best-offer__phone-fallback a {
-  color: var(--text-brand);
-  font-family: var(--font-mono);
-  font-weight: var(--fw-semibold);
-  text-decoration: none;
-}
 /* ============================================================
    BLOCK 16 — Highlights (DARK section, reliable partner)
    ============================================================ */
