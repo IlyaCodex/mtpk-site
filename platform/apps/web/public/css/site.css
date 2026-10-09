@@ -1993,26 +1993,6 @@ section.hero--home { min-height: 44vh; }
 }
 .case__ctas { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-top: auto; }
 /* ============================================================
-   BLOCK 13 — Лизинг
-   ============================================================ */
-.leasing {
-  background: var(--surface-subtle);
-  padding: var(--section-py-base, 96px) 0;
-}
-.leasing__layout {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: var(--sp-12);
-  align-items: center;
-}
-.leasing__partners {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--sp-3);
-  margin-top: var(--sp-2);
-}
-.leasing__ctas { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-8); }
-/* ============================================================
    BLOCK 14 — Карта РФ и СНГ
    ============================================================ */
 .geo {
