@@ -308,6 +308,7 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
 }
 .cdoc__nav-eyebrow { margin: 0 var(--sp-3) var(--sp-2); font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-brand); }
 .cdoc__nav-link {
+  position: relative;
   display: block;
   padding: var(--sp-2) var(--sp-3);
   border-radius: 8px;
@@ -318,7 +319,9 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 .cdoc__nav-link:hover { background: var(--surface-muted); color: var(--text-primary); }
-.cdoc__nav-link.is-active { background: var(--green-50); color: var(--green-700); font-weight: var(--fw-semibold); box-shadow: inset 3px 0 0 var(--green-500); }
+/* текущий раздел — без заливки: тёмный текст и одна прямая зелёная полоска слева */
+.cdoc__nav-link.is-active { background: none; color: var(--text-primary); font-weight: var(--fw-semibold); }
+.cdoc__nav-link.is-active::before { content: ""; position: absolute; top: 6px; bottom: 6px; left: 0; width: 3px; border-radius: 2px; background: var(--green-500); }
 .cdoc__nav-link:focus-visible { outline: 2px solid var(--green-500); outline-offset: 1px; }
 /* статья */
 .cdoc__body { min-width: 0; padding: var(--sp-2) var(--sp-12); border: 1px solid var(--border-subtle); border-radius: 18px; background: var(--surface-page); }
@@ -433,6 +436,8 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   .cdoc__nav::-webkit-scrollbar { display: none; }
   .cdoc__nav-eyebrow { display: none; }
   .cdoc__nav-link { flex-shrink: 0; max-width: 260px; border: 1px solid var(--border-subtle); }
+  /* в ленте кнопок полоска текущего раздела — прямая, снизу */
+  .cdoc__nav-link.is-active::before { top: auto; right: var(--sp-3); bottom: -1px; left: var(--sp-3); width: auto; height: 3px; }
   .cdoc__body { padding: var(--sp-2) var(--sp-8); }
 }
 @media (max-width: 640px) {
