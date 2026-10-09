@@ -49,6 +49,7 @@ export const PLACES: Record<string, Place> = {
   'equip-card__cover': { widths: WIDTHS.card, sizes: '(max-width: 1024px) 46vw, (max-width: 1280px) 31vw, 300px' },
   'stock-type__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 300px' },
   'pcard__photo': { widths: WIDTHS.thumb, sizes: '72px' },
+  'care__photo': { widths: WIDTHS.content, sizes: '(max-width: 1024px) 92vw, 540px' },
   'catalog-lvm-card__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 100vw, (max-width: 900px) 46vw, (max-width: 1440px) 30vw, 330px' },
   'muf-mod__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 100vw, (max-width: 900px) 46vw, (max-width: 1440px) 30vw, 330px' },
   'pr-photo': { widths: WIDTHS.card, sizes: '(max-width: 760px) 100vw, (max-width: 1440px) 31vw, 441px' },
