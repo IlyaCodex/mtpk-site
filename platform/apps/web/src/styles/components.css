@@ -285,14 +285,17 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
 }
 .cdoc__layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: var(--sp-8); align-items: start; }
 /* содержание */
+/* содержание садится под липкую шапку (её высота — --site-header-h, задаёт модуль шапки)
+   и целиком помещается в экран: длинный список прокручивается внутри карточки */
 .cdoc__nav {
   position: sticky;
-  top: 110px;
+  top: calc(var(--site-header-h, 116px) + var(--sp-5));
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: calc(100vh - 140px);
+  max-height: calc(100vh - var(--site-header-h, 116px) - 2 * var(--sp-5));
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--sp-5) var(--sp-3);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
@@ -315,7 +318,7 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
 .cdoc__nav-link:focus-visible { outline: 2px solid var(--green-500); outline-offset: 1px; }
 /* статья */
 .cdoc__body { min-width: 0; padding: var(--sp-2) var(--sp-12); border: 1px solid var(--border-subtle); border-radius: 18px; background: var(--surface-page); }
-.cdoc__panel { padding: var(--sp-10) 0; scroll-margin-top: 120px; }
+.cdoc__panel { padding: var(--sp-10) 0; scroll-margin-top: calc(var(--site-header-h, 116px) + var(--sp-4)); }
 .cdoc__panel + .cdoc__panel { border-top: 1px solid var(--border-subtle); }
 .cdoc__panel > * + * { margin-top: var(--sp-4); }
 .cdoc__title { margin: 0; font-family: var(--font-display); font-size: clamp(22px, 2.1vw, 28px); font-weight: var(--fw-bold); line-height: 1.25; letter-spacing: var(--ls-h3); color: var(--text-primary); }

@@ -8,7 +8,22 @@ import { $$ } from './dom';
 function initSpecNav(nav: HTMLElement, linkSelector: string): void {
   const links = $$<HTMLAnchorElement>(linkSelector, nav);
   const ids = links.map((a) => (a.getAttribute('href') ?? '').replace(/^#/, '')).filter(Boolean);
-  const setActive = (id: string) => links.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
+  const setActive = (id: string) => {
+    let current: HTMLAnchorElement | undefined;
+    for (const a of links) {
+      const on = a.getAttribute('href') === `#${id}`;
+      a.classList.toggle('is-active', on);
+      if (on) current = a;
+    }
+    // длинное содержание прокручивается внутри своей карточки — текущий пункт держим на виду (страницу не двигаем)
+    if (current && nav.scrollHeight > nav.clientHeight + 1) {
+      const top = current.getBoundingClientRect().top - nav.getBoundingClientRect().top + nav.scrollTop;
+      const bottom = top + current.offsetHeight;
+      const pad = 48;
+      if (top < nav.scrollTop + pad) nav.scrollTo({ top: Math.max(0, top - pad), behavior: 'smooth' });
+      else if (bottom > nav.scrollTop + nav.clientHeight - pad) nav.scrollTo({ top: bottom - nav.clientHeight + pad, behavior: 'smooth' });
+    }
+  };
 
   nav.addEventListener('click', (e) => {
     const a = e.target instanceof Element ? e.target.closest<HTMLAnchorElement>(linkSelector) : null;

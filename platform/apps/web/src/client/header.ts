@@ -1,9 +1,17 @@
 import { $, delegate, inertOutside, trapTab } from './dom';
 
-/** Липкая шапка: класс is-scrolled после прокрутки (не чаще раза за кадр). */
+/**
+ * Липкая шапка: класс is-scrolled после прокрутки (не чаще раза за кадр).
+ * Её высота — в переменной --site-header-h у <html>: под шапку садятся
+ * липкие элементы страницы (содержание статьи) и якоря разделов.
+ */
 function stickyHeader(): void {
   const shell = $('.header-shell');
   if (!shell) return;
+  const root = document.documentElement;
+  const measure = () => root.style.setProperty('--site-header-h', `${Math.round(shell.getBoundingClientRect().height)}px`);
+  measure();
+  if ('ResizeObserver' in window) new ResizeObserver(measure).observe(shell);
   let queued = false;
   const update = () => {
     shell.classList.toggle('is-scrolled', window.scrollY > 8);
