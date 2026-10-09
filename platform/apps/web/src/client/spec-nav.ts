@@ -1,12 +1,14 @@
 import { $$ } from './dom';
 
+const LINK = '.cdoc__nav-link';
+
 /**
- * Оглавление: подсветка раздела у верха экрана (IntersectionObserver) и
- * плавный скролл по клику. Характеристики товара (.spec__nav) и
- * контентный блок раздела (.cdoc__nav).
+ * Оглавление «Содержание»: подсветка раздела у верха экрана (IntersectionObserver)
+ * и плавный скролл по клику. Контентный блок разделов и характеристики товара —
+ * одна разметка (.cdoc__nav).
  */
-function initSpecNav(nav: HTMLElement, linkSelector: string): void {
-  const links = $$<HTMLAnchorElement>(linkSelector, nav);
+function initSpecNav(nav: HTMLElement): void {
+  const links = $$<HTMLAnchorElement>(LINK, nav);
   const ids = links.map((a) => (a.getAttribute('href') ?? '').replace(/^#/, '')).filter(Boolean);
   const setActive = (id: string) => {
     let current: HTMLAnchorElement | undefined;
@@ -26,7 +28,7 @@ function initSpecNav(nav: HTMLElement, linkSelector: string): void {
   };
 
   nav.addEventListener('click', (e) => {
-    const a = e.target instanceof Element ? e.target.closest<HTMLAnchorElement>(linkSelector) : null;
+    const a = e.target instanceof Element ? e.target.closest<HTMLAnchorElement>(LINK) : null;
     const id = a?.getAttribute('href')?.replace(/^#/, '');
     const target = id ? document.getElementById(id) : null;
     if (!a || !target) return;
@@ -56,5 +58,4 @@ function initSpecNav(nav: HTMLElement, linkSelector: string): void {
   }
 }
 
-for (const nav of $$('.spec__nav')) initSpecNav(nav, '.spec__nav-link');
-for (const nav of $$('.cdoc__nav')) initSpecNav(nav, '.cdoc__nav-link');
+for (const nav of $$('.cdoc__nav')) initSpecNav(nav);

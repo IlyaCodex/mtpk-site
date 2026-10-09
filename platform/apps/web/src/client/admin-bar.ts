@@ -42,8 +42,8 @@ const STYLE = `
 html.has-adminbar{margin-top:40px!important}
 html.has-adminbar .header-shell{top:40px}
 html.has-adminbar .megamenu{top:calc(40px + 36px + 68px)}
-html.has-adminbar .spec__nav{top:160px}
-html.has-adminbar .spec__panel{scroll-margin-top:160px}
+html.has-adminbar .cdoc__nav{top:calc(var(--site-header-h,116px) + 56px);max-height:calc(100vh - var(--site-header-h,116px) - 72px)}
+html.has-adminbar .cdoc__panel{scroll-margin-top:calc(var(--site-header-h,116px) + 56px)}
 .mtpk-ab{position:fixed;inset:0 0 auto;height:40px;z-index:390;display:flex;align-items:center;gap:2px;padding:0 8px;background:#0a1c25;color:#dde9ee;box-shadow:0 4px 16px rgba(10,28,37,.25);font:500 13px/1 var(--font-body,system-ui),-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:0;text-transform:none}
 .mtpk-ab *{box-sizing:border-box}
 .mtpk-ab svg{width:18px;height:18px;flex:none}

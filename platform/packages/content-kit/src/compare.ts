@@ -52,8 +52,9 @@ function pickImage(html: string): string {
   return m ? m[1] : '';
 }
 
+/** Строки таблиц блока «Характеристики и описание» — на странице товара это section.cdoc (ProductSpec). */
 function specs(html: string): [string, string][] {
-  const sec = html.match(/<section[^>]*class="[^"]*\bspec\b[^"]*"[^>]*>([\s\S]*?)<\/section>/i);
+  const sec = html.match(/<section[^>]*class="[^"]*\bcdoc\b[^"]*"[^>]*>([\s\S]*?)<\/section>/i);
   if (!sec) return [];
   const out: [string, string][] = [];
   for (const row of sec[1].matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)) {

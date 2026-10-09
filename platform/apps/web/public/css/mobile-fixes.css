@@ -463,7 +463,6 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
  *      (без скролла, аккуратнее); экономика (3 числовые колонки) —
  *      горизонтальный скролл внутри карточки, числа не ломаем. */
 @media (max-width: 640px) {
-  .spec__panel, .spec__body { min-width: 0; }
   .spec-table { min-width: 0; }
   .spec-table th { overflow-wrap: anywhere; }
   /* Спека param|value: значение в td имеет white-space:nowrap (tovar-b.css),
@@ -476,7 +475,6 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
   .spec-table:not(.spec-table--models) tbody th { width: 50%; }
   /* Многоколоночные таблицы моделей (числовые) — перенос ломал бы числа,
      поэтому панель с такой таблицей получает горизонтальный скролл. */
-  .spec__panel:has(.spec-table--models) { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .econ__table { min-width: 0; overflow-x: auto; }
 }
 

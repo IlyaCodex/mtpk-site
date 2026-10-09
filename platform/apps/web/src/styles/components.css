@@ -276,6 +276,9 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
    статья — белая карточка на сером фоне. Вводная панель без заголовка —
    «коротко»: светло-зелёный блок, факты с галочками. Таблицы — карточкой
    (без моноширинного шрифта и заглавных подписей), списки ссылок — сеткой.
+   Та же разметка — у HTML-секций разделов и у блока «Характеристики и
+   описание» товара (ProductSpec): одно оформление на все страницы; внутри
+   его разделов — свои классы примечаний, подзаголовков и ссылок (spec__*).
    Раньше эти стили лежали копией в блоке «Стили» каждой страницы.
    ============================================================ */
 .cdoc {
@@ -329,14 +332,16 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
 .cdoc__panel h3 { margin-bottom: 0; font-family: var(--font-display); font-size: 18px; font-weight: var(--fw-semibold); line-height: 1.35; color: var(--text-primary); }
 .cdoc__panel > h3 { margin-top: var(--sp-8); }
 .cdoc__panel strong { color: var(--text-primary); }
+/* картинки в тексте — пропорционально по ширине (атрибут height их не вытягивает); правила самих секций сильнее */
+:where(.cdoc__panel) img { max-width: 100%; height: auto; }
 /* списки — зелёная точка вместо маркера */
-.cdoc__panel ul:not(.cdoc__links) { max-width: 78ch; margin-bottom: 0; padding: 0; list-style: none; font-size: 16px; line-height: 1.7; color: var(--text-secondary); }
-.cdoc__panel ul:not(.cdoc__links) li { position: relative; padding-left: var(--sp-6); }
-.cdoc__panel ul:not(.cdoc__links) li + li { margin-top: var(--sp-2); }
-.cdoc__panel ul:not(.cdoc__links) li::before { content: ""; position: absolute; top: 0.72em; left: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--green-500); }
+.cdoc__panel ul:not(.cdoc__links, .spec__links) { max-width: 78ch; margin-bottom: 0; padding: 0; list-style: none; font-size: 16px; line-height: 1.7; color: var(--text-secondary); }
+.cdoc__panel ul:not(.cdoc__links, .spec__links) li { position: relative; padding-left: var(--sp-6); }
+.cdoc__panel ul:not(.cdoc__links, .spec__links) li + li { margin-top: var(--sp-2); }
+.cdoc__panel ul:not(.cdoc__links, .spec__links) li::before { content: ""; position: absolute; top: 0.72em; left: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--green-500); }
 /* ссылки в тексте (не кнопки, не таблицы, не список разделов) */
-.cdoc__panel :is(p, li):not(.cdoc__links li) a:not(.btn) { color: var(--text-brand); text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; }
-.cdoc__panel :is(p, li):not(.cdoc__links li) a:not(.btn):hover { color: var(--green-700); text-decoration-color: currentColor; }
+.cdoc__panel :is(p, li):not(.cdoc__links li, .spec__links li) a:not(.btn) { color: var(--text-brand); text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; }
+.cdoc__panel :is(p, li):not(.cdoc__links li, .spec__links li) a:not(.btn):hover { color: var(--green-700); text-decoration-color: currentColor; }
 /* вводная панель без заголовка — «коротко»: факты с галочками */
 .cdoc__panel:not([id]) {
   display: grid;
@@ -367,7 +372,9 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
 .cdoc__panel:not([id]) > .cdoc__lead { padding-bottom: var(--sp-2); }
 /* таблицы — карточкой */
 .cdoc__scroll { overflow-x: auto; max-width: 100%; border: 1px solid var(--border-subtle); border-radius: 12px; }
-.cdoc .spec-table { width: 100%; min-width: 560px; margin: 0; border-collapse: collapse; table-layout: auto; }
+.cdoc .spec-table { width: 100%; min-width: 0; margin: 0; border-collapse: collapse; table-layout: auto; }
+/* таблица в три столбца и больше не сжимается на узком экране — прокручивается в своей карточке */
+.cdoc .spec-table:has(tr > :nth-child(3)) { min-width: 560px; }
 /* общие правила .spec-table (site.css: ширина подписи 64%, раскладка fixed, перенос по буквам, «зебра», моноширинные значения) — здесь не нужны */
 .cdoc .spec-table tr > :is(th, td) { width: auto; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); background: none; font-family: var(--font-body); font-size: 14px; line-height: 1.5; text-align: left; vertical-align: top; white-space: normal; overflow-wrap: normal; }
 .cdoc .spec-table tbody tr:last-child > * { border-bottom: 0; }
@@ -382,9 +389,9 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
 .cdoc .spec-table a { font-family: var(--font-display); font-weight: var(--fw-bold); color: var(--text-brand); text-decoration: none; }
 .cdoc .spec-table a:hover { color: var(--green-700); }
 /* список ссылок на разделы — сеткой со стрелками */
-.cdoc__links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2) var(--sp-4); margin: 0; padding: 0; list-style: none; }
-.cdoc__links li { margin: 0; }
-.cdoc__links a {
+:is(.cdoc__links, .spec__links) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2) var(--sp-4); margin-bottom: 0; padding: 0; list-style: none; }
+:is(.cdoc__links, .spec__links) li { margin: 0; }
+:is(.cdoc__links, .spec__links) a {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -402,7 +409,7 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   text-decoration: none;
   transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
 }
-.cdoc__links a::after {
+:is(.cdoc__links, .spec__links) a::after {
   content: "";
   flex-shrink: 0;
   width: 14px;
@@ -412,8 +419,10 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   mask: var(--icon-arrow) center / contain no-repeat;
   transition: transform var(--duration-fast) var(--ease-out);
 }
-.cdoc__links a:hover { border-color: var(--green-500); background: var(--green-50); color: var(--green-700); }
-.cdoc__links a:hover::after { transform: translateX(3px); }
+:is(.cdoc__links, .spec__links) a:hover { border-color: var(--green-500); background: var(--green-50); color: var(--green-700); }
+:is(.cdoc__links, .spec__links) a:hover::after { transform: translateX(3px); }
+/* примечание к разделу — серой плашкой; подзаголовок — как h3 статьи */
+.cdoc__panel .spec__note { max-width: none; padding: var(--sp-3) var(--sp-4); border-radius: 10px; background: var(--surface-muted); font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
 /* кнопки в конце раздела */
 .cdoc__panel .cdoc__actions,
 .cdoc__panel .spec__cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
@@ -432,6 +441,6 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   .cdoc__panel { padding: var(--sp-8) 0; }
   .cdoc__panel:not([id]) { grid-template-columns: 1fr; margin-top: var(--sp-5); padding: var(--sp-5); }
   .cdoc__panel p,
-  .cdoc__panel ul:not(.cdoc__links) { font-size: 15px; }
-  .cdoc__links { grid-template-columns: 1fr; }
+  .cdoc__panel ul:not(.cdoc__links, .spec__links) { font-size: 15px; }
+  :is(.cdoc__links, .spec__links) { grid-template-columns: 1fr; }
 }

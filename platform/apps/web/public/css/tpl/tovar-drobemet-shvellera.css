@@ -423,27 +423,6 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
 .phero__facts li {display: flex; gap: var(--sp-3); align-items: flex-start; font-size: var(--fs-small); color: var(--text-secondary); line-height: var(--lh-body); }
 .phero__facts svg {width: 20px; height: 20px; color: var(--teal-600); flex-shrink: 0; margin-top: 2px; }
 .phero__facts strong {color: var(--text-primary); font-weight: var(--fw-semibold); }
-/* --- Spec: sticky TOC + all panels visible (no tabs, no cards — just dividers) --- */
-.spec {background: var(--surface-page); padding: var(--section-py-base, 96px) 0; }
-.spec__layout {display: grid; grid-template-columns: 240px 1fr; gap: var(--sp-10); align-items: start; }
-.spec__nav {position: sticky; top: var(--sp-6); display: flex; flex-direction: column; border-left: 1px solid var(--border-subtle); }
-.spec__nav-eyebrow {font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-tertiary); padding: 0 var(--sp-5) var(--sp-3); margin-left: -1px; }
-.spec__nav-link {display: block; padding: var(--sp-3) var(--sp-5); font-family: var(--font-display); font-size: var(--fs-small); font-weight: var(--fw-semibold); color: var(--text-secondary); border-left: 2px solid transparent; margin-left: -1px; text-decoration: none; transition: color var(--duration-fast) var(--ease-out),
-              background var(--duration-fast) var(--ease-out),
-              border-color var(--duration-fast) var(--ease-out); }
-.spec__nav-link:hover {color: var(--text-brand); border-left-color: var(--teal-600); }
-.spec__body {display: flex; flex-direction: column; }
-.spec__panel {background: transparent; border: 0; padding: var(--sp-10) 0; scroll-margin-top: var(--sp-6); }
-.spec__panel:first-child {padding-top: 0; }
-.spec__panel + .spec__panel {border-top: 1px solid var(--border-subtle); }
-.spec__panel > * + * {margin-top: var(--sp-4); }
-.spec__title {font-family: var(--font-display); font-size: var(--fs-h3); font-weight: var(--fw-bold); letter-spacing: var(--ls-h3); color: var(--text-primary); }
-.spec__panel p {color: var(--text-secondary); line-height: var(--lh-body); }
-.spec__panel ul {color: var(--text-secondary); line-height: var(--lh-body); padding-left: var(--sp-5); }
-.spec__panel ul li + li {margin-top: var(--sp-2); }
-.spec__note {font-size: var(--fs-small); color: var(--text-tertiary); }
-/* --- Spec: подсветка активного пункта оглавления (scrollspy через JS) --- */
-.spec__nav-link.is-active { color: var(--text-brand); border-left-color: var(--teal-600); }
 
 .spec-table {width: 100%; border-collapse: collapse; }
 .spec-table th, .spec-table td {text-align: left; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); font-size: var(--fs-small); }
@@ -476,16 +455,11 @@ a.contact-item:hover .contact-item__value {color: var(--text-brand); }
 .adv-item {padding: var(--sp-5); }
 .adv-item__title {font-size: var(--fs-body); margin-bottom: var(--sp-2); }
 .adv-item__text {font-size: var(--fs-small); line-height: var(--lh-body); }
-.spec {padding: var(--sp-16) 0; }
 /* --- Product page responsive --- */
 @media (max-width: 900px) {
   .phero__grid { grid-template-columns: 1fr; gap: var(--sp-8); }
-  .spec__layout { grid-template-columns: 1fr; gap: var(--sp-6); }
-  .spec__nav { display: none; }
-  .spec__panel { padding: var(--sp-8) 0; }
-  .spec__panel:first-child { padding-top: 0; scroll-margin-top: var(--sp-2); }
   .phero__keyspecs { column-gap: var(--sp-5); row-gap: var(--sp-4); }
-  .partner, .adv, .spec { padding: var(--sp-12) 0; }
+  .partner, .adv { padding: var(--sp-12) 0; }
 }
 @media (max-width: 1024px) {
   .nav-toggle { display: inline-flex; }
