@@ -281,7 +281,8 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
 .cdoc {
   --cdoc-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E");
   background: var(--surface-muted);
-  padding: var(--section-py-base, 96px) 0;
+  /* сверху — небольшой отступ: карточки начинаются почти сразу, «Содержание» почти не сдвигается, когда прилипает */
+  padding: var(--sp-6) 0 var(--section-py-base, 96px);
 }
 .cdoc__layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: var(--sp-8); align-items: start; }
 /* содержание */
@@ -289,11 +290,11 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
    и целиком помещается в экран: длинный список прокручивается внутри карточки */
 .cdoc__nav {
   position: sticky;
-  top: calc(var(--site-header-h, 116px) + var(--sp-5));
+  top: calc(var(--site-header-h, 116px) + var(--sp-4));
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: calc(100vh - var(--site-header-h, 116px) - 2 * var(--sp-5));
+  max-height: calc(100vh - var(--site-header-h, 116px) - 2 * var(--sp-4));
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--sp-5) var(--sp-3);
@@ -426,7 +427,7 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   .cdoc__body { padding: var(--sp-2) var(--sp-8); }
 }
 @media (max-width: 640px) {
-  .cdoc { padding: var(--sp-12) 0; }
+  .cdoc { padding: var(--sp-5) 0 var(--sp-12); }
   .cdoc__body { padding: 0 var(--sp-5); border-radius: 14px; }
   .cdoc__panel { padding: var(--sp-8) 0; }
   .cdoc__panel:not([id]) { grid-template-columns: 1fr; margin-top: var(--sp-5); padding: var(--sp-5); }

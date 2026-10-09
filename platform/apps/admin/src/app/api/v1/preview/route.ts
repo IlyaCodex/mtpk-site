@@ -72,7 +72,7 @@ export const POST = route('content', async (req, user) => {
 ${before.map(link).join('\n')}
 ${page.inlineStyles.map(styleTag).join('\n')}
 ${after.map(link).join('\n')}
-<style>html:not(.mtpk-live) a{pointer-events:none}</style>
+<style>html:not(.mtpk-live) a{pointer-events:none}:root{--site-header-h:0px}</style>
 </head>
 <body><main>${body}</main></body>
 </html>`;
