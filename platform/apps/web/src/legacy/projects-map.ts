@@ -1,17 +1,32 @@
 /* ============================================================
-   Карта реализованных проектов — УралИндуктор
-   Yandex Maps JS API 2.1, кластеризация, hover-балун.
-   Данные: window.projects (js/projects-data.js).
+   Карта реализованных проектов — УралИндуктор (главная, «География»).
+   Yandex Maps JS API 2.1: кластеры с числом проектов (щелчок — приблизить,
+   а где проекты в одной точке — список), метка проекта — по щелчку
+   карточка под картой ([data-geo-card]): фото, город, название, ссылка.
+   Кнопки секции: страны ([data-geo-country], видна, если у страны есть
+   проекты), масштаб и «Все проекты» ([data-geo-zoom="in|out|all"]).
+   Данные: window.projects (js/projects-data.js); страна — поле country,
+   иначе по городу (не из списка — Россия).
    ============================================================ */
 type GeoObject = { properties: { get(key: 'projectData'): Project | undefined } };
 type ClusterObject = { properties: { get(key: 'geoObjects'): GeoObject[] | undefined; set(key: 'balloonContent', value: string): void } };
-type MapTarget = { balloon?: { open(): void; close(): void } };
-type MapEvent = { get(key: 'target'): MapTarget | undefined };
 
 (function () {
   'use strict';
 
   var MAP_ID = 'projects-map';
+
+  /** Города за пределами России — для проектов без поля country. */
+  var COUNTRY_BY_CITY: Record<string, string> = {
+    'Алматы': 'Казахстан', 'Актобе': 'Казахстан', 'Астана': 'Казахстан', 'Атырау': 'Казахстан', 'Караганда': 'Казахстан',
+    'Костанай': 'Казахстан', 'Павлодар': 'Казахстан', 'Темиртау': 'Казахстан', 'Уральск': 'Казахстан',
+    'Усть-Каменогорск': 'Казахстан', 'Шымкент': 'Казахстан', 'Экибастуз': 'Казахстан',
+    'Ташкент': 'Узбекистан', 'Самарканд': 'Узбекистан', 'Навои': 'Узбекистан', 'Алмалык': 'Узбекистан', 'Бекабад': 'Узбекистан',
+    'Бишкек': 'Кыргызстан', 'Душанбе': 'Таджикистан', 'Ереван': 'Армения', 'Минск': 'Беларусь', 'Гомель': 'Беларусь'
+  };
+  function countryOf(p: Project): string {
+    return p.country || COUNTRY_BY_CITY[p.city || ''] || 'Россия';
+  }
 
   function esc(s: unknown): string {
     return String(s == null ? '' : s)
@@ -19,22 +34,10 @@ type MapEvent = { get(key: 'target'): MapTarget | undefined };
       .replace(/"/g, '&quot;');
   }
 
-  // — Balloon для одиночной метки —
-  function buildSinglePopup(p: Project): string {
-    var img = p.image ? '<img class="pm-pop__img" src="' + esc(p.image) + '" alt="" loading="lazy">' : '';
-    var meta = [];
-    if (p.city) meta.push(esc(p.city));
-    if (p.date) meta.push(esc(p.date));
-    var metaStr = meta.length ? '<div class="pm-pop__meta">' + meta.join(' &middot; ') + '</div>' : '';
-    var link = p.link ? '<a class="pm-pop__link" href="' + esc(p.link) + '">Открыть страницу проекта &rarr;</a>' : '';
-    return '<div class="pm-pop">' + img +
-      '<div class="pm-pop__body">' +
-      '<div class="pm-pop__title">' + esc(p.name) + '</div>' +
-      metaStr + link +
-      '</div></div>';
-  }
+  var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+  var CLOSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
-  // — Содержимое balloon для кластера (2+ проектов) — собираем сами из geoObjects —
+  // — Содержимое balloon для кластера (проекты в одной точке) — собираем сами из geoObjects —
   function buildClusterPopup(geoObjects: GeoObject[]): string {
     var items = geoObjects.map(function (go) {
       var p: Partial<Project> = go.properties.get('projectData') || {};
@@ -62,30 +65,27 @@ type MapEvent = { get(key: 'target'): MapTarget | undefined };
 
   function build() {
     var el = document.getElementById(MAP_ID);
-    if (!el || !window.projects) return;
+    var projects = window.projects;
+    if (!el || !projects) return;
+    var root: ParentNode = el.closest('section') || document;
+    var card = root.querySelector<HTMLElement>('[data-geo-card]');
 
     var map = new ymaps.Map(el, {
-      center: [56, 61], zoom: 5, controls: ['zoomControl']
+      center: [56, 61], zoom: 4, controls: []
     }, {
       suppressMapOpenBlock: true, yandexMapDisablePoiInteractivity: true
     });
     map.behaviors.disable('scrollZoom');
 
-    // Кастомный layout для balloon кластера — берёт готовый HTML из свойств кластера.
-    // Используем build-override вместо `$[…|raw]` (фильтр |raw на некоторых
-    // сборках Yandex Maps 2.1 не разворачивается и в попап попадает буквально
-    // текст). innerHTML напрямую — детерминированно и быстро.
+    // Балун кластера — готовый HTML из свойств кластера (innerHTML напрямую:
+    // фильтр |raw на некоторых сборках Yandex Maps 2.1 не разворачивается).
     var ClusterBalloonContentLayout = ymaps.templateLayoutFactory.createClass(
       '<div class="pm-cluster-pop-mount"></div>',
       {
         build: function () {
           ClusterBalloonContentLayout.superclass.build.call(this);
-          var root = this.getParentElement();
-          if (!root) return;
-          var mount = root.querySelector('.pm-cluster-pop-mount');
-          if (!mount) return;
-          var html = this.getData().properties.get('balloonContent');
-          mount.innerHTML = html || '';
+          var mount = this.getParentElement() && this.getParentElement().querySelector('.pm-cluster-pop-mount');
+          if (mount) mount.innerHTML = this.getData().properties.get('balloonContent') || '';
         }
       }
     );
@@ -93,97 +93,100 @@ type MapEvent = { get(key: 'target'): MapTarget | undefined };
     var cluster = new ymaps.Clusterer({
       preset: 'islands#greenClusterIcons',
       groupByCoordinates: false,
-      clusterDisableClickZoom: true,            // НЕ зумим — открываем balloon
+      clusterDisableClickZoom: false,           // щелчок — приблизить; не приближается — список
       clusterOpenBalloonOnClick: true,
       gridSize: 80,
-      // balloon
       clusterBalloonContentLayout: ClusterBalloonContentLayout,
       clusterBalloonPanelMaxMapArea: 0,
-      clusterBalloonCloseButton: false,
       clusterBalloonContentLayoutWidth: 320,
       clusterBalloonContentLayoutHeight: 360,
-      // hide pager — мы свой layout даём
       clusterBalloonPagerVisible: false,
-      hasHint: true
+      hasHint: false
     });
 
-    // — Hover-логика (общая для placemark и cluster) —
-    var closeTimer: ReturnType<typeof setTimeout> | null = null;
-    function cancelClose() { clearTimeout(closeTimer!); closeTimer = null; }
-    function scheduleClose(obj: MapTarget | undefined) {
-      cancelClose();
-      closeTimer = setTimeout(function () {
-        if (obj && obj.balloon) obj.balloon.close();
-      }, 400);
+    function hideCard() {
+      if (card) card.hidden = true;
+    }
+    function showCard(p: Project) {
+      if (!card) return;
+      card.innerHTML =
+        (p.image ? '<img class="geomap-card__img" src="' + esc(p.image) + '" alt="" loading="lazy">' : '') +
+        '<div class="geomap-card__body">' +
+          (p.city ? '<div class="geomap-card__city">' + PIN + esc(p.city) + '</div>' : '') +
+          '<div class="geomap-card__title">' + esc(p.name) + '</div>' +
+          (p.link ? '<a class="geomap-card__link" href="' + esc(p.link) + '">Смотреть проект <span class="geomap-card__arrow" aria-hidden="true"></span></a>' : '') +
+        '</div>' +
+        '<button type="button" class="geomap-card__close" aria-label="Закрыть карточку">' + CLOSE + '</button>';
+      card.hidden = false;
+    }
+    if (card) {
+      card.addEventListener('click', function (e) {
+        if ((e.target as Element).closest('.geomap-card__close')) hideCard();
+      });
     }
 
-    var placemarks: unknown[] = [];
-    window.projects.forEach(function (p) {
-      if (!p.ll) return;
-      var pm = new ymaps.Placemark(p.ll, {
-        hintContent: p.name,
-        balloonContentBody: buildSinglePopup(p),
-        projectData: p  // важно: пробрасываем в кластер для buildClusterPopup
-      }, {
-        preset: 'islands#greenIcon',
-        balloonMaxWidth: 320,
-        balloonCloseButton: false,
-        balloonPanelMaxMapArea: 0,
-        hideIconOnBalloonOpen: false
-      });
-      // hover — одиночная метка
-      pm.events.add('mouseenter', function () { cancelClose(); pm.balloon.open(); });
-      pm.events.add('mouseleave', function () { scheduleClose(pm); });
-      // клик/тап — открываем попап с фото (на тач-устройствах hover нет,
-      // поэтому именно клик должен показывать карточку; переход на страницу —
-      // по ссылке «Открыть страницу проекта» внутри попапа).
-      pm.events.add('click', function () { cancelClose(); pm.balloon.open(); });
-      placemarks.push(pm);
+    var all = projects.filter(function (p) { return p.ll; }).map(function (p) {
+      var pm = new ymaps.Placemark(p.ll, { hintContent: p.name, projectData: p }, { preset: 'islands#greenCircleDotIcon' });
+      pm.events.add('click', function () { showCard(p); });
+      return { pm: pm, country: countryOf(p) };
     });
 
-    cluster.add(placemarks);
-    map.geoObjects.add(cluster);
+    /** Видимые сейчас проекты — для «вписать» и центра на узком экране. */
+    var shown = all;
+    function fit() {
+      var bounds = cluster.getBounds();
+      if (!bounds) return;
+      map.setBounds(bounds, { checkZoomRange: true, zoomMargin: 40 }).then(function () {
+        // узкая карта (телефон) вписала бы проекты на виде всего мира — тогда центр по проектам, масштаб не мельче 3
+        if (map.getZoom() >= 3) return;
+        var lat = 0, lon = 0;
+        shown.forEach(function (x) { var ll = x.pm.geometry.getCoordinates(); lat += ll[0]; lon += ll[1]; });
+        map.setCenter([lat / shown.length, lon / shown.length], 3);
+      });
+    }
+    function show(country: string) {
+      cluster.removeAll();
+      shown = all.filter(function (x) { return !country || x.country === country; });
+      cluster.add(shown.map(function (x) { return x.pm; }));
+      hideCard();
+      fit();
+    }
 
     // — Когда кластер формируется, подкладываем готовый HTML в его properties.balloonContent —
     function patchClusterHTML(clusterObj: ClusterObject) {
-      var gobjs = clusterObj.properties.get('geoObjects') || [];
-      clusterObj.properties.set('balloonContent', buildClusterPopup(gobjs));
+      clusterObj.properties.set('balloonContent', buildClusterPopup(clusterObj.properties.get('geoObjects') || []));
     }
-    // делаем для всех текущих кластеров
-    cluster.getClusters().forEach(patchClusterHTML);
-    // и для будущих (при zoom in/out)
     cluster.events.add(['add', 'objectsupdated'], function () {
       cluster.getClusters().forEach(patchClusterHTML);
     });
+    map.geoObjects.add(cluster);
+    map.events.add('click', hideCard);
 
-    // — Hover на кластерах —
-    // events на ClustererInstance с фильтром по типу target
-    cluster.events.add('mouseenter', function (e: MapEvent) {
-      var target = e.get('target');
-      // target может быть Placemark (внутри кластера до раскрытия — это сам Cluster)
-      // если есть метод .balloon — открываем
-      if (target && target.balloon && typeof target.balloon.open === 'function') {
-        cancelClose();
-        target.balloon.open();
-      }
-    });
-    cluster.events.add('mouseleave', function (e: MapEvent) {
-      var target = e.get('target');
-      if (target && target.balloon) scheduleClose(target);
-    });
-
-    // — Если курсор зашёл в открытый balloon — не закрываем; покинул — закрываем —
-    map.events.add('balloonopen', function (e: MapEvent) {
-      setTimeout(function () {
-        var balloonEl = document.querySelector('#' + MAP_ID + ' [class*="balloon__layout"]');
-        if (!balloonEl) return;
-        balloonEl.addEventListener('mouseenter', cancelClose);
-        balloonEl.addEventListener('mouseleave', function () {
-          var target = e.get('target');
-          if (target && target.balloon) scheduleClose(target);
+    // — Кнопки стран: у страны без проектов кнопки нет —
+    var buttons = Array.prototype.slice.call(root.querySelectorAll('[data-geo-country]')) as HTMLElement[];
+    buttons.forEach(function (b) {
+      var country = b.getAttribute('data-geo-country') || '';
+      // кнопка видна, только если у страны есть проекты (в разметке новая страна может стоять скрытой)
+      b.hidden = Boolean(country) && !all.some(function (x) { return x.country === country; });
+      b.addEventListener('click', function () {
+        buttons.forEach(function (x) {
+          x.classList.toggle('is-active', x === b);
+          x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
         });
-      }, 50);
+        show(country);
+      });
     });
+
+    // — Масштаб и «Все проекты» —
+    Array.prototype.slice.call(root.querySelectorAll('[data-geo-zoom]')).forEach(function (b: HTMLElement) {
+      b.addEventListener('click', function () {
+        var z = b.getAttribute('data-geo-zoom');
+        if (z === 'all') fit();
+        else map.setZoom(map.getZoom() + (z === 'in' ? 1 : -1), { duration: 200, checkZoomRange: true });
+      });
+    });
+
+    show('');
   }
 
   function init() {

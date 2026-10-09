@@ -10,6 +10,8 @@ export interface Project {
   image?: string;
   link?: string;
   ll?: [number, number];
+  /** страна (нет — по городу, иначе Россия) */
+  country?: string;
 }
 
 /** Выбор «К сравнению» (ведёт модуль сайта, см. packages/ui/src/browser/compare-store.ts). */
