@@ -77,6 +77,8 @@ picture/
 │
 ├── index/                                       # уникальное для главной (/)
 │   ├── banner-modern-v2.png                     # баннер «Модернизация» на главной
+│   ├── turnkey-scheme.svg                       # «Литейное производство под ключ»: изометрическая схема участка (SVG, 2026-10-09)
+│   ├── turnkey-scheme-dark.svg                  # то же для тёмной темы
 │   ├── cat-clean-aluminij.png                   # каталог-карточка «Алюминий»
 │   ├── cat-clean-cooling.png                    # «Охлаждение»
 │   ├── cat-clean-induktion.png                  # «Индукция»
@@ -241,6 +243,8 @@ picture/
 **Источники:** `picture/brand/`, `picture/shared/`, `picture/index/`
 - Hero-фон, manager-portrait, banner-modern, banner-service, 8 catalog-карточек,
   photo-furnace + photo-drobemet (в кейсе и featured Услуги мегаменю).
+- «Литейное производство под ключ» (2026-10-09): схема участка — векторная иллюстрация по макету
+  Евгения (код, не генерация), `/img/home/turnkey-scheme.svg`, в тёмной теме — `turnkey-scheme-dark.svg`.
 
 ### Категория «Индукционное оборудование» — `/products/induktsionnoe-oborudovanie/`
 **Источники:** `picture/brand/`, `picture/shared/`, `picture/products/induktsionnoe-oborudovanie/`
