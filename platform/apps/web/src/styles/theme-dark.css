@@ -93,3 +93,9 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 
 /* номер текущей страницы (каталог запчастей): фон — цвет текста, в тёмной теме он светлый */
 html[data-theme="dark"] .pagination button.current { background: var(--teal-500); border-color: var(--teal-500); }
+
+/* флажок «Сделано в России»: белая полоса остаётся белой */
+html[data-theme="dark"] .made-badge__flag { --dk-bg-ffffff: #fff; }
+
+/* «Оборудование» на главной: фото (на белом фоне) — в единой белой рамке, а не белыми прямоугольниками разного размера */
+html[data-theme="dark"] .equip-card__cover { margin: var(--sp-2) var(--sp-2) 0; border-radius: 8px; background: #fff; }

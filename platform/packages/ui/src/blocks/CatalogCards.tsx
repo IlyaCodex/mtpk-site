@@ -9,7 +9,7 @@ import { MadeBadge } from './ProductMedia.tsx';
 
 /** Место обложки в сетке каждого вида (для srcset/sizes — см. PLACES). */
 export const CARD_COVER_PLACE: Record<CatalogCardsBlock['design'], string> = {
-  home: 'cat-card__cover',
+  home: 'equip-card__cover',
   teaser: 'teaser-card__cover',
   lvm: 'catalog-lvm-card__cover',
   lgm: 'catalog-lgm-card__cover',
@@ -34,19 +34,17 @@ function Cover({ item, place, eager }: { item: CatalogCardItem; place: string; e
   );
 }
 
-/** «Оборудование» на главной: номер «01 / 15», обложка (с бейджем «Сделано в России»), название, «Перейти в каталог». */
-function HomeCard({ item, n, total, eager }: { item: CatalogCardItem; n: number; total: number; eager: readonly string[] }) {
-  const pad = (x: number) => String(x).padStart(2, '0');
+/** «Оборудование» на главной: фото (сверху справа — «Сделано в России»), название и кнопка-стрелка. */
+function HomeCard({ item, eager }: { item: CatalogCardItem; eager: readonly string[] }) {
   return (
-    <a href={item.href} className="cat-card">
-      <div className="cat-card__cover">
-        <span className="cat-card__num">{`${pad(n)} / ${pad(total)}`}</span>
+    <a href={item.href} className="equip-card">
+      <div className="equip-card__cover">
         <Cover item={item} place={CARD_COVER_PLACE.home} eager={eager} />
         {isMadeInRussia(item.href) && <MadeBadge />}
       </div>
-      <div className="cat-card__body">
-        <Inline as="h3" className="cat-card__title" html={item.title} />
-        <Inline className="cat-card__link" html={item.linkText ?? 'Перейти в каталог'} />
+      <div className="equip-card__body">
+        <Inline as="h3" className="equip-card__title" html={item.title} />
+        <span className="equip-card__go" aria-hidden="true" />
       </div>
     </a>
   );
@@ -108,14 +106,23 @@ export function CatalogCards({ block, ctx }: { block: CatalogCardsBlock; ctx: Re
   const eager = ctx.eagerImages ?? [];
   if (block.design === 'home') {
     return (
-      <section className="catalog" {...extra(block.attrs, 'section')}>
+      <section className="equip" {...extra(block.attrs, 'section')}>
         <div className="container">
-          <div className="catalog__head catalog__head--center">
-            <Inline as="h2" className="catalog__title" html={block.head?.title ?? ''} />
+          <div className="equip__head">
+            <div>
+              <Inline as="h2" className="equip__title" html={block.head?.title ?? ''} />
+              {block.head?.lead && <Inline as="p" className="equip__lead" html={block.head.lead} />}
+            </div>
+            {block.more && (
+              <a href={block.more.href} className="equip__more">
+                <Inline html={block.more.label} />
+                <span className="equip__more-icon" aria-hidden="true" />
+              </a>
+            )}
           </div>
-          <div className="catalog__grid">
+          <div className="equip__grid">
             {items.map((item, i) => (
-              <HomeCard key={i} item={item} n={i + 1} total={items.length} eager={eager} />
+              <HomeCard key={i} item={item} eager={eager} />
             ))}
           </div>
           {block.after && <After html={block.after} ctx={ctx} />}

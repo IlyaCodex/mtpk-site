@@ -418,6 +418,7 @@ body { margin: 0; }
 .btn__arrow--back { -webkit-mask-image: var(--icon-arrow-back); mask-image: var(--icon-arrow-back); }
 :root {
   --icon-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='4 5 16 14' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E");
+  --icon-arrow-up-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7M8 7h9v9'/%3E%3C/svg%3E");
   --icon-arrow-back: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='4 5 16 14' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 6l-6 6 6 6'/%3E%3C/svg%3E");
 }
 .btn:hover .btn__arrow { transform: translateX(4px); }
@@ -1015,6 +1016,177 @@ section.hero--home { min-height: 44vh; }
   transition: transform var(--duration-base) var(--ease-out);
 }
 .cat-card:hover .cat-card__link::after { transform: translateX(4px); }
+/* ============================================================
+   Главная: «Оборудование» (дизайн 10.2026) — заголовок слева, «Все
+   категории ↗» справа; карточка: фото, название и кнопка-стрелка,
+   «Сделано в России» — сверху справа. Классы свои: .cat-card остаётся
+   у карточек новостей.
+   ============================================================ */
+.equip {
+  background: var(--surface-muted);
+  padding: var(--section-py-base, 96px) 0;
+}
+.equip__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-8);
+}
+.equip__title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: var(--fw-bold);
+  line-height: 1.1;
+  letter-spacing: var(--ls-h1);
+  color: var(--text-primary);
+  margin: 0;
+}
+.equip__lead {
+  margin: var(--sp-3) 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+.equip__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
+  color: var(--green-600);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.equip__more:hover { color: var(--green-700); }
+.equip__more-icon {
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  -webkit-mask: var(--icon-arrow-up-right) center / contain no-repeat;
+  mask: var(--icon-arrow-up-right) center / contain no-repeat;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+.equip__more:hover .equip__more-icon { transform: translate(2px, -2px); }
+.equip__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-5);
+}
+.equip-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-page);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(16, 31, 38, 0.04);
+  transition: border-color var(--duration-base) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out);
+}
+.equip-card:hover {
+  border-color: var(--green-500);
+  box-shadow: 0 12px 28px -14px rgba(16, 31, 38, 0.28);
+}
+.equip-card:focus-visible { outline: 2px solid var(--green-500); outline-offset: 2px; box-shadow: none; }
+.equip-card__cover {
+  position: relative;
+  aspect-ratio: 4 / 3;
+}
+/* фото по размеру рамки 4:3 (с полями), а не рамка — по фото */
+.equip-card__cover img {
+  position: absolute;
+  inset: var(--sp-5) var(--sp-5) 0;
+  display: block;
+  width: calc(100% - 2 * var(--sp-5));
+  height: calc(100% - var(--sp-5));
+  object-fit: contain;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+.equip-card:hover .equip-card__cover img { transform: scale(1.03); }
+.equip-card__body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: auto;
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+}
+.equip-card__title {
+  min-width: 0;
+  margin: 0;
+  /* длинное слово («Сталеразливочные») на узкой плитке — переносом по слогам, кнопка не выезжает */
+  overflow-wrap: break-word;
+  hyphens: auto;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+/* кнопка-стрелка: светло-зелёная, при наведении на карточку — зелёная с белой стрелкой */
+.equip-card__go {
+  position: relative;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--green-100);
+  color: var(--green-700);
+  transition: background-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+.equip-card__go::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  background-color: currentColor;
+  -webkit-mask: var(--icon-arrow-up-right) center / contain no-repeat;
+  mask: var(--icon-arrow-up-right) center / contain no-repeat;
+}
+.equip-card:hover .equip-card__go { background: var(--green-600); color: #fff; }
+/* «Сделано в России» в карточке — светлая плашка сверху справа */
+.equip-card .made-badge {
+  top: var(--sp-3);
+  right: var(--sp-3);
+  bottom: auto;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--neutral-100);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0;
+  text-transform: none;
+  box-shadow: none;
+}
+.equip-card .made-badge__flag { width: 14px; height: 10px; border-radius: 2px; }
+@media (max-width: 1280px) {
+  .equip__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1024px) {
+  .equip__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .equip { padding: var(--sp-12) 0; }
+  .equip__head { flex-direction: column; align-items: flex-start; gap: var(--sp-3); margin-bottom: var(--sp-6); }
+  .equip__grid { gap: var(--sp-3); }
+  .equip-card { border-radius: 10px; }
+  .equip-card__cover img { inset: var(--sp-3) var(--sp-3) 0; width: calc(100% - 2 * var(--sp-3)); height: calc(100% - var(--sp-3)); }
+  .equip-card__body { gap: var(--sp-2); padding: var(--sp-3); }
+  .equip-card__title { font-size: 13px; line-height: 1.25; }
+  .equip-card__go { width: 28px; height: 28px; border-radius: 7px; }
+  .equip-card__go::before { inset: 8px; }
+  /* на узкой плитке — только флажок, подпись читает скринридер (aria-label) */
+  .equip-card .made-badge { top: var(--sp-2); right: var(--sp-2); gap: 0; padding: 4px; font-size: 0; }
+}
 /* ============================================================
    BLOCK 3 — Собственное производство (DARK section, 3 product cards)
    ============================================================ */

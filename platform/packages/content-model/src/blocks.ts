@@ -278,8 +278,12 @@ export const catalogCardsBlock = z
     design: z
       .enum(['home', 'teaser', 'lvm', 'lgm'])
       .describe('Вид карточек')
-      .meta({ enumLabels: { home: 'Как на главной: номер, фото, название', teaser: 'Фото, название, описание', lvm: 'Линейка ЛВМ', lgm: 'Линейка ЛГМ' } }),
+      .meta({ enumLabels: { home: 'Как на главной: фото, название, кнопка-стрелка', teaser: 'Фото, название, описание', lvm: 'Линейка ЛВМ', lgm: 'Линейка ЛГМ' } }),
     head: sectionHead.optional(),
+    more: z
+      .object({ label: inline('Подпись'), href: href() })
+      .optional()
+      .describe('Ссылка справа от заголовка («Все категории»)'),
     attrs: attrs(),
     after: element('HTML под карточками').optional(),
     /** карточки после собранных из каталога: ссылки на другие разделы (запчасти, соседняя категория) */
