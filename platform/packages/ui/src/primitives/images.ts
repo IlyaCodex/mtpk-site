@@ -59,7 +59,7 @@ export const PLACES: Record<string, Place> = {
   'news-figure': { widths: WIDTHS.content, sizes: '(max-width: 880px) 96vw, 830px' },
   // во всю ширину экрана
   'section-divider__img': { widths: WIDTHS.wide, sizes: '100vw' },
-  'modern__banner': { widths: WIDTHS.wide, sizes: '100vw' },
+  'upgrade__photo': { widths: WIDTHS.content, sizes: '(max-width: 1024px) 92vw, 600px' },
 };
 
 /** srcset и sizes картинки src в месте place; null — картинка не адаптивная или место неизвестно. */
