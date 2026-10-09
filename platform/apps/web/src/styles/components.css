@@ -269,3 +269,165 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   .best-offer__drop-icon { width: 48px; height: 48px; }
   .best-offer .best-offer__form--card .best-offer__submit { padding-inline: var(--sp-4); white-space: normal; text-align: center; }
 }
+
+/* ============================================================
+   Контентный блок раздела (.cdoc, 10.2026): слева «Содержание» —
+   карточка с подсветкой текущего раздела (модуль spec-nav), справа
+   статья — белая карточка на сером фоне. Вводная панель без заголовка —
+   «коротко»: светло-зелёный блок, факты с галочками. Таблицы — карточкой
+   (без моноширинного шрифта и заглавных подписей), списки ссылок — сеткой.
+   Раньше эти стили лежали копией в блоке «Стили» каждой страницы.
+   ============================================================ */
+.cdoc {
+  --cdoc-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E");
+  background: var(--surface-muted);
+  padding: var(--section-py-base, 96px) 0;
+}
+.cdoc__layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: var(--sp-8); align-items: start; }
+/* содержание */
+.cdoc__nav {
+  position: sticky;
+  top: 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  padding: var(--sp-5) var(--sp-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  background: var(--surface-page);
+  scrollbar-width: thin;
+}
+.cdoc__nav-eyebrow { margin: 0 var(--sp-3) var(--sp-2); font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-brand); }
+.cdoc__nav-link {
+  display: block;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+.cdoc__nav-link:hover { background: var(--surface-muted); color: var(--text-primary); }
+.cdoc__nav-link.is-active { background: var(--green-50); color: var(--green-700); font-weight: var(--fw-semibold); box-shadow: inset 3px 0 0 var(--green-500); }
+.cdoc__nav-link:focus-visible { outline: 2px solid var(--green-500); outline-offset: 1px; }
+/* статья */
+.cdoc__body { min-width: 0; padding: var(--sp-2) var(--sp-12); border: 1px solid var(--border-subtle); border-radius: 18px; background: var(--surface-page); }
+.cdoc__panel { padding: var(--sp-10) 0; scroll-margin-top: 120px; }
+.cdoc__panel + .cdoc__panel { border-top: 1px solid var(--border-subtle); }
+.cdoc__panel > * + * { margin-top: var(--sp-4); }
+.cdoc__title { margin: 0; font-family: var(--font-display); font-size: clamp(22px, 2.1vw, 28px); font-weight: var(--fw-bold); line-height: 1.25; letter-spacing: var(--ls-h3); color: var(--text-primary); }
+.cdoc__panel > .cdoc__title + * { margin-top: var(--sp-5); }
+.cdoc__panel p { max-width: 78ch; margin-bottom: 0; font-size: 16px; line-height: 1.75; color: var(--text-secondary); }
+.cdoc__panel p.cdoc__lead { font-size: 17px; line-height: 1.7; color: var(--text-primary); }
+.cdoc__panel h3 { margin-bottom: 0; font-family: var(--font-display); font-size: 18px; font-weight: var(--fw-semibold); line-height: 1.35; color: var(--text-primary); }
+.cdoc__panel > h3 { margin-top: var(--sp-8); }
+.cdoc__panel strong { color: var(--text-primary); }
+/* списки — зелёная точка вместо маркера */
+.cdoc__panel ul:not(.cdoc__links) { max-width: 78ch; margin-bottom: 0; padding: 0; list-style: none; font-size: 16px; line-height: 1.7; color: var(--text-secondary); }
+.cdoc__panel ul:not(.cdoc__links) li { position: relative; padding-left: var(--sp-6); }
+.cdoc__panel ul:not(.cdoc__links) li + li { margin-top: var(--sp-2); }
+.cdoc__panel ul:not(.cdoc__links) li::before { content: ""; position: absolute; top: 0.72em; left: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--green-500); }
+/* ссылки в тексте (не кнопки, не таблицы, не список разделов) */
+.cdoc__panel :is(p, li):not(.cdoc__links li) a:not(.btn) { color: var(--text-brand); text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; }
+.cdoc__panel :is(p, li):not(.cdoc__links li) a:not(.btn):hover { color: var(--green-700); text-decoration-color: currentColor; }
+/* вводная панель без заголовка — «коротко»: факты с галочками */
+.cdoc__panel:not([id]) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3) var(--sp-8);
+  margin: var(--sp-10) 0 var(--sp-2);
+  padding: var(--sp-6) var(--sp-8);
+  border: 1px solid var(--green-100);
+  border-radius: 14px;
+  background: var(--green-50);
+}
+.cdoc__panel:not([id]) + .cdoc__panel { border-top: 0; }
+.cdoc__panel:not([id]) > * { grid-column: 1 / -1; margin: 0; max-width: none; }
+.cdoc__panel:not([id]) > p:not([class]) { grid-column: auto; position: relative; padding-left: 30px; font-size: 15px; line-height: 1.55; color: var(--text-primary); }
+/* галочка: зелёный кружок и белая галочка поверх */
+.cdoc__panel:not([id]) > p:not([class])::before { content: ""; position: absolute; top: 1px; left: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--green-500); }
+.cdoc__panel:not([id]) > p:not([class])::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  -webkit-mask: var(--cdoc-check) center / 12px no-repeat;
+  mask: var(--cdoc-check) center / 12px no-repeat;
+}
+.cdoc__panel:not([id]) > .cdoc__lead { padding-bottom: var(--sp-2); }
+/* таблицы — карточкой */
+.cdoc__scroll { overflow-x: auto; max-width: 100%; border: 1px solid var(--border-subtle); border-radius: 12px; }
+.cdoc .spec-table { width: 100%; min-width: 560px; margin: 0; border-collapse: collapse; table-layout: auto; }
+/* общие правила .spec-table (site.css: ширина подписи 64%, раскладка fixed, перенос по буквам, «зебра», моноширинные значения) — здесь не нужны */
+.cdoc .spec-table tr > :is(th, td) { width: auto; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); background: none; font-family: var(--font-body); font-size: 14px; line-height: 1.5; text-align: left; vertical-align: top; white-space: normal; overflow-wrap: normal; }
+.cdoc .spec-table tbody tr:last-child > * { border-bottom: 0; }
+.cdoc .spec-table thead th { background: var(--surface-muted); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: 0; text-transform: none; color: var(--text-tertiary); }
+.cdoc .spec-table tbody th { width: auto; font-weight: var(--fw-semibold); color: var(--text-primary); }
+.cdoc .spec-table tbody td { font-weight: var(--fw-regular); color: var(--text-secondary); }
+/* таблица «параметр — значение»: подпись слева, значение — жирнее */
+.cdoc .spec-table tbody th:first-child:nth-last-child(2) { width: 45%; font-weight: var(--fw-regular); color: var(--text-secondary); }
+.cdoc .spec-table tbody th:first-child:nth-last-child(2) + td { font-weight: var(--fw-semibold); color: var(--text-primary); }
+.cdoc .spec-table tbody tr { transition: background-color var(--duration-fast) var(--ease-out); }
+.cdoc .spec-table tbody tr:hover { background: var(--green-50); }
+.cdoc .spec-table a { font-family: var(--font-display); font-weight: var(--fw-bold); color: var(--text-brand); text-decoration: none; }
+.cdoc .spec-table a:hover { color: var(--green-700); }
+/* список ссылок на разделы — сеткой со стрелками */
+.cdoc__links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2) var(--sp-4); margin: 0; padding: 0; list-style: none; }
+.cdoc__links li { margin: 0; }
+.cdoc__links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  height: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--surface-page);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.35;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+}
+.cdoc__links a::after {
+  content: "";
+  flex-shrink: 0;
+  width: 14px;
+  height: 12px;
+  background-color: var(--green-600);
+  -webkit-mask: var(--icon-arrow) center / contain no-repeat;
+  mask: var(--icon-arrow) center / contain no-repeat;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.cdoc__links a:hover { border-color: var(--green-500); background: var(--green-50); color: var(--green-700); }
+.cdoc__links a:hover::after { transform: translateX(3px); }
+/* кнопки в конце раздела */
+.cdoc__panel .cdoc__actions,
+.cdoc__panel .spec__cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+@media (max-width: 1024px) {
+  .cdoc__layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); }
+  /* содержание — лента кнопок с прокруткой */
+  .cdoc__nav { position: static; flex-direction: row; gap: var(--sp-2); max-height: none; overflow-x: auto; padding: var(--sp-3); scrollbar-width: none; }
+  .cdoc__nav::-webkit-scrollbar { display: none; }
+  .cdoc__nav-eyebrow { display: none; }
+  .cdoc__nav-link { flex-shrink: 0; max-width: 260px; border: 1px solid var(--border-subtle); }
+  .cdoc__body { padding: var(--sp-2) var(--sp-8); }
+}
+@media (max-width: 640px) {
+  .cdoc { padding: var(--sp-12) 0; }
+  .cdoc__body { padding: 0 var(--sp-5); border-radius: 14px; }
+  .cdoc__panel { padding: var(--sp-8) 0; }
+  .cdoc__panel:not([id]) { grid-template-columns: 1fr; margin-top: var(--sp-5); padding: var(--sp-5); }
+  .cdoc__panel p,
+  .cdoc__panel ul:not(.cdoc__links) { font-size: 15px; }
+  .cdoc__links { grid-template-columns: 1fr; }
+}
