@@ -293,6 +293,94 @@ export const catalogCardsBlock = z
   })
   .describe('Карточки каталога (из данных)');
 
+// ── Склад ─────────────────────────────────────────────────────────────────
+
+/** Раздел склада: оборудование или запчасти и расходники. */
+export const STOCK_KINDS = ['equipment', 'parts'] as const;
+export type StockKind = (typeof STOCK_KINDS)[number];
+
+/** Тип позиций склада — карточка в блоке склада на главной (собирает контент-сервис). */
+export const stockGroupView = z.object({
+  key: z.string(),
+  kind: z.enum(STOCK_KINDS),
+  title: z.string(),
+  image: z.string().optional(),
+  /** позиций этого типа на сайте */
+  count: z.number().int(),
+});
+export type StockGroupView = z.infer<typeof stockGroupView>;
+
+/** Позиция склада в сетке /nalichie/: поля позиции, недостающее — из карточки товара в каталоге. */
+export const stockItemView = z.object({
+  /** тип (ключ StockGroupView) */
+  group: z.string(),
+  /** страница товара или раздела; пусто — без ссылки */
+  href: z.string(),
+  title: z.string(),
+  titleNote: z.string().optional(),
+  image: z.object({ src: z.string(), alt: z.string(), attrs: z.record(z.string(), z.string()).optional() }).optional(),
+  /** плашка на обложке из каталога («Сталь / чугун») */
+  badge: z.string().optional(),
+  origin: z.string().optional(),
+  caption: z.string().optional(),
+  specs: z.array(z.object({ label: z.string(), value: z.string() })),
+  qty: z.number().int().optional(),
+  shipping: z.string().optional(),
+  /** фото со склада */
+  photos: z.array(z.object({ src: z.string(), alt: z.string() })),
+});
+export type StockItemView = z.infer<typeof stockItemView>;
+
+/**
+ * Склад на главной: вкладки «Оборудование» / «Запчасти и расходники»,
+ * карусель карточек типов (фото, название, «Смотреть позиции» — на страницу
+ * склада с фильтром по типу), строка о сроках отгрузки и ссылка на весь склад.
+ * Карточки — из раздела админки «Наличие на складе» (собирает контент-сервис):
+ * тип без позиций не показывается.
+ */
+export const stockShowcaseBlock = z
+  .object({
+    type: z.literal('stockShowcase'),
+    head: sectionHead,
+    tabs: z
+      .object({
+        equipment: inline('Вкладка «Оборудование»').default('Оборудование'),
+        parts: inline('Вкладка «Запчасти»').default('Запчасти и расходники'),
+      })
+      .describe('Вкладки'),
+    cardNote: inline('Подпись в карточке под названием').default('Складские позиции'),
+    cardLink: inline('Ссылка в карточке').default('Смотреть позиции'),
+    listHref: href('Страница склада (карточка ведёт туда с фильтром по своему типу)').default('/nalichie/'),
+    note: z
+      .object({ title: inline('Заголовок'), text: inline('Пояснение').optional() })
+      .optional()
+      .describe('Строка под карточками (сроки отгрузки)'),
+    more: z.object({ label: inline('Подпись'), href: href() }).optional().describe('Ссылка справа под карточками'),
+    attrs: attrs(),
+    /** заполняет контент-сервис при выводе страницы */
+    groups: z.array(stockGroupView).optional().meta({ hidden: true }),
+  })
+  .describe('Склад: типы оборудования (вкладки и карусель)');
+
+/**
+ * Склад на /nalichie/: кнопки-фильтры по типам и карточки позиций — фото
+ * (на весь экран — значком справа вверху), фото со склада, характеристики,
+ * «Запросить цену». В заголовке {count} заменяется числом позиций
+ * («12 позиций»), при фильтре число меняется.
+ */
+export const stockListBlock = z
+  .object({
+    type: z.literal('stockList'),
+    head: sectionHead.optional(),
+    allLabel: inline('Кнопка фильтра «все позиции»').default('Все'),
+    empty: inline('Текст, когда позиций нет').default('Сейчас отдельных позиций в&nbsp;списке нет — напишите, какое оборудование нужно, уточним наличие и&nbsp;сроки.'),
+    attrs: attrs(),
+    /** заполняет контент-сервис при выводе страницы */
+    groups: z.array(stockGroupView).optional().meta({ hidden: true }),
+    items: z.array(stockItemView).optional().meta({ hidden: true }),
+  })
+  .describe('Склад: позиции в наличии (фильтр и карточки)');
+
 export const categoryHeroBlock = z
   .object({
     type: z.literal('categoryHero'),
@@ -543,6 +631,8 @@ export const block: z.ZodType<Block> = z.lazy(() =>
     lightboxBlock,
     catalogListBlock,
     catalogCardsBlock,
+    stockShowcaseBlock,
+    stockListBlock,
     categoryHeroBlock,
     faqBlock,
     statsBlock,
@@ -572,6 +662,8 @@ export type ProductSpecBlock = z.infer<typeof productSpecBlock>;
 export type LightboxBlock = z.infer<typeof lightboxBlock>;
 export type CatalogListBlock = z.infer<typeof catalogListBlock>;
 export type CatalogCardsBlock = z.infer<typeof catalogCardsBlock>;
+export type StockShowcaseBlock = z.infer<typeof stockShowcaseBlock>;
+export type StockListBlock = z.infer<typeof stockListBlock>;
 export type CategoryHeroBlock = z.infer<typeof categoryHeroBlock>;
 export type FaqBlock = z.infer<typeof faqBlock>;
 export type StatsBlock = z.infer<typeof statsBlock>;
@@ -601,6 +693,8 @@ export type Block =
   | LightboxBlock
   | CatalogListBlock
   | CatalogCardsBlock
+  | StockShowcaseBlock
+  | StockListBlock
   | CategoryHeroBlock
   | FaqBlock
   | StatsBlock
@@ -633,6 +727,8 @@ export const BLOCK_SCHEMAS: Record<BlockType, z.ZodType> = {
   lightbox: lightboxBlock,
   catalogList: catalogListBlock,
   catalogCards: catalogCardsBlock,
+  stockShowcase: stockShowcaseBlock,
+  stockList: stockListBlock,
   categoryHero: categoryHeroBlock,
   faq: faqBlock,
   stats: statsBlock,
@@ -664,6 +760,8 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   lightbox: 'Просмотр фото',
   catalogList: 'Товары (карточки)',
   catalogCards: 'Карточки каталога',
+  stockShowcase: 'Склад: типы оборудования',
+  stockList: 'Склад: позиции в наличии',
   categoryHero: 'Обложка раздела',
   faq: 'Частые вопросы',
   stats: 'Показатели',

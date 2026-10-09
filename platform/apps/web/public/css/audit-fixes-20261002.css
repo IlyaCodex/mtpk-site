@@ -60,7 +60,6 @@ body .header-quick-form a:focus-visible { outline: 2px solid #267221; outline-of
   body .header .header__brand img { width: 100%; max-width: 150px; height: auto; max-height: 42px; object-fit: contain; }
   body .header .header__actions { flex: 0 0 auto; gap: 8px; }
   body .cases__head-btn { max-width: 100%; min-width: 0; white-space: normal; padding-inline: 12px; }
-  body .stock-aspect__list li { flex-wrap: wrap; }
   body .scope__grid { grid-template-columns: minmax(0, 1fr); padding-left: 0; }
   body .scope-item { min-width: 0; padding-inline: 12px; gap: 12px; }
   body .scope-item__text { min-width: 0; overflow-wrap: anywhere; }

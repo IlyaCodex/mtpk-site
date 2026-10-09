@@ -1,7 +1,8 @@
 /* ============================================================
    stock.css — стили подсистемы «В наличии на складе».
    Глобальные стили (подключаются на всех страницах), нужны на:
-     - /nalichie/ — листинг карточек (.pcard через JS-рендер)
+     - /nalichie/ — карточки позиций (блок «Склад: позиции в наличии»):
+       значок «на весь экран», фото со склада, фильтр по типам
      - /products/.../ — бейдж «В наличии» поверх обложек в каталоге
    ============================================================ */
 
@@ -122,4 +123,97 @@
 @media (max-width: 767px) {
   .stock-filterbar { padding: var(--sp-3, 12px); }
   .stock-filterbar__label { font-size: 10px; }
+}
+
+/* ── Карточка позиции склада (/nalichie/) ──────────────────────
+   Справа вверху — значок «на весь экран» (фото карточки и фото со
+   склада листаются в просмотре), под фото — миниатюры «Фото со
+   склада»: подтверждение, что позиция действительно в наличии. */
+.stock-card { position: relative; }
+.pcard__zoom {
+  position: absolute;
+  top: var(--sp-3, 12px);
+  right: var(--sp-3, 12px);
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--text-primary, #14211f);
+  box-shadow: 0 2px 8px rgba(16, 31, 38, 0.18);
+  cursor: zoom-in;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.pcard__zoom svg { width: 18px; height: 18px; }
+.pcard__zoom:hover { background: var(--green-600, #3C8E33); color: #fff; }
+.pcard__zoom:focus-visible,
+.pcard__photo:focus-visible { outline: 2px solid var(--green-500, #4CAF50); outline-offset: 2px; }
+.pcard__photos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3, 12px);
+  padding: var(--sp-3, 12px) var(--sp-5, 20px);
+  background: var(--surface-subtle, #f6f8f9);
+  border-bottom: 1px solid var(--border-subtle, #e6eaee);
+}
+.pcard__photos-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display, "Inter", sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--green-700, #2D7A2B);
+  white-space: nowrap;
+}
+.pcard__photos-label svg { width: 16px; height: 16px; flex-shrink: 0; }
+.pcard__photos-list { display: flex; gap: 6px; min-width: 0; }
+.pcard__photo {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 52px;
+  height: 40px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle, #e6eaee);
+  border-radius: 2px;
+  background: var(--surface-muted, #eef2f1);
+  cursor: zoom-in;
+}
+.pcard__photo[hidden] { display: none; }
+.pcard__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pcard__photo:hover { border-color: var(--green-500, #4CAF50); }
+/* «+N» — сколько ещё фото откроется в просмотре */
+.pcard__photo[data-more]::after {
+  content: attr(data-more);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(16, 31, 38, 0.6);
+  color: #fff;
+  font-family: var(--font-display, "Inter", sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+}
+/* позиций нет */
+.stock-list__empty {
+  padding: var(--sp-10, 40px) var(--sp-6, 24px);
+  text-align: center;
+  background: var(--surface-subtle, #f6f8f9);
+  border: 1px dashed var(--border-default, #d5dde2);
+}
+.stock-list__empty p { max-width: 56ch; margin: 0 auto var(--sp-5, 20px); color: var(--text-secondary, #4a5862); line-height: 1.6; }
+@media (max-width: 400px) {
+  .pcard__photos { flex-direction: column; align-items: flex-start; gap: var(--sp-2, 8px); }
 }

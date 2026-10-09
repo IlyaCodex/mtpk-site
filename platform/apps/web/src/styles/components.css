@@ -93,3 +93,31 @@ html[data-btn-color] :is(.btn--primary, .btn--green, .btn--cta, .form__submit, .
 html[data-btn-outline] .btn--secondary { color: var(--design-outline); border-color: var(--design-outline); }
 html[data-btn-outline] .btn--secondary:hover { background-color: var(--design-outline-soft); }
 html[data-theme="dark"][data-btn-outline] .btn--secondary { color: var(--design-outline-dark); border-color: var(--design-outline-dark); }
+
+/* ============================================================
+   Просмотр фото на весь экран (модуль lightbox): на любой странице —
+   сетка фото с увеличением, карточки склада. У страниц товара те же
+   правила есть в шаблоне (tovar-*.css).
+   ============================================================ */
+.lightbox { position: fixed; inset: 0; z-index: 2000; background: rgba(15, 23, 28, 0.95); display: none; align-items: center; justify-content: center; padding: var(--sp-8); animation: lb-fade 200ms var(--ease-out, ease); }
+.lightbox.is-open { display: flex; }
+@keyframes lb-fade { from { opacity: 0 } to { opacity: 1 } }
+.lightbox__img { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4); }
+.lightbox__btn { position: absolute; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); cursor: pointer; color: white; width: 56px; height: 56px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; transition: background var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out); padding: 0; }
+.lightbox__btn:hover { background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.3); }
+.lightbox__btn svg { width: 24px; height: 24px; }
+.lightbox__close { top: var(--sp-6); right: var(--sp-6); }
+.lightbox__prev { left: var(--sp-6); top: 50%; transform: translateY(-50%); }
+.lightbox__next { right: var(--sp-6); top: 50%; transform: translateY(-50%); }
+.lightbox__counter { position: absolute; bottom: var(--sp-6); left: 50%; transform: translateX(-50%); color: rgba(255, 255, 255, 0.85); font-family: var(--font-display); font-size: var(--fs-small); letter-spacing: 0.05em; background: rgba(0, 0, 0, 0.4); padding: var(--sp-2) var(--sp-4); border-radius: 999px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+/* набор из одного кадра (карточка склада без фото со склада): без стрелок и счётчика */
+.lightbox.is-single :is(.lightbox__prev, .lightbox__next, .lightbox__counter) { display: none; }
+@media (max-width: 700px) {
+  .lightbox { padding: var(--sp-4); }
+  .lightbox__btn { width: 44px; height: 44px; }
+  .lightbox__btn svg { width: 20px; height: 20px; }
+  .lightbox__close { top: var(--sp-3); right: var(--sp-3); }
+  .lightbox__prev { left: var(--sp-3); }
+  .lightbox__next { right: var(--sp-3); }
+  .lightbox__counter { bottom: var(--sp-3); }
+}

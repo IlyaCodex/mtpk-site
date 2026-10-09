@@ -45,6 +45,7 @@ export type {
   Redirect,
   SearchDocument,
   Setting,
+  StockGroup,
   StockItem,
   StyleBlock,
   User,

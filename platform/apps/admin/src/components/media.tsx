@@ -21,6 +21,15 @@ const TRANSLIT: Record<string, string> = {
   а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p',
   р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'c', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
 };
+/** Метка для адреса из названия: «Литейные смесители» → liteynye-smesiteli. */
+export function slugify(text: string): string {
+  return [...text.toLowerCase()]
+    .map((c) => TRANSLIT[c] ?? c)
+    .join('')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export function safeFileName(name: string): string {
   const dot = name.lastIndexOf('.');
   const base = (dot > 0 ? name.slice(0, dot) : name).toLowerCase();

@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { CONTENT_STREAM, isAuthorized, publishEvent, type Logger, type Redis, type ZodTypeProvider } from '@mtpk/shared';
-import { classifyStyleBlock, detectTemplate, normalizePath } from '@mtpk/content-kit';
+import { classifyStyleBlock, detectTemplate, hasStockBlocks, normalizePath, resolveStockBlocks } from '@mtpk/content-kit';
 import { sectionParts } from '@mtpk/content-kit/section';
 import { cssFileRecord } from '@mtpk/content-kit/styles';
 import { formatHtml } from '@mtpk/content-kit/format-html';
@@ -123,18 +123,54 @@ const redirectInput = z.object({
   comment: z.string().max(500).optional(),
 });
 
-const stockInput = z.array(
-  z.object({
-    url: z.string().min(1).describe('Адрес страницы товара'),
-    qty: z.number().int().nullable().optional(),
-    shipping: z.string().nullable().optional().describe('Срок отгрузки'),
-    note: z.string().nullable().optional(),
-    title: z.string().nullable().optional(),
-    image: z.string().nullable().optional(),
-    specs: z.array(z.tuple([z.string(), z.string()])).nullable().optional(),
-    extra: z.record(z.string(), z.unknown()).optional().describe('Прочие поля позиции (сохраняются как есть)'),
-  }),
-);
+const stockInput = z
+  .object({
+    groups: z
+      .array(
+        z.object({
+          key: z
+            .string()
+            .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'метка типа — латиница, цифры и дефисы')
+            .max(80)
+            .describe('Метка в адресе фильтра /nalichie/?type=…'),
+          kind: z.enum(['equipment', 'parts']).describe('Раздел: оборудование или запчасти и расходники'),
+          title: z.string().trim().min(1).max(200).describe('Название типа'),
+          image: z.string().nullable().optional().describe('Фото карточки (нет — фото первой позиции)'),
+        }),
+      )
+      .describe('Типы позиций — в порядке показа'),
+    items: z
+      .array(
+        z.object({
+          group: z.string().nullable().optional().describe('Тип (метка)'),
+          url: z.string().default('').describe('Страница товара или раздела; пусто — без ссылки'),
+          qty: z.number().int().min(0).nullable().optional(),
+          shipping: z.string().nullable().optional().describe('Срок отгрузки'),
+          note: z.string().nullable().optional().describe('Примечание для себя (на сайт не выводится)'),
+          title: z.string().nullable().optional().describe('Название (нет — из каталога)'),
+          image: z.string().nullable().optional().describe('Фото (нет — из каталога)'),
+          specs: z.array(z.tuple([z.string(), z.string()])).nullable().optional().describe('Характеристики (нет — из каталога)'),
+          photos: z
+            .array(z.object({ src: z.string().min(1), alt: z.string().default('') }))
+            .default([])
+            .describe('Фото со склада'),
+          extra: z.record(z.string(), z.unknown()).optional().describe('Прочие поля позиции (сохраняются как есть)'),
+        }),
+      )
+      .describe('Позиции — в порядке показа'),
+  })
+  .superRefine((v, ctx) => {
+    const keys = new Set<string>();
+    v.groups.forEach((g, i) => {
+      if (keys.has(g.key)) ctx.addIssue({ code: 'custom', path: ['groups', i, 'key'], message: `метка «${g.key}» уже есть у другого типа` });
+      keys.add(g.key);
+    });
+    v.items.forEach((it, i) => {
+      if (it.group && !keys.has(it.group)) ctx.addIssue({ code: 'custom', path: ['items', i, 'group'], message: `нет типа «${it.group}»` });
+      if (it.url && !it.url.startsWith('/')) ctx.addIssue({ code: 'custom', path: ['items', i, 'url'], message: 'ссылка — адрес страницы сайта: /products/…/' });
+      if (!it.url && !it.title?.trim()) ctx.addIssue({ code: 'custom', path: ['items', i, 'title'], message: 'у позиции без ссылки нужно название' });
+    });
+  });
 
 /** Служебное API для админки (через её сервер; снаружи шлюзом не открыто). */
 export async function adminRoutes(base: FastifyInstance, deps: Deps) {
@@ -146,7 +182,9 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     }
   });
 
-  const changed = async (paths: string[], kind: 'page.upserted' | 'page.deleted' = 'page.upserted') => {
+  const changed = async (changedPaths: string[], kind: 'page.upserted' | 'page.deleted' = 'page.upserted') => {
+    // товар или раздел каталога — его название и фото есть и в блоках склада (главная, /nalichie/)
+    const paths = changedPaths.some((p) => p.startsWith('/products/')) ? [...new Set([...changedPaths, ...(await store.stockPages())])] : changedPaths;
     await store.purge(paths);
     for (const path of paths) await publishEvent(redis, CONTENT_STREAM, { type: kind, path });
     await notifyWeb(paths);
@@ -446,7 +484,9 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
         return req.body.mark ? ({ ...b, [MARK]: String(i) } as unknown as Block) : b;
       });
       const page = await db.page.findUnique({ where: { path: normalizePath(req.body.path) }, select: { id: true } });
-      const resolved = page ? resolveCatalogBlocks(page, own, await store.catalog()) : own;
+      const fromCatalog = page ? resolveCatalogBlocks(page, own, await store.catalog()) : own;
+      // блоки склада — с типами и позициями из раздела «Наличие на складе»
+      const resolved = hasStockBlocks(fromCatalog) ? resolveStockBlocks(fromCatalog, await store.stockView()) : fromCatalog;
       const marks = resolved.map((b) => ((b as Record<string, unknown>)[MARK] as string | undefined) ?? null);
       const blocks = req.body.mark ? resolved.map((b) => Object.fromEntries(Object.entries(b).filter(([k]) => k !== MARK)) as Block) : resolved;
       const site = await store.siteData();
@@ -547,34 +587,72 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
   // ── Наличие на складе ──────────────────────────────────────────────────
   app.get(
     '/admin/v1/stock',
-    { schema: { tags: ['Админка: наличие'], summary: 'Позиции на складе', security: ADMIN } },
-    async () => db.stockItem.findMany({ orderBy: { position: 'asc' } }),
+    { schema: { tags: ['Админка: наличие'], summary: 'Типы и позиции склада', security: ADMIN } },
+    async () => {
+      const [groups, items] = await Promise.all([
+        db.stockGroup.findMany({ orderBy: [{ position: 'asc' }, { id: 'asc' }] }),
+        db.stockItem.findMany({ orderBy: [{ position: 'asc' }, { id: 'asc' }] }),
+      ]);
+      // как позицию покажет сайт: название и фото (свои или из каталога, со страницы запчасти)
+      const previews = await store.stockPreviews(items);
+      return {
+        groups: groups.map((g) => ({ key: g.key, kind: g.kind, title: g.title, image: g.image })),
+        items: items.map(({ groupKey, createdAt: _c, updatedAt: _u, id: _id, position: _p, ...it }, i) => ({ ...it, group: groupKey, preview: previews[i] })),
+      };
+    },
   );
   app.put(
     '/admin/v1/stock',
-    { schema: { tags: ['Админка: наличие'], summary: 'Сохранить список позиций (целиком, в порядке показа)', body: stockInput, security: ADMIN } },
+    {
+      schema: {
+        tags: ['Админка: наличие'],
+        summary: 'Сохранить склад целиком: типы и позиции (в порядке показа)',
+        body: stockInput,
+        security: ADMIN,
+      },
+    },
     async (req) => {
-      const items = req.body;
+      const { groups, items } = req.body;
+      // что видно за пределами страниц склада: бейдж «В наличии» (по адресу товара) и срок отгрузки на странице товара
+      const outside = (rows: { url: string; shipping?: string | null }[]) =>
+        rows
+          .map((r) => `${r.url.trim()}|${r.shipping?.trim() ?? ''}`)
+          .sort()
+          .join('\n');
+      const before = outside(await db.stockItem.findMany({ select: { url: true, shipping: true } }));
       await db.$transaction([
         db.stockItem.deleteMany(),
+        db.stockGroup.deleteMany(),
+        db.stockGroup.createMany({
+          data: groups.map((g, i) => ({ position: i, key: g.key, kind: g.kind, title: g.title.trim(), image: g.image?.trim() || null })),
+        }),
         db.stockItem.createMany({
           data: items.map((it, i) => ({
             position: i,
-            url: it.url,
+            groupKey: it.group || null,
+            url: it.url.trim(),
             qty: it.qty ?? null,
-            shipping: it.shipping ?? null,
-            note: it.note ?? null,
-            title: it.title ?? null,
-            image: it.image ?? null,
-            specs: it.specs ?? Prisma.DbNull,
+            shipping: it.shipping?.trim() || null,
+            note: it.note?.trim() || null,
+            title: it.title?.trim() || null,
+            image: it.image?.trim() || null,
+            specs: it.specs?.length ? it.specs : Prisma.DbNull,
+            photos: it.photos as Prisma.InputJsonValue,
             extra: (it.extra ?? {}) as Prisma.InputJsonValue,
           })),
         }),
       ]);
-      // бейджи «В наличии» есть в карточках каталога и на страницах товаров — пересобрать всё
-      await store.purge();
-      await notifyWeb('all');
-      return { ok: true, count: items.length };
+      if (outside(items) !== before) {
+        // товары или сроки поменялись — бейджи в каталоге и статус на страницах товаров: пересобрать всё
+        await store.purge();
+        await notifyWeb('all');
+      } else {
+        // поменялись только типы, фото, названия, порядок — страницы со складом (главная, /nalichie/)
+        const pages = await store.stockPages();
+        await store.purge(pages.length ? pages : ['/nalichie/']);
+        await notifyWeb(pages);
+      }
+      return { ok: true, groups: groups.length, items: items.length };
     },
   );
 

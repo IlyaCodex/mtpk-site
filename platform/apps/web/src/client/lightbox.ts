@@ -1,6 +1,8 @@
 import { $, $$, delegate } from './dom';
 import { fullImage } from './images';
 
+type Slide = { src: string; alt: string };
+
 /** Окно просмотра — та же разметка, что у блока «Просмотр фото» (packages/ui/src/blocks/Lightbox.tsx). */
 const ICON = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
 function createBox(): HTMLElement {
@@ -25,6 +27,9 @@ function createBox(): HTMLElement {
  * товара, миниатюры, фото в блоках «HTML как есть»): полный кадр из data-full.
  * Фото виджетов (сетка фото) — data-lightbox без номера: номера им даются
  * после остальных, окно просмотра создаётся, если его на странице нет.
+ * Свой набор кадров — у элемента с data-lightbox-group (карточка склада): кадры —
+ * его [data-slide], открывают их кнопка [data-lightbox-open] (с первого кадра) и
+ * сами кадры-кнопки; листаются только кадры этого набора.
  * Клавиатура (Esc, ←, →), свайп, возврат фокуса, блокировка прокрутки фона.
  */
 function initLightbox(): void {
@@ -33,23 +38,25 @@ function initLightbox(): void {
     let next = Math.max(-1, ...$$('[data-lightbox-index]').map((el) => Number.parseInt(el.dataset.lightboxIndex ?? '-1', 10) || 0)) + 1;
     for (const el of extra) el.dataset.lightboxIndex = String(next++);
   }
-  const box = document.getElementById('lightbox') ?? (extra.length ? createBox() : null);
+  const hasGroups = $$('[data-lightbox-group]').length > 0;
+  const box = document.getElementById('lightbox') ?? (extra.length || hasGroups ? createBox() : null);
   const img = $<HTMLImageElement>('.lightbox__img', box ?? document);
   if (!box || !img) return;
   const currentEl = document.getElementById('lb-current');
   const totalEl = document.getElementById('lb-total');
 
-  const slides: { src: string; alt: string }[] = [];
+  const slides: Slide[] = [];
   for (const el of $$('[data-lightbox-index]')) {
     const i = Number.parseInt(el.dataset.lightboxIndex ?? '', 10);
     const im = el.querySelector('img');
     if (Number.isNaN(i) || slides[i] || !im) continue;
     slides[i] = { src: im.dataset.full || im.getAttribute('src') || '', alt: im.alt };
   }
-  const list = slides.filter(Boolean);
-  if (!list.length) return;
-  if (totalEl) totalEl.textContent = String(list.length);
+  const pageList = slides.filter(Boolean);
+  if (!pageList.length && !hasGroups) return;
+  if (totalEl) totalEl.textContent = String(pageList.length);
 
+  let list: Slide[] = pageList;
   let index = 0;
   let lastFocused: Element | null = null;
   const isOpen = () => box.classList.contains('is-open');
@@ -59,15 +66,19 @@ function initLightbox(): void {
     img.src = fullImage(list[index].src);
     img.alt = list[index].alt;
     if (currentEl) currentEl.textContent = String(index + 1);
-    $$('.phero__thumb').forEach((t, k) => t.classList.toggle('is-active', k === index));
+    if (list === pageList) $$('.phero__thumb').forEach((t, k) => t.classList.toggle('is-active', k === index));
   };
-  const open = (i: number) => {
+  const open = (frames: Slide[], i: number) => {
+    list = frames;
+    if (totalEl) totalEl.textContent = String(list.length);
+    // у набора из одного кадра стрелки не нужны
+    box.classList.toggle('is-single', list !== pageList && list.length < 2);
     lastFocused = document.activeElement;
     show(i);
     box.classList.add('is-open');
     box.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    $<HTMLButtonElement>('.lightbox__next', box)?.focus();
+    $<HTMLButtonElement>(list.length < 2 ? '.lightbox__close' : '.lightbox__next', box)?.focus();
   };
   const close = () => {
     box.classList.remove('is-open');
@@ -79,8 +90,21 @@ function initLightbox(): void {
 
   delegate('click', '[data-lightbox-index]', (el, e) => {
     if (el.closest('.phero__thumbs.is-carousel')) return; // в карусели миниатюра переключает фото
+    if (!pageList.length) return;
     e.preventDefault();
-    open(Number.parseInt(el.dataset.lightboxIndex ?? '0', 10) || 0);
+    open(pageList, Number.parseInt(el.dataset.lightboxIndex ?? '0', 10) || 0);
+  });
+  delegate('click', '[data-lightbox-group] [data-lightbox-open], [data-lightbox-group] button[data-slide]', (el, e) => {
+    const group = el.closest<HTMLElement>('[data-lightbox-group]');
+    if (!group) return;
+    const frames = $$('[data-slide]', group).filter((f) => f.dataset.full || f.getAttribute('src'));
+    if (!frames.length) return;
+    e.preventDefault();
+    const at = el.hasAttribute('data-slide') ? Math.max(0, frames.indexOf(el)) : 0;
+    open(
+      frames.map((f) => ({ src: f.dataset.full || f.getAttribute('src') || '', alt: f.dataset.alt ?? f.getAttribute('alt') ?? '' })),
+      at,
+    );
   });
   $('.lightbox__close', box)?.addEventListener('click', close);
   $('.lightbox__prev', box)?.addEventListener('click', () => show(index - 1));

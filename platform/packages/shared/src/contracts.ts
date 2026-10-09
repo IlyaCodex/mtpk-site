@@ -71,7 +71,6 @@ export interface StockItemDto {
   qty?: number;
   shipping?: string;
   specs?: [string, string][];
-  card_html?: string;
   [extra: string]: unknown;
 }
 

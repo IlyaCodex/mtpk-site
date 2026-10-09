@@ -35,6 +35,7 @@ const ENTRIES: Record<string, string> = {
   'spec-nav': 'src/client/spec-nav.ts',
   'catalog-filter': 'src/client/catalog-filter.ts',
   carousel: 'src/client/carousel.ts',
+  stock: 'src/client/stock.ts',
 };
 
 /**

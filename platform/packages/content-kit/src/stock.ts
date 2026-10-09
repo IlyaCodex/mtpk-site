@@ -1,8 +1,12 @@
 /**
- * «Наличие на складе»: позиции склада с карточками товаров. Формат
- * /data/stock.json — его читают stock-list.js, stock-badges.js и
- * stock-product.js.
+ * «Наличие на складе». Две выдачи из одних позиций (админка «Наличие на складе»):
+ *  - /data/stock.json — адреса товаров на складе для старых скриптов
+ *    (stock-badges.js: бейдж «В наличии» на карточках в блоках «HTML как есть»);
+ *  - склад для блоков сайта (resolveStockView): типы — карточки на главной,
+ *    позиции — карточки на /nalichie/.
  */
+import type { Block, StockGroupView, StockItemView, StockKind } from '@mtpk/content-model';
+import type { CatalogData } from './catalog.ts';
 
 export interface StockConfigItem {
   url: string;
@@ -67,34 +71,6 @@ export function pickStockCategory(html: string): string {
   return '';
 }
 
-/**
- * Готовая карточка <article class="pcard…"> из родительской категории: на
- * /nalichie/ показываем ровно то, что человек видит в каталоге.
- */
-export function extractCatalogCard(productUrl: string, lookup: PageLookup): string | null {
-  const parts = productUrl.replace(/^\/+|\/+$/g, '').split('/');
-  if (parts.length < 3) return null;
-  const parentParts = parts.slice(0, -1);
-  const parent = lookup(`/${parentParts.join('/')}/`);
-  if (!parent) return null;
-  const parentHtml = parent.body;
-  const needle = productUrl.replace(/\/$/, '');
-  const lastSeg = parentParts.length ? parts[parts.length - 1] : '';
-  let i = 0;
-  while (i < parentHtml.length) {
-    const open = parentHtml.indexOf('<article class="pcard', i);
-    if (open < 0) return null;
-    const close = parentHtml.indexOf('</article>', open);
-    if (close < 0) return null;
-    const block = parentHtml.slice(open, close + '</article>'.length);
-    const absMatch = block.includes(`href="${productUrl}"`) || block.includes(`href="${needle}"`) || block.includes(`href="${needle}/"`);
-    const relMatch = lastSeg && (block.includes(`href="${lastSeg}/"`) || block.includes(`href="${lastSeg}"`));
-    if (absMatch || relMatch) return block;
-    i = close + '</article>'.length;
-  }
-  return null;
-}
-
 export interface StockResolveResult {
   items: Record<string, unknown>[];
   warnings: string[];
@@ -126,8 +102,6 @@ export function resolveStock(config: StockConfigItem[], lookup: PageLookup): Sto
       category: pickStockCategory(html),
       image: pickStockImage(html) || null,
     };
-    const card = extractCatalogCard(url, lookup);
-    if (card) out.cardHtml = card;
     if (it.qty != null) out.qty = it.qty;
     if (it.shipping) out.shipping = it.shipping;
     if (it.note) out.note = it.note;
@@ -137,4 +111,149 @@ export function resolveStock(config: StockConfigItem[], lookup: PageLookup): Sto
     items.push(out);
   }
   return { items, warnings };
+}
+
+// ── Склад для блоков сайта (типы и позиции из админки «Наличие на складе») ──
+
+/** Тип позиций в базе (content.stock_groups). */
+export interface StockGroupRow {
+  key: string;
+  kind: string;
+  title: string;
+  image: string | null;
+}
+
+/** Позиция в базе (content.stock_items). */
+export interface StockItemRow {
+  groupKey: string | null;
+  url: string;
+  title: string | null;
+  image: string | null;
+  specs: unknown;
+  photos: unknown;
+  qty: number | null;
+  shipping: string | null;
+}
+
+export interface StockView {
+  groups: StockGroupView[];
+  items: StockItemView[];
+}
+
+const kindOf = (k: string): StockKind => (k === 'parts' ? 'parts' : 'equipment');
+
+/**
+ * Простой текст из админки (название, характеристики, срок) → HTML для сайта:
+ * спецсимволы экранированы, после предлогов и союзов — неразрывный пробел
+ * («нагреватели и&nbsp;печи»), как в остальных текстах сайта.
+ */
+export function textHtml(text: string): string {
+  return text
+    .trim()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/(?<=^|[\s(«])([а-яё]{1,2}|для|без|под|над|при|про|или)\s+/giu, '$1&nbsp;');
+}
+const pathOf = (url: string) => (url.trim() ? url.trim().replace(/[?#].*$/, '').replace(/\/?$/, '/') : '');
+
+/** Фото со склада из JSON-поля: [{ src, alt }]. */
+function photosOf(raw: unknown): StockItemView['photos'] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((p) => {
+    const src = typeof p === 'string' ? p : (p as { src?: unknown })?.src;
+    if (typeof src !== 'string' || !/^(\/|https?:\/\/)/.test(src.trim())) return [];
+    const alt = typeof p === 'object' && typeof (p as { alt?: unknown }).alt === 'string' ? (p as { alt: string }).alt : '';
+    return [{ src: src.trim(), alt }];
+  });
+}
+
+/** Характеристики позиции из JSON-поля: [название, значение][]. */
+function specsOf(raw: unknown): StockItemView['specs'] | null {
+  if (!Array.isArray(raw) || !raw.length) return null;
+  const rows = raw.flatMap((s) => (Array.isArray(s) && s.length >= 2 && String(s[0]).trim() ? [{ label: textHtml(String(s[0])), value: textHtml(String(s[1])) }] : []));
+  return rows.length ? rows : null;
+}
+
+/**
+ * Склад для блоков сайта: позиции по типам — в порядке типов, внутри типа — в
+ * порядке позиций. Чего нет у позиции (название, фото, характеристики,
+ * плашка), берётся из карточки товара или раздела каталога, на который она
+ * ссылается; ссылка на черновик каталога не выводится. Тип без позиций на
+ * сайте не показывается, фото типа по умолчанию — фото его первой позиции.
+ * Позиции без типа видны только в общем списке. Страница не из таблиц
+ * каталога (запчасти) даёт название и фото со своей разметки — pages.
+ */
+export function resolveStockView(
+  groups: StockGroupRow[],
+  items: StockItemRow[],
+  catalog: CatalogData,
+  pages: (path: string) => { title?: string; image?: string | null } | undefined = () => undefined,
+): StockView {
+  const order = new Map(groups.map((g, i) => [g.key, i]));
+  const sorted = items
+    .map((it, i) => ({ it, i }))
+    .sort((a, b) => (order.get(a.it.groupKey ?? '') ?? groups.length) - (order.get(b.it.groupKey ?? '') ?? groups.length) || a.i - b.i)
+    .map(({ it }) => it);
+
+  const views: StockItemView[] = sorted.map((it) => {
+    const path = pathOf(it.url);
+    const product = path ? catalog.products.find((p) => p.path === path) : undefined;
+    const section = path && !product ? (catalog.subcategories.find((s) => s.path === path) ?? catalog.categories.find((c) => c.path === path)) : undefined;
+    const source = product ?? section;
+    const page = path && !source ? pages(path) : undefined;
+    // своё название и название со страницы — простой текст, у каталога — уже HTML
+    const own = it.title?.trim();
+    const title = own ? textHtml(own) : source?.name || (page?.title ? textHtml(page.title) : 'Позиция на&nbsp;складе');
+    const alt = own || page?.title || title.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
+    const cover = it.image?.trim() || source?.cover || page?.image || '';
+    const specs = specsOf(it.specs) ?? product?.specs ?? [];
+    return {
+      group: it.groupKey && order.has(it.groupKey) ? it.groupKey : '',
+      href: source && source.status !== 'published' ? '' : path,
+      title,
+      ...(!it.title?.trim() && product?.nameNote ? { titleNote: product.nameNote } : {}),
+      ...(cover
+        ? {
+            image: {
+              src: cover,
+              alt: it.image?.trim() || !source ? alt : source.coverAlt,
+              ...(!it.image?.trim() && source && Object.keys(source.coverAttrs).length ? { attrs: source.coverAttrs } : {}),
+            },
+          }
+        : {}),
+      ...(product?.badge ? { badge: product.badge } : {}),
+      ...(product?.origin ? { origin: product.origin } : {}),
+      ...(product?.caption ? { caption: product.caption } : {}),
+      specs,
+      ...(it.qty != null ? { qty: it.qty } : {}),
+      ...(it.shipping?.trim() ? { shipping: textHtml(it.shipping) } : {}),
+      photos: photosOf(it.photos),
+    };
+  });
+
+  const out: StockGroupView[] = groups.flatMap((g) => {
+    const own = views.filter((v) => v.group === g.key);
+    if (!own.length) return [];
+    const image = g.image?.trim() || own.find((v) => v.image)?.image?.src;
+    return [{ key: g.key, kind: kindOf(g.kind), title: textHtml(g.title), ...(image ? { image } : {}), count: own.length }];
+  });
+  return { groups: out, items: views };
+}
+
+/** Есть ли на странице блоки склада (им нужны данные склада). */
+export function hasStockBlocks(blocks: Block[]): boolean {
+  return blocks.some((b) => b.type === 'stockShowcase' || b.type === 'stockList' || (b.type === 'container' && hasStockBlocks(b.children)));
+}
+
+/** Блоки склада получают типы и позиции (как карточки каталога — данные каталога). */
+export function resolveStockBlocks(blocks: Block[], view: StockView): Block[] {
+  const resolve = (b: Block): Block => {
+    if (b.type === 'container') return { ...b, children: b.children.map(resolve) };
+    if (b.type === 'stockShowcase') return { ...b, groups: view.groups };
+    if (b.type === 'stockList') return { ...b, groups: view.groups, items: view.items };
+    return b;
+  };
+  return blocks.map(resolve);
 }

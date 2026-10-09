@@ -17,6 +17,7 @@ import { Partner } from './Partner.tsx';
 import { ProductHero } from './ProductHero.tsx';
 import { ProductSpec } from './ProductSpec.tsx';
 import { Container, Faq, ScriptLink, Stats, StyleLink } from './Simple.tsx';
+import { StockList, StockShowcase } from './Stock.tsx';
 import { Carousel, Cta, Features, Gallery, Marquee, RichText, Spacer, Video } from './Widgets.tsx';
 import { WhyUs } from './WhyUs.tsx';
 
@@ -69,6 +70,10 @@ export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) 
       return <CatalogList block={block} ctx={ctx} />;
     case 'catalogCards':
       return <CatalogCards block={block} ctx={ctx} />;
+    case 'stockShowcase':
+      return <StockShowcase block={block} ctx={ctx} />;
+    case 'stockList':
+      return <StockList block={block} ctx={ctx} />;
     case 'categoryHero':
       return <CategoryHero block={block} />;
     case 'faq':

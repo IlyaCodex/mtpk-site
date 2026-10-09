@@ -23,7 +23,7 @@ const move = <T,>(list: T[], from: number, to: number): T[] => {
  * Галерея фото товара: сетка карточек. Первое фото — главное. Порядок —
  * перетаскиванием или стрелками; фото добавляются загрузкой с компьютера
  * (кнопкой или перетаскиванием файлов на галерею) и выбором из медиатеки.
- * Новые файлы кладутся в папку товара: img/products/<адрес>/.
+ * Новые файлы кладутся в папку товара: img/products/<адрес>/ (или в folder).
  * Фото виджетов (сетка, карусель): primary=false — без «главного» и
  * миниатюры, fields — подпись и ссылка под каждым фото.
  */
@@ -33,15 +33,18 @@ export function GalleryField({
   label,
   primary = true,
   fields = [],
+  folder: ownFolder,
 }: {
   value: Photo[];
   onChange: (v: Photo[]) => void;
   label?: string;
   primary?: boolean;
   fields?: PhotoField[];
+  /** папка медиатеки для загрузок (по умолчанию — папка страницы) */
+  folder?: string;
 }) {
   const { pagePath } = useEditorContext();
-  const folder = uploadFolderFor(pagePath);
+  const folder = ownFolder ?? uploadFolderFor(pagePath);
   const [picking, setPicking] = useState(false);
   const [uploading, setUploading] = useState(0);
   const [dragFrom, setDragFrom] = useState<number | null>(null);

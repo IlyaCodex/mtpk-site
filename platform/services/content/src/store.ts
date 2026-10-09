@@ -1,4 +1,15 @@
-import { buildCompareIndex, resolveStock, type StockConfigItem } from '@mtpk/content-kit';
+import {
+  buildCompareIndex,
+  hasStockBlocks,
+  pickStockImage,
+  pickStockTitle,
+  resolveStock,
+  resolveStockBlocks,
+  resolveStockView,
+  type StockConfigItem,
+  type StockItemRow,
+  type StockView,
+} from '@mtpk/content-kit';
 import { resolveCatalogBlocks, type CatalogData } from '@mtpk/content-kit/catalog';
 import { darkVars } from '@mtpk/content-kit/dark';
 import { styleFileCss } from '@mtpk/content-kit/styles';
@@ -15,6 +26,12 @@ type Cached<T> = T | typeof MISSING;
 /** Блоки страницы для вывода: карточки — из каталога, у товара — общие блоки его категории. */
 function withCatalog<T extends { id: number; blocks: unknown }>(row: T, data: CatalogData): T {
   return { ...row, blocks: resolveCatalogBlocks(row, row.blocks as Block[], data) };
+}
+
+/** То же плюс склад: блоки склада получают типы и позиции. */
+function withData<T extends { id: number; blocks: unknown }>(row: T, data: CatalogData, stock: StockView | null): T {
+  const out = withCatalog(row, data);
+  return stock ? { ...out, blocks: resolveStockBlocks(out.blocks as Block[], stock) } : out;
 }
 
 /**
@@ -63,7 +80,7 @@ export class ContentStore {
       await this.cache.set(key, MISSING, 60);
       return null;
     }
-    const dto = renderPage(withCatalog(row, await this.catalog()), await this.styleMap(), this.site);
+    const dto = renderPage(await this.pageData(row), await this.styleMap(), this.site);
     await this.cache.set(key, dto, this.ttl);
     return dto;
   }
@@ -101,9 +118,56 @@ export class ContentStore {
     return css;
   }
 
+  /** Блоки страницы с данными каталога и (если на ней есть блоки склада) склада. */
+  async pageData<T extends { id: number; blocks: unknown }>(row: T, catalog?: CatalogData): Promise<T> {
+    const stock = hasStockBlocks(row.blocks as Block[]) ? await this.stockView() : null;
+    return withData(row, catalog ?? (await this.catalog()), stock);
+  }
+
+  /**
+   * Склад для блоков сайта: типы и позиции из раздела админки «Наличие на
+   * складе», недостающее у позиций (название, фото, характеристики) — из
+   * каталога. Тип без позиций не показывается.
+   */
+  async stockView(): Promise<StockView> {
+    return this.cache.wrap('stock-view', this.ttl, async () => {
+      const [groups, items] = await Promise.all([
+        this.db.stockGroup.findMany({ orderBy: [{ position: 'asc' }, { id: 'asc' }] }),
+        this.db.stockItem.findMany({ orderBy: [{ position: 'asc' }, { id: 'asc' }] }),
+      ]);
+      // страницы не из таблиц каталога (запчасти): название и фото — с их разметки
+      const { pages } = await this.stockSource();
+      return resolveStockView(groups, items, await this.catalog(), (path) => pages[path]);
+    });
+  }
+
+  /** Название (простым текстом) и фото позиций — как их покажет сайт, в порядке позиций (список в админке). */
+  async stockPreviews(items: StockItemRow[]): Promise<{ title: string; image: string | null }[]> {
+    const { pages } = await this.stockSource();
+    // без типов порядок позиций сохраняется
+    const { items: views } = resolveStockView([], items, await this.catalog(), (path) => pages[path]);
+    return views.map((v) => ({
+      title: v.title.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&'),
+      image: v.image?.src ?? null,
+    }));
+  }
+
+  /** Страницы с блоками склада: в их карточках названия и фото товаров — кеш сбрасывается и при правке каталога. */
+  async stockPages(): Promise<string[]> {
+    return this.cache.wrap('stock-pages', this.ttl, async () => {
+      const rows = await this.db.$queryRaw<{ path: string }[]>`SELECT path FROM content.pages WHERE blocks::text LIKE '%"stockShowcase"%' OR blocks::text LIKE '%"stockList"%'`;
+      return rows.map((r) => r.path);
+    });
+  }
+
   /** /data/stock.json — тот же формат, что писал build-stock.mjs. */
   async stock(): Promise<Record<string, unknown>> {
-    return this.cache.wrap('stock', this.ttl, async () => {
+    return (await this.stockSource()).json;
+  }
+
+  /** stock.json и название и фото страниц позиций (до подстановки своих — для склада на страницах). */
+  private async stockSource(): Promise<{ json: Record<string, unknown>; pages: Record<string, { title: string; image: string | null }> }> {
+    return this.cache.wrap('stock-source', this.ttl, async () => {
       const items = await this.db.stockItem.findMany({ orderBy: { position: 'asc' } });
       const config: StockConfigItem[] = items.map((it) => {
         const extra = (it.extra ?? {}) as Record<string, unknown>;
@@ -118,15 +182,7 @@ export class ContentStore {
           title: it.title,
         };
       });
-      // Страницы позиций и их родительские категории (оттуда берётся готовая карточка)
-      const wanted = new Set<string>();
-      for (const c of config) {
-        const url = String(c.url || '').trim();
-        if (!url) continue;
-        wanted.add(url);
-        const parts = url.replace(/^\/+|\/+$/g, '').split('/');
-        if (parts.length >= 3) wanted.add(`/${parts.slice(0, -1).join('/')}/`);
-      }
+      const wanted = new Set(config.map((c) => String(c.url || '').trim()).filter(Boolean));
       const rows = wanted.size
         ? await this.db.page.findMany({ select: { id: true, path: true, blocks: true, title: true }, where: { path: { in: [...wanted] } } })
         : [];
@@ -135,10 +191,10 @@ export class ContentStore {
       const byPath = new Map(rows.map((r) => [r.path, { body: seoHtml(withCatalog(r, catalog)), title: r.title }]));
       const { items: resolved, warnings } = resolveStock(config, (p) => byPath.get(p));
       for (const w of warnings) this.log.warn({ stock: w }, 'склад');
+      const pages = Object.fromEntries([...byPath].map(([path, p]) => [path, { title: pickStockTitle(p.body, p.title), image: pickStockImage(p.body) }]));
       return {
-        _generated: 'content-service — не редактировать. Источник: таблица content.stock_items',
-        _count: resolved.length,
-        items: resolved,
+        json: { _generated: 'content-service — не редактировать. Источник: таблица content.stock_items', _count: resolved.length, items: resolved },
+        pages,
       };
     });
   }
@@ -181,7 +237,7 @@ export class ContentStore {
   async searchDoc(path: string): Promise<SearchDoc | null> {
     const found = await this.loadPage(path);
     if (!found) return null;
-    const row = withCatalog(found, await this.catalog());
+    const row = await this.pageData(found);
     return toSearchDoc(row, renderPage(row, await this.styleMap(), this.site));
   }
 
@@ -194,7 +250,7 @@ export class ContentStore {
       const rows = await this.db.page.findMany({ where: { path: { in: paths.slice(i, i + batch) } } });
       for (const found of rows) {
         if (found.status !== 'published') continue;
-        const row = withCatalog(found, catalog);
+        const row = await this.pageData(found, catalog);
         const doc = toSearchDoc(row, renderPage(row, styles, this.site));
         if (doc) yield doc;
       }
@@ -212,7 +268,7 @@ export class ContentStore {
   async purge(paths?: string[]): Promise<number> {
     this.styles = null;
     if (!paths || !paths.length) return this.cache.clear();
-    await this.cache.del(...paths.map((p) => `page:${p}`), 'pages:list', 'redirects', 'stock', 'site-data', 'catalog');
+    await this.cache.del(...paths.map((p) => `page:${p}`), 'pages:list', 'redirects', 'stock-source', 'stock-view', 'stock-pages', 'site-data', 'catalog');
     if (paths.some((p) => p.startsWith('/products/'))) await this.cache.del('compare');
     return paths.length;
   }

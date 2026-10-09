@@ -222,7 +222,10 @@ model Redirect {
 model StockItem {
   id        Int      @id @default(autoincrement())
   position  Int      @default(0)
-  url       String
+  /// тип позиции (StockGroup.key): карточка типа на главной, фильтр на /nalichie/
+  groupKey  String?  @map("group_key")
+  /// страница товара или раздела каталога; пусто — позиция без ссылки
+  url       String   @default("")
   qty       Int?
   shipping  String?
   note      String?
@@ -230,12 +233,33 @@ model StockItem {
   image     String?
   /// характеристики: [название, значение][]
   specs     Json?
+  /// фото со склада (подтверждение наличия): [{ src, alt }]
+  photos    Json     @default("[]")
   /// неизвестные поля исходного конфига — как есть
   extra     Json     @default("{}")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("stock_items")
+  @@schema("content")
+}
+
+/// Тип позиций склада («Индукционные нагреватели и печи», «Запчасти для индукционного оборудования»):
+/// карточка в блоке склада на главной и кнопка фильтра на /nalichie/.
+model StockGroup {
+  id        Int      @id @default(autoincrement())
+  /// метка в адресе фильтра: /nalichie/?type=<key>
+  key       String   @unique(map: "stock_groups_key_unique")
+  /// equipment — оборудование, parts — запчасти и расходники
+  kind      String   @default("equipment")
+  title     String
+  /// фото карточки на главной; нет — фото первой позиции
+  image     String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("stock_groups")
   @@schema("content")
 }
 

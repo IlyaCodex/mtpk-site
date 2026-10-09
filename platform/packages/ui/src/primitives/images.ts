@@ -47,6 +47,8 @@ export const PLACES: Record<string, Place> = {
   'cat-card__cover': { widths: WIDTHS.card, sizes: '(max-width: 1060px) 46vw, 390px' },
   // «Оборудование» на главной: 4 в ряд, 3 до 1280px, по 2 до 1024px и на телефоне
   'equip-card__cover': { widths: WIDTHS.card, sizes: '(max-width: 1024px) 46vw, (max-width: 1280px) 31vw, 300px' },
+  'stock-type__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 300px' },
+  'pcard__photo': { widths: WIDTHS.thumb, sizes: '72px' },
   'catalog-lvm-card__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 100vw, (max-width: 900px) 46vw, (max-width: 1440px) 30vw, 330px' },
   'muf-mod__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 100vw, (max-width: 900px) 46vw, (max-width: 1440px) 30vw, 330px' },
   'pr-photo': { widths: WIDTHS.card, sizes: '(max-width: 760px) 100vw, (max-width: 1440px) 31vw, 441px' },
