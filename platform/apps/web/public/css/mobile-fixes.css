@@ -337,23 +337,8 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
  * 10b. Блок «География работы»: на планшете/мобильном карта под текстом,
  *      высота компактнее (иначе 3:2 на узком экране слишком высокая).
  * ------------------------------------------------------------ */
-/* ------------------------------------------------------------
- * 10c. Каталог /products/ (.cat-index .scard-grid): на мобильном 2 карточки
- *      в ряд (по умолчанию inline-стиль ставит 1). Ужимаем отступы/шрифт,
- *      чтобы плитки читались. `.cat-index` + !important — бьёт инлайн ≤600px.
- * ------------------------------------------------------------ */
-@media (max-width: 600px) {
-  .cat-index .scard-grid {
-    /* minmax(0,1fr) — иначе 1fr=minmax(auto,1fr) не даёт колонке сжаться уже
-       min-content карточки, и правый столбец вылезает за экран. */
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 12px !important;
-  }
-  .cat-index .scard { min-width: 0 !important; }
-  .cat-index .scard__body { padding: 10px 12px 12px !important; min-width: 0 !important; }
-  .cat-index .scard__title { font-size: 14px !important; line-height: 1.25 !important; overflow-wrap: anywhere; }
-  .cat-index .scard__meta { font-size: 12px !important; }
-}
+/* 10c. Каталог /products/ (.cat-index .scard-grid) на телефоне — по две карточки
+ *      в ряд: правила теперь в src/styles/components.css вместе с карточками. */
 
 @media (max-width: 900px) {
   .geo__layout {

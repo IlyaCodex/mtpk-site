@@ -101,6 +101,9 @@ html[data-theme="dark"] .made-badge__flag { --dk-bg-ffffff: #fff; }
 html[data-theme="dark"] .equip-card__cover { margin: var(--sp-2) var(--sp-2) 0; border-radius: 8px; background: #fff; }
 /* карточки «тизер» (подкатегории разделов) — так же */
 html[data-theme="dark"] .teaser-card__cover { margin: var(--sp-2) var(--sp-2) 0; border-radius: 10px; background: #fff; }
+/* каталог /products/ (карточки .scard): рендеры — на белой подложке; фото сцен (услуги) — как есть */
+html[data-theme="dark"] .scard__cover { margin: var(--sp-2) var(--sp-2) 0; border-radius: 10px; background: #fff; }
+html[data-theme="dark"] .cat-index--photos .scard__cover { margin: 0; border-radius: 0; background: none; }
 
 /* главная, «Литейное производство под ключ»: схема участка — тёмный вариант */
 html[data-theme="dark"] .foundry__art { content: url("/img/home/turnkey-scheme-dark.svg"); }
