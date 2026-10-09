@@ -25,6 +25,8 @@ export type StockItem = {
   image: string | null;
   specs: [string, string][] | null;
   photos: { src: string; alt: string }[];
+  /** скрыта на сайте: остаётся здесь, но не выводится ни в блоках склада, ни бейджем «В наличии» */
+  hidden?: boolean;
   /** прочие поля позиции из старого конфига — сохраняются как есть */
   extra?: Record<string, unknown>;
   /** как позицию показывает сайт: название и фото (свои, из каталога или со страницы запчасти) */
@@ -114,6 +116,15 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
     void save({ ...data, groups: move(data.groups, index, target.j) }, 'Порядок сохранён');
   }
 
+  /** Показывать позицию на сайте или скрыть (в админке она остаётся). */
+  function toggleHidden(i: number) {
+    const hidden = !data.items[i].hidden;
+    void save(
+      { ...data, items: data.items.map((it, j) => (j === i ? { ...it, hidden } : it)) },
+      hidden ? 'Позиция скрыта — на сайте её не видно' : 'Позиция снова показывается на сайте',
+    );
+  }
+
   function removeItem(i: number) {
     const it = data.items[i];
     const name = it.title || byPath.get(it.url)?.name || 'позицию';
@@ -167,7 +178,15 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
           <p className="mt-1 mb-3 text-xs text-amber-800">Они видны на /nalichie/, но не попадают в карточки на главной. Откройте позицию и выберите тип.</p>
           <div className="space-y-2">
             {orphans.map(({ it, i }) => (
-              <ItemRow key={i} item={it} option={byPath.get(it.url)} onEdit={() => setItemDialog({ index: i, draft: it })} onRemove={() => removeItem(i)} />
+              <ItemRow
+                key={i}
+                item={it}
+                option={byPath.get(it.url)}
+                onEdit={() => setItemDialog({ index: i, draft: it })}
+                onToggle={() => toggleHidden(i)}
+                onRemove={() => removeItem(i)}
+                disabled={saving}
+              />
             ))}
           </div>
         </section>
@@ -175,6 +194,7 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
 
       {groupsOfKind.map(({ g, index }, n) => {
         const items = data.items.map((it, i) => ({ it, i })).filter(({ it }) => it.group === g.key);
+        const hiddenCount = items.filter(({ it }) => it.hidden).length;
         const cover = g.image || items.map(({ it }) => it.image || it.preview?.image || byPath.get(it.url)?.cover).find(Boolean) || null;
         return (
           <section key={g.key} className="rounded-xl border border-slate-200 bg-white shadow-xs">
@@ -184,6 +204,8 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
                 <h2 className="truncate text-base font-semibold text-slate-900">{g.title}</h2>
                 <p className="text-xs text-slate-500">
                   {items.length ? positions(items.length) : 'Нет позиций — на сайте тип не показывается'}
+                  {hiddenCount > 0 &&
+                    (hiddenCount === items.length ? ' · все скрыты — на сайте тип не показывается' : ` · скрыто на сайте: ${hiddenCount}`)}
                   {!g.image && items.length > 0 && ' · фото карточки — первой позиции'}
                 </p>
               </div>
@@ -204,6 +226,7 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
                   item={it}
                   option={byPath.get(it.url)}
                   onEdit={() => setItemDialog({ index: i, draft: it })}
+                  onToggle={() => toggleHidden(i)}
                   onUp={k > 0 ? () => moveItem(i, -1) : undefined}
                   onDown={k < items.length - 1 ? () => moveItem(i, 1) : undefined}
                   onRemove={() => removeItem(i)}
@@ -296,11 +319,32 @@ function IconButton({ icon, label, onClick, disabled, danger }: { icon: 'up' | '
   );
 }
 
-/** Строка позиции: фото, название, ссылка, количество и срок, фото со склада. */
+/** Тумблер «Показывать на сайте»: включён — позиция на сайте, выключен — скрыта (в админке остаётся). */
+function SiteSwitch({ on, onChange, disabled }: { on: boolean; onChange: () => void; disabled?: boolean }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      onClick={onChange}
+      disabled={disabled}
+      title={on ? 'Показывается на сайте — выключите, чтобы скрыть' : 'Скрыта на сайте — включите, чтобы показывать'}
+      className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100 disabled:pointer-events-none disabled:opacity-50"
+    >
+      <span className={cx('relative inline-block h-5 w-9 shrink-0 rounded-full transition-colors', on ? 'bg-brand-600' : 'bg-slate-300')}>
+        <span className={cx('absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-all', on ? 'left-[18px]' : 'left-0.5')} />
+      </span>
+      <span className="w-[5.5rem] text-left">{on ? 'Показывать' : 'Скрыта'}</span>
+    </button>
+  );
+}
+
+/** Строка позиции: фото, название, ссылка, количество и срок, фото со склада; тумблер «на сайте». */
 function ItemRow({
   item,
   option,
   onEdit,
+  onToggle,
   onUp,
   onDown,
   onRemove,
@@ -309,22 +353,25 @@ function ItemRow({
   item: StockItem;
   option: CatalogOption | undefined;
   onEdit: () => void;
+  onToggle: () => void;
   onUp?: () => void;
   onDown?: () => void;
   onRemove: () => void;
   disabled?: boolean;
 }) {
   const title = item.title || item.preview?.title || option?.name || item.url || 'Без названия';
+  const hidden = Boolean(item.hidden);
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-slate-200 bg-slate-50/60 p-2.5 hover:border-slate-300">
-      <button type="button" onClick={onEdit} className="shrink-0" title="Изменить позицию">
+    <div className={cx('flex items-center gap-4 rounded-lg border p-2.5', hidden ? 'border-dashed border-slate-300 bg-white' : 'border-slate-200 bg-slate-50/60 hover:border-slate-300')}>
+      <button type="button" onClick={onEdit} className={cx('shrink-0', hidden && 'opacity-50 grayscale')} title="Изменить позицию">
         <Thumb src={item.image || item.preview?.image || option?.cover} className="h-14 w-20" />
       </button>
       <div className="min-w-0 flex-1">
-        <button type="button" onClick={onEdit} className="block max-w-full truncate text-left text-sm font-semibold text-slate-900 hover:text-brand-700">
+        <button type="button" onClick={onEdit} className={cx('block max-w-full truncate text-left text-sm font-semibold hover:text-brand-700', hidden ? 'text-slate-500' : 'text-slate-900')}>
           {title}
         </button>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+          {hidden && <Badge tone="gray">скрыта на сайте</Badge>}
           {item.url ? (
             <span className="inline-flex min-w-0 items-center gap-1 font-mono">
               <Icon name="link" className="h-3.5 w-3.5 shrink-0" />
@@ -344,6 +391,7 @@ function ItemRow({
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-1">
+        <SiteSwitch on={!hidden} onChange={onToggle} disabled={disabled} />
         <Button size="sm" onClick={onEdit} disabled={disabled}>
           <Icon name="pen" className="h-4 w-4" />
           Изменить

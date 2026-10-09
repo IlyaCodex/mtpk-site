@@ -137,7 +137,8 @@ export class ContentStore {
       ]);
       // страницы не из таблиц каталога (запчасти): название и фото — с их разметки
       const { pages } = await this.stockSource();
-      return resolveStockView(groups, items, await this.catalog(), (path) => pages[path]);
+      // скрытые в админке позиции на сайт не выводятся; тип, где все позиции скрыты, тоже не показывается
+      return resolveStockView(groups, items.filter((it) => !it.hidden), await this.catalog(), (path) => pages[path]);
     });
   }
 
@@ -169,7 +170,9 @@ export class ContentStore {
   private async stockSource(): Promise<{ json: Record<string, unknown>; pages: Record<string, { title: string; image: string | null }> }> {
     return this.cache.wrap('stock-source', this.ttl, async () => {
       const items = await this.db.stockItem.findMany({ orderBy: { position: 'asc' } });
-      const config: StockConfigItem[] = items.map((it) => {
+      // в stock.json (бейдж «В наличии», срок на странице товара) — только позиции, которые показываются на сайте;
+      // страницы нужны всем позициям — превью в админке
+      const config: StockConfigItem[] = items.filter((it) => !it.hidden).map((it) => {
         const extra = (it.extra ?? {}) as Record<string, unknown>;
         return {
           ...extra,
@@ -182,7 +185,7 @@ export class ContentStore {
           title: it.title,
         };
       });
-      const wanted = new Set(config.map((c) => String(c.url || '').trim()).filter(Boolean));
+      const wanted = new Set(items.map((it) => String(it.url || '').trim()).filter(Boolean));
       const rows = wanted.size
         ? await this.db.page.findMany({ select: { id: true, path: true, blocks: true, title: true }, where: { path: { in: [...wanted] } } })
         : [];

@@ -154,6 +154,7 @@ const stockInput = z
             .array(z.object({ src: z.string().min(1), alt: z.string().default('') }))
             .default([])
             .describe('Фото со склада'),
+          hidden: z.boolean().optional().describe('Скрыта на сайте (остаётся в админке)'),
           extra: z.record(z.string(), z.unknown()).optional().describe('Прочие поля позиции (сохраняются как есть)'),
         }),
       )
@@ -613,13 +614,15 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
     },
     async (req) => {
       const { groups, items } = req.body;
-      // что видно за пределами страниц склада: бейдж «В наличии» (по адресу товара) и срок отгрузки на странице товара
-      const outside = (rows: { url: string; shipping?: string | null }[]) =>
+      // что видно за пределами страниц склада: бейдж «В наличии» (по адресу товара) и срок отгрузки на странице товара —
+      // у позиций, которые показываются на сайте
+      const outside = (rows: { url: string; shipping?: string | null; hidden?: boolean }[]) =>
         rows
+          .filter((r) => !r.hidden)
           .map((r) => `${r.url.trim()}|${r.shipping?.trim() ?? ''}`)
           .sort()
           .join('\n');
-      const before = outside(await db.stockItem.findMany({ select: { url: true, shipping: true } }));
+      const before = outside(await db.stockItem.findMany({ select: { url: true, shipping: true, hidden: true } }));
       await db.$transaction([
         db.stockItem.deleteMany(),
         db.stockGroup.deleteMany(),
@@ -638,6 +641,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
             image: it.image?.trim() || null,
             specs: it.specs?.length ? it.specs : Prisma.DbNull,
             photos: it.photos as Prisma.InputJsonValue,
+            hidden: it.hidden ?? false,
             extra: (it.extra ?? {}) as Prisma.InputJsonValue,
           })),
         }),

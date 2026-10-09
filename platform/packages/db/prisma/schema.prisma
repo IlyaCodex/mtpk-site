@@ -235,6 +235,8 @@ model StockItem {
   specs     Json?
   /// фото со склада (подтверждение наличия): [{ src, alt }]
   photos    Json     @default("[]")
+  /// скрыта на сайте: остаётся в админке, но не выводится ни в блоках склада, ни бейджем «В наличии»
+  hidden    Boolean  @default(false)
   /// неизвестные поля исходного конфига — как есть
   extra     Json     @default("{}")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
