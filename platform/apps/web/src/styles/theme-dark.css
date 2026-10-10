@@ -108,6 +108,9 @@ html[data-theme="dark"] .cat-index--photos .scard__cover { margin: 0; border-rad
 /* главная, «Литейное производство под ключ»: схема участка — тёмный вариант */
 html[data-theme="dark"] .foundry__art { content: url("/img/home/turnkey-scheme-dark.svg"); }
 
+/* /nalichie/, «Поставка под заказ»: иллюстрация — тёмный вариант */
+html[data-theme="dark"] .order__art { content: url("/img/nalichie/order-scheme-dark.svg"); }
+
 /* главная, склад: без светлого блика в углу; фото типов (на белом фоне) — в белой рамке, как у «Оборудования» */
 html[data-theme="dark"] .stock-show { background: var(--surface-muted); }
 html[data-theme="dark"] .stock-type__cover { margin: var(--sp-2) var(--sp-2) 0; border-radius: 8px; background: #fff; }
