@@ -345,6 +345,12 @@ picture/
   - Инженерный: `vladimir.png` · `dmitry-d.png` · `dmitry-p.png`
   - Бухгалтерия: `julia.png` · `ekaterina.png`
 
+### Контакты — `/kontakty/` (2026-10-11)
+- Шапка: `/img/o-company-main.jpg` — здание компании с вывеской (исходник `picture/o-company/company-main.jpg`,
+  807×545: для фона во весь экран мал, поэтому — фото в рамке справа от заголовка).
+- Команда (перенесена сюда с «О компании»): `/img/team/*.jpg` — портреты 640×800 с логотипом в углу —
+  в карточке квадратом со сдвигом вниз (лицо крупнее, логотип за кадром), на телефоне — миниатюра 96 px.
+
 ### В наличии на складе — `/nalichie/`
 **Источники:** `astro/public/img/nalichie/`
 - **Hero full-bleed:** `astro/public/img/nalichie/nalichie-hero.jpg?v=2` (+`.webp` сосед)

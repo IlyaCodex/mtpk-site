@@ -60,6 +60,9 @@ export const PLACES: Record<string, Place> = {
   'oc-hero__bg': { widths: WIDTHS.wide, sizes: '100vw' },
   'oc-photo--main': { widths: WIDTHS.content, sizes: '(max-width: 760px) 100vw, (max-width: 1100px) 92vw, (max-width: 1440px) 48vw, 690px' },
   'oc-photo': { widths: WIDTHS.card, sizes: '(max-width: 760px) 100vw, (max-width: 1100px) 46vw, (max-width: 1440px) 23vw, 340px' },
+  // «Контакты»: фото здания в шапке, портреты сотрудников (на телефоне — миниатюрой слева)
+  'kt-hero__media': { widths: WIDTHS.content, sizes: '(max-width: 760px) 92vw, (max-width: 1440px) 44vw, 631px' },
+  'kt-person__photo': { widths: WIDTHS.card, sizes: '(max-width: 600px) 96px, (max-width: 760px) 46vw, (max-width: 1100px) 30vw, (max-width: 1440px) 18vw, 262px' },
   'scard__cover': { widths: WIDTHS.card, sizes: '(max-width: 1060px) 46vw, (max-width: 1440px) 31vw, 443px' },
   'category-tile': { widths: WIDTHS.thumb, sizes: '140px' },
   // фото в статье новости
