@@ -52,7 +52,10 @@ export const PLACES: Record<string, Place> = {
   'care__photo': { widths: WIDTHS.content, sizes: '(max-width: 1024px) 92vw, 540px' },
   'catalog-lvm-card__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 100vw, (max-width: 900px) 46vw, (max-width: 1440px) 30vw, 330px' },
   'muf-mod__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 100vw, (max-width: 900px) 46vw, (max-width: 1440px) 30vw, 330px' },
-  'pr-photo': { widths: WIDTHS.card, sizes: '(max-width: 760px) 100vw, (max-width: 1440px) 31vw, 441px' },
+  // проекты: плитки с фото на всю карточку (есть широкие — на две колонки), фон шапки, миниатюры на странице проекта
+  'pr-photo': { widths: WIDTHS.card, sizes: '(max-width: 760px) 100vw, (max-width: 1100px) 50vw, (max-width: 1440px) 46vw, 660px' },
+  'pr-hero__bg': { widths: WIDTHS.wide, sizes: '100vw' },
+  'ui-thumb': { widths: WIDTHS.thumb, sizes: '84px' },
   'scard__cover': { widths: WIDTHS.card, sizes: '(max-width: 1060px) 46vw, (max-width: 1440px) 31vw, 443px' },
   'category-tile': { widths: WIDTHS.thumb, sizes: '140px' },
   // фото в статье новости
