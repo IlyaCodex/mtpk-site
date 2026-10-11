@@ -8,8 +8,9 @@ import { formatHtml } from '@mtpk/content-kit/format-html';
 import { buttonDesignAttrs } from '@mtpk/content-kit/design';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
+import { annotateDocument, setDocMeta } from '@mtpk/content-kit/doc-edit';
 import { block as blockSchema, BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
-import { renderBlocksMarked, renderBlocksToHtml } from '@mtpk/ui/server';
+import { renderBlocksMarked, renderBlocksToHtml, renderFormSlots } from '@mtpk/ui/server';
 import { catalogNodes } from './catalog.ts';
 import { catalogAdminRoutes, catalogPageGuard } from './catalog-admin.ts';
 import { catalogDependents, loadCatalog } from './catalog-data.ts';
@@ -442,6 +443,64 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       await changed([...new Set([...res.paths, ...before, ...after])]);
       return { ok: true, id: req.params.id };
     },
+  );
+
+  // ── Страницы-документы (Практикум: целый HTML-документ) ────────────────
+  app.put(
+    '/admin/v1/documents/:id',
+    {
+      schema: {
+        tags: ['Админка: страницы'],
+        summary: 'Сохранить страницу-документ (Практикум): HTML целиком; заголовок, описание и noindex — и в его <head>',
+        params: idParam,
+        body: z.object({
+          title: z.string().trim().min(1).max(300).describe('Заголовок (title)'),
+          description: z.string().trim().max(1000).nullable().optional().describe('Описание (description)'),
+          noindex: z.boolean().describe('Скрыть от поисковиков'),
+          status: z.enum(['published', 'draft']),
+          body: z.string().min(1).describe('HTML-документ целиком'),
+        }),
+        security: ADMIN,
+      },
+    },
+    async (req, reply) => {
+      const row = await db.page.findUnique({ where: { id: req.params.id }, select: { path: true, kind: true, extraMeta: true } });
+      if (!row) return reply.code(404).send({ error: 'not_found' });
+      if (row.kind !== 'document') return reply.code(409).send({ error: 'not_document', message: 'Это обычная страница — она сохраняется редактором страниц' });
+      const { title, description = null, noindex, status } = req.body;
+      // документ отдаётся как есть: его <title>, description и robots — в нём самом
+      const body = setDocMeta(req.body.body, { title, description, noindex });
+      const now = new Date();
+      await db.page.update({
+        where: { id: req.params.id },
+        data: {
+          title,
+          description: description || null,
+          noindex,
+          status,
+          body,
+          modifiedAt: now,
+          lastmodAt: now,
+          sourceHash: `admin:${now.getTime()}`,
+          extraMeta: { ...(row.extraMeta as Record<string, unknown>), source: 'admin' },
+        },
+      });
+      await changed([row.path]);
+      return { ok: true, id: req.params.id, path: row.path, title, body };
+    },
+  );
+
+  app.post(
+    '/admin/v1/documents/preview',
+    {
+      schema: {
+        tags: ['Админка: страницы'],
+        summary: 'Предпросмотр страницы-документа для правки щелчком: элементы помечены местом в исходнике, формы — как на сайте',
+        body: z.object({ body: z.string() }),
+        security: ADMIN,
+      },
+    },
+    async (req) => ({ html: renderFormSlots(annotateDocument(req.body.body)) }),
   );
 
   app.delete(

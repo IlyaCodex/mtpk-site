@@ -149,15 +149,9 @@ export default async function PagesList({ searchParams }: { searchParams: Promis
                   </td>
                   <td className="px-4 py-2.5 text-xs whitespace-nowrap text-slate-500">{formatDate(p.updatedAt)}</td>
                   <td className="px-4 py-2.5 text-right whitespace-nowrap">
-                    {p.kind === 'page' ? (
-                      <LinkButton size="sm" href={`/pages/${p.id}`}>
-                        Изменить
-                      </LinkButton>
-                    ) : (
-                      <span className="text-xs text-slate-400" title="Статьи Практикума — готовые документы, правятся в исходниках">
-                        только просмотр
-                      </span>
-                    )}
+                    <LinkButton size="sm" href={`/pages/${p.id}`}>
+                      Изменить
+                    </LinkButton>
                     <a href={`${site}${p.path}`} target="_blank" rel="noopener" className="ml-2 inline-flex rounded p-1 align-middle text-brand-600 hover:bg-brand-50" title="Открыть на сайте" aria-label="Открыть на сайте">
                       <Icon name="external" className="h-4 w-4" />
                     </a>

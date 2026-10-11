@@ -61,7 +61,7 @@ export const GET = route(null, async (req, user) => {
       updatedAt: page.updatedAt,
       // товар правится одним экраном (карточка + страница), остальное — редактором страницы
       edit: admin(cat?.kind === 'product' ? `/catalog/products/${cat.id}` : `/pages/${page.id}`),
-      editLabel: page.kind === 'document' ? 'Открыть в админке' : cat?.kind === 'product' ? 'Редактировать товар' : 'Редактировать страницу',
+      editLabel: cat?.kind === 'product' ? 'Редактировать товар' : 'Редактировать страницу',
       seo: { ...seoCheck(page), href: admin(cat?.kind === 'product' ? `/catalog/products/${cat.id}` : `/pages/${page.id}`) },
       catalog:
         cat?.kind === 'category'
