@@ -41,10 +41,10 @@ html[data-theme="dark"] {
   --border-brand: #5f9ab4;
   --border-focus: #7cafc8;
 
-  /* кнопки */
-  --action-secondary-bg-hover: #16262d;
-  --action-secondary-fg: #8eb9ce;
-  --action-secondary-border: #5f9ab4;
+  /* кнопки (контурные — зелёные, как залитые) */
+  --action-secondary-bg-hover: #16261a;
+  --action-secondary-fg: #8fcc7b;
+  --action-secondary-border: #4fab3a;
   --action-ghost-bg-hover: #1c2427;
   --action-ghost-fg: #dbe3e6;
   --action-dark-bg: #2a3337;

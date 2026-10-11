@@ -71,23 +71,10 @@
 }
 @media print { .to-top { display: none; } }
 
-/* ── Кнопки: скругление и цвета из админки («Шапка, меню, контакты» → «Оформление: кнопки»).
-   Заданы — на <html> атрибуты data-btn-* и переменные --design-* (content-kit/src/design.ts);
-   не заданы — правила ниже не действуют, кнопки как в дизайне. */
-html[data-btn-radius] :is(.btn, .form__submit, .header-quick-form__btn, .hero-quick-card__btn, .button, .cmp-btn, .cookie-consent__accept, .best-offer__file-btn) {
-  border-radius: var(--design-radius);
-}
-html[data-btn-color] :is(.btn--primary, .btn--green, .btn--cta, .form__submit, .header-quick-form__btn, .hero-quick-card__btn, .button, .cookie-consent__accept) {
-  background-color: var(--design-primary);
-  border-color: var(--design-primary);
-  color: var(--design-primary-text);
-  --btn-green-glow: 0 8px 20px -4px var(--design-primary-glow);
-  --btn-green-glow-hover: 0 12px 28px -4px var(--design-primary-glow);
-}
-html[data-btn-color] :is(.btn--primary, .btn--green, .btn--cta, .form__submit, .header-quick-form__btn, .hero-quick-card__btn, .button, .cookie-consent__accept):hover {
-  background-color: var(--design-primary-hover);
-  border-color: var(--design-primary-hover);
-}
+/* ── Контурные кнопки: цвет из админки («Шапка, меню, контакты» → «Оформление: кнопки»).
+   Задан — на <html> атрибут data-btn-outline и переменные --design-* (content-kit/src/design.ts).
+   Скругление и цвет залитых кнопок (и из админки, и по умолчанию) — public/css/base-layout.css,
+   раздел «Кнопки и чекбоксы». */
 html[data-btn-outline] .btn--secondary { color: var(--design-outline); border-color: var(--design-outline); }
 html[data-btn-outline] .btn--secondary:hover { background-color: var(--design-outline-soft); }
 html[data-theme="dark"][data-btn-outline] .btn--secondary { color: var(--design-outline-dark); border-color: var(--design-outline-dark); }
@@ -763,13 +750,65 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
 /* низ карточки: кнопка во всю ширину, под ней «Подробнее» и «К сравнению» (не влезают в строку — сравнение ниже) */
 .pcard__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-top: auto; padding-top: var(--sp-5); }
 .pcard__actions > .btn { flex: 1 1 100%; width: 100%; }
-.pcard__more { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 14px; font-weight: var(--fw-semibold); letter-spacing: 0; text-transform: none; white-space: nowrap; color: var(--green-700); text-decoration: none; }
-.pcard__more:hover { color: var(--green-600); }
-.pcard__more:hover .btn__arrow { transform: translateX(3px); }
-.pcard .cmp-btn { width: auto; margin: 0; padding: 7px 12px; border: 1px solid var(--border-subtle); border-radius: 999px; font-size: 13px; color: var(--text-secondary); }
-.pcard .cmp-btn:hover { border-color: var(--green-500); color: var(--text-primary); }
-.pcard .cmp-btn.is-active { border-color: var(--green-500); background: var(--green-50); color: var(--green-700); }
-.pcard .cmp-btn__icon { width: 15px; height: 15px; }
+/* «Подробнее о позиции» — такой же кнопкой, как «Запросить цену» (заливка, скругление и блик —
+   css/base-layout.css, «Кнопки и чекбоксы») */
+.pcard__more {
+  display: inline-flex;
+  flex: 1 1 100%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  border: 1px solid transparent;
+  font-family: var(--font-display);
+  font-size: var(--btn-font-size);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  letter-spacing: var(--btn-letter-spacing);
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow: var(--btn-green-glow);
+  transition: var(--btn-transition);
+}
+.pcard__more:hover { box-shadow: var(--btn-green-glow-hover); transform: translateY(-2px); }
+.pcard__more:hover .btn__arrow { transform: translateX(4px); }
+/* «К сравнению» (карточки и страница товара) — переключатель: слева отметка как у чекбоксов (выбрано —
+   зелёная заливка с галочкой), значок весов — после текста; переменные --btn-*, --check-mark — css/base-layout.css */
+/* в карточке — строкой во всю ширину, значок весов у правого края */
+.pcard .cmp-btn {
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--btn-round);
+  background: var(--surface-page);
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: border-color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+.pcard .cmp-btn__icon { width: 18px; height: 18px; margin-left: auto; }
+.cmp-btn::before {
+  content: "";
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--border-default);
+  border-radius: 5px;
+  background: var(--surface-page) var(--check-mark) center / 0 no-repeat;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), background-size var(--duration-fast) var(--ease-out);
+}
+.cmp-btn .cmp-btn__icon { order: 2; color: var(--text-tertiary); }
+/* состояния — после правил раскладки (та же специфичность) */
+.cmp-btn:hover { border-color: var(--btn-fill); color: var(--text-primary); }
+.cmp-btn:hover::before { border-color: var(--btn-fill); }
+.cmp-btn.is-active { border-color: var(--btn-fill); background: var(--green-50); color: var(--green-700); }
+.cmp-btn.is-active::before { border-color: var(--btn-fill); background-color: var(--btn-fill); background-size: 75%; }
+.cmp-btn.is-active .cmp-btn__icon { color: var(--green-600); }
 @media (max-width: 1060px) {
   .pcard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); }
 }

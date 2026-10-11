@@ -3,8 +3,10 @@ import { darkColor } from './dark.ts';
 /**
  * Оформление кнопок сайта из админки («Шапка, меню, контакты» → «Оформление:
  * кнопки», siteSettings.design): скругление углов и цвета. Задано — на <html>
- * атрибуты data-btn-* и переменные --design-*, по ним кнопки перекрашивают
- * правила apps/web/src/styles/components.css. Не задано — кнопки как в дизайне.
+ * атрибуты data-btn-* и переменные --design-*: залитые кнопки и скругление берут
+ * переменные в apps/web/public/css/base-layout.css («Кнопки и чекбоксы»),
+ * контурные — правила apps/web/src/styles/components.css. Не задано — кнопки
+ * как в дизайне (зелёные, скругление 10 px).
  */
 export type ButtonDesign = { buttonRadius?: number; buttonColor?: string; buttonTextColor?: string; buttonOutlineColor?: string };
 

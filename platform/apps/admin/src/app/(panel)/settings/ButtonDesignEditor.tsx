@@ -8,15 +8,16 @@ import { cx } from '@/components/ui';
 export type ButtonDesign = { buttonRadius?: number; buttonColor?: string; buttonTextColor?: string; buttonOutlineColor?: string };
 
 /** Цвета кнопок «как в дизайне» — для примера (tokens.css). */
-const DEFAULT = { color: '#4fab3a', text: '#ffffff', outline: '#1f5e78' };
+const DEFAULT = { color: '#4fab3a', text: '#ffffff', outline: '#4fab3a', radius: 10 };
 const PRESETS: [radius: number | undefined, label: string][] = [
-  [undefined, 'Как в дизайне (прямые)'],
+  [undefined, 'Как в дизайне (10 px)'],
+  [0, 'Прямые'],
   [4, 'Чуть скруглённые'],
   [8, 'Скруглённые'],
   [14, 'Сильно скруглённые'],
   [30, 'Таблетка'],
 ];
-const radiusCss = (r: number | undefined) => (r === undefined ? '0' : r >= 30 ? '999px' : `${r}px`);
+const radiusCss = (r: number | undefined) => (r === undefined ? `${DEFAULT.radius}px` : r >= 30 ? '999px' : `${r}px`);
 
 /** Пример кнопок сайта с выбранным оформлением (на светлом и тёмном фоне). */
 function Sample({ value, dark }: { value: ButtonDesign; dark?: boolean }) {
@@ -33,7 +34,7 @@ function Sample({ value, dark }: { value: ButtonDesign; dark?: boolean }) {
     gap: 10,
     lineHeight: 1,
   };
-  const outline = value.buttonOutlineColor ?? (dark ? '#8eb9ce' : DEFAULT.outline);
+  const outline = value.buttonOutlineColor ?? (dark ? '#8fcc7b' : DEFAULT.outline);
   const arrow = (
     <svg width="14" height="12" viewBox="4 5 16 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M5 12h14M13 6l6 6-6 6" />
@@ -49,8 +50,8 @@ function Sample({ value, dark }: { value: ButtonDesign; dark?: boolean }) {
 
 /**
  * Вкладка «Оформление: кнопки» в настройках сайта: скругление углов и цвета
- * кнопок — для всех страниц сразу (атрибуты и переменные на <html>, правила —
- * apps/web/src/styles/components.css).
+ * кнопок — для всех страниц сразу (переменные --design-* на <html>, правила —
+ * apps/web/public/css/base-layout.css, раздел «Кнопки и чекбоксы»).
  */
 export function ButtonDesignEditor({ value, onChange }: { value: ButtonDesign | undefined; onChange: (v: ButtonDesign | undefined) => void }) {
   const v = value ?? {};
@@ -79,7 +80,7 @@ export function ButtonDesignEditor({ value, onChange }: { value: ButtonDesign | 
               type="button"
               onClick={() => set({ buttonRadius: r })}
               className={cx('h-8 border px-3 text-xs', v.buttonRadius === r ? 'border-brand-500 bg-brand-50 font-medium text-brand-700' : 'border-slate-300 text-slate-600 hover:bg-slate-50')}
-              style={{ borderRadius: radiusCss(r) === '0' ? 2 : radiusCss(r) }}
+              style={{ borderRadius: r === 0 ? 2 : radiusCss(r) }}
             >
               {label}
             </button>
@@ -91,7 +92,7 @@ export function ButtonDesignEditor({ value, onChange }: { value: ButtonDesign | 
             min={0}
             max={30}
             step={1}
-            value={v.buttonRadius ?? 0}
+            value={v.buttonRadius ?? DEFAULT.radius}
             onChange={(e) => set({ buttonRadius: Number(e.target.value) })}
             className="w-64 accent-brand-600"
             aria-label="Скругление углов, px"
@@ -110,7 +111,7 @@ export function ButtonDesignEditor({ value, onChange }: { value: ButtonDesign | 
       </section>
       <section className="space-y-2">
         <div className="text-sm font-medium text-slate-700">Контурные кнопки («Получить консультацию»): рамка и текст</div>
-        <ColorChooser value={v.buttonOutlineColor ?? null} onChange={(c) => set({ buttonOutlineColor: c ?? undefined })} designHint="Как в дизайне: фирменный бирюзовый" />
+        <ColorChooser value={v.buttonOutlineColor ?? null} onChange={(c) => set({ buttonOutlineColor: c ?? undefined })} designHint="Как в дизайне: фирменный зелёный" />
         <p className="text-xs text-slate-500">В тёмной теме контурные кнопки светлее — оттенок подбирается сам.</p>
       </section>
     </div>

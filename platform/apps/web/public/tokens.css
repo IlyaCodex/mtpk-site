@@ -248,9 +248,10 @@
   --btn-green-glow-hover: 0 12px 28px -4px rgba(79, 171, 58, 0.65);
 
   --action-secondary-bg:        transparent;
-  --action-secondary-bg-hover:  var(--teal-50);
-  --action-secondary-fg:        var(--teal-700);
-  --action-secondary-border:    var(--teal-600);
+  /* контурные кнопки — зелёные, как залитые (2026-10-11) */
+  --action-secondary-bg-hover:  var(--green-50);
+  --action-secondary-fg:        var(--green-700);
+  --action-secondary-border:    var(--green-500);
 
   --action-ghost-bg:        transparent;
   --action-ghost-bg-hover:  var(--neutral-100);
@@ -293,7 +294,8 @@
 
 :root {
   /* ---- Button (v1: flat square, UPPERCASE, semibold) ---- */
-  --btn-radius:           0;                /* flat square без скруглений (user request) */
+  --btn-radius:           10px;             /* скруглённые кнопки (просьба заказчика 2026-10-11; прежде — прямые углы);
+                                               кнопкам сайта и Практикума его задаёт --btn-round в css/base-layout.css */
   --btn-padding-x:        var(--sp-6);
   --btn-padding-y:        var(--sp-3);
   --btn-padding-x-sm:     var(--sp-4);

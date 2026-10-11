@@ -98,17 +98,8 @@ label:has(> .audit-file-input:focus-visible) {
   outline-offset: 3px;
 }
 .js-form-status:focus-visible { outline: 2px solid #267221; outline-offset: 3px; }
-/* White text on the original bright green failed WCAG AA at small sizes. */
-body .btn--primary,
-body .btn--green,
-body .form__submit,
-body .header-quick-form__btn,
-body #cookie-accept { background-color: #2c792c; border-color: #2c792c; color: #fff; }
-body .btn--primary:hover,
-body .btn--green:hover,
-body .form__submit:hover,
-body .header-quick-form__btn:hover,
-body #cookie-accept:hover { background-color: #236623; border-color: #236623; }
+/* Тёмный фон кнопок (#2c792c — контраст WCAG AA для белого текста) снят 2026-10-11 по решению заказчика:
+   все кнопки — фирменный #4FAB3A, правила — base-layout.css, раздел «Кнопки и чекбоксы». */
 body .footer__copyright-legal { color: #9da8ad; }
 /* Правка контраста зелёной кнопки «Практикум» больше не нужна: пункт меню
    стал обычным, без рамки и своего цвета (05.10.2026). */

@@ -237,14 +237,8 @@
   .tech-request { padding: var(--sp-6, 24px); }
   .tech-request__list { grid-template-columns: 1fr; }
 }
-/* Контрастные CTA для страниц литейных технологий. */
-:root {
-  --brand-green-bright: #35802c;
-  --action-primary-bg: #35802c;
-  --action-primary-bg-hover: #2f702a;
-  --action-primary-bg-active: #245b1f;
-}
-
+/* Тёмно-зелёные CTA (#35802c, контраст белого текста) сняты 2026-10-11: кнопки везде — фирменный #4FAB3A
+   (решение заказчика; правила — css/base-layout.css, «Кнопки и чекбоксы»). */
 .btn--primary:focus-visible {
   outline: 3px solid #fff;
   outline-offset: 2px;
