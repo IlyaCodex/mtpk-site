@@ -56,6 +56,10 @@ export const PLACES: Record<string, Place> = {
   'pr-photo': { widths: WIDTHS.card, sizes: '(max-width: 760px) 100vw, (max-width: 1100px) 50vw, (max-width: 1440px) 46vw, 660px' },
   'pr-hero__bg': { widths: WIDTHS.wide, sizes: '100vw' },
   'ui-thumb': { widths: WIDTHS.thumb, sizes: '84px' },
+  // «О компании»: фон шапки, фото-мозаика производства (большой кадр и малые)
+  'oc-hero__bg': { widths: WIDTHS.wide, sizes: '100vw' },
+  'oc-photo--main': { widths: WIDTHS.content, sizes: '(max-width: 760px) 100vw, (max-width: 1100px) 92vw, (max-width: 1440px) 48vw, 690px' },
+  'oc-photo': { widths: WIDTHS.card, sizes: '(max-width: 760px) 100vw, (max-width: 1100px) 46vw, (max-width: 1440px) 23vw, 340px' },
   'scard__cover': { widths: WIDTHS.card, sizes: '(max-width: 1060px) 46vw, (max-width: 1440px) 31vw, 443px' },
   'category-tile': { widths: WIDTHS.thumb, sizes: '140px' },
   // фото в статье новости
