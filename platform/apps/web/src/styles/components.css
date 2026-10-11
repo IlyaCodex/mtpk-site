@@ -779,3 +779,67 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   .pcard__body { padding: var(--sp-4) var(--sp-5) var(--sp-5); }
   .pcard__title { font-size: 18px; }
 }
+
+/* ============================================================
+   «Решения для задач вашего производства» (блок partner, 10.2026):
+   заголовок и текст справа, пять карточек-ссылок с иконками (зелёные,
+   набор Solar), номер в углу, стрелка внизу; ниже — «Не знаете, с чего
+   начать?» и кнопка к форме заявки. Под товарами и на главной.
+   ============================================================ */
+.solve { padding: var(--section-py-base, 96px) 0; background: var(--surface-page); }
+.solve__head { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--sp-6) var(--sp-12); align-items: end; margin-bottom: var(--sp-10); }
+.solve__eyebrow { margin-bottom: var(--sp-3); font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--green-700); }
+.solve__title { margin: 0; font-family: var(--font-display); font-size: clamp(30px, 3.4vw, 46px); font-weight: var(--fw-bold); line-height: 1.1; letter-spacing: -0.02em; color: var(--text-primary); }
+.solve__title em { display: block; font-style: normal; color: var(--green-700); }
+.solve__lead { max-width: 46ch; margin: 0; font-size: 17px; line-height: 1.6; color: var(--text-secondary); }
+/* карточки */
+.solve__grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-4); margin: 0; padding: 0; list-style: none; }
+.solve__grid > li { display: flex; min-width: 0; }
+.solve-card {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 236px;
+  padding: var(--sp-6) var(--sp-5) var(--sp-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  background: var(--surface-page);
+  box-shadow: 0 1px 2px rgba(16, 31, 38, 0.04);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out), background-color var(--duration-base) var(--ease-out);
+}
+.solve-card:hover { border-color: var(--green-500); background: var(--green-50); box-shadow: 0 16px 36px -18px rgba(16, 31, 38, 0.3); transform: translateY(-2px); }
+.solve-card:focus-visible { outline: 2px solid var(--green-500); outline-offset: 2px; }
+.solve-card__top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); }
+.solve-card__icon { flex-shrink: 0; width: 46px; height: 46px; color: var(--green-600); }
+.solve-card__num { font-family: var(--font-display); font-size: 13px; font-weight: var(--fw-medium); font-variant-numeric: tabular-nums; color: var(--text-tertiary); }
+.solve-card__title { margin-top: var(--sp-5); font-family: var(--font-display); font-size: 19px; font-weight: var(--fw-semibold); line-height: 1.25; letter-spacing: -0.01em; color: var(--text-primary); }
+.solve-card__text { margin: var(--sp-2) 0 var(--sp-4); font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+.solve-card__go { align-self: flex-end; flex-shrink: 0; width: 20px; height: 20px; margin-top: auto; color: var(--green-600); transition: transform var(--duration-fast) var(--ease-out); }
+.solve-card:hover .solve-card__go { transform: translate(2px, -2px); }
+/* низ: вопрос и кнопка */
+.solve__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-4) var(--sp-8); margin-top: var(--sp-10); padding-top: var(--sp-8); border-top: 1px solid var(--border-subtle); }
+.solve__foot-text { margin: 0; font-family: var(--font-display); font-size: clamp(19px, 1.7vw, 24px); font-weight: var(--fw-medium); line-height: 1.3; color: var(--text-primary); }
+@media (max-width: 1200px) {
+  .solve__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .solve__head { grid-template-columns: minmax(0, 1fr); align-items: start; margin-bottom: var(--sp-8); }
+  .solve__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
+}
+@media (max-width: 640px) {
+  .solve { padding: var(--sp-12) 0; }
+  .solve__grid { grid-template-columns: minmax(0, 1fr); }
+  /* карточка строкой: иконка слева, текст справа, номер и стрелка — по краям */
+  .solve-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: var(--sp-4); align-items: start; min-height: 0; padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-5); }
+  .solve-card__top { display: contents; }
+  .solve-card__icon { grid-row: 1 / span 2; width: 38px; height: 38px; }
+  .solve-card__num { grid-column: 3; grid-row: 1; }
+  .solve-card__title { grid-column: 2; grid-row: 1; margin-top: 0; font-size: 17px; }
+  .solve-card__text { grid-column: 2; grid-row: 2; margin-bottom: 0; }
+  .solve-card__go { grid-column: 3; grid-row: 2; align-self: end; margin-top: 0; }
+  .solve__foot { margin-top: var(--sp-8); padding-top: var(--sp-6); }
+  .solve__foot .btn { width: 100%; justify-content: center; }
+}

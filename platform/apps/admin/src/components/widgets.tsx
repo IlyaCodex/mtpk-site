@@ -48,7 +48,7 @@ export const WIDGET_GROUPS: { title: string; note?: string; items: Widget[] }[] 
       { type: 'catalogCta', label: 'Запрос КП по каталогу', hint: 'Призыв запросить КП', icon: 'cta' },
       { type: 'adv', label: 'Преимущества производства', hint: 'Собственное производство в цифрах', icon: 'shieldStar' },
       { type: 'whyUs', label: 'Почему мы', hint: '«Почему выбирают УралИндуктор»', icon: 'like' },
-      { type: 'partner', label: 'Один партнёр', hint: '«Один партнёр для любой задачи»', icon: 'handshake' },
+      { type: 'partner', label: 'Решения для задач', hint: '«Решения для задач вашего производства» — пять направлений с иконками', icon: 'handshake' },
     ],
   },
   {

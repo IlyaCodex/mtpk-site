@@ -117,7 +117,7 @@ export const bestOfferBlock = z
   })
   .describe('Контакты и форма «Сравним КП»');
 export const catalogCtaBlock = z.object({ type: z.literal('catalogCta') }).describe('Призыв: запрос КП по каталогу');
-export const partnerBlock = z.object({ type: z.literal('partner') }).describe('Партнёры и лизинг');
+export const partnerBlock = z.object({ type: z.literal('partner') }).describe('Решения для задач производства');
 export const advBlock = z
   .object({
     type: z.literal('adv'),
@@ -788,7 +788,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   leadgen: 'Форма «Подбор и расчёт»',
   bestOffer: 'Контакты и форма КП',
   catalogCta: 'Запрос КП по каталогу',
-  partner: 'Партнёры и лизинг',
+  partner: 'Решения для задач производства',
   adv: 'Преимущества производства',
   whyUs: 'Почему мы',
   productHero: 'Карточка товара',

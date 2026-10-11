@@ -79,27 +79,6 @@ body {font-family: var(--font-body); color: var(--text-primary); background: var
    BLOCK 1 — «Один партнёр для любой задачи»
    Light surface, 5 нумерованных пунктов в ряд + контакт-CTA
    ============================================================ */
-.partner {background: var(--surface-page); padding: var(--section-py-base, 96px) 0; border-bottom: 1px solid var(--border-subtle); }
-.partner__head {max-width: 720px; margin: 0 0 var(--sp-12); }
-.partner__eyebrow {font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-brand); margin-bottom: var(--sp-4); display: inline-flex; align-items: center; gap: var(--sp-3); }
-.partner__eyebrow::before {content: ""; width: 32px; height: 2px; background: var(--teal-600); }
-.partner__title {font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 48px); font-weight: var(--fw-semibold); line-height: 1.1; letter-spacing: var(--ls-h1); margin: 0 0 var(--sp-5); color: var(--text-primary); }
-.partner__title em {font-style: normal; color: var(--text-brand); }
-.partner__lead {font-size: var(--fs-lead); color: var(--text-secondary); line-height: var(--lh-body); max-width: 60ch; margin: 0; }
-.partner__pillars {display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--border-subtle); border-left: 1px solid var(--border-subtle); }
-.pillar {padding: var(--sp-8) var(--sp-6) var(--sp-7); border-right: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: var(--sp-5); position: relative; transition: background var(--duration-base) var(--ease-out); }
-.pillar:hover {background: var(--surface-subtle); }
-.pillar:hover .pillar__num {color: var(--green-500); }
-.pillar__num {font-family: var(--font-display); font-variant-numeric: tabular-nums; font-size: 56px; font-weight: var(--fw-bold); line-height: 0.9; letter-spacing: -0.04em; color: var(--teal-600); transition: color var(--duration-base) var(--ease-out); }
-.pillar__divider {width: 32px; height: 2px; background: var(--text-primary); transition: background var(--duration-base) var(--ease-out),
-              width var(--duration-base) var(--ease-out); }
-.pillar__text {font-family: var(--font-display); font-size: 18px; font-weight: var(--fw-semibold); color: var(--text-primary); line-height: 1.3; letter-spacing: var(--ls-h3); margin: 0; }
-@media (max-width: 1024px) {
-  .partner__pillars { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 640px) {
-  .partner__pillars { grid-template-columns: 1fr; }
-}
 @media (max-width: 1280px) {
   .catalog__grid { grid-template-columns: repeat(3, 1fr); }
 }
