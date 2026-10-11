@@ -121,7 +121,7 @@ export const partnerBlock = z.object({ type: z.literal('partner') }).describe('�
 export const advBlock = z
   .object({
     type: z.literal('adv'),
-    warranty: text('Срок гарантии в заголовке').optional().describe('По умолчанию «18 месяцев»'),
+    warranty: text('Срок гарантии (карточка «Расширенная гарантия»)').optional().describe('По умолчанию «18 месяцев»; у товаров — поле товара в каталоге'),
   })
   .describe('Преимущества собственного производства');
 export const whyUsBlock = z

@@ -608,7 +608,6 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
    границу трека — блоки просто ужимаются, без горизонтальной прокрутки. */
 .stats__grid > *,
 .partner__pillars > *,
-.adv__grid > *,
 .catalog__grid > *,
 .geo__layout > *,
 .modern__grid > *,

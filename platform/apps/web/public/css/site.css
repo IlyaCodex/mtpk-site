@@ -876,8 +876,7 @@ section.hero--home { min-height: 44vh; }
   flex-shrink: 0;
 }
 .catalog__head--center .catalog__title { margin: 0; }
-.catalog__eyebrow,
-.adv__eyebrow {
+.catalog__eyebrow {
   font-family: var(--font-display);
   font-size: var(--fs-micro);
   font-weight: var(--fw-bold);
@@ -887,12 +886,10 @@ section.hero--home { min-height: 44vh; }
   margin-bottom: var(--sp-4);
   display: inline-flex; align-items: center; gap: var(--sp-3);
 }
-.catalog__eyebrow::before,
-.adv__eyebrow::before {
+.catalog__eyebrow::before {
   content: ""; width: 32px; height: 2px; background: var(--teal-600);
 }
-.catalog__title,
-.adv__title {
+.catalog__title {
   font-family: var(--font-display);
   font-size: clamp(28px, 3.2vw, 44px);
   font-weight: var(--fw-semibold);
@@ -901,8 +898,7 @@ section.hero--home { min-height: 44vh; }
   margin: 0 0 var(--sp-5);
   color: var(--text-primary);
 }
-.catalog__lead,
-.adv__lead {
+.catalog__lead {
   font-size: var(--fs-lead);
   color: var(--text-secondary);
   line-height: var(--lh-body);
@@ -1333,47 +1329,6 @@ section.hero--home { min-height: 44vh; }
   color: var(--neutral-950);
 }
 .btn--green:hover { background: var(--green-400); }
-/* ============================================================
-   BLOCK 4 — 4 преимущества собственного производства
-   ============================================================ */
-.adv {
-  background: var(--surface-page);
-  padding: var(--section-py-base, 96px) 0;
-}
-.adv__head { max-width: 920px; margin: 0 0 var(--sp-12); }
-.adv__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--sp-6);
-}
-.adv-item {
-  display: flex; flex-direction: column; gap: var(--sp-4);
-  padding-top: var(--sp-6);
-  border-top: 2px solid var(--teal-600);
-}
-.adv-item__icon {
-  width: 48px; height: 48px;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--teal-50);
-  color: var(--teal-600);
-  border-radius: var(--radius-xs);
-}
-.adv-item__icon svg { width: 28px; height: 28px; }
-.adv-item__title {
-  font-family: var(--font-display);
-  font-size: var(--fs-h4);
-  font-weight: var(--fw-semibold);
-  line-height: 1.25;
-  letter-spacing: var(--ls-h3);
-  margin: 0;
-  color: var(--text-primary);
-}
-.adv-item__text {
-  font-size: var(--fs-small);
-  line-height: 1.55;
-  color: var(--text-secondary);
-  margin: 0;
-}
 /* ============================================================
    Shared section primitives (для блоков 5-10)
    ============================================================ */
@@ -3133,7 +3088,7 @@ body.nav-open { overflow: hidden; }
 .spec-table td {color: var(--text-primary); font-weight: var(--fw-semibold); font-family: var(--font-mono); }
 .spec-table tr:nth-child(odd) th, .spec-table tr:nth-child(odd) td {background: var(--surface-subtle); }
 @media (max-width: 900px) {
-.partner, .adv { padding: var(--sp-12) 0; }
+.partner { padding: var(--sp-12) 0; }
 }
 .spec-table { width: 100%; max-width: 100%; table-layout: fixed; }
 .spec-table thead th, .spec-table td { white-space: normal; }
