@@ -8,7 +8,7 @@ export const SITE = (process.env.SITE_URL ?? 'https://uralinduktor.ru').replace(
  */
 export const ASSET_VERSIONS = {
   /** общая версия /css/tpl/*.css */
-  tplCss: '20260928a',
+  tplCss: '20261012a',
 } as const;
 
 /**
