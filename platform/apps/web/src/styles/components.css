@@ -1047,3 +1047,30 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   .benefit__icon { width: 40px; height: 40px; }
   .benefit__title { margin-top: var(--sp-4); font-size: 18px; }
 }
+
+/* ============================================================
+   FAQ (компонент Faq, packages/ui/src/blocks/Simple.tsx) — на всех страницах:
+   вопросы карточками, плюс в зелёном круге (открыт — крестик на зелёном).
+   Фон и отступы раздела задаёт страница. Прежние правила — site.css и копии
+   в стилях страниц (этот файл подключается после них).
+   ============================================================ */
+:root {
+  --faq-plus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f702a' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+  --faq-plus-on: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+}
+.faq__list { display: grid; gap: var(--sp-3); max-width: 980px; margin: 0; }
+.faq__item { overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--surface-page); box-shadow: 0 1px 2px rgba(16, 31, 38, 0.04); transition: border-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out); }
+.faq__item:hover { border-color: var(--green-500); }
+.faq__item[open] { border-color: var(--green-500); background: var(--surface-page); box-shadow: 0 18px 38px -26px rgba(16, 31, 38, 0.3); }
+.faq__item summary { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-5); padding: var(--sp-5) var(--sp-5) var(--sp-5) var(--sp-6); font-family: var(--font-display); font-size: 17px; font-weight: var(--fw-semibold); line-height: 1.4; color: var(--text-primary); list-style: none; cursor: pointer; }
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary:hover,
+.faq__item[open] summary { color: var(--text-primary); }
+.faq__item summary::after { content: ""; flex-shrink: 0; width: 36px; height: 36px; margin: 0; border: 0; border-radius: 50%; background: var(--green-50) var(--faq-plus) center / 16px no-repeat; transform: none; transition: transform var(--duration-base) var(--ease-out), background-color var(--duration-base) var(--ease-out); }
+.faq__item[open] summary::after { margin: 0; background-color: var(--green-500); background-image: var(--faq-plus-on); transform: rotate(45deg); }
+.faq__answer { max-width: 76ch; margin: 0; padding: 0 var(--sp-6) var(--sp-6); font-size: 16px; line-height: 1.7; color: var(--text-secondary); }
+@media (max-width: 760px) {
+  .faq__list { max-width: none; }
+  .faq__item summary { padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-5); font-size: 16px; }
+  .faq__answer { padding: 0 var(--sp-5) var(--sp-5); font-size: 15px; }
+}
