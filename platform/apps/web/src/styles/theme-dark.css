@@ -106,6 +106,8 @@ html[data-theme="dark"] .scard__cover { margin: var(--sp-2) var(--sp-2) 0; borde
 html[data-theme="dark"] .cat-index--photos .scard__cover { margin: 0; border-radius: 0; background: none; }
 /* карточки товаров (.pcard): фото на белой подложке, как у карточек разделов */
 html[data-theme="dark"] .pcard__cover { margin: var(--sp-2) var(--sp-2) 0; border-radius: 10px; background: #fff; }
+/* линейки ЛВМ/ЛГМ (ХТС, ПГС, ЛВМ, ЛГМ, пескоструйное) — так же */
+html[data-theme="dark"] :is(.catalog-lvm-card__cover, .catalog-lgm-card__cover) { margin: var(--sp-2) var(--sp-2) 0; border-radius: 10px; background: #fff; }
 
 /* главная, «Литейное производство под ключ»: схема участка — тёмный вариант */
 html[data-theme="dark"] .foundry__art { content: url("/img/home/turnkey-scheme-dark.svg"); }

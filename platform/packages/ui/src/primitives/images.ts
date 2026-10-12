@@ -50,7 +50,9 @@ export const PLACES: Record<string, Place> = {
   'stock-type__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 300px' },
   'pcard__photo': { widths: WIDTHS.thumb, sizes: '72px' },
   'care__photo': { widths: WIDTHS.content, sizes: '(max-width: 1024px) 92vw, 540px' },
-  'catalog-lvm-card__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 100vw, (max-width: 900px) 46vw, (max-width: 1440px) 30vw, 330px' },
+  // линейки ЛВМ/ЛГМ: 4 в ряд, 3 до 1100px, 2 до 800px, одна на телефоне
+  'catalog-lvm-card__cover': { widths: WIDTHS.card, sizes: '(max-width: 480px) 92vw, (max-width: 800px) 46vw, (max-width: 1100px) 31vw, (max-width: 1440px) 23vw, 330px' },
+  'catalog-lgm-card__cover': { widths: WIDTHS.card, sizes: '(max-width: 480px) 92vw, (max-width: 800px) 46vw, (max-width: 1100px) 31vw, (max-width: 1440px) 23vw, 330px' },
   'muf-mod__cover': { widths: WIDTHS.card, sizes: '(max-width: 640px) 100vw, (max-width: 900px) 46vw, (max-width: 1440px) 30vw, 330px' },
   // проекты: плитки с фото на всю карточку (есть широкие — на две колонки), фон шапки, миниатюры на странице проекта
   'pr-photo': { widths: WIDTHS.card, sizes: '(max-width: 760px) 100vw, (max-width: 1100px) 50vw, (max-width: 1440px) 46vw, 660px' },

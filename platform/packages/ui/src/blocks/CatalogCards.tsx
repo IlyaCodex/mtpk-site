@@ -67,7 +67,7 @@ function TeaserCard({ item, eager }: { item: CatalogCardItem; eager: readonly st
   );
 }
 
-/** Линейка ЛВМ/ЛГМ: обложка, раздел линейки, название, «Подробнее». */
+/** Линейка ЛВМ/ЛГМ: обложка, раздел линейки, название, «Подробнее →» (кнопка-стрелка — как у тизера). */
 function LineCard({ item, prefix, eager }: { item: CatalogCardItem; prefix: string; eager: readonly string[] }) {
   return (
     <a href={item.href} className={`${prefix}-card`}>
@@ -77,7 +77,7 @@ function LineCard({ item, prefix, eager }: { item: CatalogCardItem; prefix: stri
       <div className={`${prefix}-card__body`}>
         {item.label !== undefined && <Inline as="div" className={`${prefix}-card__category`} html={item.label} />}
         <Inline as="h3" className={`${prefix}-card__title`} html={item.title} />
-        <Inline className={`${prefix}-card__action`} html={item.linkText ?? 'Подробнее'} />
+        <Inline className={`${prefix}-card__action`} html={`${item.linkText ?? 'Подробнее'} <span class="btn__arrow" aria-hidden="true">→</span>`} />
       </div>
     </a>
   );
