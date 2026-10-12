@@ -74,7 +74,7 @@ export const WIDGET_GROUPS: { title: string; note?: string; items: Widget[] }[] 
   },
 ];
 
-/** Блоки, которые не из схемы, а заготовкой (HTML-секции). */
+/** Плитки-заготовки: блок создаётся не по схеме, а готовым (HTML-секция, контейнер, секция с формой). */
 const VIRTUAL = new Set(['container', 'form-section', 'html']);
 
 /** Заготовка новой HTML-секции: отступы и заголовок — как у секций сайта. */
@@ -89,22 +89,19 @@ const STARTER_HTML = `<section class="cms-section" aria-label="Новая сек
 </section>`;
 
 /**
- * Секция с формой заявки: вёрстка блока «Подбор и расчёт», форма — тег
- * <ui-form> (компонент формы; отправка на /api/send.php). Своё название формы —
- * источник заявки в CRM, свой якорь — чтобы не повторять id="leadgen".
+ * Секция с формой заявки: блок «Подбор и расчёт» (вёрстка одна на весь сайт)
+ * со своими текстами. Своё название формы — источник заявки в CRM, свой
+ * якорь — чтобы не повторять id="leadgen".
  */
-const FORM_SECTION_HTML = `<section class="leadgen" id="zayavka">
-  <div class="container">
-    <div class="leadgen__grid">
-      <div class="leadgen__intro">
-        <div class="leadgen__eyebrow">Подбор и&nbsp;расчёт</div>
-        <h2 class="leadgen__title">Обсудим вашу задачу — <em>заполните форму</em></h2>
-        <p class="leadgen__lead">Инженер свяжется с&nbsp;вами в&nbsp;течение рабочего дня и&nbsp;уточнит детали.</p>
-      </div>
-      <ui-form type="request" name="Заявка со страницы" title="Запрос расчёта" ids="zf" marks task-placeholder="Например: нужна индукционная печь для чугуна на 1 т" submit="Отправить заявку"></ui-form>
-    </div>
-  </div>
-</section>`;
+const FORM_SECTION: BlockData = {
+  type: 'leadgen',
+  eyebrow: 'Подбор и&nbsp;расчёт',
+  title: 'Обсудим вашу задачу — <em>заполните форму</em>',
+  lead: 'Инженер свяжется с&nbsp;вами в&nbsp;течение рабочего дня и&nbsp;уточнит детали.',
+  items: [],
+  form: { name: 'Заявка со страницы', title: 'Запрос расчёта', taskPlaceholder: 'Например: нужна индукционная печь для чугуна на 1 т', submit: 'Отправить заявку' },
+  attrs: { id: 'zayavka' },
+};
 
 /** Фото для заготовок: проекты компании из медиатеки — заменяются щелчком в предпросмотре. */
 const SAMPLE_PHOTOS = [
@@ -149,7 +146,7 @@ const STARTERS: Record<string, Record<string, unknown>> = {
 /** Новый блок типа type. */
 export function createBlock(type: string, schemas: BlockSchemas): BlockData {
   if (type === 'container') return { type: 'container', tag: 'div', children: [] };
-  if (type === 'form-section') return { type: 'html', html: FORM_SECTION_HTML };
+  if (type === 'form-section') return structuredClone(FORM_SECTION);
   if (type === 'html') return { type: 'html', html: STARTER_HTML };
   const schema = schemas[type].schema;
   const base = defaultFor(schema, schema) as BlockData;

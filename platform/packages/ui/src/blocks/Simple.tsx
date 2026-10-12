@@ -47,7 +47,19 @@ export function Faq({ block }: { block: FaqBlock }) {
   );
 }
 
-/** Ключевые показатели: иконка, подпись, число, пояснение. */
+/** Текст значения без тегов, единиц в <small> и знаков-сущностей (&nbsp; и т. п.). */
+const numWord = (html: string) =>
+  html
+    .replace(/<small[\s\S]*?<\/small>/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&[a-z#0-9]+;/gi, ' ')
+    .trim();
+
+/**
+ * Ключевые показатели: иконка, подпись, число, пояснение. Слово вместо числа
+ * («по ТЗ», «Готовность») — помельче (stat__num--text), иначе не помещается
+ * в колонку; подпись необязательна.
+ */
 export function Stats({ block }: { block: StatsBlock }) {
   return (
     <section className="stats" {...extra(block.attrs, 'section')}>
@@ -61,8 +73,12 @@ export function Stats({ block }: { block: StatsBlock }) {
                 </div>
               ) : null}
               <div className="stat__body">
-                <Inline as="div" className="stat__label" html={s.label} />
-                <Inline as="div" className="stat__num" html={s.num} />
+                {s.label.trim() ? <Inline as="div" className="stat__label" html={s.label} /> : null}
+                <Inline
+                  as="div"
+                  className={!/\d/.test(numWord(s.num)) && numWord(s.num).length > 3 ? 'stat__num stat__num--text' : 'stat__num'}
+                  html={s.num}
+                />
                 <Inline as="div" className="stat__text" html={s.text} />
               </div>
             </div>

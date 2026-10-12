@@ -78,7 +78,33 @@ export const containerBlock: z.ZodType<ContainerBlockData> = z.lazy(() =>
 
 // ── Общие блоки сайта (бывшие маркеры <!--C:…-->) ──────────────────────────
 
-export const leadgenBlock = z.object({ type: z.literal('leadgen') }).describe('Форма «Подбор и расчёт»');
+/**
+ * «Подбор и расчёт» (общий блок): слева заголовок, текст и пункты с галочкой,
+ * справа форма заявки. Вёрстка одна на весь сайт, все поля необязательные:
+ * пустое — как на главной; на страницах услуг и разделов свои тексты и форма
+ * (её название — источник заявки в CRM). Якорь — #leadgen; у второй такой
+ * секции на странице — свой (атрибут id), от него же id полей формы.
+ */
+export const leadgenBlock = z
+  .object({
+    type: z.literal('leadgen'),
+    eyebrow: inline('Надзаголовок').optional(),
+    title: inline('Заголовок (акцент — курсивом)').optional(),
+    lead: inline('Текст под заголовком').optional(),
+    items: z.array(inline('Пункт')).optional().describe('Пункты с галочкой'),
+    form: z
+      .object({
+        name: text('Название формы (источник заявки в CRM)'),
+        title: text('Заголовок формы'),
+        taskLabel: text('Подпись поля задачи').optional(),
+        taskPlaceholder: text('Пример в поле задачи'),
+        submit: inline('Кнопка'),
+      })
+      .optional()
+      .describe('Форма'),
+    attrs: attrs(),
+  })
+  .describe('Форма «Подбор и расчёт»');
 /** Строка контакта в блоке «Контакты»: значок, подпись, значение, пояснение, ссылка (tel:, mailto:). */
 export const contactItem = z.object({
   icon: z
@@ -819,7 +845,7 @@ export function pageHasLeadgen(blocks: Block[]): boolean {
   return blocks.some((b) => {
     switch (b.type) {
       case 'leadgen':
-        return true;
+        return (b.attrs?.id ?? 'leadgen') === 'leadgen';
       case 'html':
         return b.html.includes('id="leadgen"');
       case 'container':

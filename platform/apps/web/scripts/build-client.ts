@@ -58,6 +58,8 @@ const CSS_BUNDLES: Record<string, string[]> = {
     'public/css/stock.css',
     'public/css/base-layout.css',
     'src/styles/components.css',
+    // разделы страниц — один вид на всех страницах (после шаблонов и стилей страниц)
+    'src/styles/sections.css',
     'src/styles/widgets.css',
     'src/styles/theme-dark.css',
   ],

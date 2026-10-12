@@ -21,13 +21,14 @@ import { sameIcon } from './svg-icon';
 /** Строчные элементы: текст с ними правится одним куском (как в html-fields). */
 const INLINE = new Set(['em', 'strong', 'b', 'i', 'u', 's', 'br', 'span', 'small', 'sup', 'sub', 'mark', 'abbr', 'a', 'code', 'nobr', 'wbr', 'time']);
 /** Блоки-компоненты: их тексты одинаковы на всех страницах и в данных страницы не хранятся. */
-const COMPONENTS = new Set(['leadgen', 'bestOffer', 'catalogCta', 'partner', 'adv', 'whyUs']);
+const COMPONENTS = new Set(['bestOffer', 'catalogCta', 'partner', 'adv', 'whyUs']);
 
 const REASONS = {
   shared: 'Общий блок категории — он одинаковый у всех её товаров. Меняется в «Каталоге продукции» → категория → «Блоки под товарами».',
   component: 'Общая секция сайта — одинаковая на всех страницах, здесь её текст не меняется.',
+  defaults: 'Тексты блока — общие, как на главной. Свои тексты для этой страницы задаются в полях блока слева.',
   catalog: 'Карточка из каталога — название и подпись меняются в «Каталоге продукции».',
-  form: 'Форма заявки — её подписи меняются слева: секция → «Тексты и картинки» → поля «Форма: …».',
+  form: 'Форма заявки — её подписи меняются слева: у блока «Подбор и расчёт» — поля «Форма», у HTML-секции — «Тексты и картинки» → поля «Форма: …».',
   notFound: 'Этот текст не нашёлся в полях блока — поправьте его слева.',
   mismatch: 'Не удалось сопоставить текст с HTML секции — поправьте его слева.',
   changed: 'Секция изменилась, пока правился текст, — повторите правку.',
@@ -198,6 +199,8 @@ function plan(el: Element, blocks: BlockData[]): Plan {
   const block = blockByMark(blocks, path);
   if (!block) return deny(REASONS.notFound);
   if (COMPONENTS.has(block.type)) return deny(REASONS.component);
+  // «Подбор и расчёт» без своих текстов выводит общие — в его полях их нет
+  if (block.type === 'leadgen' && !leaves(block).some((l) => l.value.trim())) return deny(REASONS.defaults);
   const original = norm(el.textContent);
 
   if (block.type === 'html') {

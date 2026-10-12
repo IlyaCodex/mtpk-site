@@ -49,7 +49,7 @@ export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) 
     case 'container':
       return <Container block={block} render={(children) => <Blocks blocks={children} ctx={ctx} />} />;
     case 'leadgen':
-      return <Leadgen />;
+      return <Leadgen block={block} />;
     case 'bestOffer':
       return <BestOffer block={block} anchorId={ctx.hasLeadgenBlock ? 'best-offer' : 'leadgen'} />;
     case 'catalogCta':
