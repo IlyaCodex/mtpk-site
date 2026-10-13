@@ -38,6 +38,8 @@ const ENTRIES: Record<string, string> = {
   stock: 'src/client/stock.ts',
   // панель администратора на страницах-документах (Практикум) — без общего модуля site
   'doc-bar': 'src/client/doc-bar.ts',
+  // эффект праздничной обложки главной (снег, искры…) — только в дни праздника
+  'holiday-fx': 'src/client/holiday-fx.ts',
 };
 
 /**
@@ -60,6 +62,8 @@ const CSS_BUNDLES: Record<string, string[]> = {
     'src/styles/components.css',
     // разделы страниц — один вид на всех страницах (после шаблонов и стилей страниц)
     'src/styles/sections.css',
+    // праздничная обложка главной (раздел «Праздники»)
+    'src/styles/holiday.css',
     'src/styles/widgets.css',
     'src/styles/theme-dark.css',
   ],

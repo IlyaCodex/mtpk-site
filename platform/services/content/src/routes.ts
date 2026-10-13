@@ -9,7 +9,21 @@ import { buttonDesignAttrs } from '@mtpk/content-kit/design';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
 import { annotateDocument, setDocMeta } from '@mtpk/content-kit/doc-edit';
-import { block as blockSchema, BLOCK_LABELS, BLOCK_SCHEMAS, pageHasLeadgen, pageInput, siteSettings, walkBlocks, type Block, type PageInput } from '@mtpk/content-model';
+import {
+  block as blockSchema,
+  BLOCK_LABELS,
+  BLOCK_SCHEMAS,
+  holiday as holidaySchema,
+  holidaySettings,
+  nearestWindow,
+  pageHasLeadgen,
+  pageInput,
+  siteSettings,
+  toActiveHoliday,
+  walkBlocks,
+  type Block,
+  type PageInput,
+} from '@mtpk/content-model';
 import { renderBlocksMarked, renderBlocksToHtml, renderFormSlots } from '@mtpk/ui/server';
 import { catalogNodes } from './catalog.ts';
 import { catalogAdminRoutes, catalogPageGuard } from './catalog-admin.ts';
@@ -46,6 +60,7 @@ export async function publicRoutes(base: FastifyInstance, { store, db }: Deps) {
   );
   app.get('/v1/pages', { schema: { tags: ['Страницы'], summary: 'Опубликованные страницы (для карты сайта)' } }, async () => store.listPages());
   app.get('/v1/settings', { schema: { tags: ['Сайт'], summary: 'Настройки сайта: контакты, меню, подвал' } }, async () => store.settings());
+  app.get('/v1/holidays', { schema: { tags: ['Сайт'], summary: 'Праздничные баннеры главной: расписание, баннеры, поздравления' } }, async () => store.holidays());
   app.get('/v1/site-data', { schema: { tags: ['Сайт'], summary: 'Склад и разделы со сравнением (для рендера блоков)' } }, async () =>
     store.siteData(),
   );
@@ -529,6 +544,8 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
           blocks: z.array(z.unknown()),
           pretty: z.boolean().optional().describe('С отступами — для правки кодом'),
           mark: z.boolean().optional().describe('С метками блоков <!--mtpk:N--> — для правки текста в предпросмотре'),
+          holiday: holidaySchema.optional().describe('Праздник для предпросмотра обложки главной (раздел «Праздники»)'),
+          signature: z.string().optional().describe('Подпись под поздравлением'),
         }),
         security: ADMIN,
       },
@@ -557,6 +574,10 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
         hasLeadgenBlock: pageHasLeadgen(blocks),
         // предпросмотр: CSS блоков и секций — сразу в разметке
         preview: Boolean(req.body.mark),
+        // предпросмотр праздника в админке — как в его ближайшее окно показа
+        holiday: req.body.holiday
+          ? toActiveHoliday(req.body.holiday, nearestWindow(req.body.holiday, Date.now()), req.body.signature ?? (await store.holidays()).signature)
+          : null,
       };
       const html = req.body.mark ? renderBlocksMarked(blocks, marks, ctx) : renderBlocksToHtml(blocks, ctx);
       // оформление кнопок из настроек сайта — атрибуты <html> документа предпросмотра (как на сайте)
@@ -581,6 +602,26 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       // шапка и подвал есть на каждой странице
       await store.purge();
       await notifyWeb('all');
+      return { ok: true };
+    },
+  );
+
+  // ── Праздничные баннеры главной ────────────────────────────────────────
+  app.get(
+    '/admin/v1/holidays',
+    { schema: { tags: ['Админка: настройки'], summary: 'Праздники: расписание, баннеры, поздравления', security: ADMIN } },
+    async () => store.holidays(),
+  );
+  app.put(
+    '/admin/v1/holidays',
+    { schema: { tags: ['Админка: настройки'], summary: 'Сохранить праздники', body: holidaySettings, security: ADMIN } },
+    async (req) => {
+      const by = typeof req.headers['x-admin-user'] === 'string' ? req.headers['x-admin-user'] : null;
+      const value = req.body as Prisma.InputJsonValue;
+      await db.setting.upsert({ where: { key: 'holidays' }, create: { key: 'holidays', value, updatedBy: by }, update: { value, updatedBy: by } });
+      await store.purgeHolidays();
+      // праздничная шапка — только на главной
+      await notifyWeb(['/']);
       return { ok: true };
     },
   );

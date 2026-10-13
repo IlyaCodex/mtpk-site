@@ -20,6 +20,7 @@ export { ProductSpec, SpecTable } from './blocks/ProductSpec.tsx';
 export { Lightbox } from './blocks/Lightbox.tsx';
 export { CatalogList } from './blocks/CatalogList.tsx';
 export { CategoryHero } from './blocks/CategoryHero.tsx';
+export { HomeHero, holidayImageHints } from './blocks/HomeHero.tsx';
 export { Faq, Stats } from './blocks/Simple.tsx';
 export { Leadgen } from './blocks/Leadgen.tsx';
 export { BestOffer } from './blocks/BestOffer.tsx';

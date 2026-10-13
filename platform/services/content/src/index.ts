@@ -2,6 +2,7 @@
  * Контент-сервис: страницы, стили, редиректы, «Наличие», «Сравнение».
  * Источник правды — PostgreSQL (схема content), горячие данные — в Redis.
  */
+import { activeHoliday } from '@mtpk/content-model';
 import { CONTENT_STREAM, consumeEvents, createLogger, createRedis, JsonCache, startService } from '@mtpk/shared';
 import { createDb } from './db.ts';
 import { env } from './env.ts';
@@ -54,6 +55,26 @@ await startService({
     await close();
   },
 });
+
+// Праздничная шапка главной включается и выключается по расписанию («Праздники»): раз в
+// полминуты сверяем, какой праздник должен быть на сайте, и при смене — сигнал сайту
+// перегенерировать главную (страховка — revalidate у главной до ближайшей смены).
+let shownHoliday: string | null | undefined;
+const holidayTimer = setInterval(() => {
+  void (async () => {
+    try {
+      const id = activeHoliday(await store.holidays(), Date.now())?.id ?? null;
+      if (id !== shownHoliday) {
+        if (shownHoliday !== undefined) log.info({ from: shownHoliday, to: id }, 'праздничная шапка главной сменилась');
+        shownHoliday = id;
+        await notifyWeb(['/']);
+      }
+    } catch (err) {
+      log.warn({ err: (err as Error).message }, 'не удалось проверить расписание праздников');
+    }
+  })();
+}, 30_000);
+holidayTimer.unref();
 
 // Массовое изменение контента (событие content.reindex) — сбрасываем весь кеш, даже если
 // отправитель не достучался до HTTP-эндпоинта.

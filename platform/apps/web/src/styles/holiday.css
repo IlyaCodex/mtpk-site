@@ -1,0 +1,133 @@
+/* ============================================================
+   Праздничная обложка главной (13.10.2026): в дни праздника вместо фото
+   обложки — баннер праздника во весь экран, поздравление крупно, подпись
+   компании и эффект (снег, искры, лепестки, огоньки) на <canvas>.
+   Расписание, баннеры и тексты — админка «Праздники»; разметка —
+   packages/ui/src/blocks/HomeHero.tsx, эффект — src/client/holiday-fx.ts.
+   Баннеры тёмно-синие с сюжетом справа: текст — слева на тёмном поле,
+   акценты праздника — золотистые.
+   ============================================================ */
+
+:root {
+  /* цвета праздника — в переменных: пересчёт цветов для тёмной темы их не трогает (обложка тёмная в обеих темах) */
+  --holiday-ink: #060e20;
+  --holiday-gold-light: #fbe7b2;
+  --holiday-gold: #f2d48d;
+  --holiday-gold-deep: #d6a74e;
+}
+
+section.hero--holiday {
+  min-height: min(76vh, 640px);
+  align-items: center;
+  background: var(--holiday-ink);
+}
+
+/* баннер: медленное «дыхание» кадра */
+.hero--holiday .hero__holiday-img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: 70% 50%;
+  animation: holiday-breathe 30s ease-in-out infinite alternate;
+}
+@keyframes holiday-breathe {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+/* тёмное поле под текст слева, низ — плавно в цвет фона */
+.hero--holiday .hero__overlay {
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(6, 14, 32, 0.88) 0%, rgba(6, 14, 32, 0.66) 30%, rgba(6, 14, 32, 0.2) 56%, rgba(6, 14, 32, 0) 70%),
+    linear-gradient(180deg, rgba(6, 14, 32, 0) 60%, rgba(6, 14, 32, 0.5) 100%);
+}
+
+/* эффект — над баннером, под текстом; проявляется, когда модуль начал рисовать */
+.hero--holiday .hero__fx {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+.hero--holiday .hero__fx.is-on { opacity: 1; }
+
+.hero--holiday .hero__content { z-index: 3; }
+.hero--holiday .hero__content::before { display: none; }
+.hero--holiday .hero__grid { grid-template-columns: minmax(0, 1fr); }
+.hero--holiday .hero__left { max-width: 660px; }
+
+.hero--holiday .hero__eyebrow { color: var(--holiday-gold); }
+.hero--holiday .hero__eyebrow::before { background: var(--holiday-gold); }
+
+/* поздравление — вместо H1 на экране (H1 страницы скрыт, но остаётся для поисковиков) */
+.hero--holiday .hero__greeting {
+  max-width: 16ch;
+  margin: 0 0 var(--sp-5);
+  font-size: clamp(36px, 4.8vw, 66px);
+  line-height: 1.03;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.hero--holiday .hero__greeting em {
+  font-style: normal;
+  color: var(--holiday-gold);
+  background: linear-gradient(100deg, var(--holiday-gold-light) 0%, var(--holiday-gold) 45%, var(--holiday-gold-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero--holiday .hero__subtitle { max-width: 52ch; color: rgba(255, 255, 255, 0.86); }
+.hero--holiday .hero__signature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: calc(-1 * var(--sp-3)) 0 var(--sp-7);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: var(--fw-semibold, 600);
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.7);
+}
+.hero--holiday .hero__signature::before {
+  content: "";
+  flex: none;
+  width: 28px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--holiday-gold), transparent);
+}
+
+.hero__h1-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  section.hero--holiday { min-height: 82vh; align-items: flex-end; }
+  /* на телефоне баннер под текстом: затемнение снизу, сюжет — сверху */
+  .hero--holiday .hero__overlay {
+    background: linear-gradient(180deg, rgba(6, 14, 32, 0.2) 0%, rgba(6, 14, 32, 0.38) 34%, rgba(6, 14, 32, 0.86) 66%, var(--holiday-ink) 100%);
+  }
+  .hero--holiday .hero__greeting { max-width: none; font-size: clamp(32px, 9vw, 42px); }
+  .hero--holiday .hero__signature { margin-bottom: var(--sp-6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero--holiday .hero__holiday-img { animation: none; }
+  .hero--holiday .hero__fx { display: none; }
+}

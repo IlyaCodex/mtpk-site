@@ -470,6 +470,32 @@ export const categoryHeroBlock = z
   })
   .describe('Обложка раздела/категории');
 
+/**
+ * Обложка главной: фото во весь экран, заголовок (H1), кнопки и карточка
+ * «Экспресс-заявка» справа. В дни праздников — праздничный вид из расписания
+ * «Праздники» (баннер, поздравление, эффект): его подставляет сайт, в полях
+ * блока он не хранится. Фото обложки — в стилях сайта (.hero__image).
+ */
+export const homeHeroBlock = z
+  .object({
+    type: z.literal('homeHero'),
+    imageLabel: text('Что на фото (для скринридеров)'),
+    eyebrow: inline('Надзаголовок'),
+    title: inline('Заголовок (H1, акцент — курсивом)'),
+    subtitle: inline('Подзаголовок'),
+    actions: z.array(action).describe('Кнопки'),
+    quickCard: z
+      .object({
+        badge: inline('Плашка'),
+        title: inline('Заголовок'),
+        subtitle: inline('Подзаголовок'),
+        formName: text('Название формы (источник заявки)'),
+      })
+      .describe('Карточка «Экспресс-заявка»')
+      .optional(),
+  })
+  .describe('Обложка главной (праздничные баннеры — раздел «Праздники»)');
+
 export const faqBlock = z
   .object({
     type: z.literal('faq'),
@@ -696,6 +722,7 @@ export const block: z.ZodType<Block> = z.lazy(() =>
     stockShowcaseBlock,
     stockListBlock,
     categoryHeroBlock,
+    homeHeroBlock,
     faqBlock,
     statsBlock,
     richTextBlock,
@@ -727,6 +754,7 @@ export type CatalogCardsBlock = z.infer<typeof catalogCardsBlock>;
 export type StockShowcaseBlock = z.infer<typeof stockShowcaseBlock>;
 export type StockListBlock = z.infer<typeof stockListBlock>;
 export type CategoryHeroBlock = z.infer<typeof categoryHeroBlock>;
+export type HomeHeroBlock = z.infer<typeof homeHeroBlock>;
 export type FaqBlock = z.infer<typeof faqBlock>;
 export type StatsBlock = z.infer<typeof statsBlock>;
 export type RichTextBlock = z.infer<typeof richTextBlock>;
@@ -758,6 +786,7 @@ export type Block =
   | StockShowcaseBlock
   | StockListBlock
   | CategoryHeroBlock
+  | HomeHeroBlock
   | FaqBlock
   | StatsBlock
   | RichTextBlock
@@ -792,6 +821,7 @@ export const BLOCK_SCHEMAS: Record<BlockType, z.ZodType> = {
   stockShowcase: stockShowcaseBlock,
   stockList: stockListBlock,
   categoryHero: categoryHeroBlock,
+  homeHero: homeHeroBlock,
   faq: faqBlock,
   stats: statsBlock,
   richText: richTextBlock,
@@ -825,6 +855,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   stockShowcase: 'Склад: типы оборудования',
   stockList: 'Склад: позиции в наличии',
   categoryHero: 'Обложка раздела',
+  homeHero: 'Обложка главной',
   faq: 'Частые вопросы',
   stats: 'Показатели',
   richText: 'Текст',

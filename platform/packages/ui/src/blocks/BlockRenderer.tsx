@@ -11,6 +11,7 @@ import { CatalogCta } from './CatalogCta.tsx';
 import { CatalogCards } from './CatalogCards.tsx';
 import { CatalogList } from './CatalogList.tsx';
 import { CategoryHero } from './CategoryHero.tsx';
+import { HomeHero } from './HomeHero.tsx';
 import { Leadgen } from './Leadgen.tsx';
 import { Lightbox } from './Lightbox.tsx';
 import { Partner } from './Partner.tsx';
@@ -76,6 +77,8 @@ export function BlockView({ block, ctx }: { block: Block; ctx: RenderContext }) 
       return <StockList block={block} ctx={ctx} />;
     case 'categoryHero':
       return <CategoryHero block={block} />;
+    case 'homeHero':
+      return <HomeHero block={block} holiday={ctx.holiday} />;
     case 'faq':
       return <Faq block={block} />;
     case 'stats':

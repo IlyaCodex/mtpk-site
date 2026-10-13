@@ -70,6 +70,9 @@
   панелью «Добавить блок» (`apps/admin/src/components/widgets.tsx`) или «+» у блока в предпросмотре.
 - Панель администратора на сайте (вошли в админку — сверху «Редактировать страницу» и т. д.) —
   `apps/web/src/client/admin-bar.ts`, данные — `/admin/api/v1/site-bar`.
+- Праздничные баннеры главной (расписание, баннеры, поздравления, эффекты) — админка «Праздники»; модель и даты —
+  `packages/content-model/src/holidays.ts`, шапка — `packages/ui/src/blocks/HomeHero.tsx`, эффекты —
+  `apps/web/src/client/holiday-fx.ts`, стили — `apps/web/src/styles/holiday.css`.
 
 ## Где живёт состояние проекта
 

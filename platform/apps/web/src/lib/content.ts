@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, type SiteSettings } from '@mtpk/content-model';
+import { DEFAULT_SETTINGS, type HolidaySettings, type SiteSettings } from '@mtpk/content-model';
 import type { PageDto, PageListItem, RedirectDto, SiteDataDto } from '@mtpk/shared/contracts';
 
 /**
@@ -31,6 +31,15 @@ export async function getSettings(): Promise<SiteSettings> {
     return (await getJson<SiteSettings>('/v1/settings')) ?? DEFAULT_SETTINGS;
   } catch {
     return DEFAULT_SETTINGS;
+  }
+}
+
+/** Праздничные баннеры главной (раздел «Праздники»); контент-сервис недоступен — без праздника. */
+export async function getHolidays(): Promise<HolidaySettings | null> {
+  try {
+    return await getJson<HolidaySettings>('/v1/holidays');
+  } catch {
+    return null;
   }
 }
 

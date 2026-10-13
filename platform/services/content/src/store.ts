@@ -13,7 +13,7 @@ import {
 import { resolveCatalogBlocks, type CatalogData } from '@mtpk/content-kit/catalog';
 import { darkVars } from '@mtpk/content-kit/dark';
 import { styleFileCss } from '@mtpk/content-kit/styles';
-import { DEFAULT_SETTINGS, siteSettings, type Block, type SiteSettings } from '@mtpk/content-model';
+import { DEFAULT_HOLIDAYS, DEFAULT_SETTINGS, holidaySettings, siteSettings, type Block, type HolidaySettings, type SiteSettings } from '@mtpk/content-model';
 import { loadCatalog } from './catalog-data.ts';
 import type { Db, Page, StyleBlock } from './db.ts';
 import type { JsonCache, Logger, PageDto, PageListItem, RedirectDto } from '@mtpk/shared';
@@ -235,6 +235,22 @@ export class ContentStore {
       this.log.error({ issues: parsed.error.issues.slice(0, 5) }, 'настройки сайта не прошли проверку — отдаём значения по умолчанию');
       return DEFAULT_SETTINGS;
     });
+  }
+
+  /** Праздничные баннеры главной (раздел «Праздники»). Нет записи или она битая — праздники по умолчанию. */
+  async holidays(): Promise<HolidaySettings> {
+    return this.cache.wrap('holidays', this.ttl, async () => {
+      const row = await this.db.setting.findUnique({ where: { key: 'holidays' } });
+      if (!row) return DEFAULT_HOLIDAYS;
+      const parsed = holidaySettings.safeParse(row.value);
+      if (parsed.success) return parsed.data;
+      this.log.error({ issues: parsed.error.issues.slice(0, 5) }, 'расписание праздников не прошло проверку — отдаём праздники по умолчанию');
+      return DEFAULT_HOLIDAYS;
+    });
+  }
+
+  async purgeHolidays(): Promise<void> {
+    await this.cache.del('holidays');
   }
 
   async searchDoc(path: string): Promise<SearchDoc | null> {

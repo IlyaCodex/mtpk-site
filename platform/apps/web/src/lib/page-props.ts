@@ -1,4 +1,4 @@
-import { walkBlocks, type Block, type SiteSettings } from '@mtpk/content-model';
+import { walkBlocks, type ActiveHoliday, type Block, type SiteSettings } from '@mtpk/content-model';
 import type { SiteDataDto } from '@mtpk/shared/contracts';
 import type { HeadPage } from '@/components/SiteHead';
 import { clientModuleUrl, type ClientModule } from './assets';
@@ -23,11 +23,14 @@ export interface SitePageProps extends DocumentProps {
   settings: SiteSettings;
   site: SiteDataDto;
   activeNav: string | null;
+  /** праздник на главной (раздел «Праздники»): праздничный вид обложки */
+  holiday: ActiveHoliday | null;
 }
 
-/** Какие клиентские модули нужны странице — по её блокам. */
-export function pageModules(blocks: Block[]): string[] {
+/** Какие клиентские модули нужны странице — по её блокам (и праздничному эффекту обложки главной). */
+export function pageModules(blocks: Block[], holiday: ActiveHoliday | null = null): string[] {
   const need = new Set<ClientModule>(['site']);
+  if (holiday && holiday.effect !== 'none') need.add('holiday-fx');
   for (const b of walkBlocks(blocks)) {
     if (b.type === 'productHero' && b.media.photos.length > 1) need.add('gallery');
     if (b.type === 'lightbox') need.add('lightbox');

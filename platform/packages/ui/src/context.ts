@@ -1,4 +1,4 @@
-import { pageHasLeadgen, walkBlocks, type Block } from '@mtpk/content-model';
+import { pageHasLeadgen, walkBlocks, type ActiveHoliday, type Block } from '@mtpk/content-model';
 import { CARD_COVER_PLACE } from './blocks/CatalogCards.tsx';
 import { findImagePlace, imageSources } from './primitives/images-html.ts';
 import { responsive } from './primitives/images.ts';
@@ -27,6 +27,8 @@ export interface RenderContext {
   eagerImages?: string[];
   /** предпросмотр в админке: CSS блоков и секций — сразу в разметке (несохранённого файла ещё нет) */
   preview?: boolean;
+  /** праздник, который сейчас на сайте: праздничный вид обложки главной (раздел «Праздники») */
+  holiday?: ActiveHoliday | null;
 }
 
 export const EMPTY_CONTEXT: RenderContext = { path: '/', stock: {}, compareSections: [], hasLeadgenBlock: false };
@@ -91,7 +93,12 @@ export function preloadHints(src: string, blocks: Block[]): { href: string; srcS
 }
 
 /** Контекст страницы по её блокам и данным сайта. */
-export function buildRenderContext(path: string, blocks: Block[], site: { stock: Record<string, StockInfo>; compareSections: string[] }): RenderContext {
+export function buildRenderContext(
+  path: string,
+  blocks: Block[],
+  site: { stock: Record<string, StockInfo>; compareSections: string[] },
+  holiday: ActiveHoliday | null = null,
+): RenderContext {
   const frames = countLightboxFrames(blocks);
   return {
     path,
@@ -100,5 +107,6 @@ export function buildRenderContext(path: string, blocks: Block[], site: { stock:
     hasLeadgenBlock: pageHasLeadgen(blocks),
     lightboxTotal: frames || undefined,
     eagerImages: firstImages(blocks),
+    holiday,
   };
 }

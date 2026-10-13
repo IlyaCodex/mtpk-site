@@ -127,6 +127,10 @@ const LINEAR = {
   /** code-linear */
   code: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M17 7.82959L18.6965 9.35641C20.239 10.7447 21.0103 11.4389 21.0103 12.3296C21.0103 13.2203 20.239 13.9145 18.6965 15.3028L17 16.8296"/><path d="M13.9868 5L12 12.4149L10.0132 19.8297"/><path d="M7.00005 7.82959L5.30358 9.35641C3.76102 10.7447 2.98975 11.4389 2.98975 12.3296C2.98975 13.2203 3.76102 13.9145 5.30358 15.3028L7.00005 16.8296"/></g>',
   /** magnifier-linear */
+  /** gift-linear */
+  gift: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M22 12H2"/><path d="M12 2V22"/><path d="M13 12C13 14.21 14.79 16 17 16"/><path d="M11 12C11 14.21 9.21 16 7 16"/><path d="M12 10.04C12 8.55 13.01 7.25 14.46 6.89C16.06 6.48 17.52 7.94 17.11 9.54C16.75 10.99 15.45 12 13.96 12H12V10.04Z"/><path d="M12 10.04C12 8.55 10.99 7.25 9.54 6.89C7.94 6.48 6.48 7.94 6.89 9.54C7.25 10.99 8.55 12 10.04 12H12V10.04Z"/><path d="M2 12C2 7.29 2 4.93 3.46 3.46C4.93 2 7.29 2 12 2C16.71 2 19.07 2 20.54 3.46C22 4.93 22 7.29 22 12C22 16.71 22 19.07 20.54 20.54C19.07 22 16.71 22 12 22C7.29 22 4.93 22 3.46 20.54C2 19.07 2 16.71 2 12Z"/></g>',
+  /** calendar-linear */
+  calendar: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M2 12C2 8.23 2 6.34 3.17 5.17C4.34 4 6.23 4 10 4H14C17.77 4 19.66 4 20.83 5.17C22 6.34 22 8.23 22 12V14C22 17.77 22 19.66 20.83 20.83C19.66 22 17.77 22 14 22H10C6.23 22 4.34 22 3.17 20.83C2 19.66 2 17.77 2 14V12Z"/><path d="M7 4V2.5"/><path d="M17 4V2.5"/><path d="M2.5 9H21.5"/><path stroke-linejoin="round" d="M17 13H17"/><path stroke-linejoin="round" d="M12 13H12"/><path stroke-linejoin="round" d="M7 13H7"/><path stroke-linejoin="round" d="M17 17.02H17"/><path stroke-linejoin="round" d="M12 17.02H12"/><path stroke-linejoin="round" d="M7 17.02H7"/></g>',
   search: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><circle cx="11.5" cy="11.5" r="9.5"/><path d="M18.2173 18.2178L21.9999 22.0004"/></g>',
 } as const;
 
