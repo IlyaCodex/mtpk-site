@@ -28,6 +28,8 @@ function apply(theme: Theme): void {
  * (localStorage) и сразу применяется в других открытых вкладках сайта.
  */
 export function initTheme(): void {
+  // страница без переключателя (статьи Практикума) всегда светлая: её стили тёмной темы не знают
+  if (!document.querySelector('[data-theme-toggle]')) return;
   paint(current());
   delegate('click', '[data-theme-toggle]', () => {
     const next: Theme = current() === 'dark' ? 'light' : 'dark';

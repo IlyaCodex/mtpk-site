@@ -1,15 +1,21 @@
-import { DRAWER_ICONS, type ContactsSettings, type DrawerItem } from '@mtpk/content-model';
+import { DRAWER_ICONS, type NavItem, type SiteSettings } from '@mtpk/content-model';
 import { ContactLink } from './ContactLink';
 import { MenuIcon } from './icons';
+
+type MegaLink = NonNullable<NavItem['mega']>['columns'][number]['links'][number];
 
 const contactIcon = (paths: string) =>
   `<span class="nav-drawer__contact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg></span>`;
 
 /**
- * Мобильное меню (≤ 1024px): пункты из настроек сайта. Открытие, разделы-
- * «аккордеоны», недоступность фона и фокус — клиентский модуль header.ts.
+ * Мобильное меню (≤ 1024px): пункты из настроек сайта (админка «Шапка, меню,
+ * контакты» → мобильное меню). Подпункты разделов — как мегаменю на компьютере:
+ * иконка и подпись берутся у пункта мегаменю с тем же адресом. Открытие,
+ * разделы-«аккордеоны», недоступность фона и фокус — клиентский модуль header.ts.
  */
-export function Drawer({ items, contacts }: { items: DrawerItem[]; contacts: ContactsSettings }) {
+export function Drawer({ settings }: { settings: SiteSettings }) {
+  const { drawer: items, contacts, nav } = settings;
+  const mega = new Map<string, MegaLink>(nav.flatMap((n) => n.mega?.columns.flatMap((c) => c.links) ?? []).map((l) => [l.href, l]));
   return (
     <aside className="nav-drawer" aria-hidden="true" data-nav-drawer="">
       <div className="nav-drawer__header">
@@ -32,24 +38,43 @@ export function Drawer({ items, contacts }: { items: DrawerItem[]; contacts: Con
                 <span className="nav-drawer__text">{item.label}</span>
                 <span className="nav-drawer__acc-chev" aria-hidden="true" />
               </button>
+              {/* панель раскрывается плавно: внешний блок — высота (grid), внутренний — обрезка, третий — отступы */}
               <div className="nav-drawer__panel">
-                {item.groups.flatMap((group, g) => [
-                  group.label ? (
-                    <div key={`g${g}`} className="nav-drawer__group-label">
-                      {group.label}
-                    </div>
-                  ) : null,
-                  ...group.links.map((link) => (
-                    <a key={`${g}${link.href}`} className="nav-drawer__sublink" href={link.href}>
-                      {link.label}
-                    </a>
-                  )),
-                ])}
-                {item.all && (
-                  <a className="nav-drawer__sublink nav-drawer__sublink--all" href={item.all.href}>
-                    <ArrowLabel label={item.all.label} />
-                  </a>
-                )}
+                <div className="nav-drawer__panel-inner">
+                  <div className="nav-drawer__panel-body">
+                    {item.groups.map((group, g) => (
+                      <div key={g} className="nav-drawer__group">
+                        {group.label && <div className="nav-drawer__group-label">{group.label}</div>}
+                        <ul className="nav-drawer__sublist">
+                          {group.links.map((link) => {
+                            const meta = mega.get(link.href);
+                            // подпись не повторяет название («ХТС — холодно-твердеющие смеси» / «Холодно-твердеющие смеси»)
+                            const desc = meta?.desc && !link.label.toLowerCase().includes(meta.desc.toLowerCase()) ? meta.desc : null;
+                            return (
+                              <li key={link.href}>
+                                <a className="nav-drawer__sublink" href={link.href}>
+                                  <span className="nav-drawer__sub-icon" aria-hidden="true">
+                                    {meta?.icon ? <MenuIcon paths={meta.icon} strokeWidth={1.7} /> : <span className="nav-drawer__sub-dot" />}
+                                  </span>
+                                  <span className="nav-drawer__sub-body">
+                                    <span className="nav-drawer__sub-title">{link.label}</span>
+                                    {desc && <span className="nav-drawer__sub-desc">{desc}</span>}
+                                  </span>
+                                  <span className="nav-drawer__sub-arrow" aria-hidden="true" />
+                                </a>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    ))}
+                    {item.all && (
+                      <a className="nav-drawer__sublink nav-drawer__sublink--all" href={item.all.href}>
+                        <ArrowLabel label={item.all.label} />
+                      </a>
+                    )}
+                  </div>
+                </div>
               </div>
             </li>
           ) : (
@@ -78,7 +103,7 @@ export function Drawer({ items, contacts }: { items: DrawerItem[]; contacts: Con
 
 /** Подпись ссылки из настроек: «→» в конце — иконкой, как у кнопок (стили .btn__arrow). */
 function ArrowLabel({ label }: { label: string }) {
-  const m = /^([\s\S]*?)[\s\u00a0]*→\s*$/.exec(label);
+  const m = /^([\s\S]*?)[\s ]*→\s*$/.exec(label);
   if (!m) return <>{label}</>;
   return (
     <>

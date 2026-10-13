@@ -61,7 +61,7 @@ export default function NotFound({ settings }: Props) {
         </section>
       </main>
       <Footer settings={settings} />
-      <Drawer items={settings.drawer} contacts={settings.contacts} />
+      <Drawer settings={settings} />
       <CookieConsent />
     </>
   );

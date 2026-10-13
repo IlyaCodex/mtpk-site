@@ -21,8 +21,10 @@ export function pathToSlug(p: string): string {
  * фото товара, фон hero или первое изображение страницы.
  */
 export function pickSearchImage(body: string, preloadImage: string | null | undefined): string | null {
+  // кавычки в url() бывают и сущностями: React пишет style="background-image:url(&#x27;/img/…&#x27;)"
+  const q = `(?:['"]|&#x27;|&#39;|&quot;)?`;
   const m = body.match(/class="phero__main"[\s\S]*?<img[^>]*?src="([^"]+)"/)
-    || body.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/)
+    || body.match(new RegExp(`background-image:\\s*url\\(${q}([^'"&)]+)${q}\\)`))
     || body.match(/<img[^>]*?src="([^"]+)"/);
   const raw = (preloadImage || (m && m[1]) || '').replace(/\?v=\d+/, '');
   return raw || null;

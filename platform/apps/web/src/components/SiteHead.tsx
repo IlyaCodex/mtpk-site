@@ -14,6 +14,29 @@ export type HeadPage = Pick<
 };
 
 /**
+ * Общее для всех страниц сайта и статей Практикума (lib/site-chrome.tsx):
+ * предзагрузка логотипа шапки и шрифтов, модулей страницы и общие стили core.css.
+ */
+export function CoreAssets({ modules = [] }: { modules?: string[] }) {
+  const core = clientModuleUrl('core.css');
+  return (
+    <>
+      {/* Лого в шапке — LCP-элемент; основные веса Inter — параллельно с HTML (T-PERF-2) */}
+      <link rel="preload" as="image" href="/brand/logo-header-clean.png" fetchPriority="high" />
+      <link rel="preload" href="/fonts/inter-400-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
+      <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossOrigin="" />
+      <link rel="preload" href="/fonts/inter-600-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
+      <link rel="preload" href="/fonts/inter-600-latin.woff2" as="font" type="font/woff2" crossOrigin="" />
+      {/* модули страницы качаются параллельно со стилями, выполняются после разбора HTML */}
+      {modules.map((src) => (
+        <link key={src} rel="modulepreload" href={src} />
+      ))}
+      {core && <link rel="stylesheet" href={core} />}
+    </>
+  );
+}
+
+/**
  * <head> страницы. Все стили — внешние файлы (кешируются браузером, в коде
  * страницы <style> нет). Порядок — каскад прежнего сайта: общее ядро
  * (core.css) → шаблонные стили страницы → её собственные → мобильные правки
@@ -23,7 +46,6 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
   const canonical = `${SITE}${page.path}`;
   const ogDescription = page.description ?? DEFAULT_DESCRIPTION;
   const image = `${SITE}${DEFAULT_OG_IMAGE}`;
-  const core = clientModuleUrl('core.css');
   const coreEnd = clientModuleUrl('core-end.css');
   return (
     <>
@@ -53,17 +75,7 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(ORGANIZATION_SCHEMA) }} />
       {home && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(WEBSITE_SCHEMA) }} />}
-      {/* Лого в шапке — LCP-элемент; основные веса Inter — параллельно с HTML (T-PERF-2) */}
-      <link rel="preload" as="image" href="/brand/logo-header-clean.png" fetchPriority="high" />
-      <link rel="preload" href="/fonts/inter-400-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
-      <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossOrigin="" />
-      <link rel="preload" href="/fonts/inter-600-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
-      <link rel="preload" href="/fonts/inter-600-latin.woff2" as="font" type="font/woff2" crossOrigin="" />
-      {/* модули страницы качаются параллельно со стилями, выполняются после разбора HTML */}
-      {modules.map((src) => (
-        <link key={src} rel="modulepreload" href={src} />
-      ))}
-      {core && <link rel="stylesheet" href={core} />}
+      <CoreAssets modules={modules} />
       {page.preloadImage && (
         <link
           rel="preload"

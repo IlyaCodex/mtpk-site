@@ -70,7 +70,7 @@ export default function SitePage({ path, blocks, settings, site, activeNav, holi
         <Blocks blocks={blocks} ctx={buildRenderContext(path, blocks, site, holiday)} />
       </main>
       <Footer settings={settings} />
-      <Drawer items={settings.drawer} contacts={settings.contacts} />
+      <Drawer settings={settings} />
       <CookieConsent />
     </>
   );

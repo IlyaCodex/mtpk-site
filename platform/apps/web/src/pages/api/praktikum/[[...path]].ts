@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { PageDto } from '@mtpk/shared/contracts';
 import { clientModuleUrl } from '@/lib/assets';
-import { getPage } from '@/lib/content';
+import { getPage, getSettings } from '@/lib/content';
+import { hasSiteChrome, withSiteChrome } from '@/lib/site-chrome';
 
 /** Вошёл в админку (флажок ставит админка при входе) — на странице нужна панель администратора. */
 const isAdmin = (req: NextApiRequest) => /(?:^|;\s*)mtpk_bar=1/.test(req.headers.cookie ?? '');
@@ -17,9 +18,12 @@ function withAdminBar(html: string): string {
 
 /**
  * Раздел «Практикум» (адреса /praktikum/… переписываются сюда в next.config):
- * статьи хранятся в контенте целыми HTML-документами и отдаются как есть,
- * без общего каркаса сайта. Ассеты раздела идут через медиасервис. Тем, кто
- * вошёл в админку, — ещё и панель администратора (правка — в админке).
+ * статьи хранятся в контенте целыми HTML-документами своей вёрстки. Шапка,
+ * подвал, мобильное меню, общие стили и скрипты — те же, что у всех страниц
+ * сайта: на места <site-header>/<site-footer> документа их ставит
+ * lib/site-chrome.tsx (панель администратора — в общем модуле сайта).
+ * Документы без этих мест (рабочие листы для печати) отдаются как есть, панель
+ * администратора им — отдельным модулем doc-bar. Ассеты раздела — через медиасервис.
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const segments = ([] as string[]).concat(req.query.path ?? []);
@@ -35,5 +39,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, must-revalidate');
   res.setHeader('Vary', 'Cookie');
+  if (hasSiteChrome(page.bodyHtml)) return res.send(withSiteChrome(page.bodyHtml, await getSettings(), urlPath));
   res.send(isAdmin(req) ? withAdminBar(page.bodyHtml) : page.bodyHtml);
 }

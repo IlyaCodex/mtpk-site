@@ -47,6 +47,11 @@
 
 ## Шапка и подвал — ТОЛЬКО через партиалы
 
+> **Устарело (так было на Astro).** На платформе шапка, мобильное меню и подвал — React-компоненты
+> `platform/apps/web/src/components/layout` (`Header.tsx`, `Drawer.tsx`, `Footer.tsx`), одни на все страницы,
+> включая Практикум; пункты меню и контакты — админка «Шапка, меню, контакты». Партиалы ниже сайтом
+> не используются — см. [`CLAUDE.md`](../CLAUDE.md), «Где что лежит».
+
 Источники правды: `design/prototypes/_partials/header.html` и `_partials/footer.html`.
 В страницах эти блоки обёрнуты маркерами `@partial:header` / `/@partial:header`.
 

@@ -30,6 +30,12 @@ export async function siteAssets(site: string): Promise<Record<string, string>> 
   return assets?.map ?? {};
 }
 
+/** Общие стили сайта: до стилей страницы (core) и после них (core-end) — собранные файлы или исходные по прямым адресам. */
+export async function coreStyles(site: string): Promise<{ core: string[]; coreEnd: string[] }> {
+  const built = await siteAssets(site);
+  return { core: built['core.css'] ? [built['core.css']] : CORE, coreEnd: built['core-end.css'] ? [built['core-end.css']] : CORE_END };
+}
+
 export async function siteDocument(o: {
   site: string;
   title: string;
