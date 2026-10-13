@@ -13,6 +13,7 @@ const schema = z.object({
   LEADS_URL: z.string().default('http://127.0.0.1:4102'),
   SEARCH_URL: z.string().default('http://127.0.0.1:4103'),
   MEDIA_URL: z.string().default('http://127.0.0.1:4104'),
+  MAILING_URL: z.string().default('http://127.0.0.1:4105'),
   /** публичный адрес сайта: ссылки «открыть на сайте», стили и картинки предпросмотра */
   PUBLIC_SITE_URL: z.string().default('http://127.0.0.1:3200'),
   /** cookie сессии только по HTTPS (в проде за шлюзом с TLS) */

@@ -9,6 +9,7 @@ import { can, requireUser } from '@/lib/auth';
 import { plural } from '@/lib/catalog';
 import { db } from '@/lib/db';
 import { env } from '@/lib/env';
+import { CAMPAIGN_STATUS, pct, type MailingSummary } from '@/lib/mailing';
 import { serviceBase, serviceJson, type Service } from '@/lib/services';
 
 type ContentStats = {
@@ -45,6 +46,7 @@ const SERVICES: { id: Service; label: string }[] = [
   { id: 'leads', label: 'Заявки' },
   { id: 'media', label: 'Медиа' },
   { id: 'search', label: 'Поиск' },
+  { id: 'mailing', label: 'Рассылки' },
 ];
 
 /** Данные одного источника; недоступен — null (карточка покажет прочерк). */
@@ -163,7 +165,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const user = await requireUser();
   const sp = await searchParams;
   const days = PERIODS.find((d) => String(d) === sp.days) ?? 30;
-  const [content, templates, home, leads, search, recent, media, services] = await Promise.all([
+  const [content, templates, home, leads, search, recent, media, services, mailing] = await Promise.all([
     can(user, 'content') ? safe(serviceJson<ContentStats>('content', 'stats', { user })) : null,
     can(user, 'content') ? safe(serviceJson<{ template: string; count: number }[]>('content', 'pages/templates', { user })) : null,
     can(user, 'content') ? safe(serviceJson<{ items: { id: number }[] }>('content', 'pages?template=home&limit=1', { user })) : null,
@@ -179,6 +181,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         )
       : null,
     Promise.all(SERVICES.map(async (s) => ({ ...s, ...(await health(s.id)) }))),
+    can(user, 'mailing') ? safe(serviceJson<MailingSummary>('mailing', 'summary', { user })) : null,
   ]);
   const count = (...t: string[]) => t.reduce((s, x) => s + (templates?.find((r) => r.template === x)?.count ?? 0), 0);
   const today = new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', timeZone: TZ });
@@ -217,6 +220,15 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   if (otherPages) siteParts.push({ label: 'Остальные страницы', value: otherPages });
   const typedShare = content && content.blocks ? Math.round(((content.blocks - content.htmlBlocks) / content.blocks) * 100) : 0;
   const allUp = services.every((s) => s.ok);
+
+  // переходы из рассылок по дням за 30 дней — с нулями
+  const mailClicks = new Map(mailing?.clicksByDay.map((d) => [d.day, d.clicks]) ?? []);
+  const mailSeries = Array.from({ length: 30 }, (_, i) => {
+    const key = dayKey(new Date(Date.now() - (29 - i) * 24 * 3600 * 1000));
+    const value = mailClicks.get(key) ?? 0;
+    const [, m, d] = key.split('-');
+    return { label: `${d}.${m}`, value, title: `${d}.${m}: ${value} ${plural(value, 'переход', 'перехода', 'переходов')} из писем` };
+  });
 
   return (
     <div className="space-y-6">
@@ -369,6 +381,58 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                 </div>
               </div>
             </div>
+          </Panel>
+        </div>
+      )}
+
+      {mailing && (
+        <div className="grid gap-6 xl:grid-cols-3">
+          <Panel className="xl:col-span-2" title="Переходы из email-рассылок за 30 дней" action={<More href="/mailing">Рассылки</More>}>
+            <div className="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {[
+                ['Отправлено писем', fmt(mailing.last30.sent)],
+                ['Открыли', `${pct(mailing.last30.opened, mailing.last30.sent)}%`],
+                ['Перешли на сайт', `${pct(mailing.last30.clicked, mailing.last30.sent)}%`],
+                ['Переходов', fmt(mailing.last30.clicks)],
+              ].map(([label, value]) => (
+                <div key={label}>
+                  <div className="text-xs font-medium text-slate-500">{label}</div>
+                  <div className="text-xl font-semibold tracking-tight text-slate-900 tabular-nums">{value}</div>
+                </div>
+              ))}
+            </div>
+            {mailing.last30.clicks ? (
+              <AreaChart id="chart-mail-clicks" points={mailSeries} height={200} />
+            ) : (
+              <p className="py-10 text-center text-sm text-slate-400">За 30 дней переходов из писем не было.</p>
+            )}
+          </Panel>
+          <Panel title="Последние рассылки" action={<More href="/mailing">Все</More>}>
+            {mailing.campaigns.length ? (
+              <ul className="space-y-3">
+                {mailing.campaigns.map((c) => {
+                  const [label, tone] = CAMPAIGN_STATUS[c.status] ?? [c.status, 'gray'];
+                  return (
+                    <li key={c.id}>
+                      <div className="flex items-center justify-between gap-2">
+                        <Link href={`/mailing/${c.id}`} className="truncate text-sm font-medium text-slate-800 hover:text-brand-600">
+                          {c.name}
+                        </Link>
+                        <Badge tone={tone}>{label}</Badge>
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        {formatDate(c.startedAt)} · {fmt(c.stats.sent)} {plural(c.stats.sent, 'письмо', 'письма', 'писем')} · открыли {pct(c.stats.opened, c.stats.sent)}% · перешли{' '}
+                        {pct(c.stats.clicked, c.stats.sent)}%{c.transport === 'log' && ' · тест'}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-sm text-slate-500">
+                Рассылок ещё не было. Адресов для рассылок: {fmt(mailing.contacts.active)}.
+              </p>
+            )}
           </Panel>
         </div>
       )}

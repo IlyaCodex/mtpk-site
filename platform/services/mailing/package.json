@@ -1,0 +1,27 @@
+{
+  "name": "@mtpk/mailing-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "E-mail рассылки: базы адресов (файлы, заявки сайта, CRM), письма с UTM-метками, очередь отправки, переходы и отписка.",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "dev:worker": "tsx watch --clear-screen=false src/worker.ts",
+    "start": "node dist/index.js",
+    "start:worker": "node dist/worker.js",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "tsx --test \"src/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@fastify/multipart": "^10.1.2",
+    "@mtpk/db": "*",
+    "@mtpk/shared": "*",
+    "fastify": "^5.12.5",
+    "fflate": "^0.8.3",
+    "nodemailer": "^10.0.15",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^8.0.2"
+  }
+}

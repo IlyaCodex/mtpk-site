@@ -30,6 +30,7 @@ x-node-env: &node-env
   SEARCH_URL: http://search:4103
   MEDIA_URL: http://media:4104
   LEADS_URL: http://leads:4102
+  MAILING_URL: http://mailing:4105
   WEB_URL: http://web:3000
   REVALIDATE_SECRET: ${REVALIDATE_SECRET:?задайте REVALIDATE_SECRET}
 
@@ -188,6 +189,50 @@ services:
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
+    deploy:
+      resources: { limits: { cpus: "0.5", memory: 256M } }
+
+  # ── Рассылки: базы адресов, письма, переходы (/r/…) и отправитель ─────────
+  mailing:
+    build:
+      context: .
+      dockerfile: infra/docker/service.Dockerfile
+      args: { WORKSPACE: services/mailing }
+    image: mtpk/mailing:${IMAGE_TAG:-latest}
+    <<: *service
+    environment: &mailing-env
+      <<: *node-env
+      MAILING_PORT: 4105
+      # log — письма не уходят (проверка); smtp — нужны MAILING_SMTP_*
+      MAILING_TRANSPORT: ${MAILING_TRANSPORT:-log}
+      MAILING_SMTP_HOST: ${MAILING_SMTP_HOST:-}
+      MAILING_SMTP_PORT: ${MAILING_SMTP_PORT:-465}
+      MAILING_SMTP_SECURE: ${MAILING_SMTP_SECURE:-ssl}
+      MAILING_SMTP_USER: ${MAILING_SMTP_USER:-}
+      MAILING_SMTP_PASS: ${MAILING_SMTP_PASS:-}
+      MAILING_FROM: ${MAILING_FROM:-news@uralinduktor.ru}
+      MAILING_REPLY_TO: ${MAILING_REPLY_TO:-}
+      MAILING_RATE: ${MAILING_RATE:-5}
+      MAILING_PUBLIC_URL: ${MAILING_PUBLIC_URL:-}
+      B24_WEBHOOK: ${B24_WEBHOOK:-}
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4105/ready"]
+      <<: *node-health
+    deploy:
+      resources: { limits: { cpus: "0.5", memory: 384M } }
+
+  mailing-worker:
+    build:
+      context: .
+      dockerfile: infra/docker/service.Dockerfile
+      args: { WORKSPACE: services/mailing, ENTRY: dist/worker.js }
+    image: mtpk/mailing-worker:${IMAGE_TAG:-latest}
+    <<: *service
+    environment: *mailing-env
+    depends_on:
+      postgres: { condition: service_healthy }
     deploy:
       resources: { limits: { cpus: "0.5", memory: 256M } }
 

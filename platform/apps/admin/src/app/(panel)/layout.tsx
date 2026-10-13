@@ -16,6 +16,7 @@ const NAV: (NavItem & { area?: Area })[] = [
   { href: '/holidays', label: 'Праздники', icon: 'gift', area: 'content', group: 'Настройки сайта' },
   { href: '/redirects', label: 'Редиректы', icon: 'redirects', area: 'content', group: 'Настройки сайта' },
   { href: '/leads', label: 'Заявки', icon: 'leads', area: 'leads', group: 'Продажи' },
+  { href: '/mailing', label: 'Email-рассылки', icon: 'letter', area: 'mailing', group: 'Продажи' },
   { href: '/users', label: 'Пользователи', icon: 'users', area: 'users', group: 'Администрирование' },
   { href: '/audit', label: 'Журнал действий', icon: 'audit', area: 'audit', group: 'Администрирование' },
 ];

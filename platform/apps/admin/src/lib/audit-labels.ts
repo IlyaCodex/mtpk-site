@@ -56,9 +56,43 @@ export function describeAction({ action, target, details }: Entry): string {
       return `Повторная отправка заявки №${t.split('/')[2] ?? ''}`;
     case action.startsWith('search.'):
       return 'Пересобран поиск по сайту';
+    case action.startsWith('mailing.'):
+      return describeMailing(verb ?? '', t, d);
     default:
       return `${action} ${t}`.trim();
   }
+}
+
+/** Действия раздела «Email-рассылки»: базы, адреса, рассылки. */
+function describeMailing(verb: string, t: string, d: Record<string, unknown>): string {
+  const name = plain(d.name) ? ` «${plain(d.name)}»` : '';
+  const [, kind, , step] = t.split('/');
+  if (kind === 'lists') {
+    const steps: Record<string, string> = {
+      'import-file': 'Загружены адреса из файла в базу рассылок',
+      'import-text': 'Добавлены адреса списком в базу рассылок',
+      'import-leads': 'Добавлены адреса из заявок сайта в базу рассылок',
+      'import-crm': 'Запущена загрузка адресов из CRM в базу рассылок',
+      remove: 'Убраны адреса из базы рассылок',
+    };
+    if (step) return steps[step] ?? `Изменена база рассылок`;
+    return `${verb === 'post' ? 'Создана' : verb === 'delete' ? 'Удалена' : 'Изменена'} база рассылок${name}`;
+  }
+  if (kind === 'contacts') return d.status === 'active' ? 'Адрес возвращён в рассылки' : 'Адрес отписан от рассылок';
+  if (kind === 'campaigns') {
+    const steps: Record<string, string> = {
+      duplicate: 'Сделана копия рассылки',
+      test: 'Отправлено тестовое письмо рассылки',
+      schedule: 'Запущена рассылка',
+      unschedule: 'Рассылка снята с расписания',
+      pause: 'Рассылка поставлена на паузу',
+      resume: 'Рассылка продолжена',
+      cancel: 'Рассылка остановлена',
+    };
+    if (step) return steps[step] ?? 'Изменена рассылка';
+    return `${verb === 'post' ? 'Создана' : verb === 'delete' ? 'Удалена' : 'Изменена'} рассылка${name}`;
+  }
+  return `Рассылки: ${t}`;
 }
 
 /** Цвет метки действия: удаления и неудачные входы — красным. */

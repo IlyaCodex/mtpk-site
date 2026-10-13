@@ -41,10 +41,15 @@ async function proxy(req: Request, user: SessionUser, ctx: Ctx): Promise<Respons
     headers: body?.byteLength ? { 'content-type': contentType } : {},
     user,
   });
-  if (mutating && res.ok) {
+  // проверки без изменений (предпросмотр письма, проверка файла с адресами) — не в журнал
+  const probe = /\/render$/.test(target.split('?')[0]!) || new URLSearchParams(search).has('dry');
+  if (mutating && res.ok && !probe) {
     await audit(user, `${service}.${req.method.toLowerCase()}`, `/${path.join('/')}`, summarize(contentType, body));
   }
   const headers = new Headers({ 'content-type': res.headers.get('content-type') ?? 'application/json' });
+  // выгрузки (CSV и т. п.) скачиваются под именем, которое дал сервис
+  const disposition = res.headers.get('content-disposition');
+  if (disposition) headers.set('content-disposition', disposition);
   return new Response(res.body, { status: res.status, headers });
 }
 

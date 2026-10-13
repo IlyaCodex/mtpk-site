@@ -14,7 +14,7 @@ import { chromiumPath } from './browser.ts';
 const outDir = process.argv[2] ?? path.resolve('tools/checks/report/admin');
 fs.mkdirSync(outDir, { recursive: true });
 
-const PAGES = ['/', '/catalog', '/pages', '/settings', '/media', '/redirects', '/stock', '/leads', '/users', '/audit'];
+const PAGES = ['/', '/catalog', '/pages', '/settings', '/media', '/redirects', '/stock', '/leads', '/mailing', '/mailing/lists', '/mailing/contacts', '/users', '/audit'];
 
 const browser = await chromium.launch({ executablePath: chromiumPath(), headless: true });
 const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });

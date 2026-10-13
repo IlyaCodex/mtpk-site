@@ -18,6 +18,7 @@ const TARGETS: Record<string, { dir: string; entries: string[] }> = {
   media: { dir: 'services/media', entries: ['src/index.ts'] },
   search: { dir: 'services/search', entries: ['src/index.ts'] },
   leads: { dir: 'services/leads', entries: ['src/index.ts', 'src/worker.ts'] },
+  mailing: { dir: 'services/mailing', entries: ['src/index.ts', 'src/worker.ts'] },
 };
 
 /** Пакеты монорепо — в бандл; всё остальное (node_modules) — внешнее. */

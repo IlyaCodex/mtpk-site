@@ -10,14 +10,14 @@ import { secureCookies } from './gate';
  * Роли:
  *   admin   — всё, включая пользователей и журнал;
  *   editor  — контент: страницы, медиатека, редиректы, наличие, настройки;
- *   manager — заявки.
+ *   manager — заявки и e-mail рассылки.
  */
 export type Role = 'admin' | 'editor' | 'manager';
 export const ROLES: Role[] = ['admin', 'editor', 'manager'];
 export const ROLE_LABELS: Record<Role, string> = {
   admin: 'Администратор',
   editor: 'Редактор',
-  manager: 'Менеджер заявок',
+  manager: 'Менеджер продаж',
 };
 
 /** Кто к какому разделу допущен. */
@@ -26,6 +26,7 @@ export const ACCESS = {
   media: ['admin', 'editor'],
   search: ['admin', 'editor'],
   leads: ['admin', 'manager'],
+  mailing: ['admin', 'manager'],
   users: ['admin'],
   audit: ['admin'],
 } satisfies Record<string, Role[]>;

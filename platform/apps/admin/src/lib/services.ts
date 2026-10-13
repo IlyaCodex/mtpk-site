@@ -2,12 +2,12 @@ import { env } from './env';
 import type { SessionUser } from './auth';
 
 /** Микросервисы, у которых есть служебное API /admin/v1. */
-export const SERVICES = ['content', 'leads', 'media', 'search'] as const;
+export const SERVICES = ['content', 'leads', 'media', 'search', 'mailing'] as const;
 export type Service = (typeof SERVICES)[number];
 
 export function serviceBase(service: Service): string {
   const e = env();
-  return { content: e.CONTENT_URL, leads: e.LEADS_URL, media: e.MEDIA_URL, search: e.SEARCH_URL }[service].replace(/\/$/, '');
+  return { content: e.CONTENT_URL, leads: e.LEADS_URL, media: e.MEDIA_URL, search: e.SEARCH_URL, mailing: e.MAILING_URL }[service].replace(/\/$/, '');
 }
 
 export class ServiceError extends Error {

@@ -1,7 +1,7 @@
 // Схема базы данных платформы — единственное её описание. По ней Prisma
 // строит миграции (prisma/migrations) и типизированный клиент
 // (src/generated/prisma). Таблицы разложены по схемам PostgreSQL —
-// у каждого сервиса своя: content, leads, search, admin.
+// у каждого сервиса своя: content, leads, mailing, search, admin.
 //
 //   npm run db:migrate                      — применить миграции
 //   npm run db:migration -- --name <имя>    — новая миграция по изменениям схемы
@@ -15,7 +15,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  schemas  = ["admin", "content", "leads", "search"]
+  schemas  = ["admin", "content", "leads", "mailing", "search"]
 }
 
 // ─── content: страницы, стили, редиректы, склад, настройки, файлы ───────────
@@ -414,4 +414,179 @@ model AuditEntry {
   @@index([target], map: "audit_target_idx")
   @@map("audit_log")
   @@schema("admin")
+}
+
+// ─── mailing: e-mail рассылки — контакты, базы, рассылки, переходы ──────────
+
+/// Контакт рассылок — один на адрес. Отписавшиеся и недоставляемые (bounced)
+/// не получают писем ни из одной базы.
+model MailContact {
+  id             Int              @id @default(autoincrement())
+  /// в нижнем регистре
+  email          String           @unique(map: "mail_contacts_email_unique")
+  name           String?
+  company        String?
+  phone          String?
+  /// откуда пришёл первым: file | text | leads | crm | manual
+  source         String           @default("manual")
+  /// active | unsubscribed | bounced
+  status         String           @default("active")
+  unsubscribedAt DateTime?        @map("unsubscribed_at") @db.Timestamptz(6)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  lists          MailListMember[]
+
+  @@index([status], map: "mail_contacts_status_idx")
+  @@map("contacts")
+  @@schema("mailing")
+}
+
+/// База рассылки: набор контактов (из файла, заявок сайта, CRM, вручную).
+model MailList {
+  id          Int              @id @default(autoincrement())
+  name        String
+  description String?
+  /// последнее пополнение из заявок: { kind: 'leads', from, to } — для «Обновить из заявок»
+  source      Json             @default("{}")
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  members     MailListMember[]
+  campaigns   MailCampaign[]
+  imports     MailImport[]
+
+  @@map("lists")
+  @@schema("mailing")
+}
+
+model MailListMember {
+  listId    Int         @map("list_id")
+  contactId Int         @map("contact_id")
+  addedAt   DateTime    @default(now()) @map("added_at") @db.Timestamptz(6)
+  list      MailList    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  contact   MailContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([listId, contactId])
+  @@index([contactId], map: "mail_list_members_contact_idx")
+  @@map("list_members")
+  @@schema("mailing")
+}
+
+/// Рассылка: письмо (HTML), база, расписание. При запуске получатели и ссылки
+/// с UTM-метками фиксируются (recipients, links), письмо — с подставленными
+/// ссылками отслеживания (compiled).
+model MailCampaign {
+  id          Int             @id @default(autoincrement())
+  name        String
+  subject     String          @default("")
+  /// текст-превью рядом с темой в почтовом ящике
+  preheader   String          @default("")
+  fromName    String          @default("УралИндуктор") @map("from_name")
+  html        String          @default("")
+  listId      Int?            @map("list_id")
+  /// utm_campaign ссылок письма
+  utmCampaign String          @default("") @map("utm_campaign")
+  /// draft | scheduled | sending | paused | sent | cancelled
+  status      String          @default("draft")
+  /// smtp — письма уходят; log — тестовый режим (не отправлялись)
+  transport   String?
+  scheduledAt DateTime?       @map("scheduled_at") @db.Timestamptz(6)
+  startedAt   DateTime?       @map("started_at") @db.Timestamptz(6)
+  finishedAt  DateTime?       @map("finished_at") @db.Timestamptz(6)
+  compiled    String?
+  total       Int             @default(0)
+  createdBy   String?         @map("created_by")
+  createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  list        MailList?       @relation(fields: [listId], references: [id], onDelete: SetNull)
+  recipients  MailRecipient[]
+  links       MailLink[]
+
+  @@index([status], map: "mail_campaigns_status_idx")
+  @@map("campaigns")
+  @@schema("mailing")
+}
+
+/// Получатель рассылки: адрес на момент запуска, свой токен для ссылок, открытия и отписки.
+model MailRecipient {
+  id          Int          @id @default(autoincrement())
+  campaignId  Int          @map("campaign_id")
+  contactId   Int?         @map("contact_id")
+  email       String
+  name        String?
+  token       String       @unique(map: "mail_recipients_token_unique")
+  /// queued | sending | sent | failed | skipped
+  status      String       @default("queued")
+  attempts    Int          @default(0)
+  error       String?
+  lockedAt    DateTime?    @map("locked_at") @db.Timestamptz(6)
+  sentAt      DateTime?    @map("sent_at") @db.Timestamptz(6)
+  openedAt    DateTime?    @map("opened_at") @db.Timestamptz(6)
+  opens       Int          @default(0)
+  clickedAt   DateTime?    @map("clicked_at") @db.Timestamptz(6)
+  clicks      Int          @default(0)
+  campaign    MailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  clickEvents MailClick[]
+
+  @@unique([campaignId, email], map: "mail_recipients_campaign_email_unique")
+  @@index([campaignId, status], map: "mail_recipients_campaign_status_idx")
+  @@map("recipients")
+  @@schema("mailing")
+}
+
+/// Ссылка письма: исходный адрес и адрес с UTM-метками, счётчики переходов.
+model MailLink {
+  id           Int          @id @default(autoincrement())
+  campaignId   Int          @map("campaign_id")
+  position     Int
+  /// текст ссылки или кнопки
+  label        String       @default("")
+  url          String
+  /// куда ведёт переход: адрес с UTM-метками
+  target       String
+  utmContent   String       @default("") @map("utm_content")
+  clicks       Int          @default(0)
+  uniqueClicks Int          @default(0) @map("unique_clicks")
+  campaign     MailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  clickEvents  MailClick[]
+
+  @@index([campaignId], map: "mail_links_campaign_idx")
+  @@map("links")
+  @@schema("mailing")
+}
+
+/// Переход по ссылке письма.
+model MailClick {
+  id          BigInt         @id @default(autoincrement())
+  linkId      Int            @map("link_id")
+  recipientId Int?           @map("recipient_id")
+  at          DateTime       @default(now()) @db.Timestamptz(6)
+  userAgent   String?        @map("user_agent")
+  link        MailLink       @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  recipient   MailRecipient? @relation(fields: [recipientId], references: [id], onDelete: SetNull)
+
+  @@index([linkId], map: "mail_clicks_link_idx")
+  @@index([recipientId], map: "mail_clicks_recipient_idx")
+  @@index([at], map: "mail_clicks_at_idx")
+  @@map("clicks")
+  @@schema("mailing")
+}
+
+/// Импорт в базу, который идёт в фоне (CRM): ход и итог.
+model MailImport {
+  id         Int       @id @default(autoincrement())
+  listId     Int       @map("list_id")
+  /// crm
+  kind       String
+  /// running | done | failed
+  status     String    @default("running")
+  processed  Int       @default(0)
+  added      Int       @default(0)
+  skipped    Int       @default(0)
+  error      String?
+  startedAt  DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  finishedAt DateTime? @map("finished_at") @db.Timestamptz(6)
+  list       MailList  @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@map("imports")
+  @@schema("mailing")
 }

@@ -14,6 +14,8 @@ const PROCS: Record<string, [string, string[]]> = {
   media: ['npm', ['run', 'dev', '-w', '@mtpk/media-service']],
   leads: ['npm', ['run', 'dev', '-w', '@mtpk/leads-service']],
   'leads-worker': ['npm', ['run', 'dev:worker', '-w', '@mtpk/leads-service']],
+  mailing: ['npm', ['run', 'dev', '-w', '@mtpk/mailing-service']],
+  'mailing-worker': ['npm', ['run', 'dev:worker', '-w', '@mtpk/mailing-service']],
   search: ['npm', ['run', 'dev', '-w', '@mtpk/search-service']],
   web: ['npm', ['run', 'dev', '-w', '@mtpk/web']],
   // клиентские модули и старые скрипты сайта (src/client, src/legacy), пересборка при изменениях
