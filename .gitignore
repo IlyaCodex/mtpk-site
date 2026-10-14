@@ -9,3 +9,41 @@ __pycache__/
 # Лог генератора картинок (полные промпты) — не коммитить, не публиковать (T-IMG-C)
 astro/public/img/history.jsonl
 _merge-backup/
+
+# --- Медиа — не в git (репозиторий на GitHub): картинки сайта — в медиатеке (S3),
+# исходники, архив и фирстиль — локально (picture/, brand/). В git только то, без чего
+# не собирается сайт: логотипы, иконки, шрифты в platform/.
+picture/
+brand/
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.avif
+*.gif
+*.svg
+*.heic
+*.tif
+*.tiff
+*.bmp
+*.psd
+*.ai
+*.eps
+*.mp4
+*.webm
+*.mov
+*.avi
+!platform/**
+
+# --- Секреты: никогда в git, в том числе в platform/ (блок последним — правила сильнее исключения выше).
+# Пароли и ключи — только в .env на компьютере или сервере.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+.claude/settings.local.json

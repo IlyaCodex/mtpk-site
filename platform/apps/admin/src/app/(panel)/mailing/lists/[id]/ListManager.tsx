@@ -352,12 +352,12 @@ function TextImport({ listId, onDone }: { listId: number; onDone: () => Promise<
 
   return (
     <div className="space-y-4">
-      <Field label="Адреса" hint="По одному на строку или через запятую; можно «Иван Петров <ivan@zavod.ru>» или «Имя; адрес» — имя подставится в письмо.">
+      <Field label="Адреса" hint="По одному на строку или через запятую; можно «Иван Петров <ivan@example.com>» или «Имя; адрес» — имя подставится в письмо.">
         <textarea
           className="field min-h-40 font-mono text-sm"
           value={text}
           onChange={(e) => (setText(e.target.value), setReport(null))}
-          placeholder={'ivan@zavod.ru\nПётр Сидоров <petr@lit.ru>\nsnab@metall.ru, info@kuznica.ru'}
+          placeholder={'ivan@example.com\nПётр Сидоров <petr@example.com>\nsnab@example.org, info@example.net'}
         />
       </Field>
       {report && <ReportView report={report} />}
