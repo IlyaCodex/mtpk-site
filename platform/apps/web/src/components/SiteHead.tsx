@@ -1,4 +1,5 @@
 import type { PageDto } from '@mtpk/shared/contracts';
+import { logoPreload } from '@/components/layout/Logo';
 import { clientModuleUrl, templateCssUrl } from '@/lib/assets';
 import { jsonLdHtml, ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/lib/seo';
 import { ASSET_VERSIONS, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE } from '@/lib/site';
@@ -22,7 +23,7 @@ export function CoreAssets({ modules = [] }: { modules?: string[] }) {
   return (
     <>
       {/* Лого в шапке — LCP-элемент; основные веса Inter — параллельно с HTML (T-PERF-2) */}
-      <link rel="preload" as="image" href="/brand/logo-header-clean.png" fetchPriority="high" />
+      <link rel="preload" as="image" {...logoPreload('/brand/logo-header-clean.png')} fetchPriority="high" />
       <link rel="preload" href="/fonts/inter-400-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
       <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossOrigin="" />
       <link rel="preload" href="/fonts/inter-600-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />

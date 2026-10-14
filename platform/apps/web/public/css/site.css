@@ -111,6 +111,8 @@ body { margin: 0; }
   width: auto;
   display: block;
 }
+/* Логотип в <picture> (WebP с запасным PNG, компонент Logo): обёртка без своей коробки — стили у <img> */
+.brand-pic { display: contents; }
 /* Nav (DMG MORI: sentence case, no underline-on-hover, dot-indicator) */
 .nav { display: flex; gap: var(--sp-2); align-items: center; }
 .nav__item { position: relative; }

@@ -1,6 +1,7 @@
 import type { SiteSettings } from '@mtpk/content-model';
 import { ContactLink } from './ContactLink';
 import { FOOTER_MAIL_SVG, MaxLogo, TelegramGlyph } from './icons';
+import { Logo } from './Logo';
 
 /** Подвал: логотип и контакты, колонки ссылок, реквизиты и документы. */
 export function Footer({ settings }: { settings: SiteSettings }) {
@@ -11,7 +12,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
         <div className="footer__top">
           <div className="footer__brand-block">
             <a href="/" className="footer__brand">
-              <img src="/brand/logo-footer-white.png" alt="УралИндуктор · ООО МТПК" width="252" height="72" loading="lazy" decoding="async" />
+              <Logo src="/brand/logo-footer-white.png" alt="УралИндуктор · ООО МТПК" width="252" height="72" loading="lazy" decoding="async" />
             </a>
             <p className="footer__brand-tagline">{company.tagline}</p>
             <div className="footer__contact">

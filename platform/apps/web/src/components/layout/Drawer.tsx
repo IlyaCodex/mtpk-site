@@ -1,6 +1,7 @@
 import { DRAWER_ICONS, type NavItem, type SiteSettings } from '@mtpk/content-model';
 import { ContactLink } from './ContactLink';
 import { MenuIcon } from './icons';
+import { Logo } from './Logo';
 
 type MegaLink = NonNullable<NavItem['mega']>['columns'][number]['links'][number];
 
@@ -20,7 +21,7 @@ export function Drawer({ settings }: { settings: SiteSettings }) {
     <aside className="nav-drawer" aria-hidden="true" data-nav-drawer="">
       <div className="nav-drawer__header">
         <a href="/" className="nav-drawer__brand" aria-label="УралИндуктор — на главную">
-          <img src="/brand/logo-header-clean.png" alt="УралИндуктор" width="200" height="56" loading="lazy" decoding="async" />
+          <Logo src="/brand/logo-header-clean.png" alt="УралИндуктор" width="200" height="56" loading="lazy" decoding="async" />
         </a>
         <button className="nav-drawer__close" aria-label="Закрыть меню" data-nav-close="">
           ×

@@ -22,6 +22,7 @@
     "@mtpk/shared": "*",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "esbuild": "*"
+    "esbuild": "*",
+    "sharp": "^0.35.5"
   }
 }

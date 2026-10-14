@@ -45,7 +45,7 @@ async function limited<T>(fn: () => Promise<T>): Promise<T> {
   }
 }
 
-async function readAll(body: unknown): Promise<Buffer> {
+export async function readAll(body: unknown): Promise<Buffer> {
   const chunks: Buffer[] = [];
   for await (const chunk of body as AsyncIterable<Uint8Array>) chunks.push(Buffer.from(chunk));
   return Buffer.concat(chunks);
@@ -64,6 +64,19 @@ async function encode(source: Buffer, width: number, format: Format): Promise<Bu
       return img.jpeg({ quality: 80, mozjpeg: true, progressive: true }).toBuffer();
   }
 }
+
+/**
+ * WebP-копия картинки в исходном размере (foo.png.webp) — её получают браузеры
+ * с WebP по прямому адресу /img/foo.png. null — WebP не легче исходника хотя бы
+ * на 5 % (так бывает у маленьких PNG с палитрой): тогда отдаём исходник.
+ */
+export async function encodeWebpCopy(source: Buffer): Promise<Buffer | null> {
+  const body = await limited(() => sharp(source, { failOn: 'none' }).rotate().webp({ quality: 80, alphaQuality: 90, effort: 5, smartSubsample: true }).toBuffer());
+  return body.length < source.length * 0.95 ? body : null;
+}
+
+/** Метка «WebP не легче исходника» — чтобы не перекодировать картинку снова (удаляется вместе с копиями). */
+export const noWebpMarker = (key: string) => `_variants/${key}/no-webp`;
 
 /** Папка копий одной картинки: _variants/img/foo.png/ (внутри — 640.avif@<etag> …). */
 const variantsPrefix = (key: string) => `_variants/${key}/`;

@@ -4,7 +4,9 @@
  *
  * Повторяет поведение nginx старого сайта:
  *  - WebP по Accept: на /img/foo.png браузеру с поддержкой WebP отдаётся
- *    соседний foo.png.webp (T-PERF-7, try_files $uri$webp_suffix), Vary: Accept;
+ *    соседний foo.png.webp (T-PERF-7, try_files $uri$webp_suffix), Vary: Accept.
+ *    Копию сервис делает сам: после загрузки в медиатеку, по первому запросу
+ *    картинки без копии и при запуске — для всех старых файлов;
  *  - кеш: картинки/шрифты — 30 дней, css — 7 дней;
  *  - Range-запросы (видео, большие PDF) и ETag/304.
  */
@@ -28,7 +30,7 @@ import {
   type ZodTypeProvider,
 } from '@mtpk/shared';
 import { createDb } from '@mtpk/db';
-import { dropVariants, getVariant, pickFormat, snapWidth, VARIANT_SOURCE } from './variants.ts';
+import { dropVariants, encodeWebpCopy, getVariant, noWebpMarker, pickFormat, readAll, snapWidth, VARIANT_SOURCE } from './variants.ts';
 
 const env = readEnv(
   z.object({
@@ -190,6 +192,8 @@ async function adminRoutes(base: import('fastify').FastifyInstance) {
         update: { size: req.body.length, etag, contentType },
       });
       catalog.set(key, etag);
+      // WebP-копия — в фоне: загрузка не ждёт перекодирования
+      ensureWebp(key);
       return { ok: true, key, url: `/${key}`, etag };
     },
   );
@@ -203,6 +207,7 @@ async function adminRoutes(base: import('fastify').FastifyInstance) {
       await removeObject(key);
       if (catalog.has(`${key}.webp`)) await removeObject(`${key}.webp`);
       await dropVariants(s3, bucket, key);
+      noWebp.delete(key);
       return { ok: true };
     },
   );
@@ -226,9 +231,62 @@ async function removeObject(key: string): Promise<void> {
   catalog.delete(key);
 }
 
+// ── WebP-копии ─────────────────────────────────────────────────────────────
+// У каждой PNG/JPG — соседний foo.png.webp: прямой адрес /img/foo.png отдаёт его
+// браузерам с WebP. Перекодирование — в общей очереди с уменьшенными копиями
+// (не больше двух сразу), одна картинка — одной задачей.
+const webpJobs = new Map<string, Promise<void>>();
+/** Картинки, у которых WebP не легче исходника (метка в S3), — их не перекодируем. */
+const noWebp = new Set<string>();
+
+const needsWebp = (key: string) =>
+  catalogLoaded && WEBP_SOURCE.test(key) && PREFIXES.some((p) => key.startsWith(p)) && catalog.has(key) && !catalog.has(`${key}.webp`) && !noWebp.has(key);
+
+/** Начать (или продолжить) создание WebP-копии; true — копия делается. */
+function ensureWebp(key: string): boolean {
+  if (webpJobs.has(key)) return true;
+  if (!needsWebp(key)) return false;
+  webpJobs.set(key, makeWebp(key).finally(() => webpJobs.delete(key)));
+  return true;
+}
+
+async function makeWebp(key: string): Promise<void> {
+  try {
+    if (await headObject(s3, bucket, noWebpMarker(key))) {
+      noWebp.add(key);
+      return;
+    }
+    const source = await readAll((await getObject(s3, bucket, key)).Body);
+    const webp = await encodeWebpCopy(source);
+    if (!webp) {
+      await putObject(s3, bucket, noWebpMarker(key), Buffer.alloc(0), 'text/plain');
+      noWebp.add(key);
+      return;
+    }
+    const copy = `${key}.webp`;
+    const etag = await putObject(s3, bucket, copy, webp, 'image/webp');
+    await db.asset.upsert({ where: { key: copy }, create: { key: copy, size: webp.length, etag, contentType: 'image/webp' }, update: { size: webp.length, etag, contentType: 'image/webp' } });
+    catalog.set(copy, etag);
+    log.info({ key, from: source.length, to: webp.length }, 'WebP-копия готова');
+  } catch (err) {
+    if (!isNotFound(err)) log.warn({ err, key }, 'WebP-копия не создана');
+  }
+}
+
+/** Файлы без WebP-копии (залиты до автоматики или в обход медиатеки) — по одному, в фоне после запуска. */
+async function backfillWebp(): Promise<void> {
+  const todo = [...catalog.keys()].filter(needsWebp);
+  if (!todo.length) return;
+  log.info({ files: todo.length }, 'WebP-копии: делаю для файлов без копии');
+  for (const key of todo) if (ensureWebp(key)) await webpJobs.get(key);
+  log.info({ files: todo.length }, 'WebP-копии: готово');
+}
+
 await loadCatalog();
 const timer = setInterval(() => void loadCatalog(), env.MEDIA_CATALOG_REFRESH * 1000);
 timer.unref();
+const backfill = setTimeout(() => void backfillWebp(), 15_000);
+backfill.unref();
 
 await startService({
   name: 'media',
@@ -264,12 +322,18 @@ await startService({
       }
 
       let target = key;
+      let webpPending = false;
       const negotiable = WEBP_SOURCE.test(key);
       if (negotiable) {
         reply.header('Vary', 'Accept');
         const accept = String(req.headers.accept ?? '');
-        if (accept.includes('image/webp') && (await exists(`${key}.webp`))) target = `${key}.webp`;
+        if (accept.includes('image/webp')) {
+          if (await exists(`${key}.webp`)) target = `${key}.webp`;
+          // копии ещё нет — делается; исходник пока с коротким кешем, чтобы шлюз и браузер скоро взяли WebP
+          else webpPending = ensureWebp(key);
+        }
       }
+      const cacheControl = webpPending ? 'public, max-age=120' : cacheControlFor(target);
 
       const ifNoneMatch = req.headers['if-none-match'];
       try {
@@ -283,7 +347,7 @@ await startService({
         const status = obj.ContentRange ? 206 : 200;
         reply.code(status);
         reply.header('Content-Type', target.endsWith('.webp') ? 'image/webp' : obj.ContentType || contentTypeFor(target));
-        reply.header('Cache-Control', cacheControlFor(target));
+        reply.header('Cache-Control', cacheControl);
         reply.header('Accept-Ranges', 'bytes');
         if (obj.ETag) reply.header('ETag', obj.ETag);
         if (obj.LastModified) reply.header('Last-Modified', obj.LastModified.toUTCString());
@@ -295,7 +359,7 @@ await startService({
         }
         return reply.send(obj.Body as Readable);
       } catch (err) {
-        if (isNotModified(err)) return reply.code(304).header('Cache-Control', cacheControlFor(target)).send();
+        if (isNotModified(err)) return reply.code(304).header('Cache-Control', cacheControl).send();
         if (isNotFound(err)) return reply.code(404).type('text/plain').send('Not Found');
         const status = (err as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode;
         if (status === 416) return reply.code(416).send();
@@ -313,6 +377,7 @@ await startService({
   },
   async onClose() {
     clearInterval(timer);
+    clearTimeout(backfill);
     await close();
   },
 });

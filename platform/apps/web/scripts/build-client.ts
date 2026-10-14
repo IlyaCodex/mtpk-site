@@ -8,8 +8,11 @@
  *    Цвета в CSS — с переменными тёмной темы (content-kit/src/dark.ts):
  *    светлая тема та же, у тёмной (html[data-theme=dark]) — свои значения;
  *  - старые скрипты страниц (src/legacy/*.ts) → public/js/<имя>.js: обычные
- *    скрипты (не модули), адреса прежние — на них ссылаются страницы.
+ *    скрипты (не модули), адреса прежние — на них ссылаются страницы;
+ *  - логотипы (public/brand/*.png, *.jpg) → WebP-копии рядом (logo.png.webp):
+ *    их берёт <picture> компонента Logo; новые и изменённые — при каждой сборке.
  * manifest.json «имя → файл» читает сервер (src/lib/assets.ts).
+ * Картинки медиатеки (/img/…) — забота медиасервиса: WebP-копии и уменьшенные копии он делает сам.
  *
  *   tsx scripts/build-client.ts           — сборка (перед next build)
  *   tsx scripts/build-client.ts --watch   — разработка
@@ -19,6 +22,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build, context, transform, type BuildOptions, type Plugin } from 'esbuild';
+import sharp from 'sharp';
 import { darkVars } from '@mtpk/content-kit/dark';
 import { ASSET_VERSIONS } from '../src/lib/site.ts';
 
@@ -175,6 +179,25 @@ const legacy: BuildOptions = {
     },
   ],
 };
+
+/**
+ * WebP-копии логотипов: нет копии или исходник новее — создать. Копия есть у
+ * каждого PNG/JPG: компонент Logo всегда ставит её источником <picture>.
+ */
+async function brandWebp(): Promise<void> {
+  const dir = path.join(ROOT, 'public/brand');
+  let made = 0;
+  for (const name of fs.readdirSync(dir).filter((f) => /\.(png|jpe?g)$/i.test(f))) {
+    const src = path.join(dir, name);
+    const copy = `${src}.webp`;
+    if (fs.existsSync(copy) && fs.statSync(copy).mtimeMs >= fs.statSync(src).mtimeMs) continue;
+    fs.writeFileSync(copy, await sharp(fs.readFileSync(src)).webp({ quality: 90, alphaQuality: 100, effort: 6 }).toBuffer());
+    made++;
+  }
+  if (made) console.log(`логотипы: WebP-копий создано ${made} (public/brand)`);
+}
+
+await brandWebp();
 
 if (watch) {
   await Promise.all([(await context(modules)).watch(), (await context(legacy)).watch()]);
