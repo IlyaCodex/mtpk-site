@@ -122,7 +122,9 @@
 3. Картинки — в медиатеку по picture.md; генерация по канону style.md.
 4. Новая страница — сначала тип (docs/page-types/), адрес и место в structura.md.
 5. Выкладки нет — только локально (см. «Что это»).
-6. Секреты (platform/.env, ключи, пароли) — не коммитить, не вписывать в доки.
+6. Секреты (platform/.env, ключи, пароли) — не коммитить, не вписывать в доки. **Репозиторий на GitHub
+   публичный** (github.com/IlyaCodex/mtpk-site): сведения о серверах (IP, вход, защита, выкладка) — только
+   в локальных документах (в `.gitignore`), медиа (picture/, brand/, картинки вне platform/) — не в git.
 7. Товарные картинки (перерисовать/заменить/добавить) — ТОЛЬКО через скил
    /product-image, даже если просьба сформулирована свободным текстом.
    Без скила не генерировать. Канон и промт — briefs/product-image-prompt.md.
@@ -154,4 +156,4 @@ server/          # конфиги старого боевого сервера �
 | Подсистема «Сравнение товаров» | docs/compare-system.md |
 | Подсистема «Email-рассылки» | docs/mailing.md |
 | О проекте, команда, контент-источник, наследие WP | docs/project-info.md |
-| Старый сайт на Astro: конвенции, формы, деплой, сервер (справочно) | docs/conventions.md, docs/forms.md, docs/deploy-gotchas.md, briefs/hosting-spec.md, MAINTENANCE.md |
+| Старый сайт на Astro: конвенции, формы, деплой, сервер (справочно) | docs/conventions.md, docs/forms.md; о сервере и выкладке — локально, не в git: docs/deploy-gotchas.md, briefs/hosting-spec.md, MAINTENANCE.md |

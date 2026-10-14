@@ -35,6 +35,21 @@ brand/
 *.avi
 !platform/**
 
+# --- Сведения о серверах (адреса, доступ, защита, выкладка) — только локально: репозиторий на GitHub публичный ---
+server/
+handoff/
+MAINTENANCE.md
+scripts/deploy*
+.claude/skills/ship/
+docs/deploy-gotchas.md
+docs/handoff-2026-06-23.md
+briefs/hosting-spec.md
+briefs/tz-server-hardening.md
+briefs/tz-hardening-round2.md
+briefs/tz-form-secrets-smtp.md
+briefs/deployment-handoff-prompt.md
+briefs/tech-spec.md
+
 # --- Секреты: никогда в git, в том числе в platform/ (блок последним — правила сильнее исключения выше).
 # Пароли и ключи — только в .env на компьютере или сервере.
 .env
