@@ -118,7 +118,9 @@ async function adminRoutes(base: import('fastify').FastifyInstance) {
   app.addHook('onRequest', async (req, reply) => {
     if (!isAuthorized(req.headers as Record<string, unknown>, env.ADMIN_TOKEN)) return reply.code(401).send({ error: 'unauthorized' });
   });
-  // тело загрузки — файл как есть (любой Content-Type)
+  // тело загрузки — файл как есть, любого типа: без встроенного разбора text/plain и JSON,
+  // иначе .txt и .json приходили бы строкой и объектом, а не байтами (ответ 400)
+  app.removeAllContentTypeParsers();
   app.addContentTypeParser('*', { parseAs: 'buffer' }, (_req, body, done) => done(null, body));
 
   app.get(
