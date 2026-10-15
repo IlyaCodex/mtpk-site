@@ -457,6 +457,11 @@
             тесты content-kit 47, сайт 6. Правки базы — с копиями страниц в tools/checks/report (zp-crumbs-ld-backup,
             news-img-size-backup).
 
+      - [x] robots.txt (15.10.2026): роботы ИИ-поиска названы явно в общей группе с «*» — OAI-SearchBot (поиск
+            ChatGPT, так советует OpenAI), ChatGPT-User, PerplexityBot, Perplexity-User, Claude-SearchBot, Claude-User;
+            правила те же. Блокировок по User-Agent нет ни в шлюзе, ни в конфигах старого сервера. Роботы обучения
+            (GPTBot, ClaudeBot) разрешены общим правилом — закрыть их можно отдельной группой.
+
       **Дальше:**
       - [ ] Товарная разметка — решение Евгения: у 749 товаров в Product нет цены (offers), отзывов и рейтинга —
             Google не покажет товарный сниппет и в Search Console («Товарные сниппеты») отметит их ошибкой; на позиции
