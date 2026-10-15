@@ -5,7 +5,7 @@ import { toast } from '@/components/toast';
 import { Badge, Button, Field, formatDate, Table } from '@/components/ui';
 import { api } from '@/lib/client-api';
 
-type User = { id: number; email: string; name: string; role: string; active: boolean; lastLoginAt: string | null; createdAt: string };
+type User = { id: number; email: string; name: string; role: string; active: boolean; totpEnabledAt: string | null; lastLoginAt: string | null; createdAt: string };
 
 export function UsersManager({ initial, roles, meId }: { initial: User[]; roles: Record<string, string>; meId: number }) {
   const [list, setList] = useState(initial);
@@ -37,7 +37,7 @@ export function UsersManager({ initial, roles, meId }: { initial: User[]; roles:
 
   return (
     <div className="space-y-6">
-      <Table head={['Пользователь', 'Роль', 'Последний вход', '']}>
+      <Table head={['Пользователь', 'Роль', '2FA', 'Последний вход', '']}>
         {list.map((u) => (
           <tr key={u.id} className={u.active ? '' : 'opacity-60'}>
             <td className="px-4 py-2.5">
@@ -55,6 +55,9 @@ export function UsersManager({ initial, roles, meId }: { initial: User[]; roles:
                 ))}
               </select>
             </td>
+            <td className="px-4 py-2.5">
+              {u.totpEnabledAt ? <Badge tone="green">включена</Badge> : <span className="text-xs text-slate-400">нет</span>}
+            </td>
             <td className="px-4 py-2.5 text-xs text-slate-500">{formatDate(u.lastLoginAt)}</td>
             <td className="space-x-3 px-4 py-2.5 text-right text-xs whitespace-nowrap">
               <button
@@ -67,6 +70,25 @@ export function UsersManager({ initial, roles, meId }: { initial: User[]; roles:
               >
                 сменить пароль
               </button>
+              {u.totpEnabledAt && u.id !== meId && (
+                <button
+                  type="button"
+                  className="text-amber-700 hover:underline"
+                  title="Потерян телефон и резервные коды: следующий вход — по паролю, 2FA включается заново"
+                  onClick={async () => {
+                    if (!window.confirm(`Сбросить 2FA у ${u.email}? Следующий вход — только по паролю, затем 2FA нужно включить заново.`)) return;
+                    try {
+                      await api(`users/${u.id}/2fa`, { method: 'DELETE' });
+                      toast.ok('2FA сброшена');
+                      await reload();
+                    } catch (err) {
+                      toast.error(err);
+                    }
+                  }}
+                >
+                  сбросить 2FA
+                </button>
+              )}
               {u.id !== meId && (
                 <button type="button" className="text-slate-600 hover:underline" onClick={() => void update(u, { active: !u.active }, u.active ? 'Отключён' : 'Включён')}>
                   {u.active ? 'отключить' : 'включить'}

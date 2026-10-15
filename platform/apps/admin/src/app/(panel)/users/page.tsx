@@ -19,7 +19,12 @@ export default async function UsersPage() {
       <UsersManager
         meId={me.id}
         roles={ROLE_LABELS}
-        initial={list.map((u) => ({ ...u, lastLoginAt: u.lastLoginAt?.toISOString() ?? null, createdAt: u.createdAt.toISOString() }))}
+        initial={list.map((u) => ({
+          ...u,
+          totpEnabledAt: u.totpEnabledAt?.toISOString() ?? null,
+          lastLoginAt: u.lastLoginAt?.toISOString() ?? null,
+          createdAt: u.createdAt.toISOString(),
+        }))}
       />
     </>
   );

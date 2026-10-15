@@ -382,16 +382,21 @@ model SearchDocument {
 
 /// Пользователь админки. Роли: admin — всё; editor — контент; manager — заявки.
 model User {
-  id           Int       @id @default(autoincrement())
-  email        String    @unique(map: "users_email_unique")
-  name         String
+  id            Int       @id @default(autoincrement())
+  email         String    @unique(map: "users_email_unique")
+  name          String
   /// scrypt: 'scrypt$N$r$p$соль$хеш' (base64url)
-  passwordHash String    @map("password_hash")
-  role         String    @default("editor")
-  active       Boolean   @default(true)
-  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz(6)
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  passwordHash  String    @map("password_hash")
+  role          String    @default("editor")
+  active        Boolean   @default(true)
+  /// 2FA: секрет кодов из приложения (TOTP, Base32); null — 2FA выключена
+  totpSecret    String?   @map("totp_secret")
+  totpEnabledAt DateTime? @map("totp_enabled_at") @db.Timestamptz(6)
+  /// 2FA: SHA-256 неиспользованных резервных кодов
+  recoveryCodes String[]  @default([]) @map("recovery_codes")
+  lastLoginAt   DateTime? @map("last_login_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("users")
   @@schema("admin")

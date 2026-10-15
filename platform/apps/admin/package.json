@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "next start --port 3300",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test \"src/**/*.test.ts\"",
     "create-user": "tsx scripts/create-user.ts"
   },
   "dependencies": {

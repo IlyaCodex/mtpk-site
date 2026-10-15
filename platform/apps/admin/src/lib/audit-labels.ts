@@ -25,6 +25,18 @@ export function describeAction({ action, target, details }: Entry): string {
       return `Неудачная попытка входа: ${t}`;
     case action === 'logout':
       return 'Выход из админки';
+    case action === 'login.2fa_failed':
+      return `Неверный код 2FA при входе: ${t}`;
+    case action === '2fa.enable':
+      return 'Включена двухфакторная защита';
+    case action === '2fa.disable':
+      return 'Выключена двухфакторная защита';
+    case action === '2fa.codes':
+      return 'Новые резервные коды 2FA';
+    case action === '2fa.recovery_used':
+      return `Вход по резервному коду 2FA (осталось ${Number(d.left ?? 0)})`;
+    case action === '2fa.reset':
+      return `Сброшена 2FA пользователя ${t}`;
     case action === 'user.create':
       return `Добавлен пользователь ${t}`;
     case action === 'user.update':
@@ -95,5 +107,10 @@ function describeMailing(verb: string, t: string, d: Record<string, unknown>): s
   return `Рассылки: ${t}`;
 }
 
-/** Цвет метки действия: удаления и неудачные входы — красным. */
-export const actionTone = (action: string) => (action.endsWith('.delete') || action === 'login.failed' ? 'red' : action.startsWith('login') || action === 'logout' ? 'gray' : 'blue');
+/** Цвет метки действия: удаления, неудачные входы и снятие 2FA — красным. */
+export const actionTone = (action: string) =>
+  action.endsWith('.delete') || ['login.failed', 'login.2fa_failed', '2fa.disable', '2fa.reset'].includes(action)
+    ? 'red'
+    : action.startsWith('login') || action === 'logout'
+      ? 'gray'
+      : 'blue';

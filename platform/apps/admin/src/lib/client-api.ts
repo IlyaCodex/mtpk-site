@@ -42,7 +42,8 @@ export async function api<T = unknown>(
   });
   const isJson = res.headers.get('content-type')?.includes('json');
   const data = isJson ? await res.json().catch(() => null) : await res.text();
-  if (res.status === 401 && typeof window !== 'undefined') window.location.assign(withBase('/login'));
+  // 401 — сессия истекла, заново на вход; у самого входа (auth/…) 401 — неверные данные или нужен код 2FA
+  if (res.status === 401 && typeof window !== 'undefined' && !path.replace(/^\/+/, '').startsWith('auth/')) window.location.assign(withBase('/login'));
   if (!res.ok) throw new ApiError(res.status, data);
   return data as T;
 }

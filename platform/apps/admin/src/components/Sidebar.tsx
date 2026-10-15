@@ -48,10 +48,23 @@ export function Sidebar({ items, user, siteUrl }: { items: NavItem[]; user: { na
       <div className="border-t border-brand-900 px-5 py-4 text-xs">
         <div className="truncate font-medium text-white">{user.name}</div>
         <div className="truncate text-brand-200">{user.roleLabel}</div>
-        <button type="button" onClick={logout} className="mt-2 inline-flex items-center gap-1.5 text-brand-200 underline-offset-2 hover:text-white hover:underline">
-          <Icon name="logout" className="h-4 w-4" />
-          Выйти
-        </button>
+        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+          {/* свои настройки входа (2FA) — у любой роли */}
+          <Link
+            href="/security"
+            className={cx(
+              'inline-flex items-center gap-1.5 underline-offset-2 hover:text-white hover:underline',
+              active('/security') ? 'text-white' : 'text-brand-200',
+            )}
+          >
+            <Icon name="shield" className="h-4 w-4" />
+            Настройки входа
+          </Link>
+          <button type="button" onClick={logout} className="inline-flex items-center gap-1.5 text-brand-200 underline-offset-2 hover:text-white hover:underline">
+            <Icon name="logout" className="h-4 w-4" />
+            Выйти
+          </button>
+        </div>
       </div>
     </aside>
   );
