@@ -15,13 +15,19 @@ export type HeadPage = Pick<
 };
 
 /**
- * Общее для всех страниц сайта и статей Практикума (lib/site-chrome.tsx):
+ * Общее для всех страниц сайта и статей Практикума (lib/site-chrome.tsx): значок компании,
  * предзагрузка логотипа шапки и шрифтов, модулей страницы и общие стили core.css.
  */
 export function CoreAssets({ modules = [] }: { modules?: string[] }) {
   const core = clientModuleUrl('core.css');
   return (
     <>
+      {/* значок компании (scripts/brand-icons.ts): SVG — новым браузерам и Яндексу, ICO — остальным
+          и Google, PNG — iPhone и Android */}
+      <link rel="icon" href="/favicon.ico" sizes="32x32" />
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      <link rel="manifest" href="/site.webmanifest" />
       {/* Лого в шапке — LCP-элемент; основные веса Inter — параллельно с HTML (T-PERF-2) */}
       <link rel="preload" as="image" {...logoPreload('/brand/logo-header-clean.png')} fetchPriority="high" />
       <link rel="preload" href="/fonts/inter-400-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
@@ -72,7 +78,6 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
       <meta name="twitter:title" content={page.title} />
       <meta name="twitter:description" content={ogDescription} />
       <meta name="twitter:image" content={image} />
-      <link rel="icon" href="/brand/favicon-original.ico" type="image/x-icon" />
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(ORGANIZATION_SCHEMA) }} />
       {home && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(WEBSITE_SCHEMA) }} />}

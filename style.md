@@ -224,7 +224,8 @@
 | `Header.astro` (шапка) | `brand/logo-header-clean.png` | 56 / 40 px | Светлый белый фон, без подписи «ООО МТПК» |
 | `Footer.astro` (футер) | `brand/logo-white.png` | ~48–56 px | Тёмный фон `--neutral-950` |
 | OG / Telegram / письма / КП | `brand/logo-color.png` | — | Полный цветной знак с «ООО МТПК» |
-| Favicon | `brand/favicon-original.ico` | — | — |
+| Значок сайта (favicon, выдача Яндекса и Google) | `favicon.svg`, `favicon.ico` (16/32/48), `apple-touch-icon.png` (180), `icon-192/512.png` — в корне сайта | — | Два треугольника знака (цвета логотипа `#21A745`, `#1E6D7F`) на белой плашке. Рисунок — `platform/apps/web/public/favicon.svg`; ICO, PNG и копии для админки делает `npx tsx scripts/brand-icons.ts`. Подключение — `CoreAssets` (все страницы и Практикум). `brand/favicon-original.ico` (16×16) — прежний, не используется |
+| Админка: вход / меню / значок | `apps/admin/public/brand/logo.png` / `logo-white.png` / `favicon.svg` | 63 / 51 px | Копии от `scripts/brand-icons.ts`: цветной на белой карточке входа, белый — на тёмном меню |
 
 ---
 

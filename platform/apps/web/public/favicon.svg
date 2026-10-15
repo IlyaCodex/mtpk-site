@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-36 -36 480 480">
+  <!-- Значок УралИндуктор: два треугольника знака логотипа (brand/logo-color.png) на белой плашке.
+       Из него scripts/brand-icons.ts делает favicon.ico и PNG-значки. -->
+  <rect x="-36" y="-36" width="480" height="480" rx="80" fill="#fff"/>
+  <path fill="#21A745" d="M0 0H346L64.87 281.13A38 38 0 0 1 0 254.26Z"/>
+  <path fill="#1E6D7F" d="M408 408H62L343.13 126.87A38 38 0 0 1 408 153.74Z"/>
+</svg>

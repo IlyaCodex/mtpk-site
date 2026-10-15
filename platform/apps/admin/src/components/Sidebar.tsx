@@ -20,14 +20,11 @@ export function Sidebar({ items, user, siteUrl }: { items: NavItem[]; user: { na
 
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-brand-900 bg-brand-950 text-brand-100">
-      <div className="flex items-center gap-3 px-5 py-5">
-        <img src={withBase('/favicon.svg')} alt="" className="h-8 w-8" />
-        <div className="leading-tight">
-          <div className="text-sm font-semibold text-white">УралИндуктор</div>
-          <a href={siteUrl} target="_blank" rel="noopener" className="text-xs text-brand-200 hover:text-white">
-            открыть сайт <Icon name="external" className={INLINE} />
-          </a>
-        </div>
+      <div className="px-5 py-5">
+        <img src={withBase('/brand/logo-white.png')} alt="УралИндуктор · ООО МТПК" width={176} height={51} className="h-auto w-44" />
+        <a href={siteUrl} target="_blank" rel="noopener" className="mt-2 inline-block text-xs text-brand-200 hover:text-white">
+          открыть сайт <Icon name="external" className={INLINE} />
+        </a>
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3" aria-label="Разделы админки">
         {items.map((item, i) => (

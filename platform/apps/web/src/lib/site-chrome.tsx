@@ -17,6 +17,9 @@ const FOOTER_SLOT = /<site-footer\b[^>]*>\s*<\/site-footer>/i;
 /** Документ (статья Практикума) с местами <site-header>/<site-footer> — в общем каркасе сайта. */
 export const hasSiteChrome = (html: string) => HEADER_SLOT.test(html) || FOOTER_SLOT.test(html);
 
+/** Свои ссылки статьи на значок (остались от прежнего сайта): значок — общий, из CoreAssets. */
+const ICON_LINK = /<link\b[^>]*\brel=["']?(?:shortcut\s+)?(?:icon|apple-touch-icon)(?=["'\s/>])[^>]*>[^\S\n]*\n?/gi;
+
 const escapeAttr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
 /** Вставка перед первым совпадением (или перед запасной позицией). */
@@ -29,8 +32,8 @@ function insertBefore(html: string, re: RegExp, fallback: RegExp, chunk: string)
  * Статья Практикума — целый HTML-документ своей вёрстки — в том же каркасе,
  * что все страницы сайта: на месте <site-header></site-header> — шапка
  * (компонент Header, без переключателя темы: статьи всегда светлые), на месте
- * <site-footer></site-footer> — подвал, мобильное меню и плашка cookie; в <head> —
- * общие стили до стилей статьи (core.css) и после них (core-end.css); в конце
+ * <site-footer></site-footer> — подвал, мобильное меню и плашка cookie; в <head> — значок
+ * компании и общие стили до стилей статьи (core.css) и после них (core-end.css); в конце
  * <body> — общий модуль сайта и счётчики (SiteScripts); на <html> — оформление
  * кнопок из настроек. Пункты меню, контакты и подвал правятся в админке
  * «Шапка, меню, контакты» — и сразу меняются везде.
@@ -52,7 +55,7 @@ export function withSiteChrome(html: string, settings: SiteSettings, path: strin
   const scripts = renderToStaticMarkup(<SiteScripts modules={modules} legacy={[]} />);
   const head = renderToStaticMarkup(<CoreAssets modules={modules} />);
 
-  let out = html.replace(HEADER_SLOT, () => header).replace(FOOTER_SLOT, () => footer);
+  let out = html.replace(HEADER_SLOT, () => header).replace(FOOTER_SLOT, () => footer).replace(ICON_LINK, '');
   // общие стили — до стилей статьи, «после» — последними, как у страниц сайта (SiteHead)
   out = insertBefore(out, /<link\b[^>]*rel=["']?stylesheet[^>]*>/i, /<\/head>/i, head);
   if (coreEnd) out = insertBefore(out, /<\/head>/i, /<body\b/i, `<link rel="stylesheet" href="${coreEnd}">`);

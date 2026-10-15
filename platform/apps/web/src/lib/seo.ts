@@ -15,8 +15,8 @@ export const ORGANIZATION_SCHEMA = {
     '@type': 'ImageObject',
     '@id': `${SITE}/brand/logo-color.png`,
     url: `${SITE}/brand/logo-color.png`,
-    width: 512,
-    height: 512,
+    width: 1898,
+    height: 495,
   },
   image: `${SITE}/og/default.jpg`,
   description:
@@ -68,7 +68,13 @@ const VERIFICATION: Metadata['verification'] = {
   yandex: '5cf3197708e8d0e7',
 };
 
-const ICONS: Metadata['icons'] = { icon: [{ url: '/brand/favicon-original.ico', type: 'image/x-icon' }] };
+const ICONS: Metadata['icons'] = {
+  icon: [
+    { url: '/favicon.ico', sizes: '32x32' },
+    { url: '/favicon.svg', type: 'image/svg+xml' },
+  ],
+  apple: '/apple-touch-icon.png',
+};
 
 /** Метаданные страницы: title, description, canonical, robots, Open Graph, Twitter (SEO-T1/T2). */
 export function pageMetadata(page: Pick<PageDto, 'path' | 'title' | 'description' | 'noindex'>): Metadata {

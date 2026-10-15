@@ -11,12 +11,9 @@ export default async function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-950 via-brand-900 to-brand-700 p-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl">
-        <div className="mb-6 flex items-center gap-3">
-          <img src={withBase('/favicon.svg')} alt="" className="h-10 w-10" />
-          <div>
-            <div className="text-lg font-semibold text-slate-900">УралИндуктор</div>
-            <div className="text-sm text-slate-500">Управление сайтом</div>
-          </div>
+        <div className="mb-6">
+          <img src={withBase('/brand/logo.png')} alt="УралИндуктор · ООО МТПК" width={240} height={63} className="h-auto w-60" />
+          <div className="mt-3 text-sm text-slate-500">Управление сайтом</div>
         </div>
         <LoginForm />
       </div>

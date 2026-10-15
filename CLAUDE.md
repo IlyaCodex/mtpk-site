@@ -58,7 +58,8 @@
   медиасервис: у каждой PNG/JPG сам делает WebP-копию (`foo.png.webp`: при загрузке, по первому запросу,
   при запуске — для старых) и отдаёт её по тому же адресу браузерам с WebP; уменьшенные копии `?w=` — в AVIF/WebP.
   Логотипы `apps/web/public/brand` — компонент `Logo` (`<picture>`), WebP-копии делает сборка сайта.
-  Исходники и архив — picture/.
+  Значок сайта (favicon) — рисунок `apps/web/public/favicon.svg`; ICO/PNG и логотипы админки из него и из
+  brand/ — `npx tsx scripts/brand-icons.ts`. Исходники и архив — picture/.
 - Стили сайта — `apps/web/public/css`. Скрипты — только TypeScript: модули `apps/web/src/client`,
   старые скрипты страниц `apps/web/src/legacy` (собираются в `public/js/<имя>.js` при `npm run build:web`,
   в git — только исходники .ts), служебные скрипты платформы — `platform/scripts/*.ts` (запуск через tsx).
