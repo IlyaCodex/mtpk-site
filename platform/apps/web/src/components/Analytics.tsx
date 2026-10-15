@@ -17,6 +17,11 @@ export function AnalyticsNoscript() {
       </noscript>
       <noscript>
         <div>
+          <img src="https://mc.yandex.ru/watch/94628479" className="ui-pixel" alt="" />
+        </div>
+      </noscript>
+      <noscript>
+        <div>
           <img src="https://top-fwz1.mail.ru/counter?id=3784620;js=na" className="ui-pixel" alt="Top.Mail.Ru" />
         </div>
       </noscript>

@@ -70,8 +70,11 @@ async function smtp(name: string, prefix: '' | 'MAILING_') {
       secure: !tls,
       requireTLS: tls,
       auth: { user, pass },
+      // как у сервисов: недоступный адрес сервера — к следующему через 10 с
+      connectionTimeout: 10_000,
+      greetingTimeout: 15_000,
     });
-    await withTimeout(transport.verify());
+    await withTimeout(transport.verify(), 60_000);
     transport.close();
     return `вход на ${host} как ${user.replace(/^(.).*(@.*)$/, '$1…$2')} — письма не отправлялись`;
   });

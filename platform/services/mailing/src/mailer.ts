@@ -18,6 +18,9 @@ export function createTransport(): Transporter {
     secure: env.MAILING_SMTP_SECURE === 'ssl',
     requireTLS: env.MAILING_SMTP_SECURE === 'tls',
     auth: { user: env.MAILING_SMTP_USER, pass: env.MAILING_SMTP_PASS },
+    // у почтового сервера несколько адресов: недоступный — к следующему через 10 с, а не через 2 мин
+    connectionTimeout: 10_000,
+    greetingTimeout: 15_000,
   });
 }
 

@@ -124,7 +124,8 @@
 - Любая правка вёрстки заканчивается проверкой (platform/tools/checks): до правки
   `npm run checks -- --save [--visual]`, после — `npm run checks [--visual]`, снимки отличий —
   глазами. Поведение сайта — `npx tsx tools/checks/src/functional-check.ts --no-submit`,
-  админка — `tools/checks/src/admin-smoke.ts`.
+  админка — `tools/checks/src/admin-smoke.ts`, CSP шлюза (счётчики Метрики, Mango, карта) —
+  `tools/checks/src/csp-check.ts`.
 - Запутался или поправили дважды — предложи /clear и новую сессию.
 
 ## Железные правила

@@ -24,6 +24,9 @@ const transport =
         secure: env.SMTP_SECURE === 'ssl',
         requireTLS: env.SMTP_SECURE === 'tls',
         auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+        // у почтового сервера несколько адресов: недоступный — к следующему через 10 с, а не через 2 мин
+        connectionTimeout: 10_000,
+        greetingTimeout: 15_000,
         // проверка сертификата включена по умолчанию — не отключать
       })
     : nodemailer.createTransport({ jsonTransport: true });

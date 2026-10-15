@@ -31,7 +31,7 @@ export const PAGE_SCRIPT_VERSIONS: Record<string, string> = {
 };
 
 /** Коллтрекинг Mango: имя файла содержит дату и хеш сборки — кешируется надолго. */
-export const MANGO_SCRIPT = '/js/mango-uibusiness-tracking-20261002-6a7d1dff2fde.js';
+export const MANGO_SCRIPT = '/js/mango-uibusiness-tracking-20261007-63dc454cb493.js';
 
 export const DEFAULT_OG_IMAGE = '/og/default.jpg';
 export const DEFAULT_DESCRIPTION =

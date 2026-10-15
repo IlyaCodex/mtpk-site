@@ -5,7 +5,8 @@
  */
 const KEY = 'ui_cookie_consent';
 const CONSENT_VERSION = 'v2026.1';
-const YM_COUNTERS = [25228307, 112991420]; // кабинеты «УралИндуктор3» и uibusiness
+// кабинеты «УралИндуктор3», uibusiness и третий — как на боевом сайте (сверено 15.10.2026)
+const YM_COUNTERS = [25228307, 112991420, 94628479];
 const TMR_COUNTER = '3784620'; // Top.Mail.Ru
 
 type W = Window & { ym?: ((...args: unknown[]) => void) & { a?: unknown[]; l?: number }; _tmr?: unknown[] };
