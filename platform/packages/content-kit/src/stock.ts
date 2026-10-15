@@ -133,6 +133,10 @@ export interface StockItemRow {
   photos: unknown;
   qty: number | null;
   shipping: string | null;
+  /** цена, ₽ (нет — «по запросу»), «от» перед ней, пояснение («с НДС») */
+  price?: number | null;
+  priceFrom?: boolean;
+  priceNote?: string | null;
 }
 
 export interface StockView {
@@ -157,6 +161,13 @@ export function textHtml(text: string): string {
     .replace(/(?<=^|[\s(«])([а-яё]{1,2}|для|без|под|над|при|про|или)\s+/giu, '$1&nbsp;');
 }
 const pathOf = (url: string) => (url.trim() ? url.trim().replace(/[?#].*$/, '').replace(/\/?$/, '/') : '');
+
+/** Цена для карточки: разряды через узкий неразрывный пробел, «от» и ₽ — неразрывно; нет цены — undefined. */
+export function priceHtml(price: number | null | undefined, from = false): string | undefined {
+  if (price == null || !Number.isFinite(price) || price <= 0) return undefined;
+  const digits = String(Math.round(price)).replace(/\B(?=(\d{3})+(?!\d))/g, '&#8239;');
+  return `${from ? 'от&nbsp;' : ''}${digits}&nbsp;₽`;
+}
 
 /** Фото со склада из JSON-поля: [{ src, alt }]. */
 function photosOf(raw: unknown): StockItemView['photos'] {
@@ -209,6 +220,7 @@ export function resolveStockView(
     const alt = own || page?.title || title.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
     const cover = it.image?.trim() || source?.cover || page?.image || '';
     const specs = specsOf(it.specs) ?? product?.specs ?? [];
+    const price = priceHtml(it.price, it.priceFrom);
     return {
       group: it.groupKey && order.has(it.groupKey) ? it.groupKey : '',
       href: source && source.status !== 'published' ? '' : path,
@@ -229,6 +241,7 @@ export function resolveStockView(
       specs,
       ...(it.qty != null ? { qty: it.qty } : {}),
       ...(it.shipping?.trim() ? { shipping: textHtml(it.shipping) } : {}),
+      ...(price ? { price, ...(it.priceNote?.trim() ? { priceNote: textHtml(it.priceNote) } : {}) } : {}),
       photos: photosOf(it.photos),
     };
   });

@@ -89,6 +89,63 @@
   line-height: 1.4;
 }
 
+/* Цена позиции (админка «Наличие на складе»; нет — «по запросу»). Блок одной высоты у всех
+   карточек — подпись, сумма в одну строку, строка «N шт · отгрузка …» (пусть и пустая) — и прижат
+   к низу вместе с кнопками: в ряду цены стоят на одном уровне. */
+.stock-card .pcard__price {
+  margin-top: auto;
+  padding-top: var(--sp-4, 16px);
+  border-top: 1px solid var(--border-subtle, #e5e5e5);
+}
+.stock-card .pcard__price + .pcard__actions { margin-top: 0; padding-top: var(--sp-4, 16px); }
+.pcard__price-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: var(--fw-bold, 700);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, #71717a);
+}
+.pcard__price-value {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  height: 38px;
+  margin-top: 4px;
+}
+.pcard__price-amount {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: var(--fw-bold, 700);
+  line-height: 38px;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--text-primary, #18181b);
+}
+.pcard__price-amount--ask { font-size: 19px; font-weight: var(--fw-semibold, 600); color: var(--text-secondary, #52525b); }
+.pcard__price-note {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-tertiary, #71717a);
+}
+.pcard__price .pcard__stock-meta {
+  min-height: 18px;
+  margin-top: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* заглушка вместо «Подробнее» у позиции без страницы: та же высота, что у кнопки */
+.pcard__more--none { visibility: hidden; }
+.pcard__more--none::before { content: "\00a0"; }
+
 /* Полоска-обёртка фильтра: лейбл «Фильтр по категории:» слева + сами кнопки.
    Скрывается JS если позиций меньше двух категорий. */
 .stock-filterbar {

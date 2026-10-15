@@ -228,6 +228,12 @@ model StockItem {
   url       String   @default("")
   qty       Int?
   shipping  String?
+  /// цена, ₽ — на карточке /nalichie/; нет — «по запросу»
+  price     Int?
+  /// «от» перед ценой
+  priceFrom Boolean  @default(false) @map("price_from")
+  /// пояснение к цене в одну строку: «с НДС», «за комплект»
+  priceNote String?  @map("price_note")
   note      String?
   title     String?
   image     String?

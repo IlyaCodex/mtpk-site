@@ -388,6 +388,10 @@ export const stockItemView = z.object({
   specs: z.array(z.object({ label: z.string(), value: z.string() })),
   qty: z.number().int().optional(),
   shipping: z.string().optional(),
+  /** цена (HTML): «от 1 250 000 ₽»; нет — «по запросу» */
+  price: z.string().optional(),
+  /** пояснение к цене (HTML): «с НДС» */
+  priceNote: z.string().optional(),
   /** фото со склада */
   photos: z.array(z.object({ src: z.string(), alt: z.string() })),
 });

@@ -20,6 +20,12 @@ export type StockItem = {
   url: string;
   qty: number | null;
   shipping: string | null;
+  /** цена, ₽: на карточке /nalichie/; нет — «по запросу» */
+  price?: number | null;
+  /** «от» перед ценой */
+  priceFrom?: boolean;
+  /** пояснение к цене в одну строку: «с НДС», «за комплект» */
+  priceNote?: string | null;
   note: string | null;
   title: string | null;
   image: string | null;
@@ -50,7 +56,24 @@ const plural = (n: number, one: string, few: string, many: string) => {
 };
 const positions = (n: number) => `${n} ${plural(n, 'позиция', 'позиции', 'позиций')}`;
 
-const emptyItem = (group: string): StockItem => ({ group, url: '', qty: null, shipping: null, note: null, title: null, image: null, specs: null, photos: [] });
+const emptyItem = (group: string): StockItem => ({
+  group,
+  url: '',
+  qty: null,
+  shipping: null,
+  price: null,
+  priceFrom: false,
+  priceNote: null,
+  note: null,
+  title: null,
+  image: null,
+  specs: null,
+  photos: [],
+});
+
+/** Цена как на сайте: «от 1 250 000 ₽». */
+export const priceText = (item: Pick<StockItem, 'price' | 'priceFrom'>) =>
+  item.price ? `${item.priceFrom ? 'от ' : ''}${item.price.toLocaleString('ru-RU')} ₽` : '';
 
 /** Уникальная метка типа из названия. */
 function uniqueKey(title: string, taken: string[]): string {
@@ -382,6 +405,7 @@ function ItemRow({
           )}
           {item.url && !option && <Badge tone="amber">нет в каталоге</Badge>}
           {option?.draft && <Badge tone="amber">страница — черновик</Badge>}
+          <span className={item.price ? 'font-semibold text-slate-800' : 'text-slate-400'}>{item.price ? priceText(item) : 'цена по запросу'}</span>
           {item.qty != null && <span>{item.qty} шт.</span>}
           {item.shipping && <span>отгрузка {item.shipping}</span>}
           <span className={cx('inline-flex items-center gap-1', item.photos.length ? 'text-accent-700' : 'text-slate-400')}>
@@ -418,7 +442,7 @@ function Field({ label, hint, error, children }: { label: string; hint?: ReactNo
   );
 }
 
-/** Окно позиции: тип, оборудование из каталога, название, фото, фото со склада, количество, срок, характеристики. */
+/** Окно позиции: тип, оборудование из каталога, название, количество, срок, цена, фото, фото со склада, характеристики. */
 function ItemDialog({
   initial,
   isNew,
@@ -457,6 +481,9 @@ function ItemDialog({
       title: draft.title?.trim() || null,
       image: draft.image?.trim() || null,
       shipping: draft.shipping?.trim() || null,
+      price: draft.price && draft.price > 0 ? Math.round(draft.price) : null,
+      priceFrom: Boolean(draft.price && draft.priceFrom),
+      priceNote: draft.price ? draft.priceNote?.trim() || null : null,
       note: draft.note?.trim() || null,
       specs: specs.length ? specs : null,
     });
@@ -511,6 +538,35 @@ function ItemDialog({
               <input className="field" value={draft.shipping ?? ''} placeholder="от 3 дней" onChange={(e) => set({ shipping: e.target.value })} />
             </Field>
           </div>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <span className="mb-1 block text-sm font-medium text-slate-700">Цена, ₽</span>
+            <div className="flex items-center gap-3">
+              <input
+                className="field"
+                type="number"
+                min={0}
+                step={1}
+                inputMode="numeric"
+                aria-label="Цена, ₽"
+                value={draft.price ?? ''}
+                placeholder="Например: 1250000"
+                onChange={(e) => set({ price: e.target.value === '' ? null : Math.max(0, Math.round(Number(e.target.value))) })}
+              />
+              <label className={cx('inline-flex shrink-0 items-center gap-2 text-sm', draft.price ? 'text-slate-700' : 'text-slate-400')}>
+                <input type="checkbox" checked={Boolean(draft.priceFrom)} disabled={!draft.price} onChange={(e) => set({ priceFrom: e.target.checked })} />
+                «от»
+              </label>
+            </div>
+            <span className="mt-1 block text-xs text-slate-500">
+              {draft.price ? `На сайте: ${priceText(draft)}` : 'Пусто — на сайте «Цена по запросу»'}
+            </span>
+          </div>
+          <Field label="Пояснение к цене" hint="Коротко, в одну строку рядом с ценой">
+            <input className="field" maxLength={40} value={draft.priceNote ?? ''} placeholder="с НДС" disabled={!draft.price} onChange={(e) => set({ priceNote: e.target.value })} />
+          </Field>
         </div>
 
         <Field label="Фото в карточке" hint={option?.cover || (draft.url === initial.url && initial.preview?.image) ? 'Пусто — фото со страницы товара' : 'Главное фото карточки на /nalichie/'}>

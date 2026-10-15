@@ -144,3 +144,19 @@ test('простой текст из админки → HTML: экраниров
   assert.equal(textHtml('и в печи'), 'и&nbsp;в&nbsp;печи');
   assert.equal(textHtml('УИ-0.25Т'), 'УИ-0.25Т');
 });
+
+test('цена: разряды узким неразрывным пробелом, «от», пояснение; без цены — полей нет', () => {
+  const { items } = resolveStockView(
+    groups,
+    [item({ price: 1250000, priceFrom: true, priceNote: ' с НДС ' }), item({ price: 98500, priceNote: '' }), item({ price: 0, priceNote: 'с НДС' }), item({})],
+    catalog,
+  );
+  assert.equal(items[0].price, 'от&nbsp;1&#8239;250&#8239;000&nbsp;₽');
+  assert.equal(items[0].priceNote, 'с&nbsp;НДС');
+  assert.equal(items[1].price, '98&#8239;500&nbsp;₽');
+  assert.equal(items[1].priceNote, undefined);
+  for (const it of items.slice(2)) {
+    assert.equal(it.price, undefined);
+    assert.equal(it.priceNote, undefined);
+  }
+});

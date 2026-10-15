@@ -154,7 +154,7 @@ const VISIBLE_PHOTOS = 4;
 /**
  * Карточка позиции склада (разметка .pcard — как в каталоге): фото с бейджами,
  * значок «на весь экран» справа вверху, миниатюры фото со склада, название,
- * характеристики, количество и срок, «Запросить цену», «Подробнее».
+ * характеристики, цена (из админки; нет — «по запросу»), количество и срок, «Запросить цену», «Подробнее».
  * Кадры просмотра — фото карточки и фото со склада (data-slide), группа —
  * сама карточка (data-lightbox-group): листаются только её фото.
  */
@@ -239,10 +239,31 @@ function StockCard({ item, eager }: { item: StockItemView; eager: readonly strin
             ))}
           </dl>
         )}
-        {meta && <Inline as="div" className="pcard__stock-meta" html={meta} />}
+        {/* цена — одной высоты во всех карточках и прижата к низу: в ряду она на одном уровне */}
+        <div className="pcard__price">
+          <span className="pcard__price-label">Цена</span>
+          <div className="pcard__price-value">
+            {item.price ? (
+              <Inline className="pcard__price-amount" html={item.price} />
+            ) : (
+              <span className="pcard__price-amount pcard__price-amount--ask">По&nbsp;запросу</span>
+            )}
+            {item.price && item.priceNote !== undefined && <Inline className="pcard__price-note" html={item.priceNote} />}
+          </div>
+          <Inline as="div" className="pcard__stock-meta" html={meta} />
+        </div>
         <div className="pcard__actions">
-          <a href="#leadgen" className="btn btn--primary btn--block js-quote-btn" dangerouslySetInnerHTML={{ __html: withArrow('Запросить цену', true) }} />
-          {href && <a href={href} className="pcard__more" dangerouslySetInnerHTML={{ __html: withArrow('Подробнее о&nbsp;позиции', true) }} />}
+          <a
+            href="#leadgen"
+            className="btn btn--primary btn--block js-quote-btn"
+            dangerouslySetInnerHTML={{ __html: withArrow(item.price ? 'Оставить заявку' : 'Запросить цену', true) }}
+          />
+          {href ? (
+            <a href={href} className="pcard__more" dangerouslySetInnerHTML={{ __html: withArrow('Подробнее о&nbsp;позиции', true) }} />
+          ) : (
+            // без страницы позиции — пустое место той же высоты: низ карточек в ряду совпадает
+            <span className="pcard__more pcard__more--none" aria-hidden="true" />
+          )}
         </div>
       </div>
     </article>
