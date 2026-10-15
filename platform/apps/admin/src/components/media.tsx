@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { withBase } from '@/lib/base-path';
+import { plural } from '@/lib/catalog';
 import { api } from '@/lib/client-api';
 import { Icon } from './icons';
 import { toast } from './toast';
@@ -13,6 +14,8 @@ type Listing = { prefix: string; folders: { name: string; prefix: string; count:
 /** Файлы показываются через прокси админки (/media-files → медиасервис). */
 export const fileSrc = (url: string) => (url.startsWith('/') ? withBase(`/media-files${url}`) : url);
 export const isImage = (key: string) => /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(key.split(/[?#]/)[0]);
+/** Превью в сетке — уменьшенная копия (320 px, AVIF/WebP из медиасервиса), а не исходник в полный размер. */
+const previewSrc = (url: string) => fileSrc(/\.(png|jpe?g|webp)$/i.test(url) ? `${url}?w=320` : url);
 const ROOTS = ['img/', 'files/', 'docs/', 'og/'];
 const keyPath = (key: string) => key.split('/').map(encodeURIComponent).join('/');
 
@@ -73,6 +76,9 @@ export function MediaBrowser({
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(0);
   const [selected, setSelected] = useState<string[]>([]);
+  // новые папки этого сеанса: в S3 пустых папок не бывает — папка сохраняется вместе с первым файлом
+  const [newFolders, setNewFolders] = useState<string[]>([]);
+  const [folderName, setFolderName] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -121,6 +127,17 @@ export function MediaBrowser({
     }
   }
 
+  /** Новая папка внутри открытой: адрес латиницей из названия, сразу открывается. */
+  function createFolder() {
+    const slug = slugify(folderName ?? '').slice(0, 60).replace(/-+$/, '');
+    if (!slug) return toast.error('Название папки — буквы или цифры');
+    const target = `${prefix}${slug}/`;
+    if (!data?.folders.some((f) => f.prefix === target)) setNewFolders((n) => (n.includes(target) ? n : [...n, target]));
+    setFolderName(null);
+    setSearch('');
+    setPrefix(target);
+  }
+
   function choose(file: MediaFile) {
     if (mode === 'manage') return window.open(fileSrc(file.url), '_blank');
     if (!multiple) return onPick?.(file.url);
@@ -128,6 +145,13 @@ export function MediaBrowser({
   }
 
   const crumbs = prefix.split('/').filter(Boolean);
+  // новые (ещё пустые) папки открытой папки — пока в них ничего не загрузили; сверка — только
+  // со списком этой же папки (пока грузится новый, на экране ещё прежний)
+  const fresh = data?.prefix === prefix ? data : null;
+  const pendingFolders = fresh
+    ? newFolders.filter((p) => p.startsWith(prefix) && p.slice(prefix.length).split('/').filter(Boolean).length === 1 && !fresh.folders.some((f) => f.prefix === p))
+    : [];
+  const isNewEmpty = Boolean(fresh && newFolders.includes(prefix) && !fresh.files.length && !fresh.folders.length);
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -144,11 +168,48 @@ export function MediaBrowser({
           ))}
         </div>
         <input className="field ml-auto max-w-64" placeholder="Поиск по имени файла" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <Button onClick={() => setFolderName((v) => (v === null ? '' : null))} aria-expanded={folderName !== null}>
+          <Icon name="plus" className="h-4 w-4" />
+          Новая папка
+        </Button>
         <Button variant="primary" onClick={() => fileInput.current?.click()} disabled={uploading > 0}>
           {uploading ? `Загрузка… (${uploading})` : 'Загрузить файлы'}
         </Button>
         <input ref={fileInput} type="file" multiple hidden onChange={(e) => void upload(e.target.files)} />
       </div>
+
+      {/* не <form>: окно выбора файла бывает внутри формы редактора, вложенная форма отправила бы внешнюю */}
+      {folderName !== null && (
+        <div role="group" aria-label="Новая папка" className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <input
+            autoFocus
+            className="field max-w-72"
+            placeholder="Название папки, например «Проекты 2026»"
+            value={folderName}
+            maxLength={80}
+            onChange={(e) => setFolderName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                createFolder();
+              } else if (e.key === 'Escape') {
+                // Esc закрывает только поле: окно выбора (Modal) обработанный Esc пропускает
+                e.preventDefault();
+                setFolderName(null);
+              }
+            }}
+          />
+          <span className="text-xs text-slate-500">
+            адрес: <code className="text-slate-700">/{prefix}{slugify(folderName).slice(0, 60).replace(/-+$/, '') || '…'}/</code>
+          </span>
+          <span className="ml-auto flex gap-2">
+            <Button onClick={() => setFolderName(null)}>Отмена</Button>
+            <Button variant="primary" onClick={createFolder} disabled={!slugify(folderName)}>
+              Создать
+            </Button>
+          </span>
+        </div>
+      )}
 
       <nav className="mb-3 flex flex-wrap items-center gap-1 text-sm text-slate-500" aria-label="Папка">
         {crumbs.map((c, i) => (
@@ -174,7 +235,22 @@ export function MediaBrowser({
               >
                 <span className="text-2xl">📁</span>
                 <span className="mt-1 w-full truncate text-sm font-medium text-slate-800">{f.name}</span>
-                <span className="text-xs text-slate-400">{f.count} файлов</span>
+                <span className="text-xs text-slate-400">
+                  {f.count} {plural(f.count, 'файл', 'файла', 'файлов')}
+                </span>
+              </button>
+            ))}
+          {!search &&
+            pendingFolders.map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPrefix(p)}
+                className="flex flex-col items-start rounded-lg border border-dashed border-brand-300 bg-brand-50/40 p-3 text-left hover:border-brand-400 hover:bg-brand-50"
+              >
+                <span className="text-2xl">📁</span>
+                <span className="mt-1 w-full truncate text-sm font-medium text-slate-800">{p.slice(prefix.length, -1)}</span>
+                <span className="text-xs text-brand-700">новая — пока пустая</span>
               </button>
             ))}
           {data.files.map((f) => {
@@ -183,7 +259,7 @@ export function MediaBrowser({
               <div key={f.key} className={cx('group relative overflow-hidden rounded-lg border bg-white', picked ? 'border-brand-500 ring-2 ring-brand-200' : 'border-slate-200')}>
                 <button type="button" className="block aspect-[4/3] w-full bg-slate-100" onClick={() => choose(f)} title={mode === 'pick' ? 'Выбрать' : 'Открыть'}>
                   {isImage(f.key) ? (
-                    <img src={fileSrc(f.url)} alt="" loading="lazy" className="h-full w-full object-contain" />
+                    <img src={previewSrc(f.url)} alt="" loading="lazy" className="h-full w-full object-contain" />
                   ) : (
                     <span className="flex h-full items-center justify-center text-xs font-semibold text-slate-500 uppercase">{f.key.split('.').pop()}</span>
                   )}
@@ -219,7 +295,17 @@ export function MediaBrowser({
           })}
         </div>
       )}
-      {data && !data.files.length && !data.folders.length && <p className="py-8 text-center text-sm text-slate-500">Здесь пусто.</p>}
+      {isNewEmpty ? (
+        <div className="rounded-lg border border-dashed border-brand-300 bg-brand-50/40 px-6 py-8 text-center text-sm text-slate-600">
+          <div className="font-medium text-slate-800">Новая папка /{prefix}</div>
+          <p className="mt-1">Загрузите в неё файлы — папка сохранится вместе с ними. Пустая папка в хранилище не сохраняется.</p>
+          <Button variant="primary" className="mt-4" onClick={() => fileInput.current?.click()} disabled={uploading > 0}>
+            Загрузить файлы сюда
+          </Button>
+        </div>
+      ) : (
+        data && !data.files.length && !data.folders.length && !pendingFolders.length && <p className="py-8 text-center text-sm text-slate-500">Здесь пусто.</p>
+      )}
       {data && data.total > data.files.length && <p className="mt-3 text-xs text-slate-500">Показаны первые {data.files.length} из {data.total} — уточните поиск.</p>}
 
       {mode === 'pick' && multiple && (
@@ -276,7 +362,8 @@ export function MediaInput({ value, onChange }: { value: string; onChange: (v: s
 
 export function Modal({ title, onClose, children, width = 'max-w-5xl' }: { title: string; onClose: () => void; children: React.ReactNode; width?: string }) {
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    // Esc, уже обработанный полем внутри окна (preventDefault), окно не закрывает
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !e.defaultPrevented && onClose();
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);

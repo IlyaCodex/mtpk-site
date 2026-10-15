@@ -151,7 +151,8 @@ async function adminRoutes(base: import('fastify').FastifyInstance) {
           continue;
         }
         const slash = rest.indexOf('/');
-        if (slash >= 0) folders.set(rest.slice(0, slash), (folders.get(rest.slice(0, slash)) ?? 0) + 1);
+        // в счётчике папки — только видимые файлы (без WebP-копий)
+        if (slash >= 0) folders.set(rest.slice(0, slash), (folders.get(rest.slice(0, slash)) ?? 0) + (WEBP_COPY.test(r.key) ? 0 : 1));
         else if (!WEBP_COPY.test(r.key)) files.push(r);
       }
       return {
