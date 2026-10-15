@@ -103,7 +103,6 @@ label:has(> .audit-file-input:focus-visible) {
 body .footer__copyright-legal { color: #9da8ad; }
 /* Правка контраста зелёной кнопки «Практикум» больше не нужна: пункт меню
    стал обычным, без рамки и своего цвета (05.10.2026). */
-body .ss-card__more { color: #2c792c; }
 body .pcard__stock-badge { background-color: #2c792c; color: #fff; min-height: 28px; }
 /* Forms have both light and dark templates: give the small file hint its own
    explicit surface instead of assuming the surrounding form is dark. */

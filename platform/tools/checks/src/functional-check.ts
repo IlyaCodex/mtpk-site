@@ -59,8 +59,13 @@ await check('поиск: окно по «лупе», результаты по �
   await page.fill('#ss-input', 'дробемёт');
   await page.waitForSelector('#ss-list .ss-card', { timeout: 8000 });
   const n = await page.locator('#ss-list .ss-card').count();
+  // стрелка вниз выбирает первый результат
+  await page.keyboard.press('ArrowDown');
+  assert(await page.locator('#ss-list .ss-card.is-active').count(), 'стрелка не выбрала результат');
   await page.keyboard.press('Escape');
-  assert(await page.locator('#search-modal[hidden]').count(), 'окно не закрылось');
+  // окно закрывается с анимацией (styles/search.css) — после неё скрыто
+  const closed = await page.waitForSelector('#search-modal[hidden]', { state: 'attached', timeout: 3000 }).then(() => true, () => false);
+  assert(closed, 'окно не закрылось');
   return `${n} результатов`;
 });
 

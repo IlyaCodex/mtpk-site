@@ -70,6 +70,8 @@ const CSS_BUNDLES: Record<string, string[]> = {
     // праздничная обложка главной (раздел «Праздники»)
     'src/styles/holiday.css',
     'src/styles/widgets.css',
+    // окно поиска по «лупе» (client/search.ts)
+    'src/styles/search.css',
     'src/styles/theme-dark.css',
   ],
 };
