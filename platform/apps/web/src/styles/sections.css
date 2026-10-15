@@ -622,3 +622,192 @@
   .stats .stat + .stat { border-top: 1px solid var(--border-subtle); }
   .app-card__spec { grid-template-columns: minmax(0, 1fr); gap: 2px; }
 }
+
+/* ============================================================
+   Модельный ряд в карточке-таблице (mrange): заголовок и рисунок, отбор, таблица,
+   ссылки на полные ряды, панель «Не нашли…». Печи и дробемёты (экспресс-подбор
+   с отбором — скрипт секции), установки ТВЧ (таблица характеристик серии).
+   ============================================================ */
+.mrange {
+  --mr-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  position: relative;
+  background: var(--surface-muted);
+  padding: var(--section-py-base, 96px) 0;
+}
+.mrange .mrange__head { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-8); margin-bottom: var(--sp-8); }
+.mrange .mrange__eyebrow { margin-bottom: var(--sp-3); font-family: var(--font-display); font-size: var(--fs-micro); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-brand); }
+.mrange .mrange__title { margin: 0; font-family: var(--font-display); font-size: clamp(28px, 3vw, 40px); font-weight: var(--fw-bold); line-height: 1.15; letter-spacing: var(--ls-h1); color: var(--text-primary); }
+.mrange .mrange__title em { font-style: normal; color: var(--text-brand); }
+.mrange .mrange__lead { max-width: 62ch; margin: var(--sp-4) 0 0; font-size: 15px; line-height: 1.6; color: var(--text-secondary); }
+.mrange .mrange__art { flex-shrink: 0; width: 230px; height: auto; margin: -16px 0 -24px; color: var(--green-200); }
+html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
+.mrange .mrange__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.mrange .mrange__pills { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.mrange .mrange__pill-btn {
+  min-height: 42px;
+  padding: 0 var(--sp-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--surface-page);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+.mrange .mrange__pill-btn:hover { border-color: var(--green-500); }
+.mrange .mrange__pill-btn.is-active { background: var(--green-600); border-color: var(--green-600); color: #fff; }
+.mrange .mrange__pill-btn:focus-visible, .mrange .mrange__select:focus-visible { outline: 2px solid var(--green-500); outline-offset: 2px; }
+.mrange .mrange__select {
+  min-height: 42px;
+  min-width: 230px;
+  padding: 0 var(--sp-10) 0 var(--sp-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--surface-page);
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.mrange .mrange__select-wrap { position: relative; }
+.mrange .mrange__select-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 14px;
+  height: 14px;
+  transform: translateY(-50%);
+  background-color: var(--text-tertiary);
+  -webkit-mask: var(--mr-check) center / contain no-repeat;
+  mask: var(--mr-check) center / contain no-repeat;
+  pointer-events: none;
+}
+.mrange .mrange__card { overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--surface-page); box-shadow: 0 1px 2px rgba(16, 31, 38, 0.04); }
+.mrange .mrange__table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.mrange .mrange__table thead th { padding: var(--sp-3) var(--sp-5); background: var(--surface-muted); font-family: var(--font-body); font-size: 13px; font-weight: var(--fw-medium); text-align: left; color: var(--text-tertiary); white-space: nowrap; }
+.mrange .mrange__table tbody > tr > * { padding: var(--sp-3) var(--sp-5); border-top: 1px solid var(--border-subtle); text-align: left; vertical-align: middle; color: var(--text-secondary); }
+.mrange .mrange__table tbody tr { transition: background-color var(--duration-fast) var(--ease-out); }
+.mrange .mrange__table tbody tr:hover { background: var(--green-50); }
+.mrange .mrange__table tr[hidden] { display: none; }
+/* таблица типов (дробемёты): тип и число моделей | задача и габарит | модели — всё по верху строки */
+.mrange .mrange__table--types tbody > tr > * { padding-top: var(--sp-4); padding-bottom: var(--sp-4); vertical-align: top; }
+.mrange .mrange__table--types thead th:nth-child(1) { width: 22%; }
+.mrange .mrange__table--types thead th:nth-child(2) { width: 38%; }
+.mrange .mrange__count { display: block; margin-top: 4px; font-size: 12px; font-weight: var(--fw-regular, 400); color: var(--text-tertiary); }
+.mrange .mrange__task { display: block; color: var(--text-primary); }
+.mrange .mrange__size { display: block; margin-top: 4px; font-size: 13px; line-height: 1.45; color: var(--text-tertiary); }
+.mrange .mrange__models-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.mrange .mrange__model {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: var(--surface-muted);
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
+  color: var(--text-brand);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+.mrange .mrange__table tbody tr:hover .mrange__model { background: var(--surface-page); }
+.mrange .mrange__model:hover,
+.mrange .mrange__table tbody tr:hover .mrange__model:hover { background: var(--green-600); color: #fff; }
+.mrange .mrange__model:focus-visible { outline: 2px solid var(--green-500); outline-offset: 2px; }
+.mrange .mrange__table tbody th a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  color: var(--text-brand);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.mrange .mrange__table tbody th a::after {
+  content: "";
+  width: 13px;
+  height: 11px;
+  background-color: currentColor;
+  -webkit-mask: var(--icon-arrow) center / contain no-repeat;
+  mask: var(--icon-arrow) center / contain no-repeat;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.mrange .mrange__table tbody th a:hover { color: var(--green-700); }
+.mrange .mrange__table tbody th a:hover::after { transform: translateX(3px); }
+.mrange .mrange__table strong { font-family: var(--font-display); font-weight: var(--fw-bold); color: var(--text-primary); }
+.mrange .mrange__tag {
+  display: inline-block;
+  margin-right: var(--sp-2);
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  font-size: 12px;
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.mrange .mrange__empty td { padding: var(--sp-6) var(--sp-5); text-align: center; color: var(--text-tertiary); }
+.mrange .mrange__links { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-6); margin: var(--sp-6) 0 var(--sp-8); font-size: 14px; color: var(--text-tertiary); }
+.mrange .mrange__links a { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: var(--fw-semibold); color: var(--green-600); text-decoration: none; }
+.mrange .mrange__links a::after {
+  content: "";
+  width: 11px;
+  height: 11px;
+  background-color: currentColor;
+  -webkit-mask: var(--icon-arrow-up-right) center / contain no-repeat;
+  mask: var(--icon-arrow-up-right) center / contain no-repeat;
+}
+.mrange .mrange__links a:hover { color: var(--green-700); }
+.mrange .mrange__cta { display: flex; align-items: center; gap: var(--sp-6); padding: var(--sp-6) var(--sp-8); border: 1px solid var(--green-100); border-radius: 16px; background: var(--green-50); }
+.mrange .mrange__cta-icon { display: inline-flex; flex-shrink: 0; color: var(--green-600); }
+.mrange .mrange__cta-icon svg { width: 48px; height: 48px; }
+.mrange .mrange__cta-text { flex: 1; min-width: 0; }
+.mrange .mrange__cta-title { margin: 0 0 var(--sp-1); font-family: var(--font-display); font-size: 18px; font-weight: var(--fw-bold); color: var(--text-primary); }
+.mrange .mrange__cta-lead { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+.mrange .mrange__cta .btn { flex-shrink: 0; }
+@media (max-width: 1024px) {
+  .mrange .mrange__art { display: none; }
+}
+/* телефон и узкий планшет: строки таблицы — карточками */
+@media (max-width: 760px) {
+  .mrange { padding: var(--sp-12) 0; }
+  .mrange .mrange__bar { flex-direction: column; align-items: stretch; }
+  .mrange .mrange__select { width: 100%; }
+  .mrange .mrange__table thead { display: none; }
+  .mrange .mrange__table tbody tr { display: flex; flex-wrap: wrap; gap: 4px var(--sp-3); padding: var(--sp-4); border-top: 1px solid var(--border-subtle); }
+  .mrange .mrange__table tbody tr:first-child { border-top: 0; }
+  .mrange .mrange__table tbody > tr > *,
+  .mrange .mrange__table--types tbody > tr > * { display: block; width: 100%; padding: 0; border: 0; }
+  .mrange .mrange__table--types tbody > tr > td:last-child { margin-top: var(--sp-2); }
+  /* у печей мощность и генератор — в одну строку */
+  .mrange .mrange__table tbody tr[data-gen] td:nth-child(3),
+  .mrange .mrange__table tbody tr[data-gen] td:last-child { width: auto; }
+  .mrange .mrange__table tbody tr[data-gen] td:nth-child(3)::after { content: "·"; margin-left: var(--sp-3); color: var(--text-tertiary); }
+  .mrange .mrange__table tbody th a { font-size: 16px; }
+  .mrange .mrange__empty td { padding: var(--sp-4) 0; }
+  .mrange .mrange__cta { flex-direction: column; align-items: flex-start; padding: var(--sp-5); }
+  .mrange .mrange__cta .btn { width: 100%; justify-content: center; }
+}
+/* таблица характеристик серии (установки ТВЧ): модель | мощность | питание | ток | типовые детали */
+.mrange .mrange__table--specs thead th:nth-child(1) { width: 17%; }
+.mrange .mrange__table--specs thead th:nth-child(2) { width: 14%; }
+.mrange .mrange__table--specs thead th:nth-child(3) { width: 18%; }
+.mrange .mrange__table--specs thead th:nth-child(4) { width: 14%; }
+.mrange .mrange__table--specs tbody td { white-space: nowrap; }
+.mrange .mrange__table--specs tbody td:last-child { white-space: normal; color: var(--text-primary); }
+@media (max-width: 760px) {
+  /* телефон: модель, типовые детали, ниже — мощность · питание · ток одной строкой */
+  .mrange .mrange__table--specs tbody tr > th { order: -2; }
+  .mrange .mrange__table--specs tbody tr > td:last-child { order: -1; }
+  .mrange .mrange__table--specs tbody tr > td:not(:last-child) { width: auto; }
+  .mrange .mrange__table--specs tbody tr > td:nth-child(2)::after,
+  .mrange .mrange__table--specs tbody tr > td:nth-child(3)::after { content: "·"; margin-left: var(--sp-3); color: var(--text-tertiary); }
+}
