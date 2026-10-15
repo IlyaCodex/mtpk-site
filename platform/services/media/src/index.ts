@@ -1,5 +1,5 @@
 /**
- * Медиасервис: отдаёт файлы сайта из S3 (MinIO сейчас, Wasabi потом) по тем же
+ * Медиасервис: отдаёт файлы сайта из S3 (MinIO локально, TimeWeb Cloud S3 на сервере) по тем же
  * адресам, что и раньше (/img/…, /files/…, /docs/…, /og/…, /praktikum/…).
  *
  * Повторяет поведение nginx старого сайта:
@@ -290,7 +290,7 @@ backfill.unref();
 
 await startService({
   name: 'media',
-  description: 'Файлы сайта из S3 (MinIO/Wasabi) по прежним адресам /img, /files, /docs, /og, /praktikum: WebP по Accept, Range, ETag. Служебное /admin/v1 — медиатека: список, загрузка, удаление.',
+  description: 'Файлы сайта из S3 (MinIO/TimeWeb S3) по прежним адресам /img, /files, /docs, /og, /praktikum: WebP по Accept, Range, ETag. Служебное /admin/v1 — медиатека: список, загрузка, удаление.',
   port: env.MEDIA_PORT,
   // журнал каждого запроса картинки не нужен — только предупреждения и ошибки
   logger: log.child({}, { level: 'warn' }),

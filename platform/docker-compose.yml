@@ -7,7 +7,7 @@
 #
 # Снаружи доступен только шлюз (gateway) на 127.0.0.1:${GATEWAY_PORT:-8080}:
 # TLS и домен остаются на системном nginx сервера (proxy_pass на этот порт).
-# MinIO включается профилем minio; после переезда на Wasabi профиль не нужен —
+# MinIO включается профилем minio; с TimeWeb S3 (s3.twcstorage.ru) профиль не нужен —
 # достаточно поменять S3_* в .env.
 # ============================================================================
 name: mtpk
@@ -108,7 +108,7 @@ services:
     deploy:
       resources: { limits: { cpus: "1", memory: 512M } }
 
-  # ── Медиа: файлы из S3 (MinIO/Wasabi) с WebP по Accept ────────────────────
+  # ── Медиа: файлы из S3 (MinIO/TimeWeb) с WebP по Accept ────────────────────
   media:
     build:
       context: .
@@ -269,7 +269,7 @@ services:
     deploy:
       resources: { limits: { cpus: "0.5", memory: 320M } }
 
-  # S3 на своём сервере (до переезда на Wasabi): docker compose --profile minio up -d
+  # S3 на своём сервере (до переезда на TimeWeb S3): docker compose --profile minio up -d
   minio:
     image: ${MINIO_IMAGE:-minio/minio:latest}
     profiles: [minio]
