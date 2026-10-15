@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { PageDto } from '@mtpk/shared/contracts';
+import { completeArticleLd } from '@/lib/article-ld';
 import { clientModuleUrl } from '@/lib/assets';
 import { getPage, getSettings } from '@/lib/content';
 import { hasSiteChrome, withSiteChrome } from '@/lib/site-chrome';
@@ -39,6 +40,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, must-revalidate');
   res.setHeader('Vary', 'Cookie');
-  if (hasSiteChrome(page.bodyHtml)) return res.send(withSiteChrome(page.bodyHtml, await getSettings(), urlPath));
-  res.send(isAdmin(req) ? withAdminBar(page.bodyHtml) : page.bodyHtml);
+  // разметка статьи — с автором и датами (lib/article-ld.ts)
+  const html = completeArticleLd(page.bodyHtml, page);
+  if (hasSiteChrome(html)) return res.send(withSiteChrome(html, await getSettings(), urlPath));
+  res.send(isAdmin(req) ? withAdminBar(html) : html);
 }

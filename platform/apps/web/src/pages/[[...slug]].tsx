@@ -1,4 +1,5 @@
 import type { GetStaticPaths, GetStaticProps } from 'next';
+import { heroPreload } from '@mtpk/content-kit/hero-css';
 import { activeNavFor } from '@mtpk/content-kit/page-meta';
 import { activeHoliday, nextHolidayChange, type Block } from '@mtpk/content-model';
 import { Blocks, buildRenderContext, holidayImageHints, preloadHints } from '@mtpk/ui';
@@ -8,7 +9,9 @@ import { Drawer } from '@/components/layout/Drawer';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { getHolidays, getPage, getSettings, getSiteData } from '@/lib/content';
+import { heroImage } from '@/lib/hero';
 import { legacyScripts, pageModules, type SitePageProps } from '@/lib/page-props';
+import { pageOgImage } from '@/lib/seo';
 import { slugToPath } from '@/lib/site';
 
 /** Страница уходит в браузер чистым HTML: без React-рантайма и без копии данных. */
@@ -27,7 +30,9 @@ export const getStaticProps: GetStaticProps<SitePageProps> = async ({ params }) 
   // главная в дни праздника — праздничная обложка (раздел «Праздники»): баннер предзагружается вместо фото обложки
   const now = Date.now();
   const holiday = home && blocks.some((b) => b.type === 'homeHero') ? activeHoliday(holidays, now) : null;
-  const preload = holiday ? holidayImageHints(holiday.image) : page.preloadImage ? preloadHints(page.preloadImage, blocks) : null;
+  // фото обложки (фон из CSS) — предзагрузка теми же адресами, что выберет CSS: узким экранам копия 828 px (hero-css.ts)
+  const hero = holiday ? null : await heroImage(blocks, page.cssTemplates, page.externalStyles);
+  const preload = holiday ? holidayImageHints(holiday.image) : !hero && page.preloadImage ? preloadHints(page.preloadImage, blocks) : null;
   // перегенерировать к ближайшей смене праздника (основной сигнал — от контент-сервиса в ту же минуту)
   const change = home ? nextHolidayChange(holidays, now) : null;
   const revalidate = change ? Math.min(3600, Math.max(15, Math.ceil((change - now) / 1000) + 5)) : 3600;
@@ -45,7 +50,10 @@ export const getStaticProps: GetStaticProps<SitePageProps> = async ({ params }) 
         title: page.title,
         description: page.description,
         noindex: page.noindex,
-        preloadImage: preload?.href ?? page.preloadImage,
+        preloadImage: hero ? null : (preload?.href ?? page.preloadImage),
+        preloadHero: hero ? heroPreload(hero) : null,
+        // превью ссылки — фото товара, статьи или обложки; у главной — общая картинка сайта
+        ogImage: home ? null : pageOgImage(page.jsonLd, hero),
         preloadSrcSet: preload?.srcSet ?? null,
         preloadSizes: preload?.sizes ?? null,
         jsonLd: page.jsonLd,

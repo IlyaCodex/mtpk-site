@@ -17,3 +17,9 @@ export function Logo({ src, alt, ...img }: ImgHTMLAttributes<HTMLImageElement> &
 
 /** Предзагрузка логотипа шапки — того же файла, что выберет <picture> (браузер без WebP её пропустит). */
 export const logoPreload = (src: string) => ({ href: `${src}.webp`, type: 'image/webp' });
+
+/**
+ * Логотип шапки и мобильного меню: копия 400×104 px исходника logo-header-clean.png (1898 px) —
+ * на экране он ~184×48, этого хватает и экранам ×3 (scripts/brand-icons.ts).
+ */
+export const HEADER_LOGO = '/brand/logo-header.png';

@@ -3,7 +3,7 @@ import type { NavItem, SiteSettings } from '@mtpk/content-model';
 import { ContactLink } from './ContactLink';
 import { QuickCallForm } from '@mtpk/ui';
 import { ClockIcon, MAIL_SVG, MaxLogo, MenuIcon, PHONE_SVG, SearchIcon, TelegramLogo, ThemeIcons } from './icons';
-import { Logo } from './Logo';
+import { HEADER_LOGO, Logo } from './Logo';
 
 /**
  * Шапка сайта — одна на все страницы, включая статьи Практикума: строка контактов, логотип,
@@ -52,10 +52,10 @@ export function Header({ settings, activeNav, themeToggle = true }: { settings: 
         <div className="container header__inner">
           <a href="/" className="header__brand" aria-label="УралИндуктор · МТПК — на главную">
             <Logo
-              src="/brand/logo-header-clean.png"
+              src={HEADER_LOGO}
               alt="УралИндуктор · производство и поставка оборудования для металлургии"
-              width="200"
-              height="56"
+              width="184"
+              height="48"
               fetchPriority="high"
               decoding="async"
             />

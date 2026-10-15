@@ -66,7 +66,9 @@
   Логотипы `apps/web/public/brand` — компонент `Logo` (`<picture>`), WebP-копии делает сборка сайта.
   Значок сайта (favicon) — рисунок `apps/web/public/favicon.svg`; ICO/PNG и логотипы админки из него и из
   brand/ — `npx tsx scripts/brand-icons.ts`. Исходники и архив — picture/.
-- Стили сайта — `apps/web/public/css`. Скрипты — только TypeScript: модули `apps/web/src/client`,
+- Стили сайта — `apps/web/public/css`. Фото обложек (`.hero__image`, `.cat-hero__image`, фоном из CSS или style блока)
+  телефонам отдаются копией 828 px, предзагрузка — теми же адресами: `packages/content-kit/src/hero-css.ts`.
+  Скрипты — только TypeScript: модули `apps/web/src/client`,
   старые скрипты страниц `apps/web/src/legacy` (собираются в `public/js/<имя>.js` при `npm run build:web`,
   в git — только исходники .ts), служебные скрипты платформы — `platform/scripts/*.ts` (запуск через tsx).
 - Анимации и поведение отдельных страниц — блок «Скрипт» (TypeScript/JS) в админке: контент-сервис
@@ -125,7 +127,8 @@
   `npm run checks -- --save [--visual]`, после — `npm run checks [--visual]`, снимки отличий —
   глазами. Поведение сайта — `npx tsx tools/checks/src/functional-check.ts --no-submit`,
   админка — `tools/checks/src/admin-smoke.ts`, CSP шлюза (счётчики Метрики, Mango, карта) —
-  `tools/checks/src/csp-check.ts`.
+  `tools/checks/src/csp-check.ts`, SEO всех страниц из sitemap и ссылок — `tools/checks/src/seo-audit.ts`,
+  скорость на телефоне — `tools/checks/src/perf-check.ts`.
 - Запутался или поправили дважды — предложи /clear и новую сессию.
 
 ## Железные правила

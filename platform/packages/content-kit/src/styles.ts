@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { HERO_CSS_REVISION } from './hero-css.ts';
 
 /**
  * Стили страниц (бывший meta.inline_styles и <style> в теле страниц).
@@ -60,6 +61,7 @@ export function styleFileCss(record: { mode: string; css: string }): string {
   return record.mode === 'external' ? record.css : absolutizeUrls(styleBlockCssText(record.css));
 }
 
+/** Адрес файла стилей страницы; ?r= — ревизия правил, которые дописываются при отдаче (hero-css.ts): кеш навсегда. */
 export function externalStyleUrl(hash: string): string {
-  return `/css/inline-extracted/inline-${hash}.css`;
+  return `/css/inline-extracted/inline-${hash}.css?r=${HERO_CSS_REVISION}`;
 }

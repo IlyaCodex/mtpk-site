@@ -183,14 +183,14 @@ export function buildProductSchema(html: string, description: string | null, can
     .sort((a, b) => (isCategoryShot(a.u) ? 1 : 0) - (isCategoryShot(b.u) ? 1 : 0) || a.i - b.i)
     .map((x) => x.u)
     .slice(0, 8);
-  if (!images.length) images.push(`${site}/og/default.jpg`);
 
+  // image — только фото самого товара: общую картинку сайта Google товаром не считает (поле необязательное)
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name,
     description: description ?? name,
-    image: images,
+    ...(images.length ? { image: images } : {}),
     brand: { '@type': 'Brand', name: 'УралИндуктор' },
     manufacturer: { '@id': `${site}/#organization` },
     url: canonicalAbs,
@@ -238,6 +238,41 @@ export function buildArticleSchema(
   }
   if (dates.published) schema.datePublished = dates.published;
   if (dates.modified) schema.dateModified = dates.modified;
+  return JSON.stringify(schema);
+}
+
+/**
+ * NewsArticle — новость (/news/<адрес>/): заголовок из h1, главное фото — первая картинка из /img/news/,
+ * даты страницы (дата публикации — та, что видна на странице: «Новости · дд.мм.гггг»); автор и
+ * издатель — компания (#organization есть в разметке каждой страницы).
+ */
+export function buildNewsArticleSchema(
+  html: string,
+  description: string | null,
+  canonicalAbs: string,
+  dates: { published?: string | null; modified?: string | null },
+  site = DEFAULT_SITE,
+): string | null {
+  const h1 = html.match(/<h1[^>]*>([\s\S]+?)<\/h1>/);
+  if (!h1) return null;
+  const headline = decodeEntities(h1[1].replace(/<[^>]+>/g, ''));
+  const img = html.match(/<img\b[^>]*?\bsrc="(\/img\/news\/[^"?]+)/);
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    // Google: заголовок статьи — до 110 знаков
+    headline: headline.length > 110 ? `${headline.slice(0, 109).trimEnd()}…` : headline,
+    description: description ?? headline,
+    url: canonicalAbs,
+    mainEntityOfPage: canonicalAbs,
+    author: { '@id': `${site}/#organization` },
+    publisher: { '@id': `${site}/#organization` },
+  };
+  if (img) schema.image = [`${site}${img[1]}`];
+  if (dates.published) schema.datePublished = dates.published;
+  // правка не раньше публикации
+  const modified = dates.modified && dates.published && dates.modified < dates.published ? dates.published : (dates.modified ?? dates.published);
+  if (modified) schema.dateModified = modified;
   return JSON.stringify(schema);
 }
 
@@ -290,5 +325,9 @@ export function buildPageJsonLd(
     modified: page.modifiedAt ?? undefined,
   }, site);
   if (article) out.push(article);
+  if (/^news\/[^/]+$/.test(slug)) {
+    const news = buildNewsArticleSchema(body, page.description, canonicalAbs, { published: page.publishedAt, modified: page.modifiedAt }, site);
+    if (news) out.push(news);
+  }
   return out;
 }

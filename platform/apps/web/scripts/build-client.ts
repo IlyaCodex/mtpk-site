@@ -24,6 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { build, context, transform, type BuildOptions, type Plugin } from 'esbuild';
 import sharp from 'sharp';
 import { darkVars } from '@mtpk/content-kit/dark';
+import { responsiveHeroCss } from '@mtpk/content-kit/hero-css';
 import { ASSET_VERSIONS } from '../src/lib/site.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -101,10 +102,11 @@ async function buildCss(): Promise<Record<string, string>> {
   for (const [name, files] of Object.entries(CSS_BUNDLES)) {
     const own = files.filter((f) => !AS_IS.has(f)).map(read).join('\n');
     const asIs = files.filter((f) => AS_IS.has(f)).map(read).join('\n');
-    out[`${name}.css`] = await writeCss(name, `${darkVars(own)}\n${asIs}`);
+    // фото обложки главной (.hero__image) — телефонам копией 828 px (hero-css.ts)
+    out[`${name}.css`] = await writeCss(name, responsiveHeroCss(`${darkVars(own)}\n${asIs}`));
   }
   for (const f of fs.readdirSync(path.join(ROOT, TPL_DIR)).filter((x) => x.endsWith('.css'))) {
-    out[`tpl/${f}`] = await writeCss(`tpl/${f.slice(0, -4)}`, darkVars(read(`${TPL_DIR}/${f}`)));
+    out[`tpl/${f}`] = await writeCss(`tpl/${f.slice(0, -4)}`, responsiveHeroCss(darkVars(read(`${TPL_DIR}/${f}`))));
   }
   return out;
 }

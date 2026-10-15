@@ -80,6 +80,8 @@ const nextConfig: NextConfig = {
       // шрифты разрешены и другим источникам: их подгружает предпросмотр в админке
       { source: '/fonts/:path*', headers: [...cache('public, max-age=2592000'), { key: 'Access-Control-Allow-Origin', value: '*' }] },
       { source: '/brand/:path*', headers: cache('public, max-age=2592000') },
+      // значок сайта и манифест (scripts/brand-icons.ts): без кеша браузер перепроверял их на каждом заходе
+      { source: '/:file(favicon\\.ico|favicon\\.svg|apple-touch-icon\\.png|icon-192\\.png|icon-512\\.png|site\\.webmanifest)', headers: cache('public, max-age=604800') },
     ];
   },
 };

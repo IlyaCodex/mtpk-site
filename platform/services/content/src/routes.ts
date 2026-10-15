@@ -9,6 +9,7 @@ import { buttonDesignAttrs } from '@mtpk/content-kit/design';
 import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-styles';
 import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
 import { annotateDocument, setDocMeta } from '@mtpk/content-kit/doc-edit';
+import { responsiveHeroCss } from '@mtpk/content-kit/hero-css';
 import {
   block as blockSchema,
   BLOCK_LABELS,
@@ -85,7 +86,8 @@ export async function publicRoutes(base: FastifyInstance, { store, db }: Deps) {
       const css = m ? await store.styleCss(m[1]) : null;
       if (!css) return reply.code(404).type('text/plain').send('not found');
       reply.header('Cache-Control', 'public, max-age=31536000, immutable');
-      return reply.type('text/css; charset=utf-8').send(css);
+      // фото обложки — телефонам копией 828 px (hero-css.ts; ревизия правил — в адресе ?r=)
+      return reply.type('text/css; charset=utf-8').send(responsiveHeroCss(css));
     },
   );
   app.get(
@@ -202,6 +204,10 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
   const changed = async (changedPaths: string[], kind: 'page.upserted' | 'page.deleted' = 'page.upserted') => {
     // товар или раздел каталога — его название и фото есть и в блоках склада (главная, /nalichie/)
     const paths = changedPaths.some((p) => p.startsWith('/products/')) ? [...new Set([...changedPaths, ...(await store.stockPages())])] : changedPaths;
+    // lastmod в sitemap — по факту: правка товара в каталоге меняет его страницу и списки, где видна карточка
+    // (поисковики верят lastmod, пока он совпадает с изменениями). Страницы склада — только сброс кеша:
+    // товар мог там и не показываться
+    if (kind === 'page.upserted') await db.page.updateMany({ where: { path: { in: changedPaths } }, data: { lastmodAt: new Date() } });
     await store.purge(paths);
     for (const path of paths) await publishEvent(redis, CONTENT_STREAM, { type: kind, path });
     await notifyWeb(paths);

@@ -1,5 +1,5 @@
 import type { PageDto } from '@mtpk/shared/contracts';
-import { logoPreload } from '@/components/layout/Logo';
+import { HEADER_LOGO, logoPreload } from '@/components/layout/Logo';
 import { clientModuleUrl, templateCssUrl } from '@/lib/assets';
 import { jsonLdHtml, ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/lib/seo';
 import { ASSET_VERSIONS, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE } from '@/lib/site';
@@ -12,6 +12,10 @@ export type HeadPage = Pick<
   /** srcset/sizes предзагружаемой картинки — те же, что у неё на странице */
   preloadSrcSet?: string | null;
   preloadSizes?: string | null;
+  /** фото обложки (фон из CSS): узким экранам — копия 828 px, широким — исходник (hero-css.ts) */
+  preloadHero?: { href: string; media: string }[] | null;
+  /** картинка превью ссылки (seo.ts, pageOgImage); нет — общая картинка сайта 1200×630 */
+  ogImage?: string | null;
 };
 
 /**
@@ -28,12 +32,10 @@ export function CoreAssets({ modules = [] }: { modules?: string[] }) {
       <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       <link rel="manifest" href="/site.webmanifest" />
-      {/* Лого в шапке — LCP-элемент; основные веса Inter — параллельно с HTML (T-PERF-2) */}
-      <link rel="preload" as="image" {...logoPreload('/brand/logo-header-clean.png')} fetchPriority="high" />
-      <link rel="preload" href="/fonts/inter-400-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
-      <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossOrigin="" />
-      <link rel="preload" href="/fonts/inter-600-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
-      <link rel="preload" href="/fonts/inter-600-latin.woff2" as="font" type="font/woff2" crossOrigin="" />
+      {/* Лого в шапке; Inter (вариативный: один файл на алфавит — все толщины) — параллельно с HTML (T-PERF-2) */}
+      <link rel="preload" as="image" {...logoPreload(HEADER_LOGO)} fetchPriority="high" />
+      <link rel="preload" href="/fonts/inter-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
+      <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossOrigin="" />
       {/* модули страницы качаются параллельно со стилями, выполняются после разбора HTML */}
       {modules.map((src) => (
         <link key={src} rel="modulepreload" href={src} />
@@ -52,7 +54,7 @@ export function CoreAssets({ modules = [] }: { modules?: string[] }) {
 export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage; home?: boolean; modules?: string[] }) {
   const canonical = `${SITE}${page.path}`;
   const ogDescription = page.description ?? DEFAULT_DESCRIPTION;
-  const image = `${SITE}${DEFAULT_OG_IMAGE}`;
+  const image = page.ogImage ?? `${SITE}${DEFAULT_OG_IMAGE}`;
   const coreEnd = clientModuleUrl('core-end.css');
   return (
     <>
@@ -71,8 +73,9 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
       <meta property="og:site_name" content="УралИндуктор · МТПК" />
       <meta property="og:locale" content="ru_RU" />
       <meta property="og:image" content={image} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
+      {/* размеры известны только у общей картинки; у фото страницы их возьмёт сам мессенджер */}
+      {!page.ogImage && <meta property="og:image:width" content="1200" />}
+      {!page.ogImage && <meta property="og:image:height" content="630" />}
       <meta property="og:type" content="website" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={page.title} />
@@ -92,6 +95,9 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
           fetchPriority="high"
         />
       )}
+      {page.preloadHero?.map((p) => (
+        <link key={p.media} rel="preload" as="image" href={p.href} media={p.media} fetchPriority="high" />
+      ))}
       {page.jsonLd.map((json, i) => (
         <script key={`ld${i}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(json) }} />
       ))}

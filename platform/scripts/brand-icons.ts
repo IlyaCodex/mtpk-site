@@ -1,5 +1,5 @@
 /**
- * Значок компании (favicon) и логотипы админки — из готовых рисунков, одной командой:
+ * Значок компании (favicon), логотип шапки сайта и логотипы админки — из готовых рисунков, одной командой:
  *   apps/web/public/favicon.svg (знак логотипа на белой плашке) →
  *     favicon.ico (16, 32, 48 — для браузеров и роботов Яндекса и Google),
  *     apple-touch-icon.png (180, на белом — iPhone и «Табло»), icon-192.png и icon-512.png
@@ -93,4 +93,7 @@ const logo = (from: string, width: number) =>
   sharp(path.join(WEB, 'brand', from)).resize({ width }).png({ compressionLevel: 9, palette: true, quality: 95 }).toBuffer();
 await save(path.join(ADMIN, 'brand/logo.png'), logo('logo-header-clean.png', 560));
 await save(path.join(ADMIN, 'brand/logo-white.png'), logo('logo-footer-white.png', 400));
+// шапка и мобильное меню сайта: на экране ~184×48 px — копия 400 px (чётко на экранах ×2 и ×3),
+// а не исходник 1898 px; WebP-копию делает сборка сайта
+await save(path.join(WEB, 'brand/logo-header.png'), logo('logo-header-clean.png', 400));
 console.log(written.join('\n'));

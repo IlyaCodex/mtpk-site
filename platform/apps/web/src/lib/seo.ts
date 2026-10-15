@@ -62,6 +62,34 @@ export function jsonLdHtml(json: string | object): string {
   return s.replace(/<\//g, '<\\/');
 }
 
+/**
+ * Картинка превью ссылки (og:image — мессенджеры, соцсети): фото товара или статьи из разметки
+ * страницы, иначе фото обложки (hero). null — общая картинка сайта (og/default.jpg).
+ */
+export function pageOgImage(jsonLd: (string | object)[], hero: string | null): string | null {
+  // разметка страницы приходит строками JSON (как пишется в <script>)
+  const parse = (d: string | object): unknown => {
+    if (typeof d !== 'string') return d;
+    try {
+      return JSON.parse(d);
+    } catch {
+      return null;
+    }
+  };
+  const items = jsonLd
+    .map(parse)
+    .filter((d): d is Record<string, unknown> => !!d && typeof d === 'object')
+    .flatMap((d) => (d['@graph'] as Record<string, unknown>[] | undefined) ?? [d]);
+  for (const item of items) {
+    const types = ([] as string[]).concat((item['@type'] as string | string[] | undefined) ?? []);
+    if (!types.some((t) => t === 'Product' || t.endsWith('Article'))) continue;
+    const first = ([] as unknown[]).concat(item.image ?? [])[0];
+    const url = typeof first === 'string' ? first : (first as { url?: string } | undefined)?.url;
+    if (url && !url.endsWith(DEFAULT_OG_IMAGE)) return url;
+  }
+  return hero ? `${SITE}${hero}` : null;
+}
+
 const VERIFICATION: Metadata['verification'] = {
   // Google Search Console (2026-08-28) и Яндекс.Вебмастер — тот же код, что в /yandex_*.html
   google: 'klj1lj9utoieH9ZljmhDYykW6XSM3G7dtdVklWGJQw4',

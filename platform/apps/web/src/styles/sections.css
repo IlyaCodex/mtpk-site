@@ -39,6 +39,9 @@
    ============================================================ */
 .cat-hero { position: relative; display: flex; align-items: center; min-height: 640px; overflow: hidden; background: var(--surface-deep); color: #fff; }
 .cat-hero__image { position: absolute; inset: 0; z-index: 0; background-color: var(--surface-deep); background-size: cover; background-repeat: no-repeat; }
+/* фото из блока обложки (встроенный style → переменные, content-kit/src/hero-css.ts): телефонам копия 828 px */
+.cat-hero__image[style*="--hero-img"] { background-image: var(--hero-img); }
+@media (max-width: 767px) { .cat-hero__image[style*="--hero-img"] { background-image: var(--hero-img-sm); } }
 .cat-hero__overlay {
   position: absolute;
   inset: 0;

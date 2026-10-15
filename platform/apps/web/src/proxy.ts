@@ -54,7 +54,8 @@ function redirect(location: string, req: NextRequest, code = 301) {
  *  1. легаси-карта WordPress → новые адреса (точное совпадение пути, 301, без query);
  *  2. /index.html и …/index.html → адрес каталога;
  *  3. /sitemap.xml → /sitemap-index.xml;
- *  4. адрес без слеша на конце → со слешем, если такая страница есть.
+ *  4. адрес без слеша на конце → со слешем, если такая страница есть;
+ *  (после легаси-карты) адрес в другом регистре → страница в нижнем.
  */
 export async function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
@@ -68,6 +69,13 @@ export async function proxy(req: NextRequest) {
   const s = await getState();
   const legacy = s?.redirects.get(decoded);
   if (legacy) return redirect(legacy.to, req, legacy.code);
+
+  // адрес в другом регистре (/KONTAKTY/) — на страницу в нижнем: иначе у поисковиков дубль
+  const lower = decoded.toLowerCase();
+  if (lower !== decoded && s) {
+    const target = s.paths.has(lower) ? lower : s.paths.has(`${lower}/`) ? `${lower}/` : null;
+    if (target) return redirect(`${encodeURI(target)}${search}`, req);
+  }
 
   const index = pathname.match(/^(.*\/)index\.html$/);
   if (index) return redirect(`${index[1]}${search}`, req);

@@ -1,3 +1,4 @@
+import { heroInlineStyle } from '@mtpk/content-kit/hero-css';
 import type { CategoryHeroBlock } from '@mtpk/content-model';
 import { extra, Inline } from '../primitives/Html.tsx';
 import { ActionLink, Breadcrumbs } from '../primitives/common.tsx';
@@ -36,9 +37,12 @@ export function CategoryHero({ block }: { block: CategoryHeroBlock }) {
       )}
     </div>
   );
+  // фото во встроенном style — переменными: телефонам копия 828 px (hero-css.ts, правило в sections.css)
+  const heroStyle = heroInlineStyle(block.imageAttrs?.style);
+  const imageAttrs = heroStyle ? { ...block.imageAttrs, style: heroStyle } : block.imageAttrs;
   return (
     <section className="cat-hero">
-      <div className="cat-hero__image" {...extra(block.imageAttrs, 'div')} />
+      <div className="cat-hero__image" {...extra(imageAttrs, 'div')} />
       <div className="cat-hero__overlay" />
       <div className="container cat-hero__content">
         <Breadcrumbs items={block.breadcrumbs} />

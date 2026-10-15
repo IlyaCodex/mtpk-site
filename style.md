@@ -51,6 +51,10 @@
 - **Шрифт:** **Inter** (Google Fonts, веса 300/400/500/600/700/800).
 - **Mono:** **JetBrains Mono** — только для tech specs, табличных чисел,
   номеров типа `01 / 06`.
+- **Файлы:** оба шрифта — вариативные (все толщины в одном файле): `platform/apps/web/public/fonts/`
+  `inter-cyrillic.woff2`, `inter-latin.woff2` (толщины 100–900), `jetbrains-mono-*.woff2` (400–800);
+  `@font-face` — `fonts-critical.css` (Inter, оба файла предзагружаются) и `fonts-extended.css`.
+  Отдельных файлов на толщину не заводить: браузер скачал бы одни и те же байты несколько раз.
 
 ### Шкала размеров
 
@@ -221,7 +225,7 @@
 ### Где используется
 | Место | Файл | Высота | Примечание |
 |---|---|---|---|
-| `Header.astro` (шапка) | `brand/logo-header-clean.png` | 56 / 40 px | Светлый белый фон, без подписи «ООО МТПК» |
+| Шапка и мобильное меню (`Header.tsx`, `Drawer.tsx`) | `brand/logo-header.png` (+ `.webp`) — копия 400×104 px исходника `logo-header-clean.png` | 48 / 34–42 px | Светлый белый фон, без подписи «ООО МТПК». Копию делает `npx tsx scripts/brand-icons.ts` (4,5 КБ вместо 21 КБ) |
 | `Footer.astro` (футер) | `brand/logo-white.png` | ~48–56 px | Тёмный фон `--neutral-950` |
 | OG / Telegram / письма / КП | `brand/logo-color.png` | — | Полный цветной знак с «ООО МТПК» |
 | Значок сайта (favicon, выдача Яндекса и Google) | `favicon.svg`, `favicon.ico` (16/32/48), `apple-touch-icon.png` (180), `icon-192/512.png` — в корне сайта | — | Два треугольника знака (цвета логотипа `#21A745`, `#1E6D7F`) на белой плашке. Рисунок — `platform/apps/web/public/favicon.svg`; ICO, PNG и копии для админки делает `npx tsx scripts/brand-icons.ts`. Подключение — `CoreAssets` (все страницы и Практикум). `brand/favicon-original.ico` (16×16) — прежний, не используется |
