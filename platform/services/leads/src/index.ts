@@ -12,7 +12,7 @@ import multipart from '@fastify/multipart';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { createLogger, createRedis, createS3, putObject, startService, type LeadResponse } from '@mtpk/shared';
 import { createDb, type Lead } from '@mtpk/db';
-import { ALLOWED_HOSTS, env } from './env.ts';
+import { ALLOWED_HOSTS, B24_WEBHOOK, env } from './env.ts';
 import { clean, isTooFast, originAllowed, pageUrlFrom, parseLead, validateLead, type Fields } from './fields.ts';
 import { ATTACH_MAX_BYTES, checkAttachment } from './attachment.ts';
 import { createQueue, type DeliveryResult } from './queue.ts';
@@ -199,7 +199,7 @@ async function handle(req: FastifyRequest, reply: FastifyReply) {
       attachmentName: attachment?.name ?? null,
       attachmentNote,
       mailStatus: 'pending',
-      b24Status: env.B24_WEBHOOK ? 'pending' : 'skipped',
+      b24Status: B24_WEBHOOK ? 'pending' : 'skipped',
     },
   });
   if (!row) {

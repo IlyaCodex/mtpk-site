@@ -4,6 +4,8 @@
  * стили страницы → общие «после». Общий для предпросмотра страниц и
  * праздничной обложки главной.
  */
+import { env } from './env';
+
 export const escapeAttr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const styleTag = (css: string) => (css.trim().startsWith('<style') ? css : `<style>${css}</style>`);
 const link = (href: string) => `<link rel="stylesheet" href="${escapeAttr(href)}">`;
@@ -21,7 +23,8 @@ let assets: { at: number; map: Record<string, string> } | null = null;
 export async function siteAssets(site: string): Promise<Record<string, string>> {
   if (!assets || Date.now() - assets.at > 30_000) {
     try {
-      const res = await fetch(`${site}/assets/manifest.json`, { cache: 'no-store' });
+      // с сервера — по внутреннему адресу сайта (на сервере http://web:3000), а не через интернет
+      const res = await fetch(`${env().WEB_URL || site}/assets/manifest.json`, { cache: 'no-store' });
       if (res.ok) assets = { at: Date.now(), map: (await res.json()) as Record<string, string> };
     } catch {
       /* сайт недоступен — общие стили по прямым адресам */

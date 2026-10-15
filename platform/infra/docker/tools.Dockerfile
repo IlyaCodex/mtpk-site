@@ -16,6 +16,7 @@ COPY services/content/package.json services/content/
 COPY services/media/package.json services/media/
 COPY services/search/package.json services/search/
 COPY services/leads/package.json services/leads/
+COPY services/mailing/package.json services/mailing/
 COPY apps/web/package.json apps/web/
 COPY apps/admin/package.json apps/admin/
 COPY tools/checks/package.json tools/checks/

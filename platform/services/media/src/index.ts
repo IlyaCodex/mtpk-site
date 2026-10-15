@@ -53,6 +53,8 @@ const PREFIXES = ['img/', 'files/', 'docs/', 'og/', 'praktikum/'];
 const WEBP_SOURCE = /\.(png|jpe?g)$/i;
 /** WebP-копия картинки (foo.png.webp) — служебная, в медиатеке не показывается. */
 const WEBP_COPY = /\.(png|jpe?g)\.webp$/i;
+/** Файлы, в которых браузер может выполнить скрипт, если открыть их напрямую. */
+const ACTIVE_FILE = /\.(svg|html?|xhtml|xml)$/i;
 
 // Каталог бакета «ключ → ETag»: есть ли WebP-сосед и какая версия файла —
 // без лишних запросов в S3.
@@ -356,6 +358,13 @@ await startService({
         if (obj.LastModified) reply.header('Last-Modified', obj.LastModified.toUTCString());
         if (obj.ContentLength !== undefined) reply.header('Content-Length', obj.ContentLength);
         if (obj.ContentRange) reply.header('Content-Range', obj.ContentRange);
+        // SVG, HTML, XML из медиатеки, открытые по прямой ссылке, скриптов не выполняют (страница
+        // сайта в <img> показывает SVG как обычно), HTML — только скачивается: загруженный файл
+        // не станет «страницей» на домене сайта
+        if (ACTIVE_FILE.test(target)) {
+          reply.header('Content-Security-Policy', "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; font-src 'self' data:; sandbox");
+          if (/\.(html?|xhtml)$/i.test(target)) reply.header('Content-Disposition', 'attachment');
+        }
         if (req.method === 'HEAD') {
           (obj.Body as Readable | undefined)?.destroy?.();
           return reply.send();

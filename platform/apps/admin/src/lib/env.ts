@@ -16,6 +16,8 @@ const schema = z.object({
   MAILING_URL: z.string().default('http://127.0.0.1:4105'),
   /** публичный адрес сайта: ссылки «открыть на сайте», стили и картинки предпросмотра */
   PUBLIC_SITE_URL: z.string().default('http://127.0.0.1:3200'),
+  /** адрес сайта для запросов с сервера (на сервере — http://web:3000); пусто — PUBLIC_SITE_URL */
+  WEB_URL: z.string().default(''),
   /** cookie сессии только по HTTPS (в проде за шлюзом с TLS) */
   ADMIN_SECURE_COOKIE: z.enum(['true', 'false']).optional(),
 });

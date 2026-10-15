@@ -2,6 +2,7 @@
 # Сами сервисы и Next.js запускаются на хосте (npm run dev) — без сборки
 # Docker-образов, чтобы не копить build-кеш на диске C.
 # Образы — те, что уже скачаны локально (postgres:17.6, redis:7-alpine, minio).
+# Пароли базы и Redis — из .env рядом (тот же файл, что у сервисов и сервера).
 name: mtpk-dev
 
 services:
@@ -9,9 +10,10 @@ services:
     image: ${POSTGRES_IMAGE:-postgres:17.6}
     container_name: mtpk-dev-postgres
     environment:
-      POSTGRES_DB: mtpk
-      POSTGRES_USER: mtpk
-      POSTGRES_PASSWORD: mtpk_dev_password
+      POSTGRES_DB: ${POSTGRES_DB:-mtpk}
+      POSTGRES_USER: ${POSTGRES_USER:-mtpk}
+      # действует при создании тома; у готовой базы пароль меняется ALTER ROLE
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD в .env}
     command:
       - postgres
       - -c
@@ -25,7 +27,7 @@ services:
       # служебная база для Prisma (создаётся один раз, при первом запуске тома)
       - ./infra/postgres/init-dev.sql:/docker-entrypoint-initdb.d/10-shadow-db.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mtpk -d mtpk"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -46,6 +48,10 @@ services:
       - 256mb
       - --maxmemory-policy
       - noeviction
+      - --requirepass
+      - ${REDIS_PASSWORD:?задайте REDIS_PASSWORD в .env}
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?задайте REDIS_PASSWORD в .env}
     ports:
       - "127.0.0.1:6392:6379"
     healthcheck:

@@ -25,7 +25,19 @@ export const env = readEnv(
     MAIL_FROM: z.string().default(''),
     B24_WEBHOOK: z.string().default(''),
     B24_YM_UID_FIELD: z.string().default('UF_CRM_YA_CID'),
+    /** локально (не production) проверить настоящую доставку: письмо и лид в Битрикс24 */
+    LEADS_LOCAL_DELIVERY: envParts.bool,
   }),
 );
 
 export const ALLOWED_HOSTS = env.LEADS_ALLOWED_HOSTS.split(',').map((h) => h.trim()).filter(Boolean);
+
+/**
+ * Заявки по-настоящему (письмо по SMTP, лид в Битрикс24) уходят только на сервере — там
+ * docker-compose задаёт NODE_ENV=production. Локально — только база и лог, даже если в .env
+ * боевые SMTP и вебхук: проверки не засоряют почту и CRM. Проверить доставку локально —
+ * LEADS_LOCAL_DELIVERY=true.
+ */
+const live = env.NODE_ENV === 'production' || env.LEADS_LOCAL_DELIVERY;
+export const MAIL_TRANSPORT = live ? env.MAIL_TRANSPORT : 'log';
+export const B24_WEBHOOK = live ? env.B24_WEBHOOK : '';

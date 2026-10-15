@@ -27,6 +27,8 @@ export const env = readEnv(
     MAILING_OWN_HOSTS: z.string().default('uralinduktor.ru,new.uralinduktor.ru'),
     /** вебхук Битрикс24 (как у сервиса заявок): импорт адресов из CRM */
     B24_WEBHOOK: z.string().default(''),
+    /** локально (не production) отправлять письма по-настоящему — только для проверки на своих адресах */
+    MAILING_LOCAL_DELIVERY: envParts.bool,
   }),
 );
 
@@ -36,5 +38,12 @@ export const PUBLIC_URL = (env.MAILING_PUBLIC_URL || (env.NODE_ENV === 'developm
 /** Свои домены: к ссылкам на них добавляются UTM-метки. */
 export const OWN_HOSTS = [...new Set([...env.MAILING_OWN_HOSTS.split(','), new URL(PUBLIC_URL).host].map((h) => h.trim().toLowerCase()).filter(Boolean))];
 
-/** Письма действительно уходят (SMTP настроен), иначе — тестовый режим. */
-export const SENDS_FOR_REAL = env.MAILING_TRANSPORT === 'smtp' && Boolean(env.MAILING_SMTP_HOST && env.MAILING_SMTP_USER && env.MAILING_SMTP_PASS);
+/**
+ * Письма действительно уходят (SMTP настроен) — только на сервере (NODE_ENV=production задаёт
+ * docker-compose) или с MAILING_LOCAL_DELIVERY=true; иначе — тестовый режим, даже если в .env
+ * боевой SMTP: локальная проверка не разошлёт письма по базе.
+ */
+export const SENDS_FOR_REAL =
+  (env.NODE_ENV === 'production' || env.MAILING_LOCAL_DELIVERY) &&
+  env.MAILING_TRANSPORT === 'smtp' &&
+  Boolean(env.MAILING_SMTP_HOST && env.MAILING_SMTP_USER && env.MAILING_SMTP_PASS);

@@ -23,6 +23,10 @@
 
 - Инфраструктура: `npm run infra:up` — Postgres (:5442), Redis, MinIO в Docker Desktop. Файлы сайта с 15.10.2026 —
   в TimeWeb Cloud S3 (`S3_*` в platform/.env); MinIO — только для отката (его данные — на 15.10.2026).
+- Настройки — **один файл platform/.env** (шаблона нет): его читают сервисы, Next.js и docker-compose.dev.yml
+  (пароли базы и Redis), а на сервере — docker-compose.yml (секреты и интеграции; адреса сервисов и `production`
+  он задаёт сам). Связь с базой, Redis, S3, SMTP и Битрикс24 без отправки писем и лидов —
+  `npx tsx scripts/check-integrations.ts`. Выпуск на сервер — docs/release-checklist.md (локально, не в git).
 - Сервисы: `npm run dev` — контент :4101, заявки :4102, поиск :4103, медиа :4104, рассылки :4105 (+ отправитель писем).
 - Сайт: `npm run build:web` → `npm run start -w @mtpk/web` — http://127.0.0.1:3200.
 - Админка: `npm run dev -w @mtpk/admin` — адрес `/admin`: http://127.0.0.1:3300/admin, через сайт —
@@ -51,7 +55,8 @@
 - Оформление разделов страниц (показатели, заявка, этапы, «Почему выбирают»…) — одно на весь сайт:
   `apps/web/src/styles/sections.css` (после шаблонов и стилей страниц); в стили страниц и шаблоны не копировать.
 - Формы обратной связи — компоненты `packages/ui/src/forms` (по одному на вид формы), все отправляют
-  на `/api/send.php` (сервис заявок: база, раздел «Заявки» в админке, почта, Битрикс24). В HTML-секции
+  на `/api/send.php` (сервис заявок: база, раздел «Заявки» в админке, почта, Битрикс24; локально — только база
+  и лог, почта и Битрикс24 проверочных заявок не получают, `LEADS_LOCAL_DELIVERY=true` — проверить). В HTML-секции
   форма ставится тегом `<ui-form type="request|short|express|call|catalog|spare" …>` — не копией разметки.
 - Картинки и файлы — TimeWeb Cloud S3, Санкт-Петербург: бакеты `uralinduktor-assets` (файлы сайта) и
   `uralinduktor-private` (вложения заявок, удаляются через 30 дней), оба приватные — посетителям файлы отдаёт
@@ -164,4 +169,5 @@ server/          # конфиги старого боевого сервера �
 | Подсистема «Сравнение товаров» | docs/compare-system.md |
 | Подсистема «Email-рассылки» | docs/mailing.md |
 | О проекте, команда, контент-источник, наследие WP | docs/project-info.md |
+| Выпуск новой платформы на сервер: чек-лист, аудит безопасности (локально, не в git) | docs/release-checklist.md |
 | Старый сайт на Astro: конвенции, формы, деплой, сервер (справочно) | docs/conventions.md, docs/forms.md; о сервере и выкладке — локально, не в git: docs/deploy-gotchas.md, briefs/hosting-spec.md, MAINTENANCE.md |

@@ -7,7 +7,7 @@ import { Worker, type Job } from 'bullmq';
 import nodemailer from 'nodemailer';
 import { createLogger, createS3, deleteObject, getObject } from '@mtpk/shared';
 import { createDb, type Lead, type Prisma } from '@mtpk/db';
-import { env } from './env.ts';
+import { B24_WEBHOOK, env, MAIL_TRANSPORT } from './env.ts';
 import { bitrixLeadFields, emailBody, MAIL_SUBJECT, phpBuildQuery } from './messages.ts';
 import { bullConnection, QUEUE, type DeliveryJob, type DeliveryResult } from './queue.ts';
 
@@ -17,7 +17,7 @@ const s3 = createS3(env);
 
 const smtpConfigured = Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS && env.MAIL_TO);
 const transport =
-  env.MAIL_TRANSPORT === 'smtp' && smtpConfigured
+  MAIL_TRANSPORT === 'smtp' && smtpConfigured
     ? nodemailer.createTransport({
         host: env.SMTP_HOST,
         port: env.SMTP_PORT ?? (env.SMTP_SECURE === 'tls' ? 587 : 465),
@@ -48,14 +48,14 @@ async function sendMail(lead: Lead): Promise<void> {
     text: emailBody(lead),
     attachments,
   });
-  if (env.MAIL_TRANSPORT === 'log' || !smtpConfigured) {
+  if (MAIL_TRANSPORT === 'log' || !smtpConfigured) {
     log.info({ leadId: lead.id, preview: JSON.parse(String(info.message)).text?.slice(0, 400) }, 'письмо (режим log — не отправлялось)');
   }
 }
 
 /** Вызов REST Битрикс24 как в send.php: POST form-urlencoded, таймаут 10 с. */
 async function b24call(method: string, params: Record<string, unknown>): Promise<{ result: unknown; http: number }> {
-  const base = env.B24_WEBHOOK.replace(/\/?$/, '/');
+  const base = B24_WEBHOOK.replace(/\/?$/, '/');
   const res = await fetch(`${base}${method}.json`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -88,8 +88,8 @@ async function deliver(job: Job<DeliveryJob, DeliveryResult>): Promise<DeliveryR
   }
 
   // 2. Битрикс24: лид, затем сквозной трейс (ошибка трейса лид не отменяет)
-  let b24: DeliveryResult['b24'] = lead.b24Status === 'sent' ? 'sent' : env.B24_WEBHOOK ? 'failed' : 'skipped';
-  if (!env.B24_WEBHOOK) {
+  let b24: DeliveryResult['b24'] = lead.b24Status === 'sent' ? 'sent' : B24_WEBHOOK ? 'failed' : 'skipped';
+  if (!B24_WEBHOOK) {
     patch.b24Status = 'skipped';
   } else if (lead.b24Status !== 'sent') {
     try {
@@ -145,7 +145,7 @@ const worker = new Worker<DeliveryJob, DeliveryResult>(QUEUE, deliver, {
 });
 worker.on('failed', (job, err) => log.warn({ jobId: job?.id, attempts: job?.attemptsMade, err: err.message }, 'попытка доставки не удалась'));
 worker.on('error', (err) => log.error({ err }, 'ошибка воркера'));
-log.info({ queue: QUEUE, mail: env.MAIL_TRANSPORT === 'smtp' && smtpConfigured ? 'smtp' : 'log', b24: Boolean(env.B24_WEBHOOK) }, 'воркер доставки запущен');
+log.info({ queue: QUEUE, mail: MAIL_TRANSPORT === 'smtp' && smtpConfigured ? 'smtp' : 'log', b24: Boolean(B24_WEBHOOK) }, 'воркер доставки запущен');
 
 const shutdown = async () => {
   await worker.close();

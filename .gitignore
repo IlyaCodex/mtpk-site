@@ -43,6 +43,7 @@ scripts/deploy*
 .claude/skills/ship/
 docs/deploy-gotchas.md
 docs/handoff-2026-06-23.md
+docs/release-checklist.md
 briefs/hosting-spec.md
 briefs/tz-server-hardening.md
 briefs/tz-hardening-round2.md
