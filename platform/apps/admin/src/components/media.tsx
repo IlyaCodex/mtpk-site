@@ -16,6 +16,13 @@ export const fileSrc = (url: string) => (url.startsWith('/') ? withBase(`/media-
 export const isImage = (key: string) => /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(key.split(/[?#]/)[0]);
 /** Превью в сетке — уменьшенная копия (320 px, AVIF/WebP из медиасервиса), а не исходник в полный размер. */
 const previewSrc = (url: string) => fileSrc(/\.(png|jpe?g|webp)$/i.test(url) ? `${url}?w=320` : url);
+/**
+ * Просмотр во весь экран — сам файл (медиасервис отдаёт его WebP-копию, если она есть): картинки
+ * сайта лёгкие, а копию ещё пришлось бы делать. Тяжёлый снимок (больше 3 МБ) — копия шириной 1920 px.
+ */
+const VIEW_COPY_FROM = 3 * 1024 * 1024;
+const viewsCopy = (file: MediaFile) => file.size > VIEW_COPY_FROM && /\.(png|jpe?g|webp)$/i.test(file.key);
+const viewSrc = (file: MediaFile) => fileSrc(viewsCopy(file) ? `${file.url}?w=1920` : file.url);
 const ROOTS = ['img/', 'files/', 'docs/', 'og/'];
 const keyPath = (key: string) => key.split('/').map(encodeURIComponent).join('/');
 
@@ -78,6 +85,8 @@ export function MediaBrowser({
   const [selected, setSelected] = useState<string[]>([]);
   // новые папки этого сеанса: в S3 пустых папок не бывает — папка сохраняется вместе с первым файлом
   const [newFolders, setNewFolders] = useState<string[]>([]);
+  // картинка, открытая во весь экран (ключ файла)
+  const [viewing, setViewing] = useState<string | null>(null);
   const [folderName, setFolderName] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -116,14 +125,17 @@ export function MediaBrowser({
     await load();
   }
 
-  async function remove(file: MediaFile) {
-    if (!window.confirm(`Удалить ${file.url}? Если файл используется на страницах, там будет пустое место.`)) return;
+  /** Удалить файл (с вопросом); true — удалён. */
+  async function remove(file: MediaFile): Promise<boolean> {
+    if (!window.confirm(`Удалить ${file.url}? Если файл используется на страницах, там будет пустое место.`)) return false;
     try {
       await api(`media/objects/${keyPath(file.key)}`, { method: 'DELETE' });
       toast.ok('Файл удалён');
       await load();
+      return true;
     } catch (err) {
       toast.error(err);
+      return false;
     }
   }
 
@@ -139,7 +151,8 @@ export function MediaBrowser({
   }
 
   function choose(file: MediaFile) {
-    if (mode === 'manage') return window.open(fileSrc(file.url), '_blank');
+    // картинка — во весь экран поверх медиатеки; PDF и прочие файлы — в новой вкладке
+    if (mode === 'manage') return isImage(file.key) ? setViewing(file.key) : window.open(fileSrc(file.url), '_blank');
     if (!multiple) return onPick?.(file.url);
     setSelected((s) => (s.includes(file.url) ? s.filter((u) => u !== file.url) : [...s, file.url]));
   }
@@ -308,6 +321,10 @@ export function MediaBrowser({
       )}
       {data && data.total > data.files.length && <p className="mt-3 text-xs text-slate-500">Показаны первые {data.files.length} из {data.total} — уточните поиск.</p>}
 
+      {viewing && data && (
+        <ImageViewer files={data.files.filter((f) => isImage(f.key))} current={viewing} onChange={setViewing} onClose={() => setViewing(null)} onDelete={remove} />
+      )}
+
       {mode === 'pick' && multiple && (
         <div className="sticky bottom-0 -mx-6 -mb-6 mt-6 flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-6 py-3">
           <span className="text-sm text-slate-600">{selected.length ? `Выбрано: ${selected.length}` : 'Отметьте фото — они добавятся в порядке выбора'}</span>
@@ -356,6 +373,166 @@ export function MediaInput({ value, onChange }: { value: string; onChange: (v: s
           />
         </Modal>
       )}
+    </div>
+  );
+}
+
+/**
+ * Картинка медиатеки во весь экран: ← и → (клавиши или кнопки) — соседние картинки
+ * папки, Esc, крестик или щелчок по фону — закрыть. «Оригинал» — исходный файл в новой вкладке.
+ */
+function ImageViewer({
+  files,
+  current,
+  onChange,
+  onClose,
+  onDelete,
+}: {
+  files: MediaFile[];
+  current: string;
+  onChange: (key: string) => void;
+  onClose: () => void;
+  onDelete: (file: MediaFile) => Promise<boolean>;
+}) {
+  const index = files.findIndex((f) => f.key === current);
+  const file = files[index];
+  const [shown, setShown] = useState<{ key: string; w: number; h: number } | null>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const go = useCallback(
+    (step: number) => {
+      if (files.length > 1 && index >= 0) onChange(files[(index + step + files.length) % files.length]!.key);
+    },
+    [files, index, onChange],
+  );
+
+  // клавиши, прокрутка страницы под окном, фокус — на «Закрыть» и обратно после закрытия
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      else if (e.key === 'ArrowLeft') go(-1);
+      else if (e.key === 'ArrowRight') go(1);
+      else return;
+      e.preventDefault();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [go, onClose]);
+  useEffect(() => {
+    const before = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButton.current?.focus();
+    return () => {
+      document.body.style.overflow = overflow;
+      before?.focus?.();
+    };
+  }, []);
+  // файла больше нет в списке (удалили, сменилась папка) — закрываем
+  useEffect(() => {
+    if (index < 0) onClose();
+  }, [index, onClose]);
+  // соседние картинки — заранее, чтобы листалось без ожидания
+  useEffect(() => {
+    for (const step of [1, -1]) {
+      const near = files[(index + step + files.length) % files.length];
+      if (near && near.key !== current) new Image().src = viewSrc(near);
+    }
+  }, [files, index, current]);
+
+  if (!file) return null;
+  const name = file.key.split('/').pop() ?? file.key;
+  const loaded = shown?.key === file.key;
+  // копия не шире 1920 px: если она у́же, это и есть размер оригинала
+  const dims = loaded ? (shown.w < 1920 || !viewsCopy(file) ? `${shown.w}×${shown.h} px` : 'от 1920 px в ширину') : '';
+
+  async function removeHere() {
+    const next = files.length > 1 ? files[(index + 1) % files.length]!.key : null;
+    if (await onDelete(file!)) {
+      if (next) onChange(next);
+      else onClose();
+    }
+  }
+
+  const tool = 'inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 hover:text-white';
+  const closeOnBackdrop = (e: React.MouseEvent) => e.target === e.currentTarget && onClose();
+  return (
+    <div role="dialog" aria-modal="true" aria-label={`Просмотр: ${name}`} className="fixed inset-0 z-50 flex flex-col bg-slate-950 text-white" onMouseDown={closeOnBackdrop}>
+      <header className="flex flex-wrap items-center gap-2 px-4 py-3">
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-medium">{name}</div>
+          <div className="text-xs text-slate-400">
+            {index + 1} из {files.length} · {formatBytes(file.size)}
+            {dims && ` · ${dims}`}
+            {file.webp && ' · есть WebP-копия'}
+          </div>
+        </div>
+        <button type="button" className={tool} onClick={() => void navigator.clipboard.writeText(file.url).then(() => toast.ok('Адрес скопирован'))} title={file.url}>
+          <Icon name="copy" className="h-4 w-4" />
+          Копировать адрес
+        </button>
+        <a className={tool} href={fileSrc(file.url)} target="_blank" rel="noopener">
+          <Icon name="external" className="h-4 w-4" />
+          Оригинал
+        </a>
+        <button type="button" className={cx(tool, 'hover:bg-red-500/20 hover:text-red-200')} onClick={() => void removeHere()}>
+          <Icon name="trash" className="h-4 w-4" />
+          Удалить
+        </button>
+        <button ref={closeButton} type="button" className={cx(tool, 'px-2')} onClick={onClose} aria-label="Закрыть (Esc)" title="Закрыть (Esc)">
+          <Icon name="close" className="h-6 w-6" />
+        </button>
+      </header>
+
+      <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-6 sm:px-20" onMouseDown={closeOnBackdrop}>
+        <div className="relative flex h-full w-full items-center justify-center" onMouseDown={closeOnBackdrop}>
+          {/* пока грузится чёткая копия (первый раз она делается до нескольких секунд) — превью из сетки,
+              оно уже в кеше; копия готова — превью плавно гаснет, копия проявляется */}
+          <img
+            key={`preview:${file.key}`}
+            src={previewSrc(file.url)}
+            alt=""
+            aria-hidden="true"
+            className={cx('pointer-events-none absolute inset-0 h-full w-full object-contain blur-[2px] transition-opacity duration-300', loaded ? 'opacity-0' : 'opacity-80')}
+          />
+          <img
+            key={file.key}
+            src={viewSrc(file)}
+            alt={name}
+            // впереди превью сетки, которые ещё грузятся
+            fetchPriority="high"
+            onLoad={(e) => setShown({ key: file.key, w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })}
+            className={cx('relative max-h-full max-w-full rounded object-contain shadow-2xl transition-opacity duration-300', loaded ? 'opacity-100' : 'opacity-0')}
+          />
+          {/* подпись — только если ждать заметно (копия из кеша приходит раньше) */}
+          {!loaded && (
+            <span className="pointer-events-none absolute bottom-2 rounded-full bg-black/50 px-3 py-1 text-xs text-slate-200 transition-opacity delay-700 duration-300 starting:opacity-0">
+              загружаю чёткую копию…
+            </span>
+          )}
+        </div>
+        {files.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Предыдущая (←)"
+              title="Предыдущая (←)"
+              onClick={() => go(-1)}
+              className="absolute top-1/2 left-3 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white transition hover:bg-white/25"
+            >
+              <Icon name="chevronLeft" className="h-6 w-6" />
+            </button>
+            <button
+              type="button"
+              aria-label="Следующая (→)"
+              title="Следующая (→)"
+              onClick={() => go(1)}
+              className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white transition hover:bg-white/25"
+            >
+              <Icon name="chevronRight" className="h-6 w-6" />
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
