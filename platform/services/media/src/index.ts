@@ -29,6 +29,7 @@ import {
   startService,
   type ZodTypeProvider,
 } from '@mtpk/shared';
+import { darkVars } from '@mtpk/content-kit/dark';
 import { createDb } from '@mtpk/db';
 import { dropVariants, encodeWebpCopy, getVariant, noWebpMarker, pickFormat, readAll, snapWidth, VARIANT_SOURCE } from './variants.ts';
 
@@ -89,6 +90,28 @@ async function versionOf(key: string): Promise<string | null> {
   if (known) return known;
   const head = await headObject(s3, bucket, key);
   return head ? (head.ETag ?? '').replaceAll('"', '') : null;
+}
+
+/**
+ * Стили статей Практикума — с тёмной темой: их цвета (и свои переменные статей, --ink: …)
+ * получают тёмные значения, как стили страниц сайта (content-kit/src/dark.ts). Готовый CSS
+ * держится в памяти по версии файла; ETag — с ревизией обработки. Адрес у файла без версии,
+ * поэтому кеш короткий: правка статьи и смена обработки доходят до браузеров за час.
+ */
+const PRAKTIKUM_CSS = /^praktikum\/.+\.css$/i;
+const DARK_REVISION = 'dk1';
+const darkCss = new Map<string, { etag: string; body: Buffer }>();
+
+async function praktikumCss(key: string): Promise<{ etag: string; body: Buffer } | null> {
+  const version = await versionOf(key);
+  if (version === null) return null;
+  const etag = `"${version}-${DARK_REVISION}"`;
+  const ready = darkCss.get(key);
+  if (ready?.etag === etag) return ready;
+  const source = (await readAll((await getObject(s3, bucket, key)).Body)).toString('utf8');
+  const entry = { etag, body: Buffer.from(darkVars(source, { ownVars: true }), 'utf8') };
+  darkCss.set(key, entry);
+  return entry;
 }
 
 function cacheControlFor(key: string): string {
@@ -306,6 +329,22 @@ await startService({
     const serve = async (req: import('fastify').FastifyRequest, reply: import('fastify').FastifyReply) => {
       const key = toKey(req.url);
       if (!key) return reply.code(404).type('text/plain').send('Not Found');
+
+      if (PRAKTIKUM_CSS.test(key)) {
+        try {
+          const css = await praktikumCss(key);
+          if (!css) return reply.code(404).type('text/plain').send('Not Found');
+          reply.header('Cache-Control', 'public, max-age=3600');
+          reply.header('ETag', css.etag);
+          if (req.headers['if-none-match'] === css.etag) return reply.code(304).send();
+          reply.header('Content-Type', 'text/css; charset=utf-8');
+          reply.header('Content-Length', css.body.length);
+          return reply.send(req.method === 'HEAD' ? undefined : css.body);
+        } catch (err) {
+          if (isNotFound(err)) return reply.code(404).type('text/plain').send('Not Found');
+          throw err;
+        }
+      }
 
       // ?w=640 — уменьшенная копия в AVIF/WebP (для srcset на сайте). Копии
       // подписаны версией исходника: заменили файл — копии создаются заново.

@@ -9,6 +9,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@mtpk/content-kit": "*",
     "@mtpk/db": "*",
     "@mtpk/shared": "*",
     "fastify": "^5.12.5",

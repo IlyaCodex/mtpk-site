@@ -9,6 +9,7 @@ import { Drawer } from '@/components/layout/Drawer';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { clientModuleUrl } from './assets';
+import { THEME_INIT } from './theme';
 
 /** Места в документе под общие шапку и подвал сайта. */
 const HEADER_SLOT = /<site-header\b[^>]*>\s*<\/site-header>/i;
@@ -31,7 +32,7 @@ function insertBefore(html: string, re: RegExp, fallback: RegExp, chunk: string)
 /**
  * Статья Практикума — целый HTML-документ своей вёрстки — в том же каркасе,
  * что все страницы сайта: на месте <site-header></site-header> — шапка
- * (компонент Header, без переключателя темы: статьи всегда светлые), на месте
+ * (компонент Header с переключателем темы), на месте
  * <site-footer></site-footer> — подвал, мобильное меню и плашка cookie; в <head> — значок
  * компании и общие стили до стилей статьи (core.css) и после них (core-end.css); в конце
  * <body> — общий модуль сайта и счётчики (SiteScripts); на <html> — оформление
@@ -44,7 +45,7 @@ export function withSiteChrome(html: string, settings: SiteSettings, path: strin
   const modules = site ? [site] : [];
   const coreEnd = clientModuleUrl('core-end.css');
 
-  const header = renderToStaticMarkup(<Header settings={settings} activeNav={activeNavFor(path)} themeToggle={false} />);
+  const header = renderToStaticMarkup(<Header settings={settings} activeNav={activeNavFor(path)} />);
   const footer = renderToStaticMarkup(
     <>
       <Footer settings={settings} />
@@ -56,8 +57,10 @@ export function withSiteChrome(html: string, settings: SiteSettings, path: strin
   const head = renderToStaticMarkup(<CoreAssets modules={modules} />);
 
   let out = html.replace(HEADER_SLOT, () => header).replace(FOOTER_SLOT, () => footer).replace(ICON_LINK, '');
+  // выбранная тёмная тема — до стилей, чтобы статья не мигнула светлой (lib/theme.ts); цвета стилей
+  // статьи в тёмной теме — от медиасервиса (content-kit/src/dark.ts)
   // общие стили — до стилей статьи, «после» — последними, как у страниц сайта (SiteHead)
-  out = insertBefore(out, /<link\b[^>]*rel=["']?stylesheet[^>]*>/i, /<\/head>/i, head);
+  out = insertBefore(out, /<link\b[^>]*rel=["']?stylesheet[^>]*>/i, /<\/head>/i, `<script>${THEME_INIT}</script>${head}`);
   if (coreEnd) out = insertBefore(out, /<\/head>/i, /<body\b/i, `<link rel="stylesheet" href="${coreEnd}">`);
   out = insertBefore(out, /<\/body>/i, /$/, scripts);
 

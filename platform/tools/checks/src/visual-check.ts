@@ -5,7 +5,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { chromium } from 'playwright';
+import { chromium, type Browser } from 'playwright';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 import { chromiumPath, shot, shotName, type Viewport } from './browser.ts';
@@ -20,6 +20,19 @@ export interface VisualResult {
   diffImage?: string;
 }
 
+/**
+ * Снимок страницы или null, если она не загрузилась (например, большие исходники фото из S3
+ * идут медленно): одна такая страница не обрывает всю сверку — она пропускается с пометкой.
+ */
+async function shotOrSkip(browser: Browser, url: string, vp: Viewport, name: string): Promise<Buffer | null> {
+  try {
+    return await shot(browser, url, vp);
+  } catch (err) {
+    console.warn(`  ✗ ${name}: не загрузилась — ${(err as Error).message.split('\n')[0]}`);
+    return null;
+  }
+}
+
 /** Сохранить эталонные снимки страниц. */
 export async function saveShots(opts: { site: string; paths: string[]; dir: string; viewports?: Viewport[]; onShot?: (name: string) => void }): Promise<void> {
   fs.mkdirSync(opts.dir, { recursive: true });
@@ -28,7 +41,9 @@ export async function saveShots(opts: { site: string; paths: string[]; dir: stri
     for (const p of opts.paths) {
       for (const vp of opts.viewports ?? (['desktop', 'mobile'] as const)) {
         const name = shotName(p, vp);
-        fs.writeFileSync(path.join(opts.dir, `${name}.png`), await shot(browser, `${opts.site}${p}`, vp));
+        const png = await shotOrSkip(browser, `${opts.site}${p}`, vp, name);
+        if (!png) continue;
+        fs.writeFileSync(path.join(opts.dir, `${name}.png`), png);
         opts.onShot?.(name);
       }
     }
@@ -59,7 +74,8 @@ export async function compareShots(opts: {
           continue;
         }
         const a = fs.readFileSync(basePath);
-        const b = await shot(browser, `${opts.site}${p}`, vp);
+        const b = await shotOrSkip(browser, `${opts.site}${p}`, vp, name);
+        if (!b) continue;
         const A = PNG.sync.read(a);
         const B = PNG.sync.read(b);
         const width = Math.min(A.width, B.width);

@@ -178,8 +178,119 @@ function colonOf(chunk: string): number {
   return -1;
 }
 
+/** Свои переменные стилей с цветом: где заданы (по порядку в CSS) и в каких ролях используются. */
+type OwnVars = { defs: { name: string; selector: string; color: Rgba }[]; names: Set<string>; used: Map<string, Set<Role>> };
+
+/** Значение — ровно один цвет (#hex, rgb()/rgba(), white/black), иначе null. */
+function colorLiteral(value: string): Rgba | null {
+  const v = value.trim();
+  if (/^#[0-9a-f]{3,8}$/i.test(v)) return parseHex(v);
+  if (/^rgba?\([^()]*\)$/i.test(v)) return parseRgb(v);
+  const named = NAMED[v.toLowerCase()];
+  return named ? parseHex(named) : null;
+}
+
+/**
+ * Свои переменные стилей с цветом (`--ink: #1c3038`) — шаблоны страниц и статьи Практикума задают
+ * ими цвета текста и подложек. Учитываются заданные в правилах верхнего уровня; переменная, которая
+ * где-то задана не цветом или внутри @media, остаётся как есть — её тёмное значение не угадать.
+ */
+function ownColorVars(css: string): OwnVars {
+  const defs: OwnVars['defs'] = [];
+  const skip = new Set<string>();
+  const stack: string[] = [];
+  let start = 0;
+  const decl = (end: number) => {
+    const chunk = css.slice(start, end);
+    const colon = colonOf(chunk);
+    if (colon < 0 || !stack.length) return;
+    const prop = chunk.slice(0, colon).replace(/\/\*[\s\S]*?\*\//g, '').trim();
+    if (!/^--[\w-]+$/.test(prop) || /^--dkv?-/.test(prop)) return;
+    const name = prop.slice(2);
+    const color = colorLiteral(chunk.slice(colon + 1).replace(/\/\*[\s\S]*?\*\//g, ''));
+    if (!color || stack.length !== 1 || stack[0].startsWith('@')) skip.add(name);
+    else defs.push({ name, selector: stack[0], color });
+  };
+  for (let i = 0; i < css.length; i++) {
+    const ch = css[i];
+    if (ch === '/' && css[i + 1] === '*') {
+      const end = css.indexOf('*/', i + 2);
+      i = end < 0 ? css.length : end + 1;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      i = skipString(css, i);
+      continue;
+    }
+    if (ch === '(') {
+      i = closeParen(css, i);
+      continue;
+    }
+    if (ch === '{') {
+      stack.push(css.slice(start, i).replace(/\/\*[\s\S]*?\*\//g, '').trim());
+      start = i + 1;
+    } else if (ch === ';' || ch === '}') {
+      decl(i);
+      start = i + 1;
+      if (ch === '}') stack.pop();
+    }
+  }
+  const kept = defs.filter((d) => !skip.has(d.name));
+  return { defs: kept, names: new Set(kept.map((d) => d.name)), used: new Map() };
+}
+
+/** Части селектора через запятую верхнего уровня (запятые в :is(…) и [..] не делят). */
+function selectorParts(selector: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let from = 0;
+  for (let i = 0; i < selector.length; i++) {
+    const ch = selector[i];
+    if (ch === '(' || ch === '[') depth++;
+    else if (ch === ')' || ch === ']') depth--;
+    else if (ch === ',' && depth === 0) {
+      parts.push(selector.slice(from, i));
+      from = i + 1;
+    }
+  }
+  return [...parts, selector.slice(from)].map((p) => p.trim()).filter(Boolean);
+}
+
+/** Тот же селектор в тёмной теме: :root и html — сам <html data-theme="dark">, остальное — внутри него. */
+function darkScope(selector: string): string {
+  const DARK = 'html[data-theme="dark"]';
+  return selectorParts(selector)
+    .map((p) => {
+      if (/^(?::root|html)$/i.test(p)) return DARK;
+      if (/^:root(?=[\s.#[:>~+])/i.test(p)) return DARK + p.slice(5);
+      if (/^html(?=[\s.#[:>~+])/i.test(p)) return DARK + p.slice(4);
+      return `${DARK} ${p}`;
+    })
+    .join(',');
+}
+
+/**
+ * Тёмные значения своих переменных — по одному на роль (фон, текст, рамка): одна и та же
+ * --ink бывает и цветом текста (в тёмной теме — светлым), и тёмной подложкой (остаётся).
+ * Правила повторяют, где переменная задана, — поэтому и переопределения в .блоке работают.
+ */
+function ownVarRules(own: OwnVars): string {
+  const rules: string[] = [];
+  for (const d of own.defs) {
+    const roles = own.used.get(d.name);
+    if (!roles) continue;
+    const decls = [...roles].map((role) => {
+      const dark = darkColor(role, d.color);
+      // «initial» — тёмного значения нет: работает сама переменная (а не значение снаружи блока)
+      return `--dkv-${role}-${d.name}:${dark ? cssOf(dark) : 'initial'}`;
+    });
+    rules.push(`${darkScope(d.selector)}{${decls.join(';')}}`);
+  }
+  return rules.length ? `${rules.join('\n')}\n` : '';
+}
+
 /** Значение свойства: цвета роли role → переменные; url() и строки — как есть. */
-function transformValue(value: string, role: Role, defs: Map<string, string>): string {
+function transformValue(value: string, role: Role, defs: Map<string, string>, own?: OwnVars): string {
   let out = '';
   for (let i = 0; i < value.length; ) {
     const ch = value[i];
@@ -196,10 +307,14 @@ function transformValue(value: string, role: Role, defs: Map<string, string>): s
       const name = /^var\(\s*--([\w-]+)/i.exec(whole)?.[1];
       const color = name && TOKENS[name] ? parseHex(TOKENS[name]) : null;
       if (color) out += replaced(whole, color, role, defs);
-      else if (name && !name.startsWith('dk-') && whole.includes(',')) {
+      else if (name && own?.names.has(name)) {
+        // своя переменная с цветом: тёмное значение — для этой роли (ownVarRules)
+        own.used.set(name, (own.used.get(name) ?? new Set<Role>()).add(role));
+        out += `var(--dkv-${role}-${name}, ${whole})`;
+      } else if (name && !/^dkv?-/.test(name) && whole.includes(',')) {
         // var(--нет-такой, #f6f8f9): работает запасной цвет — его и переделываем
         const comma = topComma(whole);
-        out += comma > 0 ? whole.slice(0, comma + 1) + transformValue(whole.slice(comma + 1, -1), role, defs) + ')' : whole;
+        out += comma > 0 ? whole.slice(0, comma + 1) + transformValue(whole.slice(comma + 1, -1), role, defs, own) + ')' : whole;
       } else out += whole;
       i = end + 1;
       continue;
@@ -248,9 +363,14 @@ function replaced(original: string, color: Rgba, role: Role, defs: Map<string, s
 /**
  * CSS → тот же CSS с переменными тёмной темы (см. описание файла) и их
  * значениями в конце. Повторный вызов ничего не меняет: var(--dk-…) не трогается.
+ *
+ * ownVars — и свои переменные стилей с цветом (`--ink: #1c3038` … `color: var(--ink)`): так
+ * написаны шаблоны страниц и статьи Практикума. Общим стилям сайта не нужно — его токены
+ * в тёмной теме задаёт theme-dark.css.
  */
-export function darkVars(css: string): string {
+export function darkVars(css: string, opts: { ownVars?: boolean } = {}): string {
   const defs = new Map<string, string>();
+  const own = opts.ownVars ? ownColorVars(css) : undefined;
   let out = '';
   let start = 0;
   let depth = 0;
@@ -260,7 +380,7 @@ export function darkVars(css: string): string {
     const colon = colonOf(chunk);
     const prop = colon > 0 ? chunk.slice(0, colon).replace(/\/\*[\s\S]*?\*\//g, '').trim().toLowerCase() : '';
     const role = depth > 0 && /^-?-?[a-z][\w-]*$/.test(prop) ? roleOf(prop) : null;
-    out += role ? chunk.slice(0, colon + 1) + transformValue(chunk.slice(colon + 1), role, defs) : chunk;
+    out += role ? chunk.slice(0, colon + 1) + transformValue(chunk.slice(colon + 1), role, defs, own) : chunk;
   };
   for (let i = 0; i < css.length; i++) {
     const ch = css[i];
@@ -290,7 +410,8 @@ export function darkVars(css: string): string {
     }
   }
   flush(css.length);
-  if (!defs.size) return out;
+  const ownRules = own ? ownVarRules(own) : '';
+  if (!defs.size && !ownRules) return out;
   const vars = [...defs].map(([k, v]) => `${k}:${v}`).join(';');
-  return `${out}\nhtml[data-theme="dark"]{${vars}}\n`;
+  return `${out}\n${defs.size ? `html[data-theme="dark"]{${vars}}\n` : ''}${ownRules}`;
 }

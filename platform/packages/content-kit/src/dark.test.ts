@@ -39,3 +39,26 @@ test('@media, комментарии, !important; повторный вызов 
   assert.ok(once.startsWith('@media (max-width: 640px){.a:hover{/* фон: белый */background-color:var(--dk-bg-fafafa, #FAFAFA) !important}}'));
   assert.equal(darkVars(once).split('\nhtml')[0], once.split('\nhtml')[0]);
 });
+
+test('свои переменные стилей (ownVars): тёмное значение — своё для каждой роли, области — как у переменной', () => {
+  const css = ':root{--ink:#1c3038;--paper:#fff}.a{color:var(--ink);background:var(--paper)}.th{background:var(--ink);color:#fff}.hero{--ink:#ffffff}';
+  const out = darkVars(css, { ownVars: true });
+  assert.ok(out.includes('.a{color:var(--dkv-tx-ink, var(--ink));background:var(--dkv-bg-paper, var(--paper))}'), out);
+  assert.ok(out.includes('.th{background:var(--dkv-bg-ink, var(--ink));color:#fff}'), out);
+  // :root — сам <html>: текст из --ink светлеет, тёмная подложка из --ink остаётся
+  assert.match(out, /\nhtml\[data-theme="dark"\]\{--dkv-tx-ink:#[a-f][0-9a-f]{5};--dkv-bg-ink:initial\}/);
+  assert.match(out, /\nhtml\[data-theme="dark"\]\{--dkv-bg-paper:#1[0-9a-f]{5}\}/);
+  // переопределение в блоке повторяется в тёмной теме: белый текст героя остаётся белым
+  assert.match(out, /\nhtml\[data-theme="dark"\] \.hero\{--dkv-tx-ink:initial;--dkv-bg-ink:#1[0-9a-f]{5}\}/);
+  // без ownVars — как раньше; повторный вызов ничего не меняет
+  assert.equal(darkVars(css), css);
+  assert.equal(darkVars(out, { ownVars: true }), out);
+});
+
+test('ownVars: html.класс и списки селекторов; переменная не цветом или в @media — как есть', () => {
+  const out = darkVars('html.a .b, .c{--line:#e0e6e6}.d{border:1px solid var(--line)}', { ownVars: true });
+  assert.match(out, /html\[data-theme="dark"\]\.a \.b,html\[data-theme="dark"\] \.c\{--dkv-ln-line:#[0-9a-f]{6}\}/);
+  const kept = ':root{--x:#fff;--y:var(--x)}@media print{:root{--z:#fff}}.e{background:var(--x);color:var(--y);border-color:var(--z)}';
+  const res = darkVars(kept, { ownVars: true });
+  assert.ok(res.includes('.e{background:var(--dkv-bg-x, var(--x));color:var(--y);border-color:var(--z)}'), res);
+});

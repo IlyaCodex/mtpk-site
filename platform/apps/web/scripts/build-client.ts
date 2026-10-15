@@ -106,7 +106,8 @@ async function buildCss(): Promise<Record<string, string>> {
     out[`${name}.css`] = await writeCss(name, responsiveHeroCss(`${darkVars(own)}\n${asIs}`));
   }
   for (const f of fs.readdirSync(path.join(ROOT, TPL_DIR)).filter((x) => x.endsWith('.css'))) {
-    out[`tpl/${f}`] = await writeCss(`tpl/${f.slice(0, -4)}`, responsiveHeroCss(darkVars(read(`${TPL_DIR}/${f}`))));
+    // шаблоны задают цвета и своими переменными (--ink: #142a32) — им тоже тёмные значения
+    out[`tpl/${f}`] = await writeCss(`tpl/${f.slice(0, -4)}`, responsiveHeroCss(darkVars(read(`${TPL_DIR}/${f}`), { ownVars: true })));
   }
   return out;
 }

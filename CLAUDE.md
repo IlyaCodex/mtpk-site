@@ -84,9 +84,12 @@
 - Иконки SVG в блоках — окно «Иконка и цвет» (`apps/admin/src/components/icon-picker.tsx`), набор Solar —
   `apps/admin/public/icons/solar-linear.json` (`scripts/icons-solar.ts`); цвет — `style="color:…"` у `<svg>`
   (в HTML-секциях при сохранении остаётся на месте, в класс не уходит).
-- Тёмная тема — `<html data-theme="dark">`: переключатель в шапке (`apps/web/src/client/theme.ts`), токены и свои
-  правила — `apps/web/src/styles/theme-dark.css`. Цвета в CSS (сайт, шаблоны, стили страниц) получают тёмные значения
-  сами (`packages/content-kit/src/dark.ts`: при сборке и при отдаче стилей страниц) — новый CSS пишется как обычно.
+- Тёмная тема — `<html data-theme="dark">`: переключатель в шапке (`apps/web/src/client/theme.ts`, и у статей
+  Практикума), токены и свои правила — `apps/web/src/styles/theme-dark.css`. Цвета в CSS (сайт, шаблоны, стили
+  страниц, стили статей Практикума — их отдаёт медиасервис) получают тёмные значения сами
+  (`packages/content-kit/src/dark.ts`: при сборке и при отдаче), в шаблонах, стилях страниц и статьях — и свои
+  переменные с цветом (`--ink: #…`). Новый CSS пишется как обычно; шаблон страницы — только в `public/css/tpl/`
+  (файлы вне неё сборка не обрабатывает). Проверка всех страниц — `tools/checks/src/dark-check.ts`.
 - Виджеты конструктора (текст, сетка фото, карусель, бегущая строка, видео, колонки, призыв, отступ) —
   блоки `packages/ui/src/blocks/Widgets.tsx`, стили `apps/web/src/styles/widgets.css`; добавляются в админке
   панелью «Добавить блок» (`apps/admin/src/components/widgets.tsx`) или «+» у блока в предпросмотре.
@@ -128,7 +131,8 @@
   глазами. Поведение сайта — `npx tsx tools/checks/src/functional-check.ts --no-submit`,
   админка — `tools/checks/src/admin-smoke.ts`, CSP шлюза (счётчики Метрики, Mango, карта) —
   `tools/checks/src/csp-check.ts`, SEO всех страниц из sitemap и ссылок — `tools/checks/src/seo-audit.ts`,
-  скорость на телефоне — `tools/checks/src/perf-check.ts`.
+  скорость на телефоне — `tools/checks/src/perf-check.ts`, тёмная тема (светлые блоки, нечитаемый текст) —
+  `tools/checks/src/dark-check.ts --all`.
 - Запутался или поправили дважды — предложи /clear и новую сессию.
 
 ## Железные правила

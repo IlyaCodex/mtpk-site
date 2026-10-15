@@ -9,9 +9,8 @@ import { HEADER_LOGO, Logo } from './Logo';
  * Шапка сайта — одна на все страницы, включая статьи Практикума: строка контактов, логотип,
  * главное меню с мегаменю, поиск, переключатель светлой и тёмной темы, мобильное меню и
  * экспресс-звонок. Контакты и пункты меню — из настроек сайта (админка «Шапка, меню, контакты»).
- * themeToggle: false — без переключателя темы (статьи Практикума всегда светлые).
  */
-export function Header({ settings, activeNav, themeToggle = true }: { settings: SiteSettings; activeNav?: string; themeToggle?: boolean }) {
+export function Header({ settings, activeNav }: { settings: SiteSettings; activeNav?: string }) {
   const { contacts } = settings;
   return (
     // класс is-scrolled при прокрутке ставит клиентский модуль (header.ts)
@@ -75,11 +74,9 @@ export function Header({ settings, activeNav, themeToggle = true }: { settings: 
               <SearchIcon />
             </button>
             {/* состояние (aria-pressed, подсказка) ставит client/theme.ts */}
-            {themeToggle && (
-              <button type="button" className="icon-btn theme-toggle" aria-label="Тёмная тема" aria-pressed="false" title="Тёмная тема" data-theme-toggle="">
-                <ThemeIcons />
-              </button>
-            )}
+            <button type="button" className="icon-btn theme-toggle" aria-label="Тёмная тема" aria-pressed="false" title="Тёмная тема" data-theme-toggle="">
+              <ThemeIcons />
+            </button>
             <QuickCallForm />
           </div>
         </div>

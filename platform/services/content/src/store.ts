@@ -113,7 +113,8 @@ export class ContentStore {
     if (ready !== undefined) return ready;
     const block = (await this.styleMap()).get(hash);
     if (!block) return null;
-    const css = darkVars(styleFileCss(block));
+    // и свои переменные с цветом (--ink: #142a32) — как у шаблонов
+    const css = darkVars(styleFileCss(block), { ownVars: true });
     this.styleFiles.set(hash, css);
     return css;
   }

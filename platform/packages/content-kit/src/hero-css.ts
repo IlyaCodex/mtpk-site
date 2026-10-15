@@ -7,8 +7,11 @@
  */
 export const HERO_MOBILE_MAX = 767;
 export const HERO_MOBILE_WIDTH = 828;
-/** Ревизия правил: меняется — меняются адреса стилей страниц (они кешируются навсегда). */
-export const HERO_CSS_REVISION = '1';
+/**
+ * Ревизия обработки стилей страниц (копии фото обложек, тёмная тема — dark.ts): меняется —
+ * меняются адреса стилей страниц (они кешируются навсегда). 2 — свои переменные с цветом.
+ */
+export const HERO_CSS_REVISION = '2';
 
 const RULE = /([^{}]*\b(?:cat-hero|hero)__image\b[^{}]*)\{([^{}]*)\}/g;
 const URL = /url\(\s*(['"]?)(\/img\/[^'")?#\s]+\.(?:png|jpe?g|webp))(\?[^'")#\s]*)?\1\s*\)/gi;
