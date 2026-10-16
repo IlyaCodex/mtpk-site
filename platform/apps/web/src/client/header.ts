@@ -1,4 +1,4 @@
-import { $, delegate, inertOutside, trapTab } from './dom';
+import { $, $$, delegate, inertOutside, trapTab } from './dom';
 
 /**
  * Липкая шапка: класс is-scrolled после прокрутки (не чаще раза за кадр).
@@ -89,6 +89,22 @@ function mobileNav(): void {
   });
 }
 
+/**
+ * Мегаменю: колонка длиннее первой прокручивается внутри (site.css). Край списка, за которым есть
+ * ещё пункты, растворяется — классы can-up / can-down; пересчёт при прокрутке и при открытии меню.
+ */
+function megaScroll(): void {
+  for (const list of $$('.megamenu__col:first-child ~ .megamenu__col .megamenu__list')) {
+    const update = () => {
+      list.classList.toggle('can-up', list.scrollTop > 1);
+      list.classList.toggle('can-down', list.scrollTop + list.clientHeight < list.scrollHeight - 1);
+    };
+    update();
+    list.addEventListener('scroll', update, { passive: true });
+    list.closest('.nav__item')?.addEventListener('mouseenter', update);
+  }
+}
+
 /** Поиск: модуль с окном поиска грузится только по первому клику на «лупу» (или ?q= в адресе). */
 function searchOpener(): void {
   let loading: Promise<{ openSearch: (q?: string) => void }> | null = null;
@@ -104,5 +120,6 @@ function searchOpener(): void {
 export function initHeader(): void {
   stickyHeader();
   mobileNav();
+  megaScroll();
   searchOpener();
 }

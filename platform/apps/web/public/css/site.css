@@ -312,6 +312,33 @@ body { margin: 0; }
   color: var(--text-tertiary);
   line-height: 1.4;
 }
+/* Колонки после первой — не выше первой: высоту меню задаёт она (contain: size — в высоту ряда колонка
+   не входит), длинный список прокручивается внутри колонки под её заголовком. Край, за которым есть ещё
+   пункты, растворяется: классы can-up / can-down ставит client/header.ts; полоса прокрутки (правые 12px)
+   не растворяется. Градиенты — в переменной: только прозрачность, пересчёт цветов для тёмной темы не нужен. */
+.megamenu__col:first-child ~ .megamenu__col {
+  contain: size;
+  display: flex;
+  flex-direction: column;
+}
+.megamenu__col:first-child ~ .megamenu__col .megamenu__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  /* отрицательные поля пунктов (подсветка при наведении) — внутри области прокрутки */
+  margin: 0 calc(var(--sp-3) * -1);
+  padding: 0 var(--sp-3);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
+}
+.megamenu__list.can-down { --mm-fade: linear-gradient(#000 calc(100% - 48px), transparent); }
+.megamenu__list.can-up { --mm-fade: linear-gradient(transparent, #000 48px); }
+.megamenu__list.can-up.can-down { --mm-fade: linear-gradient(transparent, #000 48px, #000 calc(100% - 48px), transparent); }
+.megamenu__list:is(.can-up, .can-down) {
+  -webkit-mask: var(--mm-fade) 0 0 / calc(100% - 12px) 100% no-repeat, linear-gradient(#000 0 0) 100% 0 / 12px 100% no-repeat;
+  mask: var(--mm-fade) 0 0 / calc(100% - 12px) 100% no-repeat, linear-gradient(#000 0 0) 100% 0 / 12px 100% no-repeat;
+}
 .header__actions {
   display: flex;
   align-items: center;
