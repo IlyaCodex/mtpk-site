@@ -116,13 +116,6 @@
 .ui-transistor-site .tr-section a{color:var(--tr-green-dark)}
 .ui-transistor-site .tr-section ul,.ui-transistor-site .tr-section ol{padding-left:22px}
 .ui-transistor-site .tr-section li{margin-bottom:9px}
-.ui-transistor-site details{border-bottom:1px solid var(--tr-line);padding:16px 0}
-.ui-transistor-site details:first-of-type{border-top:1px solid var(--tr-line)}
-.ui-transistor-site summary{display:flex;justify-content:space-between;gap:15px;list-style:none;font-size:14px;font-weight:600}
-.ui-transistor-site summary::-webkit-details-marker{display:none}
-.ui-transistor-site summary:after{content:"+";font-size:19px;color:var(--tr-green);flex-shrink:0}
-.ui-transistor-site details[open] summary:after{content:"−"}
-.ui-transistor-site details p{margin:12px 0 0;font-size:13px}
 .ui-transistor-site .tr-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .ui-transistor-site .tr-gallery figure{border:1px solid var(--tr-line);border-radius:8px;margin:0;overflow:hidden;min-width:0;background:white}
 .ui-transistor-site .tr-gallery a{display:block;aspect-ratio:1.2;padding:18px}

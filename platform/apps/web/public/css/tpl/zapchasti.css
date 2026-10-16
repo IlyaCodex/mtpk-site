@@ -134,13 +134,6 @@
 .seo-faq{display:grid;grid-template-columns:1fr 1fr;gap:76px;padding-top:7px;padding-bottom:6px}
 .seo-faq h2{font-size:25px;line-height:1.25;margin:0 0 20px;letter-spacing:-.02em}
 .seo-faq p{color:#637479;font-size:14px;line-height:1.8}
-.seo-faq details{border-bottom:1px solid var(--border-subtle);padding:16px 0}
-.seo-faq details:first-of-type{border-top:1px solid var(--border-subtle)}
-summary{cursor:pointer;list-style:none;font-size:14px;font-weight:600;line-height:1.5;display:flex;justify-content:space-between;gap:16px}
-summary::-webkit-details-marker{display:none}
-summary:after{content:'+';font-size:19px;color:var(--green-500);font-weight:400;flex-shrink:0}
-details[open] summary:after{content:'−'}
-.seo-faq details p{font-size:13px;margin:12px 0 3px}
 .product-page{padding-block:25px 45px}
 .product-page .breadcrumbs{margin-bottom:28px}
 .product-overview{display:grid;grid-template-columns:1fr 1fr;gap:55px;align-items:start}
@@ -328,8 +321,6 @@ details[open] summary:after{content:'−'}
 .step-number{font-size:10px}
 .seo-faq h2{font-size:23px}
 .seo-faq p{font-size:12px}
-.seo-faq summary{font-size:12px}
-.seo-faq details p{font-size:12px}
 .product-page{padding-top:19px}
 .product-page .breadcrumbs{margin-bottom:19px}
 .product-overview{display:flex;flex-direction:column;gap:19px}

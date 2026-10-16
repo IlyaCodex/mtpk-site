@@ -1,8 +1,8 @@
 import { $, delegate, reducedMotion } from './dom';
 
 /**
- * Запчасти (шаблоны zapchasti и ui-spares): окно «Запросить цену / подбор» — <dialog id="request-dialog">
- * страницы с формой <ui-form type="spare">: деталь, модель и количество подставляются из кнопки
+ * Запчасти (шаблоны zapchasti, ui-spares и транзисторных — у них только фото): окно «Запросить цену / подбор» —
+ * <dialog id="request-dialog"> страницы с формой <ui-form type="spare">: деталь, модель и количество подставляются из кнопки
  * (data-part, data-model, поле #quantity; модель — и из фильтра списка #model-select); «−/+» количества
  * (data-qty); фото на весь экран (data-zoom → #image-dialog). Окна открываются и закрываются плавно
  * (класс is-open, оформление — sections.css), Esc и щелчок мимо окна закрывают. При отправке —

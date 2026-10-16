@@ -30,7 +30,6 @@
 .ui-spares .ui-breadcrumbs{font-size:13px;color:#637886;margin:10px 0}
 .ui-spares ul{padding-left:22px}
 .ui-spares li{margin-bottom:7px}
-.ui-spares .ui-question{border-top:1px solid #dbe3e7;padding-top:6px}
 .ui-spares .ui-related{border-top:2px solid #dbe3e7;margin-top:32px;padding-top:8px}
 @media(max-width:600px){.ui-spares{font-size:15px}.ui-spares h2{font-size:22px}.ui-spares .ui-cta{padding:16px}.ui-spares figure{max-width:100%;min-width:0}.ui-spares th, .ui-spares td{padding:8px}.ui-spares .ui-button{width:100%;text-align:center}}
 .ui-spares{--ui-green:#258749;--ui-ink:#15333f;--ui-muted:#64777c;font-family:Arial,sans-serif;color:var(--ui-ink)}
@@ -377,7 +376,6 @@
   border-radius:8px; padding:22px 24px;
 }
 .ui-spares-scope .v9-callout h2{ font-size:22px; color:var(--ink) }
-.ui-spares-scope .ui-faq .ui-question{ border-top:1px solid var(--line); padding-top:14px; margin-top:14px }
 .ui-spares-scope .ui-cta{
   border:1px solid var(--line); border-left:4px solid var(--green); border-radius:10px;
   background:var(--soft); padding:26px 28px; margin:34px 0;
