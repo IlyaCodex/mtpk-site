@@ -49,11 +49,7 @@ body .header-quick-form .js-form-status {
 }
 body .header-quick-form input:focus-visible,
 body .header-quick-form a:focus-visible { outline: 2px solid #267221; outline-offset: 2px; }
-/* Ниже 1091 px форма в строку не влезает: логотип, меню и поиск занимают
-   почти всю ширину, форме остаётся ~220 px вместо нужных ~286 — и она
-   вылезала за правый край (на 1025 px было 20 px вылета). Прячем её там,
-   как и на мобиле: телефоны остаются в верхней строке шапки. */
-@media (max-width: 1090px) { body .header-quick-form { display: none; } }
+/* Форма звонка в шапке ниже 1201 px не показывается — mobile-fixes.css, раздел 16 (шапка по ширине контента). */
 @media (max-width: 360px) {
   body .header .container.header__inner { padding-inline: 12px; gap: 8px; }
   body .header .header__brand { min-width: 0; flex: 1 1 auto; max-width: 150px; }
