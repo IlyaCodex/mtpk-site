@@ -17,6 +17,9 @@ const redis = createRedis(env.REDIS_URL);
 const CACHE_PREFIX = 'content:dto3';
 const cache = new JsonCache(redis, CACHE_PREFIX, (err) => log.warn({ err }, 'redis недоступен — работаем без кеша'));
 const store = new ContentStore(db, cache, env.SITE_URL, env.CONTENT_CACHE_TTL, log);
+// Запуск — после выкладки или пересборки: страницы прежней версии кода (разметка, адреса стилей
+// и скриптов) из кеша не отдаём — каждая собирается заново по первому запросу
+log.info({ keys: await store.purge() }, 'кеш страниц сброшен при запуске');
 
 /** Сигнал сайту: перегенерировать изменённые страницы (ISR Next.js). */
 async function notifyWeb(paths: string[] | 'all'): Promise<void> {

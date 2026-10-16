@@ -25,7 +25,6 @@ import { build, context, transform, type BuildOptions, type Plugin } from 'esbui
 import sharp from 'sharp';
 import { darkVars } from '@mtpk/content-kit/dark';
 import { responsiveHeroCss } from '@mtpk/content-kit/hero-css';
-import { ASSET_VERSIONS } from '../src/lib/site.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'public/assets');
@@ -116,6 +115,34 @@ async function buildCss(): Promise<Record<string, string>> {
   return out;
 }
 
+const contentHash = (file: string) => crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex').slice(0, 10);
+
+/**
+ * Версии файлов с постоянными адресами, на которые ссылаются страницы: старые скрипты (public/js),
+ * логотипы (public/brand), значки сайта; ключ «v:путь» → хеш содержимого. Страница ставит адрес
+ * с ?v=хеш (src/lib/versions.ts; в код их вшивает next.config.ts): поменялся файл — поменялся адрес,
+ * браузер и шлюз берут новый без чистки кеша. tpl-css-version — одна версия шаблонов /css/tpl
+ * (их адреса берёт предпросмотр в админке).
+ */
+function staticVersions(): Record<string, string> {
+  const out: Record<string, string> = {};
+  const add = (rel: string) => {
+    const file = path.join(ROOT, 'public', rel);
+    if (fs.existsSync(file) && fs.statSync(file).isFile()) out[`v:${rel}`] = contentHash(file);
+  };
+  for (const f of fs.readdirSync(path.join(ROOT, 'public/js')).filter((x) => x.endsWith('.js'))) add(`js/${f}`);
+  for (const f of fs.readdirSync(path.join(ROOT, 'public/brand'))) add(`brand/${f}`);
+  for (const f of ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'site.webmanifest']) add(f);
+  const tpl = fs
+    .readdirSync(path.join(ROOT, TPL_DIR))
+    .filter((x) => x.endsWith('.css'))
+    .sort()
+    .map((f) => fs.readFileSync(path.join(ROOT, TPL_DIR, f), 'utf8'))
+    .join('\n');
+  out['tpl-css-version'] = hash(tpl);
+  return out;
+}
+
 const writeManifest: Plugin = {
   name: 'manifest',
   setup(b) {
@@ -133,9 +160,8 @@ const writeManifest: Plugin = {
         const name = Object.entries(ENTRIES).find(([, src]) => path.resolve(ROOT, src) === path.resolve(ROOT, meta.entryPoint!))?.[0];
         if (name) manifest[name] = `/${path.relative(path.join(ROOT, 'public'), path.resolve(ROOT, file)).split(path.sep).join('/')}`;
       }
-      Object.assign(manifest, await buildCss());
-      // версия /css/tpl/*.css — её берёт предпросмотр в админке (те же адреса, что у страниц)
-      manifest['tpl-css-version'] = ASSET_VERSIONS.tplCss;
+      Object.assign(manifest, await buildCss(), staticVersions());
+      manifest.build = hash(JSON.stringify(manifest));
       fs.writeFileSync(path.join(OUT, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
       console.log(`статика сайта: модулей ${Object.keys(ENTRIES).length}, JS ${(bytes / 1024).toFixed(1)} КБ, стили ${Object.keys(CSS_BUNDLES).length} файла`);
     });
@@ -211,5 +237,7 @@ if (watch) {
   // стили пересобираются вместе с модулями; правка только CSS — перезапуск сборщика
   console.log('статика сайта: слежу за изменениями…');
 } else {
-  await Promise.all([build(modules), build(legacy)]);
+  // сначала старые скрипты: манифест модулей записывает и их версии (staticVersions)
+  await build(legacy);
+  await build(modules);
 }

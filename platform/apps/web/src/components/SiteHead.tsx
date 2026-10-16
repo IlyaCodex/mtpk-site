@@ -2,8 +2,9 @@ import type { PageDto } from '@mtpk/shared/contracts';
 import { HEADER_LOGO, logoPreload } from '@/components/layout/Logo';
 import { clientModuleUrl, templateCssUrl } from '@/lib/assets';
 import { jsonLdHtml, ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/lib/seo';
-import { ASSET_VERSIONS, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE } from '@/lib/site';
+import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE } from '@/lib/site';
 import { THEME_INIT } from '@/lib/theme';
+import { versioned } from '@/lib/versions';
 
 export type HeadPage = Pick<
   PageDto,
@@ -28,10 +29,10 @@ export function CoreAssets({ modules = [] }: { modules?: string[] }) {
     <>
       {/* значок компании (scripts/brand-icons.ts): SVG — новым браузерам и Яндексу, ICO — остальным
           и Google, PNG — iPhone и Android */}
-      <link rel="icon" href="/favicon.ico" sizes="32x32" />
-      <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-      <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-      <link rel="manifest" href="/site.webmanifest" />
+      <link rel="icon" href={versioned('/favicon.ico')} sizes="32x32" />
+      <link rel="icon" href={versioned('/favicon.svg')} type="image/svg+xml" />
+      <link rel="apple-touch-icon" href={versioned('/apple-touch-icon.png')} />
+      <link rel="manifest" href={versioned('/site.webmanifest')} />
       {/* Лого в шапке; Inter (вариативный: один файл на алфавит — все толщины) — параллельно с HTML (T-PERF-2) */}
       <link rel="preload" as="image" {...logoPreload(HEADER_LOGO)} fetchPriority="high" />
       <link rel="preload" href="/fonts/inter-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="" />
@@ -102,7 +103,7 @@ export function SiteHead({ page, home = false, modules = [] }: { page: HeadPage;
         <script key={`ld${i}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(json) }} />
       ))}
       {page.cssTemplates.map((href) => (
-        <link key={href} rel="stylesheet" href={templateCssUrl(href, ASSET_VERSIONS.tplCss)} />
+        <link key={href} rel="stylesheet" href={templateCssUrl(href)} />
       ))}
       {page.externalStyles.map((href) => (
         <link key={href} rel="stylesheet" href={href} />

@@ -10,6 +10,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { clientModuleUrl } from './assets';
 import { THEME_INIT } from './theme';
+import { BUILD_VERSION } from './versions';
 
 /** Места в документе под общие шапку и подвал сайта. */
 const HEADER_SLOT = /<site-header\b[^>]*>\s*<\/site-header>/i;
@@ -17,6 +18,12 @@ const FOOTER_SLOT = /<site-footer\b[^>]*>\s*<\/site-footer>/i;
 
 /** Документ (статья Практикума) с местами <site-header>/<site-footer> — в общем каркасе сайта. */
 export const hasSiteChrome = (html: string) => HEADER_SLOT.test(html) || FOOTER_SLOT.test(html);
+
+/**
+ * Стили и скрипты статьи — файлы в S3 по постоянным адресам: к адресу — версия сборки сайта,
+ * после выкладки браузер и шлюз берут их заново (с ней меняется и тёмная тема статьи).
+ */
+const DOC_ASSET = /(<(?:link|script)\b[^>]*?\b(?:href|src)=["'])(\/praktikum\/[^"'?#]+\.(?:css|js))(["'])/gi;
 
 /** Свои ссылки статьи на значок (остались от прежнего сайта): значок — общий, из CoreAssets. */
 const ICON_LINK = /<link\b[^>]*\brel=["']?(?:shortcut\s+)?(?:icon|apple-touch-icon)(?=["'\s/>])[^>]*>[^\S\n]*\n?/gi;
@@ -56,7 +63,11 @@ export function withSiteChrome(html: string, settings: SiteSettings, path: strin
   const scripts = renderToStaticMarkup(<SiteScripts modules={modules} legacy={[]} />);
   const head = renderToStaticMarkup(<CoreAssets modules={modules} />);
 
-  let out = html.replace(HEADER_SLOT, () => header).replace(FOOTER_SLOT, () => footer).replace(ICON_LINK, '');
+  let out = html
+    .replace(HEADER_SLOT, () => header)
+    .replace(FOOTER_SLOT, () => footer)
+    .replace(ICON_LINK, '')
+    .replace(DOC_ASSET, (_m, open: string, url: string, close: string) => `${open}${url}?v=${BUILD_VERSION}${close}`);
   // выбранная тёмная тема — до стилей, чтобы статья не мигнула светлой (lib/theme.ts); цвета стилей
   // статьи в тёмной теме — от медиасервиса (content-kit/src/dark.ts)
   // общие стили — до стилей статьи, «после» — последними, как у страниц сайта (SiteHead)

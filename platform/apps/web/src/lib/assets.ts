@@ -28,7 +28,7 @@ export function clientModuleUrl(name: ClientModule): string | null {
  * Шаблонные стили страницы (/css/tpl/имя.css): собранный файл с цветами
  * тёмной темы (assets/tpl, адрес с хешем); нет сборки — исходный файл с версией.
  */
-export function templateCssUrl(href: string, version: string): string {
+export function templateCssUrl(href: string): string {
   const name = /^\/css\/tpl\/([\w.-]+\.css)$/.exec(href)?.[1];
-  return (name && manifest()[`tpl/${name}`]) || `${href}?v=${version}`;
+  return (name && manifest()[`tpl/${name}`]) || `${href}?v=${manifest()['tpl-css-version'] ?? 'dev'}`;
 }

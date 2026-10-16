@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import type { NextConfig } from 'next';
 
@@ -17,8 +18,22 @@ const ADMIN = process.env.ADMIN_URL ?? 'http://127.0.0.1:3300';
 
 const cache = (value: string) => [{ key: 'Cache-Control', value }];
 
+/**
+ * Версии файлов с постоянными адресами (ключи «v:путь») и версия сборки — из манифеста, который
+ * пишет scripts/build-client.ts перед next build. Вшиваются в код сайта (src/lib/versions.ts).
+ */
+function staticVersions(): string {
+  try {
+    const manifest = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'public/assets/manifest.json'), 'utf8')) as Record<string, string>;
+    return JSON.stringify(Object.fromEntries(Object.entries(manifest).filter(([key]) => key.startsWith('v:') || key === 'build')));
+  } catch {
+    return '{}'; // сборки статики ещё не было — адреса без версий
+  }
+}
+
 const nextConfig: NextConfig = {
   output: 'standalone',
+  env: { MTPK_STATIC_VERSIONS: staticVersions() },
   outputFileTracingRoot: path.resolve(process.cwd(), '../..'),
   transpilePackages: ['@mtpk/content-kit', '@mtpk/content-model', '@mtpk/shared', '@mtpk/ui'],
   poweredByHeader: false,
@@ -70,9 +85,13 @@ const nextConfig: NextConfig = {
     };
   },
   async headers() {
-    // Кеш статики — как в nginx старого сайта: css/js 7 дней (сброс через ?v=),
-    // шрифты и логотипы 30 дней.
+    // Кеш статики — как в nginx старого сайта: css/js 7 дней, шрифты и логотипы 30 дней.
+    // Сброс — версией в адресе (?v=хеш содержимого, src/lib/versions.ts): её ставит сборка.
     return [
+      // страницы (HTML) браузер сверяет с сервером при каждом заходе (ETag → 304, без загрузки), как статьи
+      // Практикума: заголовок ISR (s-maxage, stale-while-revalidate) — для общих кешей, по нему браузер
+      // мог бы показать сохранённую копию страницы после её обновления
+      { source: '/:path*', has: [{ type: 'header', key: 'accept', value: '.*text/html.*' }], headers: cache('no-cache, must-revalidate') },
       { source: '/css/:path*', headers: cache('public, max-age=604800') },
       // клиентские модули: имя файла содержит хеш содержимого — кеш навсегда
       { source: '/assets/:path*', headers: cache('public, max-age=31536000, immutable') },

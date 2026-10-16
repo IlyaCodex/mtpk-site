@@ -30,6 +30,7 @@ import {
   type ZodTypeProvider,
 } from '@mtpk/shared';
 import { darkVars } from '@mtpk/content-kit/dark';
+import { stylesRevision } from '@mtpk/content-kit/styles';
 import { createDb } from '@mtpk/db';
 import { dropVariants, encodeWebpCopy, getVariant, noWebpMarker, pickFormat, readAll, snapWidth, VARIANT_SOURCE } from './variants.ts';
 
@@ -95,17 +96,17 @@ async function versionOf(key: string): Promise<string | null> {
 /**
  * Стили статей Практикума — с тёмной темой: их цвета (и свои переменные статей, --ink: …)
  * получают тёмные значения, как стили страниц сайта (content-kit/src/dark.ts). Готовый CSS
- * держится в памяти по версии файла; ETag — с ревизией обработки. Адрес у файла без версии,
- * поэтому кеш короткий: правка статьи и смена обработки доходят до браузеров за час.
+ * держится в памяти по версии файла; ETag — с ревизией обработки (content-kit, stylesRevision: правка
+ * dark.ts меняет её сама). Сайт добавляет к адресу версию сборки (lib/site-chrome.tsx), кеш — как у
+ * остальных файлов (cacheControlFor): правка стилей статьи в медиатеке доходит до браузеров за минуты.
  */
 const PRAKTIKUM_CSS = /^praktikum\/.+\.css$/i;
-const DARK_REVISION = 'dk1';
 const darkCss = new Map<string, { etag: string; body: Buffer }>();
 
 async function praktikumCss(key: string): Promise<{ etag: string; body: Buffer } | null> {
   const version = await versionOf(key);
   if (version === null) return null;
-  const etag = `"${version}-${DARK_REVISION}"`;
+  const etag = `"${version}-${stylesRevision()}"`;
   const ready = darkCss.get(key);
   if (ready?.etag === etag) return ready;
   const source = (await readAll((await getObject(s3, bucket, key)).Body)).toString('utf8');
@@ -114,10 +115,14 @@ async function praktikumCss(key: string): Promise<{ etag: string; body: Buffer }
   return entry;
 }
 
+/**
+ * Кеш файлов: браузер и шлюз отдают сохранённую копию сразу, а через 5 минут перепроверяют её
+ * у сервиса фоном (ETag → 304, без повторной загрузки). Файл, заменённый в медиатеке под тем же
+ * именем, у всех обновляется сам — чистить кеш не нужно.
+ */
 function cacheControlFor(key: string): string {
-  if (/\.(png|jpe?g|webp|avif|gif|svg|ico|woff2?|ttf|mp4|webm)$/i.test(key)) return 'public, max-age=2592000';
-  if (/\.css$/i.test(key)) return 'public, max-age=604800';
-  return 'public, max-age=86400';
+  if (/\.(png|jpe?g|webp|avif|gif|svg|ico|woff2?|ttf|mp4|webm)$/i.test(key)) return 'public, max-age=300, stale-while-revalidate=2592000';
+  return 'public, max-age=300, stale-while-revalidate=604800';
 }
 
 function toKey(urlPath: string): string | null {
@@ -334,7 +339,7 @@ await startService({
         try {
           const css = await praktikumCss(key);
           if (!css) return reply.code(404).type('text/plain').send('Not Found');
-          reply.header('Cache-Control', 'public, max-age=3600');
+          reply.header('Cache-Control', cacheControlFor(key));
           reply.header('ETag', css.etag);
           if (req.headers['if-none-match'] === css.etag) return reply.code(304).send();
           reply.header('Content-Type', 'text/css; charset=utf-8');
@@ -353,10 +358,15 @@ await startService({
         try {
           const version = await versionOf(key);
           if (version === null) return reply.code(404).type('text/plain').send('Not Found');
-          const variant = await getVariant(s3, bucket, key, width, pickFormat(String(req.headers.accept ?? ''), key), version);
+          const format = pickFormat(String(req.headers.accept ?? ''), key);
+          // версия копии — версия исходника, ширина и формат: перепроверка браузером и шлюзом — 304 без загрузки
+          const etag = `"${version}-w${width}-${format}"`;
           reply.header('Vary', 'Accept');
+          reply.header('Cache-Control', cacheControlFor(key));
+          reply.header('ETag', etag);
+          if (req.headers['if-none-match'] === etag) return reply.code(304).send();
+          const variant = await getVariant(s3, bucket, key, width, format, version);
           reply.header('Content-Type', variant.contentType);
-          reply.header('Cache-Control', 'public, max-age=2592000');
           reply.header('Content-Length', variant.body.length);
           return reply.send(req.method === 'HEAD' ? undefined : variant.body);
         } catch (err) {

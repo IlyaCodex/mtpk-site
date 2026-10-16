@@ -2,7 +2,7 @@ import { walkBlocks, type ActiveHoliday, type Block, type SiteSettings } from '@
 import type { SiteDataDto } from '@mtpk/shared/contracts';
 import type { HeadPage } from '@/components/SiteHead';
 import { clientModuleUrl, type ClientModule } from './assets';
-import { PAGE_SCRIPT_VERSIONS } from './site';
+import { versioned } from './versions';
 
 /**
  * Данные страницы для шаблона документа (_document): <head> и скрипты
@@ -53,5 +53,6 @@ export function pageModules(blocks: Block[], holiday: ActiveHoliday | null = nul
 
 /** Старые скрипты для блоков «HTML как есть» (решает контент-сервис по их разметке). */
 export function legacyScripts(features: string[]): string[] {
-  return features.map((name) => `/js/${name}.js?v=${PAGE_SCRIPT_VERSIONS[name] ?? '1'}`);
+  // версия в адресе — хеш файла (считает сборка): новый скрипт браузер возьмёт сам
+  return features.map((name) => versioned(`/js/${name}.js`));
 }
