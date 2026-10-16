@@ -11,12 +11,14 @@ export const DEFAULT_SITE = 'https://uralinduktor.ru';
 //   запчасти   <div class="breadcrumbs"> …  последний <span> без класса
 //   проекты    <div class="ui-crumb">    …  <span class="ui-crumb-current">
 //   транзисторные запчасти <nav class="tr-crumbs">
+//   электромагниты, доп оборудование <nav class="crumbs">, тигли <nav class="uc-breadcrumbs"> (пакеты 09.10.2026)
 export function breadcrumbInner(html: string): string | null {
   for (const re of [
     /<nav\s+class="breadcrumb[^"]*"[^>]*>([\s\S]*?)<\/nav>/,
     /<div\s+class="breadcrumbs"[^>]*>([\s\S]*?)<\/div>/,
     /<div\s+class="ui-crumb"[^>]*>([\s\S]*?)<\/div>/,
     /<nav\s+class="tr-crumbs"[^>]*>([\s\S]*?)<\/nav>/,
+    /<nav\s+class="(?:crumbs|uc-breadcrumbs)"[^>]*>([\s\S]*?)<\/nav>/,
   ]) {
     const m = html.match(re);
     if (m) return m[1];

@@ -210,6 +210,9 @@
    Заявка (leadgen — компонент и HTML-блоки): пункты с отметками слева,
    форма карточкой справа
    ============================================================ */
+/* фон и поля секции — свои у шаблонов (hub-catalog, landing…); где шаблон их не задаёт (страницы пакетов) —
+   эти, :where — без веса, правила шаблонов главнее */
+:where(.leadgen) { position: relative; padding: clamp(64px, 8vw, 96px) 0; background: var(--surface-subtle); }
 .leadgen::before,
 .leadgen::after { display: none; }
 .leadgen .container { position: relative; }
@@ -926,7 +929,7 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
 :is(.zp, .zapchasti-page, .ui-transistor-site) .qty button:hover { background: var(--surface-muted); color: var(--text-primary); }
 :is(.zp, .zapchasti-page, .ui-transistor-site) .qty input { width: 46px; height: auto; padding: 0; border: 0; background: transparent; font-family: var(--font-display); font-size: 16px; font-weight: var(--fw-semibold); text-align: center; color: var(--text-primary); }
 :is(.zp, .zapchasti-page, .ui-transistor-site) :is(.request-actions, .selection-panel, .tr-selection-box) > .button,
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form .button {
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -943,7 +946,7 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   transition: background-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
 }
 :is(.zp, .zapchasti-page, .ui-transistor-site) :is(.request-actions, .selection-panel, .tr-selection-box) > .button:hover,
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form .button:hover { box-shadow: var(--btn-green-glow-hover); transform: translateY(-2px); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form .button:hover { box-shadow: var(--btn-green-glow-hover); transform: translateY(-2px); }
 :is(.zp, .zapchasti-page, .ui-transistor-site) .request-actions > .button { flex: 1; min-width: 0; }
 :is(.zp, .zapchasti-page, .ui-transistor-site) .button > span { display: inline-block; transition: transform var(--duration-fast) var(--ease-out); }
 :is(.zp, .zapchasti-page, .ui-transistor-site) .button:hover > span { transform: translate(2px, -2px); }
@@ -1015,7 +1018,7 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
 .ui-transistor-site .tr-gallery figcaption { padding: 12px 16px; border-top: 1px solid var(--border-subtle); font-size: 14px; font-weight: var(--fw-medium); color: var(--text-primary); }
 
 /* вопросы — общим блоком сайта (components.css); абзацы шаблонов на ответ не влияют */
-:is(.zp, .zapchasti-page, .ui-transistor-site) .faq__item > p.faq__answer { margin: 0; font-size: 16px; line-height: 1.7; color: var(--text-secondary); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .faq__item > p.faq__answer { margin: 0; font-size: 16px; line-height: 1.7; color: var(--text-secondary); }
 /* у хабов запчастей — своим разделом под колонками «текст / Поможем с подбором» */
 :is(.zp, .zapchasti-page) .spare-faq { margin-top: clamp(48px, 5vw, 72px); }
 :is(.zp, .zapchasti-page) .spare-faq > h2 { margin: 0 0 20px; font-family: var(--font-display); font-size: clamp(24px, 2vw, 30px); font-weight: var(--fw-bold); line-height: 1.2; letter-spacing: -0.02em; color: var(--text-primary); }
@@ -1068,7 +1071,7 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
 .ui-transistor-site .tr-category--text:hover > span { background: var(--green-500); color: #ffffff; }
 
 /* окна: заявка и фото — над размытым затемнением, проявляются плавно (класс is-open — client/spare.ts) */
-:is(.zp, .zapchasti-page, .ui-transistor-site) :is(.request-dialog, .image-dialog) {
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) :is(.request-dialog, .image-dialog) {
   max-width: none;
   border: 1px solid var(--border-subtle);
   border-radius: 24px;
@@ -1079,17 +1082,17 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   transform: translateY(18px) scale(0.98);
   transition: opacity var(--duration-base) var(--ease-out), transform var(--duration-slow) var(--ease-out);
 }
-:is(.zp, .zapchasti-page, .ui-transistor-site) :is(.request-dialog, .image-dialog).is-open { opacity: 1; transform: none; }
-:is(.zp, .zapchasti-page, .ui-transistor-site) :is(.request-dialog, .image-dialog)::backdrop {
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) :is(.request-dialog, .image-dialog).is-open { opacity: 1; transform: none; }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) :is(.request-dialog, .image-dialog)::backdrop {
   background: rgba(6, 18, 24, 0.55);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
   backdrop-filter: blur(12px) saturate(140%);
   opacity: 0;
   transition: opacity 250ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-:is(.zp, .zapchasti-page, .ui-transistor-site) :is(.request-dialog, .image-dialog).is-open::backdrop { opacity: 1; }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-dialog { width: min(640px, calc(100% - 32px)); max-height: min(92vh, 900px); padding: 32px; overflow: auto; overscroll-behavior: contain; }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .dialog-close {
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) :is(.request-dialog, .image-dialog).is-open::backdrop { opacity: 1; }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-dialog { width: min(640px, calc(100% - 32px)); max-height: min(92vh, 900px); padding: 32px; overflow: auto; overscroll-behavior: contain; }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .dialog-close {
   position: absolute;
   top: 20px;
   right: 20px;
@@ -1108,8 +1111,8 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   color: var(--text-tertiary);
   transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-base) var(--ease-out);
 }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .dialog-close:hover { background: var(--surface-muted); color: var(--text-primary); transform: rotate(90deg); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .dialog-eyebrow {
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .dialog-close:hover { background: var(--surface-muted); color: var(--text-primary); transform: rotate(90deg); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .dialog-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1124,12 +1127,12 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   text-transform: uppercase;
   color: var(--green-700);
 }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .dialog-eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green-500); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-dialog h2 { margin: 16px 48px 10px 0; font-family: var(--font-display); font-size: clamp(24px, 3vw, 30px); font-weight: var(--fw-bold); line-height: 1.2; letter-spacing: -0.02em; color: var(--text-primary); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-dialog h2 + p { margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: var(--text-secondary); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 14px; }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form label { display: flex; flex-direction: column; gap: 7px; margin: 0; font-size: 13px; font-weight: var(--fw-semibold); color: var(--text-secondary); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form :is(input:not([type="checkbox"], [type="file"], [type="hidden"], .hp-field), textarea) {
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .dialog-eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green-500); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-dialog h2 { margin: 16px 48px 10px 0; font-family: var(--font-display); font-size: clamp(24px, 3vw, 30px); font-weight: var(--fw-bold); line-height: 1.2; letter-spacing: -0.02em; color: var(--text-primary); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-dialog h2 + p { margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: var(--text-secondary); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 14px; }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form label { display: flex; flex-direction: column; gap: 7px; margin: 0; font-size: 13px; font-weight: var(--fw-semibold); color: var(--text-secondary); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form :is(input:not([type="checkbox"], [type="file"], [type="hidden"], .hp-field), textarea) {
   width: 100%;
   max-width: none;
   height: 48px;
@@ -1143,12 +1146,12 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   color: var(--text-primary);
   transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
 }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form textarea { height: auto; min-height: 96px; padding: 12px 14px; line-height: 1.5; resize: vertical; }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form :is(input, textarea)::placeholder { color: var(--text-tertiary); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form :is(input:not([type="checkbox"], [type="file"]), textarea):focus { border-color: var(--green-500); outline: none; box-shadow: 0 0 0 4px rgba(79, 171, 58, 0.16); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form textarea { height: auto; min-height: 96px; padding: 12px 14px; line-height: 1.5; resize: vertical; }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form :is(input, textarea)::placeholder { color: var(--text-tertiary); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form :is(input:not([type="checkbox"], [type="file"]), textarea):focus { border-color: var(--green-500); outline: none; box-shadow: 0 0 0 4px rgba(79, 171, 58, 0.16); }
 /* «Фото или чертёж» — зона загрузки: поле выбора файла прозрачное и лежит поверх подписи (audit-fixes),
    имя выбранного файла подпись получает от client/forms.ts (класс is-attached) */
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form label:has(> input[type="file"]) {
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form label:has(> input[type="file"]) {
   --spare-upload: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12'/%3E%3C/svg%3E");
   position: relative;
   flex-direction: row;
@@ -1167,7 +1170,7 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   cursor: pointer;
   transition: border-color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
 }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form label:has(> input[type="file"])::before {
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form label:has(> input[type="file"])::before {
   content: "";
   flex-shrink: 0;
   width: 20px;
@@ -1176,16 +1179,16 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   -webkit-mask: var(--spare-upload) center / contain no-repeat;
   mask: var(--spare-upload) center / contain no-repeat;
 }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form label:has(> input[type="file"])::after { content: "PDF, JPG, PNG, DWG, DXF — до 10 МБ"; width: 100%; font-size: 12px; font-weight: var(--fw-regular); color: var(--text-tertiary); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form label:has(> input[type="file"]):hover { border-color: var(--green-500); background: var(--green-50); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form label.is-attached:has(> input[type="file"]) { border-style: solid; border-color: var(--green-500); background: var(--green-50); color: var(--green-700); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form label.is-attached:has(> input[type="file"])::after { content: "Файл приложен — можно выбрать другой"; }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form .consent { flex-direction: row; align-items: flex-start; gap: 10px; font-size: 13px; font-weight: var(--fw-regular); line-height: 1.5; color: var(--text-secondary); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form .consent a { color: var(--text-brand); }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .request-form .button { width: 100%; min-height: 54px; margin-top: 4px; }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .image-dialog { --dk-bg-ffffff: #ffffff; width: min(1100px, calc(100% - 32px)); max-height: 94vh; padding: 28px; }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .image-dialog img { width: 100%; height: min(74vh, 760px); border-radius: 16px; background: #ffffff; object-fit: contain; }
-:is(.zp, .zapchasti-page, .ui-transistor-site) .image-dialog p { margin: 14px 48px 0; font-size: 14px; line-height: 1.5; text-align: center; color: var(--text-secondary); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form label:has(> input[type="file"])::after { content: "PDF, JPG, PNG, DWG, DXF — до 10 МБ"; width: 100%; font-size: 12px; font-weight: var(--fw-regular); color: var(--text-tertiary); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form label:has(> input[type="file"]):hover { border-color: var(--green-500); background: var(--green-50); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form label.is-attached:has(> input[type="file"]) { border-style: solid; border-color: var(--green-500); background: var(--green-50); color: var(--green-700); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form label.is-attached:has(> input[type="file"])::after { content: "Файл приложен — можно выбрать другой"; }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form .consent { flex-direction: row; align-items: flex-start; gap: 10px; font-size: 13px; font-weight: var(--fw-regular); line-height: 1.5; color: var(--text-secondary); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form .consent a { color: var(--text-brand); }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form .button { width: 100%; min-height: 54px; margin-top: 4px; }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .image-dialog { --dk-bg-ffffff: #ffffff; width: min(1100px, calc(100% - 32px)); max-height: 94vh; padding: 28px; }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .image-dialog img { width: 100%; height: min(74vh, 760px); border-radius: 16px; background: #ffffff; object-fit: contain; }
+:is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .image-dialog p { margin: 14px 48px 0; font-size: 14px; line-height: 1.5; text-align: center; color: var(--text-secondary); }
 
 @media (max-width: 1024px) {
   :is(.zp, .zapchasti-page, .ui-transistor-site) :is(.product-detail-grid, .tr-detail-grid) { grid-template-columns: minmax(0, 1fr); }
@@ -1198,7 +1201,7 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   :is(.zp, .zapchasti-page, .ui-transistor-site) :is(.product-photo, .tr-product-photo > a) { flex: none; min-height: 0; aspect-ratio: 4 / 3; }
 }
 @media (max-width: 760px) {
-  :is(.zp, .zapchasti-page, .ui-transistor-site) .faq__item > p.faq__answer { font-size: 15px; }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .faq__item > p.faq__answer { font-size: 15px; }
 }
 @media (max-width: 640px) {
   :is(.zp, .zapchasti-page, .ui-transistor-site) .product-page { padding-block: var(--sp-4) var(--sp-12); }
@@ -1228,13 +1231,13 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   :is(.zp, .zapchasti-page, .ui-transistor-site) .spec-table :is(th, td) { display: block; width: auto; padding: 0; border: 0; background: none; font-size: 15px; }
   :is(.zp, .zapchasti-page, .ui-transistor-site) .spec-table th { margin-bottom: 4px; font-size: 12px; font-weight: var(--fw-semibold); letter-spacing: 0.04em; text-transform: uppercase; }
   /* окно заявки — снизу во всю ширину */
-  :is(.zp, .zapchasti-page, .ui-transistor-site) .request-dialog { width: 100%; max-height: 92dvh; margin: auto 0 0; padding: 24px 18px calc(18px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; transform: translateY(32px); }
-  :is(.zp, .zapchasti-page, .ui-transistor-site) .request-dialog.is-open { transform: none; }
-  :is(.zp, .zapchasti-page, .ui-transistor-site) .request-dialog h2 { margin-right: 44px; font-size: 24px; }
-  :is(.zp, .zapchasti-page, .ui-transistor-site) .dialog-close { top: 16px; right: 16px; }
-  :is(.zp, .zapchasti-page, .ui-transistor-site) .request-form { grid-template-columns: minmax(0, 1fr); gap: 14px; }
-  :is(.zp, .zapchasti-page, .ui-transistor-site) .image-dialog { padding: 16px; border-radius: 20px; }
-  :is(.zp, .zapchasti-page, .ui-transistor-site) .image-dialog img { height: 62vh; }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-dialog { width: 100%; max-height: 92dvh; margin: auto 0 0; padding: 24px 18px calc(18px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; transform: translateY(32px); }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-dialog.is-open { transform: none; }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-dialog h2 { margin-right: 44px; font-size: 24px; }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .dialog-close { top: 16px; right: 16px; }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .request-form { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .image-dialog { padding: 16px; border-radius: 20px; }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) .image-dialog img { height: 62vh; }
 }
 @media (max-width: 480px) {
   /* количество и кнопка: кнопка в одну строку, не помещается рядом — под количеством во всю ширину */
@@ -1244,7 +1247,7 @@ html[data-theme="dark"] .mrange .mrange__art { opacity: 0.35; }
   :is(.zp, .zapchasti-page, .ui-transistor-site) .qty input { width: 40px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  :is(.zp, .zapchasti-page, .ui-transistor-site) :is(.request-dialog, .image-dialog),
-  :is(.zp, .zapchasti-page, .ui-transistor-site) :is(.request-dialog, .image-dialog)::backdrop { transition: none; }
-  :is(.zp, .zapchasti-page, .ui-transistor-site) :is(.request-dialog, .image-dialog) { transform: none; }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) :is(.request-dialog, .image-dialog),
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) :is(.request-dialog, .image-dialog)::backdrop { transition: none; }
+  :is(.zp, .zapchasti-page, .ui-transistor-site, .uc) :is(.request-dialog, .image-dialog) { transform: none; }
 }

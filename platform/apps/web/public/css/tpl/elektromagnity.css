@@ -1,0 +1,219 @@
+/* ============================================================
+   Грузоподъёмные электромагниты — /products/gruzopodemnye-elektromagnity/ (раздел и 6 страниц).
+   Разметка — из пакета «ГРУЗОПОДЪЁМНЫЕ-ЭЛЕКТРОМАГНИТЫ» (v2, 09.10.2026), обёртка .ui-magnets;
+   оформление — сайта: шрифты, карточки, таблицы, кнопки (base-layout.css), светлая подложка фото.
+   Вопросы и форма заявки — блоками сайта («Частые вопросы», «Подбор и расчёт») после статьи.
+   Статья — во всю ширину со светлым фоном (фон body сайта тёмный), ширина текста — у вложенного .container.
+   ============================================================ */
+.ui-magnets { background: var(--surface-page); padding-top: var(--sp-6); padding-bottom: var(--sp-12); font-family: var(--font-body); font-size: 16px; line-height: 1.7; color: var(--text-secondary); }
+.ui-magnets * { box-sizing: border-box; }
+.ui-magnets :is(h1, h2, h3) { margin: 0 0 16px; font-family: var(--font-display); font-weight: var(--fw-bold); line-height: 1.2; letter-spacing: -0.02em; color: var(--text-primary); overflow-wrap: break-word; }
+.ui-magnets h1 { margin-bottom: 18px; font-size: clamp(30px, 3.2vw, 46px); line-height: 1.1; letter-spacing: -0.025em; }
+.ui-magnets h2 { font-size: clamp(24px, 2.2vw, 32px); }
+.ui-magnets h3 { font-size: 20px; letter-spacing: -0.01em; }
+.ui-magnets p { margin: 0 0 16px; }
+.ui-magnets :is(ul, ol) { margin: 12px 0 20px; padding-left: 22px; }
+.ui-magnets li { margin-bottom: 8px; }
+.ui-magnets li::marker { color: var(--green-600); }
+.ui-magnets strong { color: var(--text-primary); }
+.ui-magnets a { color: var(--text-brand); text-underline-offset: 3px; }
+.ui-magnets a:hover { color: var(--green-700); }
+.ui-magnets :is(a, summary, .table-wrap):focus-visible { outline: 2px solid var(--green-500); outline-offset: 3px; }
+.ui-magnets img { display: block; max-width: 100%; height: auto; }
+.ui-magnets figure { margin: 0; }
+.ui-magnets figcaption { margin: 12px 4px 0; font-size: 13px; line-height: 1.55; color: var(--text-tertiary); }
+.ui-magnets .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* крошки — как у страниц каталога */
+.ui-magnets .crumbs { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-bottom: var(--sp-8); font-size: 13px; color: var(--text-tertiary); }
+.ui-magnets .crumbs a { color: var(--text-secondary); text-decoration: none; transition: color var(--duration-fast) var(--ease-out); }
+.ui-magnets .crumbs a:hover { color: var(--text-brand); }
+.ui-magnets .crumbs > span[aria-hidden] { color: var(--border-default); }
+
+/* обложка: текст слева, фото на светлой подложке справа */
+.ui-magnets .ui-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 4.5vw, 72px); align-items: center; margin: 0 0 var(--sp-8); }
+.ui-magnets .menu-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 7px 12px 7px 10px;
+  border-radius: 999px;
+  background: var(--green-50);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: var(--fw-bold);
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green-700);
+}
+.ui-magnets .menu-group::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green-500); }
+.ui-magnets .lead { max-width: 60ch; font-size: 18px; line-height: 1.65; color: var(--text-secondary); }
+.ui-magnets .ui-hero-media {
+  --dk-bg-ffffff: #ffffff;
+  --dk-bg-eef2f1: #eef2f1;
+  display: flex;
+  flex-direction: column;
+}
+.ui-magnets .ui-hero-media img {
+  width: 100%;
+  height: clamp(300px, 32vw, 460px);
+  padding: clamp(20px, 3vw, 40px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  background: radial-gradient(120% 95% at 50% 35%, #ffffff 0%, #eef2f1 100%);
+  object-fit: contain;
+  mix-blend-mode: normal;
+}
+.ui-magnets .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.ui-magnets .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  font-family: var(--font-display);
+  font-size: var(--btn-font-size);
+  font-weight: var(--fw-bold);
+  line-height: 1.2;
+  letter-spacing: var(--btn-letter-spacing);
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), box-shadow var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
+}
+.ui-magnets .button:not(.button-outline) { box-shadow: var(--btn-green-glow); }
+.ui-magnets .button:not(.button-outline):hover { box-shadow: var(--btn-green-glow-hover); transform: translateY(-2px); }
+.ui-magnets .button-outline { border: 1.5px solid var(--border-default); background: transparent; color: var(--text-primary); }
+.ui-magnets .button-outline:hover { border-color: var(--green-500); color: var(--text-brand); }
+/* цена и гарантия — строкой с отметкой */
+.ui-magnets .price { display: inline-flex; align-items: center; gap: 10px; margin: 22px 0 0; font-size: 14px; font-weight: var(--fw-medium); color: var(--text-secondary); }
+.ui-magnets .price::before {
+  content: "";
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--green-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233c8e33' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat;
+}
+
+/* содержание страницы — пилюлями */
+.ui-magnets .ui-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 var(--sp-4); padding: 0; border: 0; }
+.ui-magnets .ui-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--surface-page);
+  font-size: 14px;
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+}
+.ui-magnets .ui-nav a:hover { border-color: var(--green-500); background: var(--green-50); color: var(--green-700); }
+
+/* разделы */
+.ui-magnets section { margin-top: clamp(48px, 5vw, 72px); scroll-margin-top: calc(var(--site-header-h, 116px) + var(--sp-4)); }
+.ui-magnets .copy { max-width: 78ch; }
+.ui-magnets section.copy > p, .ui-magnets section > p.copy { color: var(--text-secondary); }
+
+/* карточки семейств и принадлежностей */
+.ui-magnets .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 24px; }
+.ui-magnets .card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0 0 22px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  background: var(--surface-page);
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
+}
+.ui-magnets .card:hover { border-color: var(--green-500); box-shadow: 0 18px 38px -26px rgba(16, 31, 38, 0.35); transform: translateY(-2px); }
+.ui-magnets .card figure {
+  --dk-bg-ffffff: #ffffff;
+  --dk-bg-eef2f1: #eef2f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 230px;
+  margin: 0 0 20px;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: radial-gradient(120% 95% at 50% 35%, #ffffff 0%, #eef2f1 100%);
+}
+.ui-magnets .card img { width: 100%; height: 100%; object-fit: contain; }
+.ui-magnets .card img.source-small { width: auto; max-height: 190px; }
+.ui-magnets .card :is(h3, p, .card-link) { margin-inline: 22px; }
+.ui-magnets .card h3 { margin-bottom: 8px; font-size: 19px; line-height: 1.3; }
+.ui-magnets .card h3 a { color: var(--text-primary); text-decoration: none; }
+/* вся карточка — ссылка заголовка */
+.ui-magnets .card h3 a::after { content: ""; position: absolute; inset: 0; }
+.ui-magnets .card p { margin-bottom: 16px; font-size: 15px; line-height: 1.6; color: var(--text-secondary); }
+.ui-magnets .card-link { position: relative; display: inline-flex; align-items: center; gap: 8px; margin-top: auto; font-size: 14px; font-weight: var(--fw-semibold); color: var(--text-brand); text-decoration: none; }
+.ui-magnets .card-link::after { content: "→"; transition: transform var(--duration-fast) var(--ease-out); }
+.ui-magnets .card:hover .card-link::after { transform: translateX(3px); }
+
+/* таблицы — карточкой */
+.ui-magnets .table-wrap { margin-top: 20px; overflow: auto; overscroll-behavior: contain; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--surface-page); }
+.ui-magnets table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.55; text-align: left; }
+.ui-magnets :is(th, td) { padding: 14px 20px; border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
+.ui-magnets tbody tr:last-child > * { border-bottom: 0; }
+.ui-magnets thead th { background: var(--surface-subtle); font-size: 12px; font-weight: var(--fw-bold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); }
+.ui-magnets tbody td { font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.ui-magnets .specs { min-width: 600px; }
+.ui-magnets .compare { min-width: 640px; }
+.ui-magnets .compare td:first-child { width: 23%; font-weight: var(--fw-semibold); }
+/* «Основные параметры» — название слева, значение справа */
+.ui-magnets .facts { overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 16px; border-collapse: separate; border-spacing: 0; background: var(--surface-page); }
+.ui-magnets .facts th { width: 36%; background: var(--surface-subtle); font-weight: var(--fw-medium); color: var(--text-tertiary); }
+.ui-magnets .facts td { overflow-wrap: anywhere; }
+.ui-magnets .table-note { margin-top: 14px; font-size: 14px; line-height: 1.6; color: var(--text-tertiary); }
+.ui-magnets .table-hint { display: none; margin-bottom: 10px; font-size: 13px; color: var(--text-tertiary); }
+
+/* важное — плашкой с акцентом */
+.ui-magnets .notice { margin-top: 24px; padding: 20px 24px; border: 1px solid var(--border-subtle); border-left: 3px solid var(--green-500); border-radius: 16px; background: var(--surface-subtle); font-size: 15px; line-height: 1.65; }
+.ui-magnets .notice p:last-child { margin-bottom: 0; }
+
+/* поставка и гарантия — две колонки в карточке */
+.ui-magnets .terms { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); padding: clamp(24px, 3.5vw, 40px); border: 1px solid var(--border-subtle); border-radius: 24px; background: var(--surface-subtle); }
+.ui-magnets .terms h2 { margin-bottom: 12px; }
+.ui-magnets .terms h3 { font-size: 20px; }
+.ui-magnets .terms p { font-size: 16px; }
+.ui-magnets .terms p:last-child { margin-bottom: 0; }
+
+.ui-magnets .related-copy { margin-top: var(--sp-8); padding-top: var(--sp-6); border-top: 1px solid var(--border-subtle); font-size: 15px; color: var(--text-tertiary); }
+
+@media (max-width: 1024px) {
+  .ui-magnets .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 860px) {
+  .ui-magnets .ui-hero { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .ui-magnets .ui-hero-media img { height: auto; max-height: 380px; aspect-ratio: 4 / 3; }
+}
+@media (max-width: 640px) {
+  .ui-magnets { padding-top: var(--sp-4); font-size: 15px; }
+  .ui-magnets .crumbs { margin-bottom: var(--sp-5); font-size: 12px; }
+  .ui-magnets h1 { font-size: 28px; }
+  .ui-magnets .lead { font-size: 16px; }
+  .ui-magnets .actions .button { width: 100%; }
+  .ui-magnets .grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .ui-magnets .card figure { height: 210px; }
+  .ui-magnets .terms { grid-template-columns: minmax(0, 1fr); padding: 22px 20px; border-radius: 20px; }
+  .ui-magnets :is(th, td) { padding: 12px 14px; font-size: 14px; }
+  /* «Основные параметры» — строками: название над значением */
+  .ui-magnets .facts, .ui-magnets .facts tbody, .ui-magnets .facts tr { display: block; }
+  .ui-magnets .facts tr { padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); }
+  .ui-magnets .facts tr:last-child { border-bottom: 0; }
+  .ui-magnets .facts :is(th, td) { display: block; width: auto; padding: 0; border: 0; background: none; font-size: 15px; }
+  .ui-magnets .facts th { margin-bottom: 4px; font-size: 12px; font-weight: var(--fw-semibold); letter-spacing: 0.04em; text-transform: uppercase; }
+  .ui-magnets .notice { padding: 16px 18px; }
+  .ui-magnets .table-hint { display: block; }
+}

@@ -54,6 +54,18 @@ picture/
 │   ├── 02_УЗЛЫ_И_КАМЕРЫ/                        # камеры, сопла, поворотные столы
 │   └── 03_КОМПЛЕКТУЮЩИЕ/                        # сопла и клапаны (на сайте пока не используются)
 │
+├── products/gruzopodemnye-elektromagnity/        # пакет «Грузоподъёмные электромагниты» v2 (09.10.2026)
+│   └── *-480.webp, *-900.webp                   # round, oval, pipes, billets, cabinet, reel — в медиатеке
+│                                                # /img/gruzopodemnye-elektromagnity/ (раздел и 6 страниц, корень каталога)
+├── products/dop-oborudovanie/                    # пакет «Доп оборудование» v2 (09.10.2026)
+│   ├── zagruzochnaya-telezhka.webp, relsovaya-elektroplatforma.webp, rukavnyy-filtr.webp
+│   ├── layout.svg, filter-flow.svg              # схемы: планировка загрузки, работа рукавного фильтра
+│   └── *-zapros.txt                             # задания для подбора — в медиатеке /files/dop-oborudovanie/
+│                                                # картинки — /img/dop-oborudovanie/ (3 страницы, корень каталога)
+├── products/zapchasti/tigli/                     # пакет «Тигли» V4.3 (09.10.2026): 18 фото (photo-*.png,
+│                                                # graphite-quartz.png) и 13 схем размеров (dimensions-*.svg) —
+│                                                # в медиатеке /img/crucibles/ (12 страниц, хаб запчастей, корень каталога)
+│
 ├── otzyvy/                                      # благодарственные письма для /otzyvy/
 │   └── *.pdf                                    # 9 оригиналов писем (Desktop/Письма);
 │                                                # страницы отрисованы в /img/reviews/*.webp, 1000px

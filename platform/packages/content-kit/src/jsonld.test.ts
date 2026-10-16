@@ -46,3 +46,21 @@ test('товар: image — только свои фото; без фото по
   assert.equal(noPhoto['@type'], 'Product');
   assert.equal(noPhoto.image, undefined);
 });
+
+test('крошки пакетов 09.10.2026 (nav.crumbs, nav.uc-breadcrumbs): цепочка до текущей страницы', () => {
+  const magnets = `<article class="ui-magnets"><nav class="crumbs" aria-label="Хлебные крошки"><a href="/">Главная</a><span aria-hidden="true">/</span><a href="/products/">Каталог</a><span aria-hidden="true">/</span><span>Доп оборудование</span><span aria-hidden="true">/</span><span>Грузоподъёмные электромагниты</span></nav><h1>Грузоподъёмные электромагниты</h1></article>`;
+  const crumbs = JSON.parse(buildPageJsonLd(magnets, { path: '/products/gruzopodemnye-elektromagnity/', title: 'Электромагниты', description: null })[0]!);
+  assert.equal(crumbs['@type'], 'BreadcrumbList');
+  assert.deepEqual(
+    crumbs.itemListElement.map((i: { name: string; item: string }) => [i.name, i.item]),
+    [
+      ['Главная', 'https://uralinduktor.ru/'],
+      ['Каталог', 'https://uralinduktor.ru/products/'],
+      ['Грузоподъёмные электромагниты', 'https://uralinduktor.ru/products/gruzopodemnye-elektromagnity/'],
+    ],
+  );
+  const tigli = `<article class="uc"><nav class="uc-breadcrumbs" aria-label="Хлебные крошки"><a href="/">Главная</a> / <a href="/products/">Каталог</a> / <a href="/products/zapchasti/">Запчасти</a> / <span aria-current="page">Тигли</span></nav></article>`;
+  const list = JSON.parse(buildPageJsonLd(tigli, { path: '/products/zapchasti/tigli/', title: 'Тигли', description: null })[0]!);
+  assert.equal(list.itemListElement.length, 4);
+  assert.equal(list.itemListElement[3].item, 'https://uralinduktor.ru/products/zapchasti/tigli/');
+});
