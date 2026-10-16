@@ -1,14 +1,12 @@
 /**
  * Иконки каркаса сайта. Контурные 24×24 красятся через color вместе с текстом.
- * Строковые варианты (…_SVG) — для ссылок tel:/mailto:, чьё содержимое
- * выводится сырым HTML (см. ContactLink).
+ * Строковые варианты (…_SVG) — для ссылок mailto:, чьё содержимое выводится
+ * сырым HTML (см. ContactLink). У ссылок tel: значок — в CSS (::before): коллтрекинг
+ * Mango заменяет их содержимое на номер целиком, значок внутри ссылки пропал бы.
  */
 
-const PHONE_PATH =
-  'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z';
 const STROKE = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
 
-export const PHONE_SVG = `<svg class="contact-link__icon" viewBox="0 0 24 24" ${STROKE}><path d="${PHONE_PATH}"></path></svg>`;
 export const MAIL_SVG = `<svg class="contact-link__icon" viewBox="0 0 24 24" ${STROKE}><rect x="3" y="5" width="18" height="14" rx="1"></rect><path d="m3 7 9 6 9-6"></path></svg>`;
 export const FOOTER_MAIL_SVG = `<svg viewBox="0 0 24 24" ${STROKE}><rect x="3" y="5" width="18" height="14" rx="1"></rect><path d="m3 7 9 6 9-6"></path></svg>`;
 

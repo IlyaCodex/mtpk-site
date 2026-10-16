@@ -26,26 +26,32 @@ const CONTACTS: ContactItem[] = [
   { icon: 'clock', label: 'График работы', value: 'Пн&nbsp;—&nbsp;Пт, 9:00&nbsp;—&nbsp;18:00', meta: 'МСК+2 · время ЕКБ' },
 ];
 
-/** Строка контакта: значок, подпись, значение, пояснение; телефон и почта — ссылки. */
+/**
+ * Строка контакта: значок, подпись, значение, пояснение. Ссылка (tel:, mailto:) — только само значение,
+ * растянутое на всю строку (components.css): коллтрекинг Mango заменяет содержимое ссылки на номер целиком,
+ * и значок с подписью и пояснением пропадали. Номер — обычными пробелами (не переносится стилями): так его
+ * находит и подменяет в тексте сам виджет.
+ */
 function Item({ icon, label, value, meta, href }: ContactItem) {
-  const body = (
-    <>
+  return (
+    <div className="bo-item">
       <span className="bo-item__icon">
         <Icon name={icon} />
       </span>
       <span className="bo-item__body">
         <span className="bo-item__label">{label}</span>
-        <span className="bo-item__value" dangerouslySetInnerHTML={{ __html: value }} />
+        {href ? (
+          <a
+            className="bo-item__value"
+            href={href}
+            dangerouslySetInnerHTML={{ __html: href.startsWith('tel:') ? value.replace(/&nbsp;/g, ' ') : value }}
+          />
+        ) : (
+          <span className="bo-item__value" dangerouslySetInnerHTML={{ __html: value }} />
+        )}
         {meta !== undefined && <span className="bo-item__meta">{meta}</span>}
       </span>
-    </>
-  );
-  return href ? (
-    <a className="bo-item" href={href}>
-      {body}
-    </a>
-  ) : (
-    <div className="bo-item">{body}</div>
+    </div>
   );
 }
 

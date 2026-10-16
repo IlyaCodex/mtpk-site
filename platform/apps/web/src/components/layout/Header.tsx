@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import type { NavItem, SiteSettings } from '@mtpk/content-model';
 import { ContactLink } from './ContactLink';
 import { QuickCallForm } from '@mtpk/ui';
-import { ClockIcon, MAIL_SVG, MaxLogo, MenuIcon, PHONE_SVG, SearchIcon, TelegramLogo, ThemeIcons } from './icons';
+import { ClockIcon, MAIL_SVG, MaxLogo, MenuIcon, SearchIcon, TelegramLogo, ThemeIcons } from './icons';
 import { HEADER_LOGO, Logo } from './Logo';
 
 /**
@@ -28,7 +28,6 @@ export function Header({ settings, activeNav }: { settings: SiteSettings; active
                 href={phone.href}
                 className={phone.local ? 'contact-link contact-link--phone contact-link--phone-local' : 'contact-link contact-link--phone'}
                 aria-label={phone.label}
-                icon={PHONE_SVG}
                 text={phone.text}
               />
             </Fragment>

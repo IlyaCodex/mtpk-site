@@ -145,7 +145,7 @@ html[data-theme="dark"][data-btn-outline] .btn--secondary { color: var(--design-
 }
 .bo-info__list { display: flex; flex-direction: column; gap: var(--sp-6); margin: 0; padding: 0; list-style: none; }
 .bo-info__group { padding-top: var(--sp-6); border-top: 1px solid var(--border-subtle); }
-.bo-item { display: flex; align-items: flex-start; gap: var(--sp-5); color: inherit; text-decoration: none; }
+.bo-item { position: relative; display: flex; align-items: flex-start; gap: var(--sp-5); color: inherit; text-decoration: none; }
 .bo-item__icon { display: inline-flex; flex-shrink: 0; margin-top: 4px; color: var(--text-brand); }
 .bo-item__icon svg { width: 30px; height: 30px; }
 .bo-item__body { display: flex; min-width: 0; flex-direction: column; }
@@ -161,7 +161,14 @@ html[data-theme="dark"][data-btn-outline] .btn--secondary { color: var(--design-
 }
 .bo-info__group .bo-item__value { font-size: 18px; }
 .bo-item__meta { margin-top: 2px; font-size: 13px; color: var(--text-tertiary); }
-a.bo-item:hover .bo-item__value { color: var(--green-700); }
+/* ссылка — только значение (номер, почта), растянута на всю строку: коллтрекинг Mango заменяет содержимое
+   ссылки целиком, а значок, подпись и пояснение остаются на месте. Длинное значение (подменённая почта
+   info+…@) не переносится — скрипт страницы уменьшает его по ширине (client/page.ts) */
+a.bo-item__value { display: block; white-space: nowrap; overflow-wrap: normal; text-decoration: none; }
+a.bo-item__value::after { content: ""; position: absolute; inset: 0; }
+a.bo-item__value:hover { color: var(--green-700); }
+a.bo-item__value:focus-visible { outline: none; }
+.bo-item:has(a.bo-item__value:focus-visible) { outline: 2px solid var(--green-600); outline-offset: 4px; border-radius: 8px; }
 /* карточка справа — во всю колонку, до правого края контента (как остальные блоки);
    декор за ней выглядывает из-за верхнего правого угла: светлое пятно и значок документов */
 .bo-panel { position: relative; }

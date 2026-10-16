@@ -1,6 +1,6 @@
 import { maskPhone } from '@mtpk/ui/browser/phone';
 import { addQuoteItem } from '@mtpk/ui/browser/quote-store';
-import { $, delegate, reducedMotion } from './dom';
+import { $, $$, delegate, reducedMotion } from './dom';
 
 /** Формы заявок: у всех есть data-form (у старых из «HTML как есть» — ещё и .js-lead-form). */
 const LEAD_FORM = 'form[data-form], form.js-lead-form';
@@ -42,6 +42,38 @@ function scrollToQuoteForm(): void {
   else location.hash = 'leadgen';
 }
 
+/**
+ * Значение контакта в карточке (номер, почта) — в одну строку и целиком: если не влезает по ширине
+ * (почту коллтрекинг Mango подменяет длинной info+…@, номер — своим), шрифт уменьшается до влезания.
+ * Сразу, после подмены (MutationObserver), загрузки шрифтов и смены ширины окна.
+ */
+const FIT_VALUES = '.kt-method__value, a.bo-item__value';
+
+function fitValue(el: HTMLElement): void {
+  el.style.removeProperty('font-size');
+  let size = Number.parseFloat(getComputedStyle(el).fontSize);
+  while (el.scrollWidth > el.clientWidth + 1 && size > 12) {
+    size -= 1;
+    el.style.fontSize = `${size}px`;
+  }
+}
+
+function initFitValues(): void {
+  const values = $$(FIT_VALUES);
+  if (!values.length) return;
+  const run = () => values.forEach(fitValue);
+  run();
+  // наблюдаем только текст: своя правка размера (атрибут style) повторно наблюдатель не будит
+  const observer = new MutationObserver(run);
+  for (const el of values) observer.observe(el, { childList: true, characterData: true, subtree: true });
+  void document.fonts?.ready.then(run);
+  let timer = 0;
+  window.addEventListener('resize', () => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(run, 150);
+  });
+}
+
 /** Карта под «щитом» активна, пока курсор над ней: увели — щит снова на месте. */
 function unlockMap(shield: HTMLElement): void {
   shield.classList.add('is-hidden');
@@ -52,7 +84,8 @@ function unlockMap(shield: HTMLElement): void {
  * Поведение страницы, общее для всех блоков: «Запросить цену» копит позиции
  * и ведёт к форме заявки; якорь на секцию с формой скроллит к самой форме;
  * маска телефона во всех полях type=tel; карта-виджет за «щитом» (.geo__map-shield:
- * колесо мыши над ней прокручивает страницу) — по клику или Enter.
+ * колесо мыши над ней прокручивает страницу) — по клику или Enter; значения контактов
+ * в карточках — по ширине (после подмены коллтрекингом).
  */
 export function initPage(): void {
   (window as Window & { uiScrollToForm?: typeof scrollToForm }).uiScrollToForm = scrollToForm;
@@ -74,6 +107,8 @@ export function initPage(): void {
       history.replaceState(null, '', href);
     }
   });
+
+  initFitValues();
 
   delegate('click', '.geo__map-shield', (shield) => unlockMap(shield));
   delegate('keydown', '.geo__map-shield', (shield, e) => {

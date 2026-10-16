@@ -94,7 +94,8 @@ export function Drawer({ settings }: { settings: SiteSettings }) {
       <div className="nav-drawer__contacts">
         <div className="nav-drawer__contacts-label">Связаться</div>
         {contacts.phones.map((phone) => (
-          <ContactLink key={phone.href} href={phone.href} icon={contactIcon(DRAWER_ICONS.contacts)} text={phone.text} />
+          // значок телефона — в CSS (::before): коллтрекинг Mango заменяет содержимое ссылки на номер целиком
+          <ContactLink key={phone.href} href={phone.href} className="nav-drawer__phone" text={phone.text} />
         ))}
         <ContactLink href={`mailto:${contacts.email}`} icon={contactIcon(DRAWER_ICONS.mail)} text={contacts.email} />
       </div>
