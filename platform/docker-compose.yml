@@ -115,6 +115,9 @@ services:
     environment:
       <<: *node-env
       ADMIN_LOGIN_TOKEN: ${ADMIN_LOGIN_TOKEN:?задайте ADMIN_LOGIN_TOKEN}
+      # главный администратор: учётка создаётся или приводится к ним при запуске (apps/admin/src/lib/main-admin.ts)
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       # ссылки «открыть на сайте» и стили предпросмотра в браузере — публичный адрес
       PUBLIC_SITE_URL: ${SITE_URL:-https://uralinduktor.ru}
       ADMIN_SECURE_COOKIE: "true"

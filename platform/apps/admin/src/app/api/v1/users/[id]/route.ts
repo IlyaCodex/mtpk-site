@@ -4,6 +4,7 @@ import { jsonError, route } from '@/lib/api';
 import { audit } from '@/lib/audit';
 import { ROLES, revokeUserSessions } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { isMainAdmin } from '@/lib/main-admin';
 import { hashPassword, passwordProblem } from '@/lib/password';
 import { publicUser } from '@/lib/users';
 
@@ -28,6 +29,9 @@ export const PUT = route<Ctx>('users', async (req, user, ctx) => {
   const input = updateInput.parse(await req.json());
   const target = await db().user.findUnique({ where: { id } });
   if (!target) return jsonError(404, 'not_found');
+  // главный администратор задан в .env: пароль, роль и доступ — только там (lib/main-admin.ts)
+  if (isMainAdmin(target.email) && (input.password || (input.role && input.role !== 'admin') || input.active === false))
+    return jsonError(409, 'main_admin', { message: 'Главный администратор задаётся в .env (ADMIN_EMAIL, ADMIN_PASSWORD): пароль и доступ меняются там' });
   const demoting = target.role === 'admin' && ((input.role && input.role !== 'admin') || input.active === false);
   if (demoting && (await isLastAdmin(id))) return jsonError(409, 'last_admin', { message: 'Это последний администратор' });
 
@@ -53,6 +57,7 @@ export const DELETE = route<Ctx>('users', async (_req, user, ctx) => {
   if (!Number.isInteger(id)) return jsonError(404, 'not_found');
   const target = await db().user.findUnique({ where: { id } });
   if (!target) return jsonError(404, 'not_found');
+  if (isMainAdmin(target.email)) return jsonError(409, 'main_admin', { message: 'Главного администратора (из .env) удалить нельзя' });
   if (target.role === 'admin' && (await isLastAdmin(id))) return jsonError(409, 'last_admin', { message: 'Это последний администратор' });
   await db().user.delete({ where: { id } });
   await revokeUserSessions(id);

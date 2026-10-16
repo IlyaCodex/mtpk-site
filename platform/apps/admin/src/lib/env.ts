@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+/** Пустая переменная («ADMIN_EMAIL=») — как не заданная. */
+const blank = (v: unknown) => (typeof v === 'string' && v.trim() === '' ? undefined : v);
+
 /** Переменные окружения админки (локально — platform/.env, см. next.config.ts). */
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -9,6 +12,9 @@ const schema = z.object({
   ADMIN_TOKEN: z.string().min(8),
   /** секрет ссылки входа /admin/login?token=… (см. lib/gate.ts) */
   ADMIN_LOGIN_TOKEN: z.string().min(24),
+  /** главный администратор: e-mail (логин) и пароль — учётка создаётся или приводится к ним при запуске (lib/main-admin.ts) */
+  ADMIN_EMAIL: z.preprocess(blank, z.string().trim().toLowerCase().email().optional()),
+  ADMIN_PASSWORD: z.preprocess(blank, z.string().min(10, 'пароль главного администратора — не короче 10 символов').optional()),
   CONTENT_URL: z.string().default('http://127.0.0.1:4101'),
   LEADS_URL: z.string().default('http://127.0.0.1:4102'),
   SEARCH_URL: z.string().default('http://127.0.0.1:4103'),
