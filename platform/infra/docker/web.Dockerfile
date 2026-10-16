@@ -25,7 +25,8 @@ COPY tsconfig.base.json tsconfig.json ./
 COPY packages packages
 COPY apps/web apps/web
 # Сборка не обращается к сервисам: страницы рендерятся по первому запросу (ISR)
-RUN npm run build -w @mtpk/web
+# клиент Prisma (packages/db) — в проверку типов сайта попадают общие пакеты, как у админки
+RUN npm run generate -w @mtpk/db && npm run build -w @mtpk/web
 
 FROM ${NODE_IMAGE} AS runtime
 WORKDIR /app
