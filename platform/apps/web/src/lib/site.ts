@@ -24,7 +24,7 @@ export const PAGE_SCRIPT_VERSIONS: Record<string, string> = {
   compare: '20260923b',
   'catalog-filter': '20260601-3',
   'spec-tabs': '20260608-2',
-  'zapchasti-catalog': '20260918c',
+  'zapchasti-catalog': '20261016a',
   'zapchasti-tranzistornye': '20260918',
   projects: '20260921a',
   'project-case': '20260921c',

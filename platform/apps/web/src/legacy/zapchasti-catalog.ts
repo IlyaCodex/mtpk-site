@@ -1,9 +1,7 @@
-// Каталог запчастей: фильтры, поиск, сортировка, страницы, диалоги.
+// Каталог запчастей: фильтры, поиск, сортировка, страницы.
 // Взято из прототипа пакета; убраны демо-режим и меню его шапки —
 // шапка и отправка форм у сайта свои.
 'use strict';
-type RequestForm = HTMLFormElement & { elements: HTMLFormControlsCollection & Record<'part' | 'model' | 'quantity' | 'message' | 'source', HTMLInputElement> };
-type NumberInput = Omit<HTMLInputElement, 'value'> & { value: string | number };
 const $=<T extends HTMLElement = HTMLInputElement>(id: string)=>document.getElementById(id) as T;
 const listing=$<HTMLElement>('products'),cards=listing?[...listing.querySelectorAll<HTMLElement>('.product-card')]:[];
 let pageNumber=1, pageSize=24, filteredCards=cards;
@@ -29,25 +27,6 @@ if(listing){
  $('toggle-filters').onclick=()=>{const on=$('filters').classList.toggle('mobile-open');$('toggle-filters').setAttribute('aria-expanded',String(on))};
  filterCatalog();
 }
-// Увеличение фото: у транзисторных запчастей триггер — ссылка
-// на файл картинки, поэтому переход отменяем; без скрипта
-// ссылка продолжает работать как запасной путь.
-document.addEventListener('click',event=>{
- const request=(event.target as Element).closest<HTMLElement>('[data-request]');
- if(request){const form=$<RequestForm>('request-form');form.elements.part.value=request.dataset.part||'';form.elements.model.value=request.dataset.model||($('model-select')?.value||'');form.elements.quantity.value=$('quantity')?.value||'1';$('request-result').hidden=true;$<HTMLDialogElement>('request-dialog').showModal();return}
- const close=(event.target as Element).closest('[data-close]');if(close){close.closest('dialog')!.close();return}
- const zoom=(event.target as Element).closest<HTMLElement>('[data-zoom]');if(zoom){event.preventDefault();$<HTMLImageElement>('zoom-image').src=zoom.dataset.zoom!;$<HTMLImageElement>('zoom-image').alt=zoom.dataset.alt!;$('zoom-caption').textContent=zoom.dataset.caption!;$<HTMLDialogElement>('image-dialog').showModal();return}
- const qty=(event.target as Element).closest<HTMLElement>('[data-qty]');if(qty)$<NumberInput & HTMLElement>('quantity').value=Math.max(1,Math.min(9999,(Number($('quantity').value)||1)+Number(qty.dataset.qty)));
-});
-// Preserve the existing site's public form contract. Capture precedes forms-current.js.
-document.addEventListener('submit',event=>{
- const form=event.target as RequestForm;if(form.id!=='request-form')return;
- const text='Деталь: '+form.elements.part.value+'\nМодель: '+form.elements.model.value+'\nКоличество: '+form.elements.quantity.value;
- form.elements.message.value=text;
- // Метку берём из самой формы: обработчик обслуживает и запчасти
- // индукционных печей, у них должен быть свой источник заявки.
- form.elements.source.value=(form.dataset.form||'Запчасти')+' · '+location.pathname+' · '+text.replace(/\n/g,'; ');
-},true);
-for(const dialog of document.querySelectorAll('dialog'))dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close()}});
+// Окна «Запросить цену / подбор» и фото, «−/+» количества, текст заявки — модуль client/spare.ts.
 
 export {};

@@ -41,6 +41,8 @@ const ENTRIES: Record<string, string> = {
   'catalog-filter': 'src/client/catalog-filter.ts',
   carousel: 'src/client/carousel.ts',
   stock: 'src/client/stock.ts',
+  // запчасти: окно «Запросить цену / подбор», фото на весь экран, количество
+  spare: 'src/client/spare.ts',
   // панель администратора на страницах-документах (Практикум) — без общего модуля site
   'doc-bar': 'src/client/doc-bar.ts',
   // эффект праздничной обложки главной (снег, искры…) — только в дни праздника

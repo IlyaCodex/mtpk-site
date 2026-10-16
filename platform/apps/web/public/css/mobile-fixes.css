@@ -671,6 +671,19 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
   .phero__title { overflow-wrap: anywhere; }
 }
 
+/* 12.8 Шапка на телефоне: логотип (185 px) и три кнопки (меню, поиск, тема)
+ *      с зазорами занимали 361 px — на 375 px страница сдвигалась вбок на 6 px,
+ *      у Практикума и запчастей (их стили расширяли поля .container) — и на 390 px.
+ *      Логотип сжимается с пропорциями, зазоры меньше, поля шапки одни на всех страницах. */
+@media (max-width: 480px) {
+  .header .container { padding-left: 20px; padding-right: 20px; }
+  .header .container.header__inner { gap: var(--sp-3); }
+  .header__brand { flex-shrink: 1; min-width: 0; }
+  .header__brand .brand-pic { display: block; min-width: 0; max-width: 100%; }
+  .header__brand img { max-width: 100%; height: auto; }
+  .header__actions { gap: 4px; }
+}
+
 /* ============================================================
  * 13. Мобильная навигация — гамбургер вместо десктопного меню.
  *     Раньше правила «спрятать .nav / показать .nav-toggle» жили

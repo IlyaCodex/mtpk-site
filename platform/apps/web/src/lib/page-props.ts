@@ -37,6 +37,8 @@ export function pageModules(blocks: Block[], holiday: ActiveHoliday | null = nul
     if (b.type === 'productSpec') need.add('spec-nav');
     // контентный блок раздела: подсветка пункта «Содержания»
     if (b.type === 'html' && b.html.includes('class="cdoc__nav"')) need.add('spec-nav');
+    // запчасти: окно «Запросить цену / подбор» (карточка детали и списки)
+    if (b.type === 'html' && b.html.includes('id="request-dialog"')) need.add('spare');
     if (b.type === 'catalogList') need.add('catalog-filter');
     if (b.type === 'carousel' && b.slides.length > 1) need.add('carousel');
     if (b.type === 'gallery' && b.zoom && b.photos.length) need.add('lightbox');
