@@ -30,14 +30,17 @@ export function ProductHero({ block, ctx }: { block: ProductHeroBlock; ctx: Rend
               {status !== undefined && <Inline className="phero__status" html={status} />}
               {block.price !== undefined && <Inline className="phero__price" html={block.price} />}
             </div>
-            <div className="phero__keyspecs">
-              {block.keyspecs.map((k, i) => (
-                <div className="phero__keyspec" key={i}>
-                  <Inline as="div" className="phero__keyspec-num" html={k.num} />
-                  <Inline as="div" className="phero__keyspec-label" html={k.label} />
-                </div>
-              ))}
-            </div>
+            {/* у товаров с описательными свойствами (приборы, расходники) характеристик-чисел нет — свойства в фактах */}
+            {block.keyspecs.length > 0 && (
+              <div className="phero__keyspecs">
+                {block.keyspecs.map((k, i) => (
+                  <div className="phero__keyspec" key={i}>
+                    <Inline as="div" className="phero__keyspec-num" html={k.num} />
+                    <Inline as="div" className="phero__keyspec-label" html={k.label} />
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="phero__actions">
               {block.actions.map((a, i) => (
                 <ActionLink key={i} action={a} />

@@ -62,6 +62,9 @@ picture/
 │   ├── layout.svg, filter-flow.svg              # схемы: планировка загрузки, работа рукавного фильтра
 │   └── *-zapros.txt                             # задания для подбора — в медиатеке /files/dop-oborudovanie/
 │                                                # картинки — /img/dop-oborudovanie/ (3 страницы, корень каталога)
+├── products/kontrolno-izmeritelnye-pribory/      # раздел КИП (со старого сайта 16.10.2026): <slug>.webp 900×900 —
+│                                                # фото приборов (карточка товара), card-<slug>.webp 800×600 — обложки
+│                                                # (карточки раздела, корень каталога, главная) — /img/kontrolno-izmeritelnye-pribory/
 ├── products/zapchasti/tigli/                     # пакет «Тигли» V4.3 (09.10.2026): 18 фото (photo-*.png,
 │                                                # graphite-quartz.png) и 13 схем размеров (dimensions-*.svg) —
 │                                                # в медиатеке /img/crucibles/ (12 страниц, хаб запчастей, корень каталога)
