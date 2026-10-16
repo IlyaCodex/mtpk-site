@@ -42,10 +42,17 @@ function scrollToQuoteForm(): void {
   else location.hash = 'leadgen';
 }
 
+/** Карта под «щитом» активна, пока курсор над ней: увели — щит снова на месте. */
+function unlockMap(shield: HTMLElement): void {
+  shield.classList.add('is-hidden');
+  shield.closest('.geo__map')?.addEventListener('mouseleave', () => shield.classList.remove('is-hidden'), { once: true });
+}
+
 /**
  * Поведение страницы, общее для всех блоков: «Запросить цену» копит позиции
  * и ведёт к форме заявки; якорь на секцию с формой скроллит к самой форме;
- * маска телефона во всех полях type=tel.
+ * маска телефона во всех полях type=tel; карта-виджет за «щитом» (.geo__map-shield:
+ * колесо мыши над ней прокручивает страницу) — по клику или Enter.
  */
 export function initPage(): void {
   (window as Window & { uiScrollToForm?: typeof scrollToForm }).uiScrollToForm = scrollToForm;
@@ -66,6 +73,13 @@ export function initPage(): void {
       e.preventDefault();
       history.replaceState(null, '', href);
     }
+  });
+
+  delegate('click', '.geo__map-shield', (shield) => unlockMap(shield));
+  delegate('keydown', '.geo__map-shield', (shield, e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    unlockMap(shield);
   });
 
   // маска +7 (___) ___-__-__; иностранный код — свободный ввод

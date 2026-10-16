@@ -31,7 +31,8 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       modules: pageModules([]),
       legacy: [],
     },
-    revalidate: 3600,
+    // сборка образа идёт без контент-сервиса (меню по умолчанию) — тогда перестроить по первому же запросу
+    revalidate: home ? 3600 : 10,
   };
 };
 
