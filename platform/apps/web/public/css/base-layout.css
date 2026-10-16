@@ -42,6 +42,10 @@
   background-color: var(--btn-fill-hover);
   color: var(--btn-fill-text);
 }
+/* у <button> браузер рисует рамку «outset» — объёмную, светлую сверху и тёмную снизу: у залитых кнопок она
+   ровная, в цвет заливки (размер кнопки тот же) — как у кнопок-ссылок. :where — без веса: рамку, которую
+   убрали стили кнопки (border: none / 0), правило не возвращает */
+:where(button:is(.btn--primary, .btn--green, .btn--cta, .form__submit, .kp-form__submit, .header-quick-form__btn, .hero-quick-card__btn, .cookie-consent__accept, .pcard__more, .button:not(.button-outline, .button-light, .filter-help *), .ui-button, .tr-cta:not(.tr-cta-outline), .hub-button)) { border-style: solid; }
 /* блик — светлая косая полоса под текстом кнопки */
 :is(.btn--primary, .btn--green, .btn--cta, .form__submit, .kp-form__submit, .header-quick-form__btn, .hero-quick-card__btn, .cookie-consent__accept, .pcard__more, .button:not(.button-outline, .button-light, .filter-help *), .ui-button, .tr-cta:not(.tr-cta-outline), .hub-button):not(#_)::after {
   content: "";

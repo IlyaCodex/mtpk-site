@@ -328,6 +328,16 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
 .cdoc__panel ul:not(.cdoc__links, .spec__links) li { position: relative; padding-left: var(--sp-6); }
 .cdoc__panel ul:not(.cdoc__links, .spec__links) li + li { margin-top: var(--sp-2); }
 .cdoc__panel ul:not(.cdoc__links, .spec__links) li::before { content: ""; position: absolute; top: 0.72em; left: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--green-500); }
+/* нумерованные (порядок действий) — тем же текстом, номер зелёным */
+.cdoc__panel ol { max-width: 78ch; margin-bottom: 0; padding-left: var(--sp-6); font-size: 16px; line-height: 1.7; color: var(--text-secondary); }
+.cdoc__panel ol li { padding-left: var(--sp-1); }
+.cdoc__panel ol li + li { margin-top: var(--sp-2); }
+.cdoc__panel ol li::marker { font-family: var(--font-display); font-weight: var(--fw-bold); color: var(--green-600); }
+/* схема в разделе — карточкой с подписью; по щелчку — на весь экран (data-lightbox, модуль lightbox) */
+.cdoc__panel .spec__figure { max-width: 880px; margin: var(--sp-6) 0 0; }
+.cdoc__panel .spec__figure > a { display: block; overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 12px; cursor: zoom-in; }
+.cdoc__panel .spec__figure img { display: block; width: 100%; }
+.cdoc__panel .spec__figure figcaption { margin-top: var(--sp-3); font-size: 14px; line-height: 1.6; color: var(--text-tertiary); }
 /* ссылки в тексте (не кнопки, не таблицы, не список разделов) */
 .cdoc__panel :is(p, li):not(.cdoc__links li, .spec__links li) a:not(.btn) { color: var(--text-brand); text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; }
 .cdoc__panel :is(p, li):not(.cdoc__links li, .spec__links li) a:not(.btn):hover { color: var(--green-700); text-decoration-color: currentColor; }
@@ -432,6 +442,7 @@ a.bo-item:hover .bo-item__value { color: var(--green-700); }
   .cdoc__panel { padding: var(--sp-8) 0; }
   .cdoc__panel:not([id]) { grid-template-columns: 1fr; margin-top: var(--sp-5); padding: var(--sp-5); }
   .cdoc__panel p,
+  .cdoc__panel ol,
   .cdoc__panel ul:not(.cdoc__links, .spec__links) { font-size: 15px; }
   :is(.cdoc__links, .spec__links) { grid-template-columns: 1fr; }
 }
