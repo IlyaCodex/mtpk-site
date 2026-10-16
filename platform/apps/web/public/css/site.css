@@ -585,6 +585,47 @@ section.hero--home { min-height: 44vh; }
   gap: var(--sp-4);
   flex-wrap: wrap;
 }
+/* быстрые переходы к основным направлениям (поле «Быстрые переходы» обложки главной) — «таблетки» с зелёной
+   точкой; полупрозрачные фон и рамка — одинаковы в обеих темах (обложка всегда тёмная) */
+.hero__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+.hero__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.2;
+  color: var(--neutral-0);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+}
+.hero__link::before {
+  content: "";
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-400);
+}
+.hero__link:hover { border-color: var(--green-400); background: rgba(255, 255, 255, 0.12); color: var(--neutral-0); }
+.hero__link:focus-visible { outline: 2px solid var(--green-400); outline-offset: 2px; }
+/* под переходами — подсказка «Каталог оборудования ↓» по центру: отступ снизу больше, чтобы они не сходились */
+.hero__content:has(.hero__links) { padding-bottom: var(--sp-16); }
+@media (max-width: 480px) {
+  .hero__links { gap: var(--sp-2); margin-top: var(--sp-5); }
+  .hero__link { padding: 8px 14px; font-size: 14px; }
+}
 /* Scroll indicator */
 .hero__scroll {
   position: absolute;

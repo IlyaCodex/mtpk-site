@@ -488,6 +488,11 @@ export const homeHeroBlock = z
     title: inline('Заголовок (H1, акцент — курсивом)'),
     subtitle: inline('Подзаголовок'),
     actions: z.array(action).describe('Кнопки'),
+    /** быстрые переходы к основным направлениям — «таблетками» под кнопками */
+    links: z
+      .array(z.object({ href: href(), label: inline('Подпись') }))
+      .optional()
+      .describe('Быстрые переходы (под кнопками)'),
     quickCard: z
       .object({
         badge: inline('Плашка'),

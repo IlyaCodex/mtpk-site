@@ -13,6 +13,20 @@ export function holidayImageHints(image: string): { href: string; srcSet?: strin
   return set ? { href: image, srcSet: `${set.srcSet}, ${image} ${HOLIDAY_MASTER_WIDTH}w`, sizes: set.sizes } : { href: image };
 }
 
+/** Быстрые переходы к основным направлениям — «таблетки» с зелёной точкой под кнопками. */
+function QuickLinks({ links }: { links: HomeHeroBlock['links'] }) {
+  if (!links?.length) return null;
+  return (
+    <nav className="hero__links" aria-label="Быстрые переходы">
+      {links.map((l, i) => (
+        <a key={i} className="hero__link" href={l.href}>
+          <Inline html={l.label} />
+        </a>
+      ))}
+    </nav>
+  );
+}
+
 /** Ссылка-подсказка внизу обложки: к каталогу. */
 function ScrollHint() {
   return (
@@ -63,6 +77,7 @@ function HolidayHero({ block, holiday }: { block: HomeHeroBlock; holiday: Active
                 ))}
               </div>
             )}
+            <QuickLinks links={block.links} />
           </div>
         </div>
       </div>
@@ -96,6 +111,7 @@ export function HomeHero({ block, holiday }: { block: HomeHeroBlock; holiday?: A
                 ))}
               </div>
             )}
+            <QuickLinks links={block.links} />
           </div>
           {card && (
             <div className="hero__right">
