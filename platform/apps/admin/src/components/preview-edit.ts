@@ -1,8 +1,8 @@
 /**
  * Правка текста прямо в предпросмотре: щелчок по тексту — он выделяется и
  * правится на месте; Enter или щелчок мимо — правка уходит в черновик страницы
- * (как если бы её сделали слева), Esc — отмена. Щелчок по картинке или фону —
- * замена из медиатеки, по иконке SVG — окно «Иконка и цвет».
+ * (как если бы её сделали слева), Esc — отмена. Щелчок по картинке — её описание
+ * (alt) и замена из медиатеки, по фону — замена, по иконке SVG — окно «Иконка и цвет».
  *
  * Предпросмотр — iframe без скриптов (sandbox без allow-scripts): обработчики
  * вешает админка на его документ. Какой блок под щелчком — по меткам
@@ -40,8 +40,11 @@ type Plan = { ok: true; apply: (inner: string, text: string, blocks: BlockData[]
 /** Что меняется в черновике: блоки и/или стили страницы. */
 export type PagePatch = { blocks?: BlockData[]; inlineStyles?: string[] };
 
-/** Запрос «выбрать картинку»: что меняем, текущий адрес и что сделать с выбранной. */
-export type PickRequest = { what: 'картинку' | 'фон'; current: string; choose: (url: string) => void };
+/**
+ * Запрос «выбрать картинку»: что меняем, текущий адрес и что сделать с выбранной.
+ * alt — у картинки, описание которой хранится в данных страницы: текущее и запись нового.
+ */
+export type PickRequest = { what: 'картинку' | 'фон'; current: string; choose: (url: string) => void; alt?: { current: string; save: (alt: string) => void } };
 
 /** Запрос «сменить иконку»: текущая (<svg> из данных страницы), что сделать с новой, как убрать. */
 export type IconRequest = { current: string; choose: (svg: string) => void; remove: () => void };
@@ -276,7 +279,28 @@ function plan(el: Element, blocks: BlockData[]): Plan {
 
 /** Картинка под точкой: <img> или фон (background-image у элемента, его ::before/::after). */
 type ImageHit = { kind: 'img'; el: Element; src: string } | { kind: 'bg'; el: Element; pseudo: '' | '::before' | '::after'; url: string };
-type ImagePlan = { ok: true; what: PickRequest['what']; current: string; apply: (url: string, blocks: BlockData[], styles: string[]) => PagePatch | null } | { ok: false; reason: string };
+/** Описание картинки (alt): текущее и куда записать новое. */
+type AltPlan = { current: string; apply: (alt: string, blocks: BlockData[]) => PagePatch | null };
+type ImagePlan =
+  | { ok: true; what: PickRequest['what']; current: string; apply: (url: string, blocks: BlockData[], styles: string[]) => PagePatch | null; alt?: AltPlan }
+  | { ok: false; reason: string };
+
+/** <img> с адресом src внутри HTML-строки: разобранный шаблон и сам элемент — если такой ровно один. */
+function imgIn(html: string, src: string) {
+  if (!html.includes('<img') || !html.includes(src)) return null;
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html;
+  const found = [...tpl.content.querySelectorAll('img')].filter((img) => img.getAttribute('src') === src);
+  return found.length === 1 ? { tpl, found: found[0] } : null;
+}
+
+/** Новый адрес картинки: уменьшенные копии и WebP медиасервис делает сам — старые варианты убрать. */
+function setImgSrc(img: Element, url: string) {
+  img.setAttribute('src', url);
+  img.removeAttribute('srcset');
+  img.removeAttribute('sizes');
+  if (img.parentElement?.tagName === 'PICTURE') img.parentElement.querySelectorAll('source').forEach((s) => s.remove());
+}
 
 /** Адрес картинки на сайте: /img/… (computed style отдаёт полный адрес). */
 function sitePath(raw: string, doc: Document): string {
@@ -364,32 +388,83 @@ function imagePlan(hit: ImageHit, blocks: BlockData[]): ImagePlan {
       const found = route && root ? follow(root, route) : null;
       return found?.tagName === 'IMG' && found.getAttribute('src') === hit.src ? { tpl, found } : null;
     };
-    if (!locate(String(block.html))) return deny(REASONS.mismatch);
+    const own = locate(String(block.html));
+    if (!own) return deny(REASONS.mismatch);
+    // правка в HTML секции: найти тот же <img> в её текущем HTML, изменить, записать HTML обратно
+    const edit = (now: BlockData[], change: (img: Element) => void): PagePatch | null => {
+      const current = blockByMark(now, path);
+      const h = current?.type === 'html' ? locate(String(current.html)) : null;
+      if (!current || !h) return null;
+      change(h.found);
+      return { blocks: replaceByMark(now, path, { ...current, html: h.tpl.innerHTML }) };
+    };
     return {
       ok: true,
       what: 'картинку',
       current: hit.src,
-      apply: (url, now) => {
-        const current = blockByMark(now, path);
-        const h = current?.type === 'html' ? locate(String(current.html)) : null;
-        if (!current || !h) return null;
-        h.found.setAttribute('src', url);
-        // уменьшенные копии и WebP медиасервис делает сам — старые варианты убрать
-        h.found.removeAttribute('srcset');
-        h.found.removeAttribute('sizes');
-        if (h.found.parentElement?.tagName === 'PICTURE') h.found.parentElement.querySelectorAll('source').forEach((s) => s.remove());
-        return { blocks: replaceByMark(now, path, { ...current, html: h.tpl.innerHTML }) };
-      },
+      apply: (url, now) => edit(now, (img) => setImgSrc(img, url)),
+      alt: { current: own.found.getAttribute('alt') ?? '', apply: (alt, now) => edit(now, (img) => img.setAttribute('alt', alt)) },
     };
   }
 
   // блок с полями: поля с этим адресом; у фото галереи — и картинка, и миниатюра
   const hits = leaves(block).filter((l) => l.value === hit.src);
-  if (!hits.length) return deny(block.type === 'catalogCards' || block.type === 'catalogList' ? REASONS.catalog : REASONS.notFound);
+  if (!hits.length) {
+    if (block.type === 'catalogCards' || block.type === 'catalogList') return deny(REASONS.catalog);
+    // картинка внутри HTML-поля блока (текст раздела характеристик и т. п.) — если такая там одна
+    const inHtml = leaves(block).filter((l) => imgIn(l.value, hit.src));
+    if (inHtml.length !== 1) return deny(REASONS.notFound);
+    const leafPath = inHtml[0].path;
+    const own = imgIn(inHtml[0].value, hit.src)!;
+    const edit = (now: BlockData[], change: (img: Element) => void): PagePatch | null => {
+      const current = blockByMark(now, path);
+      const value = current ? leafAt(current, leafPath) : undefined;
+      const h = typeof value === 'string' ? imgIn(value, hit.src) : null;
+      if (!current || !h) return null;
+      change(h.found);
+      return { blocks: replaceByMark(now, path, setLeaf(current, leafPath, h.tpl.innerHTML) as BlockData) };
+    };
+    return {
+      ok: true,
+      what: 'картинку',
+      current: hit.src,
+      apply: (url, now) => edit(now, (img) => setImgSrc(img, url)),
+      alt: { current: own.found.getAttribute('alt') ?? '', apply: (alt, now) => edit(now, (img) => img.setAttribute('alt', alt)) },
+    };
+  }
+  // описание (alt) — у фото, где рядом с адресом есть поле alt ({src, alt}: галереи, обложки)
+  const parents: (string | number)[][] = [];
+  for (const l of hits) {
+    const p = l.path.slice(0, -1);
+    if (!parents.some((q) => q.join('.') === p.join('.'))) parents.push(p);
+  }
+  const photos = parents.filter((p) => typeof (leafAt(block, p) as Record<string, unknown> | undefined)?.alt === 'string');
+  // у главного фото товара бывает отдельное описание (media.mainAlt) — сайт выводит его вместо alt первого фото
+  const media = block.type === 'productHero' ? (block.media as Record<string, unknown> | undefined) : undefined;
+  const mainAlt = typeof media?.mainAlt === 'string' && hit.el.closest('.phero__main') ? media.mainAlt : undefined;
+  const alt: AltPlan | undefined = photos.length
+    ? {
+        current: mainAlt ?? String((leafAt(block, photos[0]) as Record<string, unknown>).alt),
+        apply: (value, now) => {
+          let next: unknown = blockByMark(now, path);
+          if (!next) return null;
+          for (const p of photos) next = setLeaf(next, [...p, 'alt'], value);
+          // описание главного фото — одно поле, alt первого фото: отдельное mainAlt больше его не перекрывает
+          const m = (next as { media?: Record<string, unknown> }).media;
+          if (block.type === 'productHero' && m && 'mainAlt' in m && photos.some((p) => p.join('.') === 'media.photos.0')) {
+            const rest = { ...m };
+            delete rest.mainAlt;
+            next = { ...(next as Record<string, unknown>), media: rest };
+          }
+          return { blocks: replaceByMark(now, path, next as BlockData) };
+        },
+      }
+    : undefined;
   return {
     ok: true,
     what: 'картинку',
     current: hit.src,
+    ...(alt ? { alt } : {}),
     apply: (url, now) => {
       let next: unknown = blockByMark(now, path);
       if (!next) return null;
@@ -777,23 +852,26 @@ export function attachPreviewEditor(doc: Document, opts: PreviewEditorOptions): 
     pop.style.top = `${y + 12 + pop.offsetHeight > win.innerHeight ? y - pop.offsetHeight - 12 : y + 12}px`;
     popAction = action;
   };
-  const pickImage = (hit: ImageHit, p: Extract<ImagePlan, { ok: true }>, x: number, y: number) =>
+  const pickImage = (hit: ImageHit, p: Extract<ImagePlan, { ok: true }>, x: number, y: number) => {
+    const put = (patch: PagePatch | null) => {
+      if (patch) opts.onUpdate(patch);
+      else tip(REASONS.changed, x, y);
+    };
+    const alt = p.alt;
     showPop(
       hit.el,
-      `Заменить ${p.what}…`,
+      alt ? 'Картинка и описание (alt)…' : `Заменить ${p.what}…`,
       () =>
         opts.onPick({
           what: p.what,
           current: p.current,
-          choose: (url) => {
-            const patch = p.apply(url, opts.getBlocks(), opts.getStyles());
-            if (patch) opts.onUpdate(patch);
-            else tip(REASONS.changed, x, y);
-          },
+          choose: (url) => put(p.apply(url, opts.getBlocks(), opts.getStyles())),
+          ...(alt ? { alt: { current: alt.current, save: (value: string) => put(alt.apply(value, opts.getBlocks())) } } : {}),
         }),
       x,
       y,
     );
+  };
   const pickIcon = (svg: Element, p: Extract<IconPlan, { ok: true }>, x: number, y: number) => {
     const put = (next: string) => {
       const blocks = p.apply(next, opts.getBlocks());

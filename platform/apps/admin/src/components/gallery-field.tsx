@@ -160,12 +160,16 @@ export function GalleryField({
                 </button>
               </div>
               <div className="space-y-1.5 p-2">
-                <input
-                  className="w-full rounded border border-slate-200 px-2 py-1 text-xs outline-none focus:border-brand-500"
-                  placeholder="Что на фото (для поиска и слабовидящих)"
-                  value={p.alt}
-                  onChange={(e) => set(i, { alt: e.target.value })}
-                />
+                <label className="block">
+                  <span className="mb-0.5 block text-[10px] font-medium tracking-wide text-slate-500">Описание (alt)</span>
+                  <input
+                    className="w-full rounded border border-slate-200 px-2 py-1 text-xs outline-none focus:border-brand-500"
+                    placeholder="Что на фото — для поиска и слабовидящих"
+                    title="Alt — описание фото: его читают поисковики и экранные дикторы"
+                    value={p.alt}
+                    onChange={(e) => set(i, { alt: e.target.value })}
+                  />
+                </label>
                 {fields.map((f) => (
                   <input
                     key={f.key}

@@ -221,8 +221,13 @@ export function ProductEditor({
                     </div>
                   </Section>
 
-                  <Section title="Фото товара" hint="Первое фото — главное. Порядок меняется перетаскиванием.">
-                    <GalleryField value={hero.media.photos} onChange={(photos) => setMedia({ photos })} />
+                  <Section title="Фото товара" hint="Первое фото — главное. Порядок меняется перетаскиванием. Под каждым фото — его описание (alt).">
+                    {/* у части товаров (со старого сайта) у главного фото отдельное описание mainAlt — сайт выводит его вместо
+                        alt первого фото; в галерее показываем действующее и при правке оставляем одно поле — alt фото */}
+                    <GalleryField
+                      value={typeof hero.media.mainAlt === 'string' ? hero.media.photos.map((p, i) => (i === 0 ? { ...p, alt: hero.media.mainAlt as string } : p)) : hero.media.photos}
+                      onChange={(photos) => setMedia({ photos, mainAlt: undefined })}
+                    />
                     <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <label className="block">
                         <Label>Миниатюры под фото</Label>

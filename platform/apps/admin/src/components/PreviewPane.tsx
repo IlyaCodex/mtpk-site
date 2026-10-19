@@ -8,8 +8,9 @@ import { MediaBrowser, Modal } from './media';
 import { attachPreviewEditor, patchMain, type BlockAction, type IconRequest, type PagePatch, type PickRequest, type PreviewEditor } from './preview-edit';
 import { move } from './schema-form';
 import { cloneBlock } from './section-id';
+import { toast } from './toast';
 import type { EditablePage } from './use-page-draft';
-import { cx } from './ui';
+import { Button, cx } from './ui';
 import { createBlock, useBuilder, widgetLabel } from './widgets';
 
 export type Device = 'desktop' | 'mobile' | 'off';
@@ -237,7 +238,21 @@ export function PreviewPane({
         </div>
       </div>
       {picking && (
-        <Modal title={`Заменить ${picking.what} — выберите в медиатеке или загрузите новую`} onClose={() => setPicking(null)}>
+        <Modal
+          title={picking.alt ? 'Картинка: описание (alt) и замена' : `Заменить ${picking.what} — выберите в медиатеке или загрузите новую`}
+          onClose={() => setPicking(null)}
+        >
+          {picking.alt && (
+            <AltEditor
+              current={picking.alt.current}
+              onSave={(alt) => {
+                picking.alt?.save(alt);
+                setPicking(null);
+                toast.ok('Описание картинки изменено — сохраните страницу');
+              }}
+            />
+          )}
+          {picking.alt && <div className="mb-2 text-xs font-medium text-slate-600">Заменить картинку — выберите в медиатеке или загрузите новую</div>}
           <MediaBrowser
             mode="pick"
             initialPrefix={folderOf(picking.current)}
@@ -263,5 +278,36 @@ export function PreviewPane({
         />
       )}
     </aside>
+  );
+}
+
+/** Описание картинки (alt): что на ней — его читают поисковики и экранные дикторы. Enter или «Сохранить» — в черновик страницы. */
+function AltEditor({ current, onSave }: { current: string; onSave: (alt: string) => void }) {
+  const [value, setValue] = useState(current);
+  return (
+    <form
+      className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSave(value.trim());
+      }}
+    >
+      <label className="mb-1 block text-xs font-medium text-slate-600" htmlFor="preview-alt">
+        Описание картинки (alt) — что на ней: его читают поисковики и экранные дикторы
+      </label>
+      <div className="flex gap-2">
+        <input
+          id="preview-alt"
+          className="field"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Например: Индукционная печь УИ-0,35Т-300 в цеху заказчика"
+          autoFocus
+        />
+        <Button type="submit" variant="primary" disabled={value.trim() === current.trim()}>
+          Сохранить
+        </Button>
+      </div>
+    </form>
   );
 }
