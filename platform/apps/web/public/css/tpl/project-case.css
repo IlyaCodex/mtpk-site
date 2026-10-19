@@ -136,12 +136,18 @@
 .ui-case dialog .ui-controls button { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; background: transparent; font-size: 22px; line-height: 1; color: #fff; transition: background-color var(--duration-fast) var(--ease-out); }
 .ui-case dialog .ui-controls button:hover { background: rgba(255, 255, 255, 0.12); }
 
+/* три блока обзора (без «Выполненных работ») — в три колонки, без пустой четвёртой */
+@media (min-width: 1101px) {
+  .ui-case .ui-overview:has(> article:nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 @media (max-width: 1100px) {
   .ui-case .ui-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .ui-case .ui-hero > .ui-main-col,
   .ui-case .ui-hero > .ui-main-photo { grid-column: 1 / -1; }
   .ui-case .ui-letter-hero img { aspect-ratio: 4 / 3; }
   .ui-case .ui-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* нечётное число блоков обзора: последний — на всю строку */
+  .ui-case .ui-overview > article:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .ui-case .ui-details { grid-template-columns: minmax(0, 1fr); }
   .ui-case .ui-metrics > div + div { padding-left: 0; border-left: 0; }
 }
