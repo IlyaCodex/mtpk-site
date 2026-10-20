@@ -321,6 +321,8 @@ type StatusType = 'pending' | 'success' | 'error';
             var phoneVal = phone ? phone.value.trim() : '';
             var url = '/spasibo/';
             try { sessionStorage.setItem('ui_lead_confirmed_phone', phoneVal); } catch (e) {}
+            // пропуск на «Спасибо» на 15 минут: без него открытая напрямую /spasibo/ — «не найдена» (proxy.ts)
+            document.cookie = 'ui_lead_sent=1; Max-Age=900; Path=/spasibo/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
             showStatus(status, 'success', 'Заявка отправлена! Переходим…');
             window.location.assign(url);
             return; // дальше не выполняем — уходим со страницы

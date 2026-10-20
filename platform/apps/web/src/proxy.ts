@@ -50,6 +50,22 @@ function redirect(location: string, req: NextRequest, code = 301) {
 }
 
 /**
+ * «Спасибо» открывается после заявки: пропуск от формы (cookie ui_lead_sent на 15 минут — client/forms.ts)
+ * или переход со страницы этого же сайта (вкладка, открытая до выкладки, пропуск ещё не ставит).
+ */
+function thanksAllowed(req: NextRequest): boolean {
+  if (req.cookies.has('ui_lead_sent')) return true;
+  const ref = req.headers.get('referer');
+  if (!ref) return false;
+  try {
+    const host = new URL(ref).host;
+    return host === req.headers.get('host') || host === new URL(SITE).host;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Редиректы — как nginx старого сайта (порядок тот же):
  *  1. легаси-карта WordPress → новые адреса (точное совпадение пути, 301, без query);
  *  2. /index.html и …/index.html → адрес каталога;
@@ -65,6 +81,9 @@ export async function proxy(req: NextRequest) {
   } catch {
     /* битая кодировка — сравниваем как есть */
   }
+
+  // «Спасибо» без заявки (адрес набран, закладка, бот) — обычная страница «не найдена» с кодом 404
+  if (pathname === '/spasibo/' && !thanksAllowed(req)) return NextResponse.rewrite(new URL('/404', req.url), { status: 404 });
 
   const s = await getState();
   const legacy = s?.redirects.get(decoded);

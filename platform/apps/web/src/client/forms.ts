@@ -28,6 +28,14 @@ function showStatus(el: HTMLElement | null, type: StatusType, message: string): 
   }
 }
 
+/**
+ * Пропуск на страницу «Спасибо» на 15 минут: открытая без заявки /spasibo/ — «не найдена» (proxy.ts).
+ * Cookie без личных данных, только для /spasibo/.
+ */
+function allowThanksPage(): void {
+  document.cookie = `ui_lead_sent=1; Max-Age=900; Path=/spasibo/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+}
+
 function randomId(): string | null {
   if (!window.crypto?.getRandomValues) return null;
   const bytes = new Uint8Array(16);
@@ -169,6 +177,7 @@ function initForm(form: HTMLFormElement, index: number): void {
         } catch {
           /* приватный режим */
         }
+        allowThanksPage();
         showStatus(status, 'success', 'Заявка отправлена! Переходим…');
         window.location.assign('/spasibo/');
       })
