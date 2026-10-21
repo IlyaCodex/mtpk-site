@@ -470,6 +470,57 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
   );
 
   // ── Страницы-документы (Практикум: целый HTML-документ) ────────────────
+  const documentInput = z.object({
+    title: z.string().trim().min(1).max(300).describe('Заголовок (title)'),
+    description: z.string().trim().max(1000).nullable().optional().describe('Описание (description)'),
+    noindex: z.boolean().describe('Скрыть от поисковиков'),
+    status: z.enum(['published', 'draft']),
+    body: z.string().min(1).describe('HTML-документ целиком'),
+  });
+  app.post(
+    '/admin/v1/documents',
+    {
+      schema: {
+        tags: ['Админка: страницы'],
+        summary: 'Создать страницу-документ (новая статья Практикума): HTML целиком; заголовок, описание и noindex — и в его <head>',
+        body: documentInput.extend({
+          path: z.string().trim().min(2).startsWith('/').describe('Адрес: /praktikum/…/ (рабочий лист — …/имя.html)'),
+          template: z.string().trim().min(1).max(40).default('praktikum').describe('Тип: praktikum — статья, praktikum-sheet — лист для печати'),
+        }),
+        security: ADMIN,
+      },
+    },
+    async (req, reply) => {
+      const path = req.body.path.endsWith('.html') ? req.body.path : normalizePath(req.body.path);
+      const dup = await db.page.findUnique({ where: { path }, select: { id: true } });
+      if (dup) return reply.code(409).send({ error: 'path_exists', id: dup.id });
+      const { title, description = null, noindex, status, template } = req.body;
+      const body = setDocMeta(req.body.body, { title, description, noindex });
+      const now = new Date();
+      const row = await db.page.create({
+        data: {
+          path,
+          kind: 'document',
+          template,
+          title,
+          description: description || null,
+          noindex,
+          status,
+          body,
+          publishedAt: now,
+          modifiedAt: now,
+          lastmodAt: now,
+          sourceHash: `admin:${now.getTime()}`,
+          // в поиск по сайту — текст из <main data-pagefind-body>, как у статей со старого сайта
+          extraMeta: { source: 'admin', pagefindBody: /\sdata-pagefind-body[\s=>]/.test(body) },
+        },
+        select: { id: true },
+      });
+      await changed([path]);
+      return reply.code(201).send({ ok: true, id: row.id, path });
+    },
+  );
+
   app.put(
     '/admin/v1/documents/:id',
     {
@@ -477,13 +528,7 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
         tags: ['Админка: страницы'],
         summary: 'Сохранить страницу-документ (Практикум): HTML целиком; заголовок, описание и noindex — и в его <head>',
         params: idParam,
-        body: z.object({
-          title: z.string().trim().min(1).max(300).describe('Заголовок (title)'),
-          description: z.string().trim().max(1000).nullable().optional().describe('Описание (description)'),
-          noindex: z.boolean().describe('Скрыть от поисковиков'),
-          status: z.enum(['published', 'draft']),
-          body: z.string().min(1).describe('HTML-документ целиком'),
-        }),
+        body: documentInput,
         security: ADMIN,
       },
     },

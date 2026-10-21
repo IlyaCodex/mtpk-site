@@ -91,3 +91,19 @@
 .praktikum-content .ui-article.ui-article > .portrait-photo {
   max-width: 720px;
 }
+
+/* Широкая карточка хаба (.hub-card--wide) — на всю строку сетки: картинка слева, текст справа;
+   на телефоне — как обычная карточка. Справочник «Режимы термообработки» (21.10.2026): в разделе
+   «Литейные технологии» сетка ровно на 6 строк, 19-я обычная карточка оставила бы пустые места. */
+.praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide { grid-column: 1 / -1; flex-direction: row; }
+.praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide .hub-card__media { flex: 0 0 48%; aspect-ratio: 1200 / 630; }
+.praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide .hub-card-body { justify-content: center; padding: 32px 40px; }
+.praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide h3 { font-size: 26px; }
+/* ссылка — сразу под текстом: блок текста стоит по центру высоты картинки */
+.praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide .hub-link { margin-top: 0; }
+@media (max-width: 760px) {
+  .praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide { flex-direction: column; }
+  .praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide .hub-card__media { flex: none; }
+  .praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide .hub-card-body { padding: 20px 20px 22px; }
+  .praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide h3 { font-size: 19px; }
+}

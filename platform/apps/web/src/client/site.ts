@@ -25,4 +25,7 @@ ready(() => {
   initTheme();
   // вошли в админку — панель администратора (модуль грузится только им)
   if (/(?:^|;\s*)mtpk_bar=1/.test(document.cookie)) void import('./admin-bar').then((m) => m.mountAdminBar());
+  // справочник режимов термообработки (Практикум): поиск, фильтр, пример расчёта — модуль только этой статьи
+  const guide = document.querySelector<HTMLElement>('.ui-thermal-guide');
+  if (guide) void import('./thermal-guide').then((m) => m.initThermalGuide(guide));
 });

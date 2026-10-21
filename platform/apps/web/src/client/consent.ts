@@ -86,7 +86,22 @@ function accept(banner: HTMLElement): void {
   startAnalytics();
 }
 
+/**
+ * Цели Метрики со статей Практикума: статья сообщает о действии событием ui-praktikum-event
+ * (detail: { name, …параметры }) — цель с этим именем уходит во все счётчики. Засчитывается там, где в
+ * Метрике заведена цель «JavaScript-событие» с таким идентификатором; без согласия на cookie счётчиков нет.
+ */
+function listenArticleGoals(): void {
+  document.addEventListener('ui-praktikum-event', (e) => {
+    const { name, ...params } = ((e as CustomEvent<unknown>).detail ?? {}) as Record<string, unknown>;
+    const ym = (window as W).ym;
+    if (typeof name !== 'string' || !/^[\w-]{1,64}$/.test(name) || typeof ym !== 'function') return;
+    for (const id of YM_COUNTERS) ym(id, 'reachGoal', name, params);
+  });
+}
+
 export function initConsent(): void {
+  listenArticleGoals();
   if (inFrame()) return startAnalytics();
   const banner = document.getElementById('cookie-consent');
   if (hasConsent()) return scheduleAnalytics();
