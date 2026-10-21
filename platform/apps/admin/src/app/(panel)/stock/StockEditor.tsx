@@ -561,7 +561,9 @@ function ItemDialog({
               </label>
             </div>
             <span className="mt-1 block text-xs text-slate-500">
-              {draft.price ? `На сайте: ${priceText(draft)}` : 'Пусто — на сайте «Цена по запросу»'}
+              {draft.price
+                ? `На сайте: ${priceText(draft)} — в «Наличии» и на странице товара (с разметкой цены для поисковиков)`
+                : 'Пусто — на сайте «Цена по запросу»'}
             </span>
           </div>
           <Field label="Пояснение к цене" hint="Коротко, в одну строку рядом с ценой">

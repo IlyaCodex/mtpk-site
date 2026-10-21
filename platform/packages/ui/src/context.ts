@@ -1,4 +1,5 @@
 import { pageHasLeadgen, walkBlocks, type ActiveHoliday, type Block } from '@mtpk/content-model';
+import type { StockOffer } from '@mtpk/content-kit/stock';
 import { CARD_COVER_PLACE } from './blocks/CatalogCards.tsx';
 import { findImagePlace, imageSources } from './primitives/images-html.ts';
 import { responsive } from './primitives/images.ts';
@@ -10,6 +11,8 @@ import { responsive } from './primitives/images.ts';
  */
 export interface StockInfo {
   shipping?: string;
+  /** цена со склада (позиции с ценой, ведущие на товар) — в карточке товара вместо «Цена — по запросу» */
+  offer?: StockOffer;
 }
 
 export interface RenderContext {

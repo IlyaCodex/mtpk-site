@@ -6,8 +6,10 @@ import {
   resolveStock,
   resolveStockBlocks,
   resolveStockView,
+  stockBySlug,
   type StockConfigItem,
   type StockItemRow,
+  type StockJsonItem,
   type StockView,
 } from '@mtpk/content-kit';
 import { resolveCatalogBlocks, type CatalogData } from '@mtpk/content-kit/catalog';
@@ -80,7 +82,10 @@ export class ContentStore {
       await this.cache.set(key, MISSING, 60);
       return null;
     }
-    const dto = renderPage(await this.pageData(row), await this.styleMap(), this.site);
+    // товар со склада с ценой — цена в разметке Product (offers)
+    const slug = path.replace(/^\/+|\/+$/g, '').replace(/^products\//, '');
+    const offer = path.startsWith('/products/') ? (await this.siteData()).stock[slug]?.offer : undefined;
+    const dto = renderPage(await this.pageData(row), await this.styleMap(), this.site, offer);
     await this.cache.set(key, dto, this.ttl);
     return dto;
   }
@@ -184,6 +189,9 @@ export class ContentStore {
           specs: it.specs as StockConfigItem['specs'],
           image: it.image,
           title: it.title,
+          price: it.price,
+          priceFrom: it.priceFrom,
+          priceNote: it.priceNote,
         };
       });
       const wanted = new Set(items.map((it) => String(it.url || '').trim()).filter(Boolean));
@@ -217,11 +225,10 @@ export class ContentStore {
   /** Данные для рендера блоков на сайте: склад (slug → срок) и разделы со сравнением. */
   async siteData(): Promise<SiteDataDto> {
     return this.cache.wrap('site-data', this.ttl, async () => {
-      const stock = (await this.stock()) as { items?: { slug?: string; shipping?: string }[] };
-      const map: SiteDataDto['stock'] = {};
-      for (const it of stock.items ?? []) {
-        if (it.slug) map[String(it.slug).replace(/^\/+|\/+$/g, '')] = it.shipping ? { shipping: it.shipping } : {};
-      }
+      const stock = (await this.stock()) as { items?: StockJsonItem[] };
+      const items = (stock.items ?? []).map((it) => ({ ...it, slug: it.slug ? String(it.slug).replace(/^\/+|\/+$/g, '') : undefined }));
+      // срок отгрузки и цена со склада — у страницы товара (статус, цена в карточке, разметка Product)
+      const map: SiteDataDto['stock'] = stockBySlug(items);
       return { stock: map, compareSections: (await this.compare()).sections };
     });
   }

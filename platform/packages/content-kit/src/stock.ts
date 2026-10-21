@@ -16,6 +16,55 @@ export interface StockConfigItem {
   specs?: [string, string][] | null;
   image?: string | null;
   title?: string | null;
+  /** цена, ₽ (нет — «по запросу»), «от» перед ней, пояснение («с НДС») */
+  price?: number | null;
+  priceFrom?: boolean;
+  priceNote?: string | null;
+}
+
+/** Позиция в /data/stock.json (выдача resolveStock) — то, что нужно странице товара. */
+export interface StockJsonItem {
+  slug?: string;
+  shipping?: string;
+  price?: number;
+  priceFrom?: boolean;
+  priceNote?: string;
+}
+
+/** Цена товара со склада: наименьшая из позиций с ценой (наибольшая — если цены разные), «от», пояснение, число позиций. */
+export interface StockOffer {
+  price: number;
+  maxPrice?: number;
+  priceFrom: boolean;
+  priceNote?: string;
+  offers: number;
+}
+
+/**
+ * Склад для страниц товаров: slug → срок отгрузки и цена. Срок — последней позиции, где он задан;
+ * цена — наименьшая из позиций с ценой, «от» — если так у неё или цены у позиций разные; пояснение — её.
+ */
+export function stockBySlug(items: StockJsonItem[]): Record<string, { shipping?: string; offer?: StockOffer }> {
+  const map: Record<string, { shipping?: string; offer?: StockOffer }> = {};
+  const priced: Record<string, (StockJsonItem & { price: number })[]> = {};
+  for (const it of items) {
+    if (!it.slug) continue;
+    const entry = (map[it.slug] ??= {});
+    if (it.shipping) entry.shipping = it.shipping;
+    if (typeof it.price === 'number' && Number.isFinite(it.price) && it.price > 0) (priced[it.slug] ??= []).push({ ...it, price: it.price });
+  }
+  for (const [slug, list] of Object.entries(priced)) {
+    const low = list.reduce((a, b) => (b.price < a.price ? b : a));
+    const high = Math.max(...list.map((x) => x.price));
+    map[slug].offer = {
+      price: low.price,
+      ...(high > low.price ? { maxPrice: high } : {}),
+      priceFrom: Boolean(low.priceFrom) || high > low.price,
+      ...(low.priceNote?.trim() ? { priceNote: low.priceNote.trim() } : {}),
+      offers: list.length,
+    };
+  }
+  return map;
 }
 
 export interface PageSource {
@@ -108,6 +157,12 @@ export function resolveStock(config: StockConfigItem[], lookup: PageLookup): Sto
     if (Array.isArray(it.specs) && it.specs.length) out.specs = it.specs;
     if (typeof it.image === 'string' && it.image) out.image = it.image;
     if (typeof it.title === 'string' && it.title) out.title = it.title;
+    // цена — для страницы товара (цена в карточке и разметка Product); на /nalichie/ она и так видна
+    if (typeof it.price === 'number' && it.price > 0) {
+      out.price = it.price;
+      if (it.priceFrom) out.priceFrom = true;
+      if (it.priceNote?.trim()) out.priceNote = it.priceNote.trim();
+    }
     items.push(out);
   }
   return { items, warnings };

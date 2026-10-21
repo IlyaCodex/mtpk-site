@@ -3,6 +3,7 @@
  * страницы, поэтому разметка не расходится с текстом.
  */
 import { decodeEntities } from './html.ts';
+import type { StockOffer } from './stock.ts';
 
 export const DEFAULT_SITE = 'https://uralinduktor.ru';
 
@@ -162,11 +163,16 @@ export function extractProperties(html: string): Record<string, unknown>[] {
   });
 }
 
-/** Product — на товарных страницах (.phero, .product-overview, .tr-product-overview). Без цены — она проектная. */
-export function buildProductSchema(html: string, description: string | null, canonicalAbs: string, site = DEFAULT_SITE): string | null {
+/**
+ * Product — на товарных страницах (.phero, .product-overview, .tr-product-overview). Цена (offers) — только
+ * когда товар есть в «Наличии на складе» с ценой и страница её показывает (карточка .phero): остальная цена
+ * проектная, её в разметке нет.
+ */
+export function buildProductSchema(html: string, description: string | null, canonicalAbs: string, site = DEFAULT_SITE, offer?: StockOffer): string | null {
+  const isHero = /<section\s+class="phero"/.test(html);
   const isSpare = /<div\s+class="product-overview"/.test(html);
   const isTr = /<div\s+class="tr-product-overview"/.test(html);
-  if (!/<section\s+class="phero"/.test(html) && !isSpare && !isTr) return null;
+  if (!isHero && !isSpare && !isTr) return null;
 
   const nameMatch = html.match(/<h1\s+class="phero__title"[^>]*>([\s\S]+?)<\/h1>/)
     || ((isSpare || isTr) ? html.match(/<h1[^>]*>([\s\S]+?)<\/h1>/) : null);
@@ -207,6 +213,17 @@ export function buildProductSchema(html: string, description: string | null, can
   if (category) schema.category = category;
   const props = extractProperties(html);
   if (props.length) schema.additionalProperty = props;
+  if (offer && isHero) {
+    // позиции со склада: наименьшая (и наибольшая) цена, их число; товар в наличии
+    schema.offers = {
+      '@type': 'AggregateOffer',
+      lowPrice: String(offer.price),
+      ...(offer.maxPrice ? { highPrice: String(offer.maxPrice) } : {}),
+      priceCurrency: 'RUB',
+      offerCount: String(offer.offers),
+      availability: 'https://schema.org/InStock',
+    };
+  }
   return JSON.stringify(schema);
 }
 
@@ -306,11 +323,12 @@ export function buildFaqSchema(html: string): string | null {
   });
 }
 
-/** Все JSON-LD страницы в порядке вывода: Breadcrumb, FAQ, Product, Article. */
+/** Все JSON-LD страницы в порядке вывода: Breadcrumb, FAQ, Product, Article. offer — цена товара со склада. */
 export function buildPageJsonLd(
   body: string,
   page: { path: string; title: string; description: string | null; publishedAt?: string | null; modifiedAt?: string | null },
   site = DEFAULT_SITE,
+  offer?: StockOffer,
 ): string[] {
   const slug = page.path.replace(/^\/|\/$/g, '');
   const pageUrlAbs = `${site}/${slug}${slug ? '/' : ''}`;
@@ -320,7 +338,7 @@ export function buildPageJsonLd(
   if (breadcrumb) out.push(breadcrumb);
   const faq = buildFaqSchema(body);
   if (faq) out.push(faq);
-  const product = buildProductSchema(body, page.description, canonicalAbs, site);
+  const product = buildProductSchema(body, page.description, canonicalAbs, site, offer);
   if (product) out.push(product);
   const article = buildArticleSchema(body, page.description, canonicalAbs, {
     published: page.publishedAt ?? undefined,

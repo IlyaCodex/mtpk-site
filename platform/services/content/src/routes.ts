@@ -731,7 +731,19 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
           .map((r) => `${r.url.trim()}|${r.shipping?.trim() ?? ''}`)
           .sort()
           .join('\n');
-      const before = outside(await db.stockItem.findMany({ select: { url: true, shipping: true, hidden: true } }));
+      // цена позиции видна и на странице товара (цена в карточке, разметка Product): адрес → цены его позиций
+      type PriceRow = { url: string; hidden?: boolean; price?: number | null; priceFrom?: boolean; priceNote?: string | null };
+      const prices = (rows: PriceRow[]) => {
+        const map = new Map<string, string[]>();
+        for (const r of rows.filter((x) => !x.hidden && x.price)) {
+          const url = r.url.trim();
+          map.set(url, [...(map.get(url) ?? []), `${r.price}|${r.priceFrom ? 1 : 0}|${r.priceNote?.trim() ?? ''}`]);
+        }
+        return new Map([...map].map(([url, list]) => [url, list.sort().join(';')]));
+      };
+      const old = await db.stockItem.findMany({ select: { url: true, shipping: true, hidden: true, price: true, priceFrom: true, priceNote: true } });
+      const before = outside(old);
+      const pricesBefore = prices(old);
       await db.$transaction([
         db.stockItem.deleteMany(),
         db.stockGroup.deleteMany(),
@@ -763,8 +775,10 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
         await store.purge();
         await notifyWeb('all');
       } else {
-        // поменялись только типы, фото, названия, порядок — страницы со складом (главная, /nalichie/)
-        const pages = await store.stockPages();
+        // типы, фото, названия, порядок — страницы со складом (главная, /nalichie/); цены — ещё и страницы этих товаров
+        const after = prices(items.map((it) => ({ ...it, priceFrom: Boolean(it.price && it.priceFrom), priceNote: it.price ? it.priceNote : null })));
+        const priced = [...new Set([...pricesBefore.keys(), ...after.keys()])].filter((url) => url.startsWith('/products/') && pricesBefore.get(url) !== after.get(url));
+        const pages = [...new Set([...(await store.stockPages()), ...priced])];
         await store.purge(pages.length ? pages : ['/nalichie/']);
         await notifyWeb(pages);
       }

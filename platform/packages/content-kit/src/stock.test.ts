@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { Block } from '@mtpk/content-model';
 import type { CatalogData, CatalogProduct } from './catalog.ts';
-import { hasStockBlocks, resolveStockBlocks, resolveStockView, textHtml, type StockItemRow } from './stock.ts';
+import { hasStockBlocks, resolveStockBlocks, resolveStockView, stockBySlug, textHtml, type StockItemRow } from './stock.ts';
 
 const product = (over: Partial<CatalogProduct>): CatalogProduct => ({
   id: 1,
@@ -159,4 +159,16 @@ test('цена: разряды узким неразрывным пробело�
     assert.equal(it.price, undefined);
     assert.equal(it.priceNote, undefined);
   }
+});
+
+test('склад для страниц товаров: срок отгрузки и цена — наименьшая из позиций, «от» при разных ценах, число позиций', () => {
+  const map = stockBySlug([
+    { slug: 'a/ui-1', shipping: 'от 3 дней', price: 1400000 },
+    { slug: 'a/ui-1', price: 1250000, priceNote: 'с НДС' },
+    { slug: 'a/ui-2', shipping: 'от 1 дня' },
+    { slug: 'a/ui-3', price: 500000, priceFrom: true },
+  ]);
+  assert.deepEqual(map['a/ui-1'], { shipping: 'от 3 дней', offer: { price: 1250000, maxPrice: 1400000, priceFrom: true, priceNote: 'с НДС', offers: 2 } });
+  assert.deepEqual(map['a/ui-2'], { shipping: 'от 1 дня' });
+  assert.deepEqual(map['a/ui-3'], { offer: { price: 500000, priceFrom: true, offers: 1 } });
 });

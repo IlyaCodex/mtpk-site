@@ -64,3 +64,18 @@ test('крошки пакетов 09.10.2026 (nav.crumbs, nav.uc-breadcrumbs): �
   assert.equal(list.itemListElement.length, 4);
   assert.equal(list.itemListElement[3].item, 'https://uralinduktor.ru/products/zapchasti/tigli/');
 });
+
+test('товар со склада с ценой: offers — AggregateOffer (наименьшая цена, рубли, число позиций, в наличии); без цены — без offers', () => {
+  const html = '<section class="phero"><div class="phero__main"><img src="/img/p.webp"></div><h1 class="phero__title">Индукционная печь УИ-0.15Т-160</h1></section>';
+  const url = 'https://uralinduktor.ru/products/induktsionnye-plavilnye-pechi/po-stali/ui-0-15t-160/';
+  const withPrice = JSON.parse(buildProductSchema(html, null, url, undefined, { price: 1250000, priceFrom: false, offers: 1 })!);
+  assert.deepEqual(withPrice.offers, { '@type': 'AggregateOffer', lowPrice: '1250000', priceCurrency: 'RUB', offerCount: '1', availability: 'https://schema.org/InStock' });
+  const range = JSON.parse(buildProductSchema(html, null, url, undefined, { price: 1099000, maxPrice: 1400000, priceFrom: true, offers: 3 })!);
+  assert.equal(range.offers.lowPrice, '1099000');
+  assert.equal(range.offers.highPrice, '1400000');
+  assert.equal(range.offers.offerCount, '3');
+  assert.equal(JSON.parse(buildProductSchema(html, null, url)!).offers, undefined);
+  // страница запчасти цену со склада не показывает — и в разметке её нет
+  const spare = '<div class="product-overview"><h1>Конденсатор ЭЭВП</h1></div>';
+  assert.equal(JSON.parse(buildProductSchema(spare, null, url, undefined, { price: 50000, priceFrom: false, offers: 1 })!).offers, undefined);
+});

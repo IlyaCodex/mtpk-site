@@ -7,6 +7,7 @@ import {
   pickSearchImage,
   searchWeight,
   stripHtmlComments,
+  type StockOffer,
 } from '@mtpk/content-kit';
 import { walkBlocks, type Block } from '@mtpk/content-model';
 import { renderBlocksToHtml, renderFormSlots } from '@mtpk/ui/server';
@@ -44,8 +45,8 @@ export function legacyFeatures(blocks: Block[]): string[] {
   return html ? detectPageFeatures(html).filter((f) => !REPLACED_BY_MODULES.has(f)) : [];
 }
 
-/** Запись БД → страница для вывода. */
-export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: string): PageDto {
+/** Запись БД → страница для вывода. offer — цена товара со склада (в разметку Product). */
+export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: string, offer?: StockOffer): PageDto {
   const base = {
     path: page.path,
     kind: page.kind as PageDto['kind'],
@@ -102,6 +103,7 @@ export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: st
         modifiedAt: iso(page.modifiedAt),
       },
       site,
+      offer,
     ),
     features: legacyFeatures(blocks),
     searchable: isSearchable(page.path),

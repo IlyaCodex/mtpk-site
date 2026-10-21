@@ -48,10 +48,22 @@ export interface PageListItem {
   lastmodAt: string;
 }
 
+/**
+ * Цена товара со склада (позиции «Наличия» с ценой, ведущие на страницу товара): наименьшая цена,
+ * наибольшая — если позиций с разной ценой несколько, «от», пояснение («с НДС»), число таких позиций.
+ */
+export interface StockOfferDto {
+  price: number;
+  maxPrice?: number;
+  priceFrom: boolean;
+  priceNote?: string;
+  offers: number;
+}
+
 /** Данные для блоков страницы: склад и разделы со сравнением. */
 export interface SiteDataDto {
-  /** slug товара → срок отгрузки (если задан) */
-  stock: Record<string, { shipping?: string }>;
+  /** slug товара → срок отгрузки (если задан) и цена со склада (если у позиции есть цена) */
+  stock: Record<string, { shipping?: string; offer?: StockOfferDto }>;
   compareSections: string[];
 }
 

@@ -1,4 +1,5 @@
 import type { ProductHeroBlock } from '@mtpk/content-model';
+import { priceHtml } from '@mtpk/content-kit/stock';
 import { Inline, RawElement } from '../primitives/Html.tsx';
 import { ActionLink, Breadcrumbs } from '../primitives/common.tsx';
 import { CompareButton } from '../catalog/Compare.tsx';
@@ -9,13 +10,16 @@ import { ProductMedia } from './ProductMedia.tsx';
 /**
  * Карточка товара (первый экран страницы модели): крошки, фото с галереей,
  * название, статус и цена, ключевые характеристики, кнопки, факты.
- * Позиция на складе — статус «В наличии · отгрузка…» и бейдж на фото.
+ * Позиция на складе — статус «В наличии · отгрузка…» и бейдж на фото; у позиции с ценой
+ * (админка «Наличие на складе») — её цена вместо цены из карточки («Цена — по запросу»).
  */
 export function ProductHero({ block, ctx }: { block: ProductHeroBlock; ctx: RenderContext }) {
   const slug = productSlug(ctx.path);
   const stock = slug ? ctx.stock[slug] : undefined;
   // на складе — срок отгрузки вместо срока производства (если статус у товара вообще показан)
   const status = stock && block.status !== undefined ? `В наличии · отгрузка ${stock.shipping || 'от 1 рабочего дня'}` : block.status;
+  const offer = stock?.offer;
+  const amount = offer ? priceHtml(offer.price, offer.priceFrom) : undefined;
   const compare = ctx.compareSections.includes(sectionOf(ctx.path));
   return (
     <section className="phero" data-stock={stock ? 'true' : undefined}>
@@ -28,7 +32,14 @@ export function ProductHero({ block, ctx }: { block: ProductHeroBlock; ctx: Rend
             <Inline as="h1" className="phero__title" html={block.title} />
             <div className="phero__status-row">
               {status !== undefined && <Inline className="phero__status" html={status} />}
-              {block.price !== undefined && <Inline className="phero__price" html={block.price} />}
+              {amount ? (
+                <span className="phero__price phero__price--value">
+                  <Inline className="phero__price-amount" html={amount} />
+                  {offer?.priceNote && <span className="phero__price-note">{offer.priceNote}</span>}
+                </span>
+              ) : (
+                block.price !== undefined && <Inline className="phero__price" html={block.price} />
+              )}
             </div>
             {/* у товаров с описательными свойствами (приборы, расходники) характеристик-чисел нет — свойства в фактах */}
             {block.keyspecs.length > 0 && (
