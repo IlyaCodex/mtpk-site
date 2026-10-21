@@ -95,7 +95,8 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
   const [data, setData] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [kind, setKind] = useState<StockKind>('equipment');
-  const [itemDialog, setItemDialog] = useState<{ index: number | null; draft: StockItem } | null>(null);
+  // index — правка позиции; null — новая позиция, after — копия: встаёт сразу под исходной
+  const [itemDialog, setItemDialog] = useState<{ index: number | null; draft: StockItem; after?: number } | null>(null);
   const [groupDialog, setGroupDialog] = useState<{ index: number | null; draft: StockGroup } | null>(null);
   const byPath = useMemo(() => new Map(catalog.map((c) => [c.path, c])), [catalog]);
 
@@ -146,6 +147,11 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
       { ...data, items: data.items.map((it, j) => (j === i ? { ...it, hidden } : it)) },
       hidden ? 'Позиция скрыта — на сайте её не видно' : 'Позиция снова показывается на сайте',
     );
+  }
+
+  /** Копия позиции: окно со всеми её полями; на склад она попадёт по «Добавить на склад», «Отмена» — ничего не создаёт. */
+  function duplicateItem(i: number) {
+    setItemDialog({ index: null, after: i, draft: structuredClone(data.items[i]) });
   }
 
   function removeItem(i: number) {
@@ -207,6 +213,7 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
                 option={byPath.get(it.url)}
                 onEdit={() => setItemDialog({ index: i, draft: it })}
                 onToggle={() => toggleHidden(i)}
+                onDuplicate={() => duplicateItem(i)}
                 onRemove={() => removeItem(i)}
                 disabled={saving}
               />
@@ -252,6 +259,7 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
                   onToggle={() => toggleHidden(i)}
                   onUp={k > 0 ? () => moveItem(i, -1) : undefined}
                   onDown={k < items.length - 1 ? () => moveItem(i, 1) : undefined}
+                  onDuplicate={() => duplicateItem(i)}
                   onRemove={() => removeItem(i)}
                   disabled={saving}
                 />
@@ -284,14 +292,22 @@ export function StockEditor({ initial, catalog }: { initial: StockData; catalog:
         <ItemDialog
           initial={itemDialog.draft}
           isNew={itemDialog.index === null}
+          copy={itemDialog.after !== undefined}
           groups={data.groups}
           catalog={catalog}
           byPath={byPath}
           saving={saving}
           onCancel={() => setItemDialog(null)}
           onSave={async (draft) => {
-            const items = itemDialog.index === null ? [...data.items, draft] : data.items.map((it, j) => (j === itemDialog.index ? draft : it));
-            if (await save({ ...data, items }, itemDialog.index === null ? 'Позиция добавлена на склад' : 'Позиция сохранена')) setItemDialog(null);
+            const { index, after } = itemDialog;
+            const items =
+              index !== null
+                ? data.items.map((it, j) => (j === index ? draft : it))
+                : after !== undefined
+                  ? [...data.items.slice(0, after + 1), draft, ...data.items.slice(after + 1)]
+                  : [...data.items, draft];
+            const message = index !== null ? 'Позиция сохранена' : after !== undefined ? 'Копия добавлена на склад — под исходной позицией' : 'Позиция добавлена на склад';
+            if (await save({ ...data, items }, message)) setItemDialog(null);
           }}
         />
       )}
@@ -327,7 +343,7 @@ function Thumb({ src, className }: { src: string | null | undefined; className?:
   );
 }
 
-function IconButton({ icon, label, onClick, disabled, danger }: { icon: 'up' | 'down' | 'trash' | 'pen'; label: string; onClick: () => void; disabled?: boolean; danger?: boolean }) {
+function IconButton({ icon, label, onClick, disabled, danger }: { icon: 'up' | 'down' | 'trash' | 'pen' | 'copy'; label: string; onClick: () => void; disabled?: boolean; danger?: boolean }) {
   return (
     <button
       type="button"
@@ -362,7 +378,7 @@ function SiteSwitch({ on, onChange, disabled }: { on: boolean; onChange: () => v
   );
 }
 
-/** Строка позиции: фото, название, ссылка, количество и срок, фото со склада; тумблер «на сайте». */
+/** Строка позиции: фото, название, ссылка, количество и срок, фото со склада; тумблер «на сайте», копия. */
 function ItemRow({
   item,
   option,
@@ -370,6 +386,7 @@ function ItemRow({
   onToggle,
   onUp,
   onDown,
+  onDuplicate,
   onRemove,
   disabled,
 }: {
@@ -379,6 +396,7 @@ function ItemRow({
   onToggle: () => void;
   onUp?: () => void;
   onDown?: () => void;
+  onDuplicate: () => void;
   onRemove: () => void;
   disabled?: boolean;
 }) {
@@ -420,6 +438,7 @@ function ItemRow({
           <Icon name="pen" className="h-4 w-4" />
           Изменить
         </Button>
+        <IconButton icon="copy" label="Дублировать — копия откроется для правки и встанет под этой позицией" disabled={disabled} onClick={onDuplicate} />
         {(onUp || onDown) && (
           <>
             <IconButton icon="up" label="Выше" disabled={disabled || !onUp} onClick={() => onUp?.()} />
@@ -446,6 +465,7 @@ function Field({ label, hint, error, children }: { label: string; hint?: ReactNo
 function ItemDialog({
   initial,
   isNew,
+  copy,
   groups,
   catalog,
   byPath,
@@ -455,6 +475,8 @@ function ItemDialog({
 }: {
   initial: StockItem;
   isNew: boolean;
+  /** копия существующей позиции: поля уже заполнены */
+  copy?: boolean;
   groups: StockGroup[];
   catalog: CatalogOption[];
   byPath: Map<string, CatalogOption>;
@@ -490,8 +512,14 @@ function ItemDialog({
   }
 
   return (
-    <Modal title={isNew ? 'Новая позиция на складе' : 'Позиция на складе'} onClose={onCancel}>
+    <Modal title={copy ? 'Копия позиции' : isNew ? 'Новая позиция на складе' : 'Позиция на складе'} onClose={onCancel}>
       <div className="space-y-5">
+        {copy && (
+          <p className="rounded-lg border border-brand-200 bg-brand-50 px-3 py-2 text-sm text-slate-700">
+            Все поля скопированы. Поменяйте то, чем позиция отличается, — название, цену, характеристики, фото со склада. На складе
+            копия появится после «Добавить на склад», сразу под исходной; «Отмена» — ничего не создаёт.
+          </p>
+        )}
         <Field label="Тип" error={errors.group} hint="Карточка типа на главной ведёт на /nalichie/ с фильтром по нему">
           <select className="field" value={draft.group ?? ''} onChange={(e) => set({ group: e.target.value || null })}>
             <option value="">— выберите —</option>
