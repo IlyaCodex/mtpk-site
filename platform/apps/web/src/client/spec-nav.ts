@@ -25,6 +25,11 @@ function initSpecNav(nav: HTMLElement): void {
       if (top < nav.scrollTop + pad) nav.scrollTo({ top: Math.max(0, top - pad), behavior: 'smooth' });
       else if (bottom > nav.scrollTop + nav.clientHeight - pad) nav.scrollTo({ top: bottom - nav.clientHeight + pad, behavior: 'smooth' });
     }
+    // на планшете и телефоне содержание — лента в одну строку: текущий пункт — к середине ленты
+    if (current && nav.scrollWidth > nav.clientWidth + 1) {
+      const shift = current.getBoundingClientRect().left - nav.getBoundingClientRect().left - (nav.clientWidth - current.offsetWidth) / 2;
+      nav.scrollTo({ left: nav.scrollLeft + shift, behavior: 'smooth' });
+    }
   };
 
   nav.addEventListener('click', (e) => {

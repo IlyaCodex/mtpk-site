@@ -647,6 +647,14 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
   .phero__keyspec-label { overflow-wrap: anywhere; word-break: break-word; }
 }
 
+/* 12.3c Кнопки в шапке товара («Запросить цену», «Получить консультацию»,
+ *       «К сравнению») на телефоне — одной ширины и высоты, друг под другом:
+ *       в ряд с переносом они выходили разной ширины по длине текста (21.10.2026). */
+@media (max-width: 640px) {
+  .phero__actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
+  .phero__actions > :is(.btn, .cmp-btn) { width: 100%; min-height: 52px; justify-content: center; }
+}
+
 /* 12.4 Блок «ситуаций» услуги (/uslugi/remont-drobemetov/) — карточка
  *      с длинным списком пунктов не сжималась под 375px. */
 @media (max-width: 768px) {

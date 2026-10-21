@@ -177,9 +177,17 @@
 }
 [data-stock-filter]:empty { display: none; }
 [data-stock-filter][hidden] { display: none; }
+/* Телефон: кнопки типов — одной строкой, листаются вбок до края экрана (поля — как у .container,
+   20 px); без серой рамки и подписи «Тип:» — восемь кнопок столбиком занимали полэкрана (21.10.2026). */
 @media (max-width: 767px) {
-  .stock-filterbar { padding: var(--sp-3, 12px); }
-  .stock-filterbar__label { font-size: 10px; }
+  .stock-filterbar { display: block; margin: var(--sp-4) 0 var(--sp-5); padding: 0; background: none; border: 0; }
+  .stock-filterbar__label { display: none; }
+  .stock-filterbar .stock-filter {
+    flex-wrap: nowrap; margin: 0 calc(-1 * var(--sp-5)); padding: 2px var(--sp-5); border: 0;
+    overflow-x: auto; overscroll-behavior-x: contain; scroll-padding-inline: var(--sp-5); scrollbar-width: none;
+  }
+  .stock-filterbar .stock-filter::-webkit-scrollbar { display: none; }
+  .stock-filterbar .case-filter { flex: none; white-space: nowrap; }
 }
 
 /* ── Карточка позиции склада (/nalichie/) ──────────────────────

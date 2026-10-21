@@ -98,6 +98,13 @@ function initList(root: HTMLElement): void {
       b.classList.toggle('is-active', on);
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
     }
+    // на телефоне кнопки — одной строкой с прокруткой: выбранную держим на виду (страницу не двигаем)
+    const active = buttons.find((b) => (b.dataset.type ?? '') === type);
+    const strip = active?.parentElement;
+    if (active && strip && strip.scrollWidth > strip.clientWidth + 1) {
+      const shift = active.getBoundingClientRect().left - strip.getBoundingClientRect().left - (strip.clientWidth - active.offsetWidth) / 2;
+      strip.scrollTo({ left: strip.scrollLeft + shift, behavior: smooth() });
+    }
     if (counter) counter.textContent = `${shown} ${plural(shown)}`;
   };
   for (const b of buttons) b.addEventListener('click', () => apply(b.dataset.type ?? ''));

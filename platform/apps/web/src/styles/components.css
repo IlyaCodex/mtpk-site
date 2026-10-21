@@ -439,14 +439,27 @@ a.bo-item__value:focus-visible { outline: none; }
 .cdoc__panel .spec__cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
 @media (max-width: 1024px) {
   .cdoc__layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); }
-  /* содержание — лента кнопок с прокруткой */
-  .cdoc__nav { position: static; flex-direction: row; gap: var(--sp-2); max-height: none; overflow-x: auto; padding: var(--sp-3); scrollbar-width: none; }
+  /* содержание — лента кнопок в одну строку, листается вбок до края экрана (поля — как у .container);
+     без рамки-карточки: кнопки одной высоты, текст не переносится; текущий раздел — зелёным */
+  .cdoc__nav {
+    position: static; flex-direction: row; gap: var(--sp-2); max-height: none;
+    margin: 0 calc(-1 * var(--sp-8)); padding: 2px var(--sp-8); overflow-x: auto; overscroll-behavior-x: contain;
+    border: 0; border-radius: 0; background: none; scroll-padding-inline: var(--sp-8); scrollbar-width: none;
+  }
   .cdoc__nav::-webkit-scrollbar { display: none; }
   .cdoc__nav-eyebrow { display: none; }
-  .cdoc__nav-link { flex-shrink: 0; max-width: 260px; border: 1px solid var(--border-subtle); }
-  /* в ленте кнопок полоска текущего раздела — прямая, снизу */
-  .cdoc__nav-link.is-active::before { top: auto; right: var(--sp-3); bottom: -1px; left: var(--sp-3); width: auto; height: 3px; }
+  .cdoc__nav-link {
+    flex: none; padding: 9px var(--sp-4); border: 1px solid var(--border-default); border-radius: var(--btn-round, 10px);
+    background: var(--surface-page); white-space: nowrap; font-weight: var(--fw-medium);
+  }
+  .cdoc__nav-link:hover { border-color: var(--green-500); background: var(--surface-page); }
+  .cdoc__nav-link.is-active { border-color: var(--green-500); background: var(--green-50); color: var(--green-700); font-weight: var(--fw-medium); }
+  .cdoc__nav-link.is-active::before { display: none; }
   .cdoc__body { padding: var(--sp-2) var(--sp-8); }
+}
+@media (max-width: 768px) {
+  /* поля .container на телефоне — 20 px: лента содержания уходит под край экрана ровно на них */
+  .cdoc__nav { margin: 0 calc(-1 * var(--sp-5)); padding: 2px var(--sp-5); scroll-padding-inline: var(--sp-5); }
 }
 @media (max-width: 640px) {
   .cdoc { padding: var(--sp-5) 0 var(--sp-12); }
