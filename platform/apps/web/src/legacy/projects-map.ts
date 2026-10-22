@@ -1,15 +1,17 @@
 /* ============================================================
    Карта реализованных проектов — УралИндуктор (главная, «География»).
-   Yandex Maps JS API 2.1: кластеры с числом проектов (щелчок — приблизить,
-   а где проекты в одной точке — список), метка проекта — по щелчку
-   карточка под картой ([data-geo-card]): фото, город, название, ссылка.
+   Yandex Maps JS API 2.1: кластеры с числом проектов. Щелчок по кластеру:
+   проекты в разных местах — приблизить к ним; в одной точке (один город:
+   у таких проектов одни координаты) — «паутина»: метки расходятся вокруг
+   неё, к каждой — линия от центра. Метка проекта — по щелчку карточка под
+   картой ([data-geo-card]): фото, город, название, ссылка.
    Кнопки секции: страны ([data-geo-country], видна, если у страны есть
    проекты), масштаб и «Все проекты» ([data-geo-zoom="in|out|all"]).
    Данные: window.projects (js/projects-data.js); страна — поле country,
    иначе по городу (не из списка — Россия).
    ============================================================ */
-type GeoObject = { properties: { get(key: 'projectData'): Project | undefined } };
-type ClusterObject = { properties: { get(key: 'geoObjects'): GeoObject[] | undefined; set(key: 'balloonContent', value: string): void } };
+/** Объекты Yandex Maps — без типов (ymaps: any в globals.d.ts). */
+type YObject = any;
 
 (function () {
   'use strict';
@@ -37,30 +39,34 @@ type ClusterObject = { properties: { get(key: 'geoObjects'): GeoObject[] | undef
   var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
   var CLOSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
-  // — Содержимое balloon для кластера (проекты в одной точке) — собираем сами из geoObjects —
-  function buildClusterPopup(geoObjects: GeoObject[]): string {
-    var items = geoObjects.map(function (go) {
-      var p: Partial<Project> = go.properties.get('projectData') || {};
-      var img = p.image ? '<img class="pm-cluster-item__img" src="' + esc(p.image) + '" alt="" loading="lazy">'
-                        : '<div class="pm-cluster-item__noimg" aria-hidden="true"></div>';
-      var meta = [];
-      if (p.city) meta.push(esc(p.city));
-      if (p.date) meta.push(esc(p.date));
-      var metaStr = meta.length ? '<div class="pm-cluster-item__meta">' + meta.join(' &middot; ') + '</div>' : '';
-      var href = esc(p.link || '#');
-      return '<a class="pm-cluster-item" href="' + href + '">' + img +
-        '<div class="pm-cluster-item__body">' +
-        '<div class="pm-cluster-item__title">' + esc(p.name) + '</div>' +
-        metaStr +
-        '</div></a>';
-    }).join('');
-    var n = geoObjects.length;
-    var word = (n % 10 === 1 && n % 100 !== 11) ? 'объект'
-             : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'объекта' : 'объектов';
-    return '<div class="pm-cluster-pop">' +
-      '<div class="pm-cluster-pop__head">' + n + ' ' + word + ' в&nbsp;этой точке</div>' +
-      '<div class="pm-cluster-pop__list">' + items + '</div>' +
-    '</div>';
+  /** Кластер с проектами ближе этого (градусы, ~5 км) — одна точка: раскрывается «паутиной», а не приближением. */
+  var SAME_PLACE = 0.05;
+
+  /** Шаг между метками «паутины», px: значок метки ~26 px. */
+  var SPIDER_STEP = 34;
+
+  /**
+   * Раскладка «паутины» в пикселях вокруг центра, первая метка — сверху: до 8 — по кругу, больше —
+   * спиралью Архимеда (виток к витку — тот же шаг). Начало — за значком кластера, он остаётся в центре.
+   */
+  function spiderOffsets(n: number): [number, number][] {
+    var out: [number, number][] = [];
+    var i, a;
+    if (n <= 8) {
+      var r = Math.max(56, (SPIDER_STEP * n) / (2 * Math.PI));
+      for (i = 0; i < n; i++) {
+        a = -Math.PI / 2 + (2 * Math.PI * i) / n;
+        out.push([r * Math.cos(a), r * Math.sin(a)]);
+      }
+      return out;
+    }
+    var turn = SPIDER_STEP / (2 * Math.PI);
+    for (i = 0, a = 0; i < n; i++) {
+      var rr = 50 + turn * a;
+      out.push([rr * Math.cos(a - Math.PI / 2), rr * Math.sin(a - Math.PI / 2)]);
+      a += SPIDER_STEP / rr;
+    }
+    return out;
   }
 
   function build() {
@@ -77,30 +83,15 @@ type ClusterObject = { properties: { get(key: 'geoObjects'): GeoObject[] | undef
     });
     map.behaviors.disable('scrollZoom');
 
-    // Балун кластера — готовый HTML из свойств кластера (innerHTML напрямую:
-    // фильтр |raw на некоторых сборках Yandex Maps 2.1 не разворачивается).
-    var ClusterBalloonContentLayout = ymaps.templateLayoutFactory.createClass(
-      '<div class="pm-cluster-pop-mount"></div>',
-      {
-        build: function () {
-          ClusterBalloonContentLayout.superclass.build.call(this);
-          var mount = this.getParentElement() && this.getParentElement().querySelector('.pm-cluster-pop-mount');
-          if (mount) mount.innerHTML = this.getData().properties.get('balloonContent') || '';
-        }
-      }
-    );
-
+    // щелчок по кластеру — свой (ниже): приблизить или раскрыть «паутиной»; балуна у кластера нет.
+    // Раньше кластер с проектами в одной точке приближался до улиц (точки так и не расходились)
+    // и открывал пустой балун: его содержимое подкладывалось только первым кластерам.
     var cluster = new ymaps.Clusterer({
       preset: 'islands#greenClusterIcons',
       groupByCoordinates: false,
-      clusterDisableClickZoom: false,           // щелчок — приблизить; не приближается — список
-      clusterOpenBalloonOnClick: true,
+      clusterDisableClickZoom: true,
+      clusterOpenBalloonOnClick: false,
       gridSize: 80,
-      clusterBalloonContentLayout: ClusterBalloonContentLayout,
-      clusterBalloonPanelMaxMapArea: 0,
-      clusterBalloonContentLayoutWidth: 320,
-      clusterBalloonContentLayoutHeight: 360,
-      clusterBalloonPagerVisible: false,
       hasHint: false
     });
 
@@ -145,6 +136,7 @@ type ClusterObject = { properties: { get(key: 'geoObjects'): GeoObject[] | undef
       });
     }
     function show(country: string) {
+      closeSpider();
       cluster.removeAll();
       shown = all.filter(function (x) { return !country || x.country === country; });
       cluster.add(shown.map(function (x) { return x.pm; }));
@@ -152,15 +144,69 @@ type ClusterObject = { properties: { get(key: 'geoObjects'): GeoObject[] | undef
       fit();
     }
 
-    // — Когда кластер формируется, подкладываем готовый HTML в его properties.balloonContent —
-    function patchClusterHTML(clusterObj: ClusterObject) {
-      clusterObj.properties.set('balloonContent', buildClusterPopup(clusterObj.properties.get('geoObjects') || []));
+    // — «Паутина»: проекты одной точки расходятся вокруг неё, к каждой метке — линия от центра —
+    var spider = new ymaps.GeoObjectCollection();
+    var spiderHub: YObject = null;
+    function closeSpider() {
+      if (!spiderHub) return;
+      spider.removeAll();
+      spiderHub = null;
     }
-    cluster.events.add(['add', 'objectsupdated'], function () {
-      cluster.getClusters().forEach(patchClusterHTML);
+    function openSpider(hub: YObject, objs: YObject[]) {
+      closeSpider();
+      var zoom = map.getZoom();
+      var projection = map.options.get('projection');
+      var center = hub.geometry.getCoordinates();
+      var c = projection.toGlobalPixels(center, zoom);
+      var offsets = spiderOffsets(objs.length);
+      // «паутина» целиком на виду: у края — сдвинуть карту (масштаб тот же); справа — кнопки карты
+      var reach = 18 + Math.max.apply(null, offsets.map(function (o) { return Math.sqrt(o[0] * o[0] + o[1] * o[1]); }));
+      var size = map.container.getSize();
+      var view = projection.toGlobalPixels(map.getCenter(), zoom);
+      var dx = Math.max(0, c[0] + reach - (view[0] + size[0] / 2 - 80)) - Math.max(0, view[0] - size[0] / 2 + 24 - (c[0] - reach));
+      var dy = Math.max(0, c[1] + reach - (view[1] + size[1] / 2 - 36)) - Math.max(0, view[1] - size[1] / 2 + 24 - (c[1] - reach));
+      if (dx || dy) map.setCenter(projection.fromGlobalPixels([view[0] + dx, view[1] + dy], zoom), zoom, { duration: 250 });
+      offsets.forEach(function (off, i) {
+        var p: Project = objs[i].properties.get('projectData');
+        var ll = projection.fromGlobalPixels([c[0] + off[0], c[1] + off[1]], zoom);
+        spider.add(new ymaps.Polyline([center, ll], {}, {
+          strokeColor: '#4fab3a', strokeWidth: 2, strokeOpacity: 0.85, interactivityModel: 'default#transparent'
+        }));
+        var pm = new ymaps.Placemark(ll, { hintContent: p.name }, { preset: 'islands#greenCircleDotIcon', zIndex: 1000 });
+        pm.events.add('click', function () { showCard(p); });
+        spider.add(pm);
+      });
+      spiderHub = hub;
+    }
+
+    cluster.events.add('click', function (e: YObject) {
+      var target = e.get('target');
+      // щелчок по метке проекта (не кластеру) — у неё своя карточка
+      if (!target || typeof target.getGeoObjects !== 'function') return;
+      var objs: YObject[] = target.getGeoObjects();
+      var lat = objs.map(function (o: YObject) { return o.geometry.getCoordinates()[0] as number; });
+      var lon = objs.map(function (o: YObject) { return o.geometry.getCoordinates()[1] as number; });
+      var box = [[Math.min.apply(null, lat), Math.min.apply(null, lon)], [Math.max.apply(null, lat), Math.max.apply(null, lon)]];
+      if (box[1][0] - box[0][0] > SAME_PLACE || box[1][1] - box[0][1] > SAME_PLACE) {
+        // разные места — приблизить к ним: кластер распадётся на города
+        closeSpider();
+        map.setBounds(box, { checkZoomRange: true, zoomMargin: 60, duration: 300 });
+        return;
+      }
+      // одна точка — «паутина»; повторный щелчок по центру — свернуть
+      if (spiderHub === target) closeSpider();
+      else openSpider(target, objs);
     });
+    map.geoObjects.add(spider);
     map.geoObjects.add(cluster);
-    map.events.add('click', hideCard);
+    map.events.add('click', function () {
+      hideCard();
+      closeSpider();
+    });
+    // «паутина» разложена в пикселях своего масштаба — при смене масштаба сворачивается
+    map.events.add('boundschange', function (e: YObject) {
+      if (e.get('newZoom') !== e.get('oldZoom')) closeSpider();
+    });
 
     // — Кнопки стран: у страны без проектов кнопки нет —
     var buttons = Array.prototype.slice.call(root.querySelectorAll('[data-geo-country]')) as HTMLElement[];

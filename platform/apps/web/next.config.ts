@@ -96,6 +96,10 @@ const nextConfig: NextConfig = {
       // клиентские модули: имя файла содержит хеш содержимого — кеш навсегда
       { source: '/assets/:path*', headers: cache('public, max-age=31536000, immutable') },
       { source: '/js/:path*', headers: cache('public, max-age=604800') },
+      // карта проектов на главной: скрипт и точки подгружает блок «Скрипт» страницы — адрес без версии сборки
+      // (у точек версии нет вовсе), поэтому браузер сверяет их с сервером не реже раза в 5 минут (ETag → 304):
+      // новые проекты и правки карты доходят сразу, а не через неделю
+      { source: '/js/:file(projects-map\\.js|projects-data\\.js)', headers: cache('public, max-age=300, must-revalidate') },
       // шрифты разрешены и другим источникам: их подгружает предпросмотр в админке
       { source: '/fonts/:path*', headers: [...cache('public, max-age=2592000'), { key: 'Access-Control-Allow-Origin', value: '*' }] },
       { source: '/brand/:path*', headers: cache('public, max-age=2592000') },
