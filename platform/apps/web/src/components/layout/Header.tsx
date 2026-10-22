@@ -64,17 +64,18 @@ export function Header({ settings, activeNav }: { settings: SiteSettings; active
             ))}
           </nav>
           <div className="header__actions">
-            <button className="nav-toggle" aria-label="Открыть меню" aria-expanded="false" data-nav-toggle="">
-              <span className="nav-toggle__bar" />
-              <span className="nav-toggle__bar" />
-              <span className="nav-toggle__bar" />
-            </button>
             <button className="icon-btn" aria-label="Поиск" data-search-open="">
               <SearchIcon />
             </button>
             {/* состояние (aria-pressed, подсказка) ставит client/theme.ts */}
             <button type="button" className="icon-btn theme-toggle" aria-label="Тёмная тема" aria-pressed="false" title="Тёмная тема" data-theme-toggle="">
               <ThemeIcons />
+            </button>
+            {/* меню (до 1024 px) — крайним справа: поиск, тема, меню; форма звонка на этих ширинах скрыта */}
+            <button className="nav-toggle" aria-label="Открыть меню" aria-expanded="false" data-nav-toggle="">
+              <span className="nav-toggle__bar" />
+              <span className="nav-toggle__bar" />
+              <span className="nav-toggle__bar" />
             </button>
             <QuickCallForm />
           </div>
