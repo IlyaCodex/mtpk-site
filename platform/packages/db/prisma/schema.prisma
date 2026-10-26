@@ -87,6 +87,8 @@ model Category {
   sort          Int           @default(0)
   /// показывать карточку в сетке «Оборудование» на главной
   onHome        Boolean       @default(true) @map("on_home")
+  /// скрыта на сайте (тумблер в админке «Каталог»): страница — 404, нет в карте сайта, списках, поиске и меню; вместе с подкатегориями и товарами
+  hidden        Boolean       @default(false)
   /// equipment — оборудование; spares — запчасти; hub — витрина раздела (общая страница запчастей)
   kind          String        @default("equipment")
   /// секции под каждым товаром категории: формы, преимущества, партнёры (шаблон товара)
@@ -119,6 +121,8 @@ model Subcategory {
   sort        Int       @default(0)
   /// показывать карточку в «Модельном ряду» категории
   listed      Boolean   @default(true)
+  /// скрыта на сайте (тумблер в админке «Каталог»): страница — 404, нет в карте сайта, списках, поиске и меню; вместе с товарами
+  hidden      Boolean   @default(false)
   products    Product[]
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
@@ -167,6 +171,8 @@ model Product {
   sort          Int          @default(0)
   /// показывать карточку в списке товаров подкатегории (категории)
   listed        Boolean      @default(true)
+  /// скрыта на сайте (тумблер в админке «Каталог»): страница — 404, нет в карте сайта, списках, поиске и меню; данные товара сохраняются
+  hidden        Boolean      @default(false)
   createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 

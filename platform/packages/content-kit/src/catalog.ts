@@ -21,6 +21,8 @@ export interface CatalogCategory {
   onHome: boolean;
   kind: string;
   productBlocks: Block[];
+  /** скрыта тумблером в админке (вместе с подкатегориями и товарами) */
+  hidden?: boolean;
 }
 
 export interface CatalogSubcategory {
@@ -38,6 +40,8 @@ export interface CatalogSubcategory {
   sort: number;
   /** карточка в «Модельном ряду» категории */
   listed: boolean;
+  /** скрыта тумблером в админке (вместе с товарами) */
+  hidden?: boolean;
 }
 
 export interface CatalogProduct {
@@ -65,6 +69,8 @@ export interface CatalogProduct {
   sort: number;
   /** карточка в списке товаров */
   listed: boolean;
+  /** скрыт тумблером в админке */
+  hidden?: boolean;
 }
 
 export interface CatalogData {
@@ -74,6 +80,31 @@ export interface CatalogData {
 }
 
 const bySort = <T extends { sort: number; path: string }>(a: T, b: T) => a.sort - b.sort || a.path.localeCompare(b.path);
+
+/** Статус страницы, скрытой с сайта тумблером каталога (её или раздела выше): не published — всюду не видна. */
+export const HIDDEN_STATUS = 'hidden';
+
+/**
+ * Скрытие с сайта по цепочке: скрытая категория скрывает свои подкатегории и товары, подкатегория — свои
+ * товары. У скрытых записей статус страницы — HIDDEN_STATUS: сетки, списки и шаблоны показывают только
+ * published, страница отвечает 404, её нет в карте сайта и поиске. Собственный флаг hidden не меняется.
+ */
+export function applyHidden(data: CatalogData): CatalogData {
+  const cats = new Set(data.categories.filter((c) => c.hidden).map((c) => c.id));
+  const subs = new Set(data.subcategories.filter((s) => s.hidden || cats.has(s.categoryId)).map((s) => s.id));
+  const off = <T extends { status: string }>(x: T, hidden: boolean): T => (hidden ? { ...x, status: HIDDEN_STATUS } : x);
+  return {
+    categories: data.categories.map((c) => off(c, cats.has(c.id))),
+    subcategories: data.subcategories.map((s) => off(s, subs.has(s.id))),
+    products: data.products.map((p) => off(p, Boolean(p.hidden) || cats.has(p.categoryId) || (p.subcategoryId !== null && subs.has(p.subcategoryId)))),
+  };
+}
+
+/** Страницы, скрытые с сайта тумблерами каталога: id и адреса. */
+export function hiddenPages(data: CatalogData): { ids: Set<number>; paths: Set<string> } {
+  const all = [...data.categories, ...data.subcategories, ...data.products].filter((x) => x.status === HIDDEN_STATUS);
+  return { ids: new Set(all.map((x) => x.pageId)), paths: new Set(all.map((x) => x.path)) };
+}
 
 /** Чья это страница: категории, подкатегории или товара. */
 export function catalogOwner(pageId: number, data: CatalogData) {
@@ -125,15 +156,28 @@ export function resolveCatalogBlocks(page: { id: number }, blocks: Block[], data
   const { category, subcategory, product } = catalogOwner(page.id, data);
   const ownCategory = category ?? (subcategory ? data.categories.find((c) => c.id === subcategory.categoryId) : undefined);
 
+  // дополнительные карточки и списки «по адресам» не ведут на черновики и скрытые разделы каталога
+  const unpublished = new Set([...data.categories, ...data.subcategories, ...data.products].filter((x) => x.status !== 'published').map((x) => x.path));
+  const productByPath = new Map(data.products.map((p) => [p.path, p]));
+  const asPath = (href: string) => `/${href.replace(/^https?:\/\/[^/]+/, '').replace(/[?#].*$/, '').replace(/^\/+|\/+$/g, '')}/`;
+
   const resolve = (b: Block): Block => {
     if (b.type === 'container') return { ...b, children: b.children.map(resolve) };
+    // товары по адресам (подборка из разных подкатегорий: «Транзисторные печи для стали») — карточки из каталога
+    if (b.type === 'catalogList' && b.paths?.length) {
+      const list = b.paths.map((x) => productByPath.get(asPath(x))).filter((p): p is CatalogProduct => p !== undefined && p.status === 'published');
+      return { ...b, cards: list.map(productCard) };
+    }
     if (b.type === 'catalogList' && b.auto) return { ...b, cards: pageProducts(page.id, data).map(productCard) };
     if (b.type !== 'catalogCards') return b;
-    return { ...b, items: [...cardsFor(b.source), ...(b.extra ?? [])] };
+    const auto = cardsFor(b.source).map((it) => (b.group ? { ...it, group: b.group } : it));
+    return { ...b, items: [...auto, ...(b.extra ?? []).filter((it) => !unpublished.has(asPath(it.href)))] };
   };
 
   const cardsFor = (source: Extract<Block, { type: 'catalogCards' }>['source']): CatalogCardItem[] => {
     switch (source) {
+      case 'none':
+        return [];
       case 'categories':
       case 'spares': {
         const list = data.categories

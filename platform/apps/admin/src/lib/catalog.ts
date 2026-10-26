@@ -184,6 +184,8 @@ export interface CatCategory {
   onHome: boolean;
   /** equipment — оборудование, hub — витрина запчастей */
   kind: string;
+  /** скрыта с сайта тумблером (вместе с подкатегориями и товарами) */
+  hidden: boolean;
   subcategories: number;
   products: number;
   updatedAt: string;
@@ -202,6 +204,8 @@ export interface CatSubcategory {
   coverAlt: string;
   sort: number;
   listed: boolean;
+  /** скрыта с сайта тумблером (вместе с товарами) */
+  hidden: boolean;
   products: number;
   updatedAt: string;
 }
@@ -218,6 +222,8 @@ export interface CatProduct {
   cover: string | null;
   sort: number;
   listed: boolean;
+  /** скрыт с сайта тумблером */
+  hidden: boolean;
   updatedAt: string;
 }
 
@@ -286,4 +292,15 @@ export function plural(n: number, one: string, few: string, many: string): strin
   if (m10 === 1 && m100 !== 11) return one;
   if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
   return many;
+}
+
+/**
+ * Чем скрыта запись на сайте: сама (тумблер) или вместе с разделом выше — его название. null — показывается.
+ * Так же считает сайт (content-kit applyHidden): категория скрывает подкатегории и товары, подкатегория — товары.
+ */
+export function hiddenBy(tree: CatalogTree, x: { categoryId?: number; subcategoryId?: number | null; hidden: boolean }): { self: boolean; parent: string | null } {
+  const cat = x.categoryId !== undefined ? tree.categories.find((c) => c.id === x.categoryId) : undefined;
+  const sub = x.subcategoryId ? tree.subcategories.find((s) => s.id === x.subcategoryId) : undefined;
+  const parent = cat?.hidden ? `категория «${plain(cat.name)}»` : sub?.hidden ? `подкатегория «${plain(sub.name)}»` : null;
+  return { self: x.hidden, parent };
 }

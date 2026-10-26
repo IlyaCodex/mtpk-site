@@ -16,7 +16,7 @@ import { resolveCatalogBlocks, type CatalogData } from '@mtpk/content-kit/catalo
 import { darkVars } from '@mtpk/content-kit/dark';
 import { styleFileCss } from '@mtpk/content-kit/styles';
 import { DEFAULT_HOLIDAYS, DEFAULT_SETTINGS, holidaySettings, siteSettings, type Block, type HolidaySettings, type SiteSettings } from '@mtpk/content-model';
-import { loadCatalog } from './catalog-data.ts';
+import { hiddenSitePages, loadCatalog } from './catalog-data.ts';
 import type { Db, Page, StyleBlock } from './db.ts';
 import type { JsonCache, Logger, PageDto, PageListItem, RedirectDto } from '@mtpk/shared';
 import { renderPage, seoHtml, toSearchDoc, type SearchDoc } from './render.ts';
@@ -64,7 +64,18 @@ export class ContentStore {
 
   private async loadPage(path: string): Promise<Page | null> {
     const row = await this.db.page.findUnique({ where: { path } });
-    return row && row.status === 'published' ? row : null;
+    if (!row || row.status !== 'published') return null;
+    // раздел каталога скрыт тумблером (сам или вместе с разделом выше) — страницы на сайте нет
+    return (await this.hidden()).ids.has(row.id) ? null : row;
+  }
+
+  /** Страницы, скрытые с сайта тумблерами каталога: записи каталога и страницы внутри скрытых разделов. */
+  private async hidden(): Promise<{ ids: Set<number>; paths: Set<string> }> {
+    const list = await this.cache.wrap('hidden-pages', this.ttl, async () => {
+      const h = await hiddenSitePages(this.db, await this.catalog());
+      return { ids: [...h.ids], paths: [...h.paths] };
+    });
+    return { ids: new Set(list.ids), paths: new Set(list.paths) };
   }
 
   /** Каталог: категории, подкатегории, товары — из них собираются карточки и шаблоны страниц. */
@@ -93,11 +104,13 @@ export class ContentStore {
   async listPages(): Promise<PageListItem[]> {
     return this.cache.wrap('pages:list', this.ttl, async () => {
       const rows = await this.db.page.findMany({
-        select: { path: true, kind: true, template: true, noindex: true, lastmodAt: true },
+        select: { id: true, path: true, kind: true, template: true, noindex: true, lastmodAt: true },
         where: { status: 'published' },
         orderBy: { path: 'asc' },
       });
-      return rows.map((r) => ({ ...r, kind: r.kind as PageListItem['kind'], lastmodAt: r.lastmodAt.toISOString() }));
+      // скрытые разделы каталога — не в карте сайта и не в списке страниц сайта
+      const { ids } = await this.hidden();
+      return rows.filter((r) => !ids.has(r.id)).map(({ id: _id, ...r }) => ({ ...r, kind: r.kind as PageListItem['kind'], lastmodAt: r.lastmodAt.toISOString() }));
     });
   }
 
@@ -245,6 +258,21 @@ export class ContentStore {
     });
   }
 
+  /**
+   * Настройки для сайта: без ссылок на скрытые разделы каталога — пункт мегаменю, мобильного меню и подвала,
+   * ведущий на скрытую страницу, не показывается (в админке настройки — как есть).
+   */
+  async siteSettings(): Promise<SiteSettings> {
+    const settings = await this.settings();
+    const { paths } = await this.hidden();
+    if (!paths.size) return settings;
+    const off = (v: unknown): boolean =>
+      typeof v === 'object' && v !== null && typeof (v as { href?: unknown }).href === 'string' && paths.has((v as { href: string }).href.replace(/[?#].*$/, ''));
+    const prune = (v: unknown): unknown =>
+      Array.isArray(v) ? v.filter((x) => !off(x)).map(prune) : typeof v === 'object' && v !== null ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, prune(x)])) : v;
+    return prune(settings) as SiteSettings;
+  }
+
   /** Праздничные баннеры главной (раздел «Праздники»). Нет записи или она битая — праздники по умолчанию. */
   async holidays(): Promise<HolidaySettings> {
     return this.cache.wrap('holidays', this.ttl, async () => {
@@ -272,11 +300,12 @@ export class ContentStore {
   async *searchDocs(batch = 100): AsyncGenerator<SearchDoc> {
     const styles = await this.styleMap();
     const catalog = await this.catalog();
+    const { ids: hidden } = await this.hidden();
     const paths = (await this.db.page.findMany({ select: { path: true }, orderBy: { path: 'asc' } })).map((r) => r.path);
     for (let i = 0; i < paths.length; i += batch) {
       const rows = await this.db.page.findMany({ where: { path: { in: paths.slice(i, i + batch) } } });
       for (const found of rows) {
-        if (found.status !== 'published') continue;
+        if (found.status !== 'published' || hidden.has(found.id)) continue;
         const row = await this.pageData(found, catalog);
         const doc = toSearchDoc(row, renderPage(row, styles, this.site));
         if (doc) yield doc;
@@ -295,7 +324,7 @@ export class ContentStore {
   async purge(paths?: string[]): Promise<number> {
     this.styles = null;
     if (!paths || !paths.length) return this.cache.clear();
-    await this.cache.del(...paths.map((p) => `page:${p}`), 'pages:list', 'redirects', 'stock-source', 'stock-view', 'stock-pages', 'site-data', 'catalog');
+    await this.cache.del(...paths.map((p) => `page:${p}`), 'pages:list', 'redirects', 'stock-source', 'stock-view', 'stock-pages', 'site-data', 'catalog', 'hidden-pages');
     if (paths.some((p) => p.startsWith('/products/'))) await this.cache.del('compare');
     return paths.length;
   }

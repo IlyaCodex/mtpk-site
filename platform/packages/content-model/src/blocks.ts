@@ -298,6 +298,8 @@ export const catalogListBlock = z
     head: sectionHead.optional(),
     /** фильтр по характеристикам; если не задан — строится автоматически по data-атрибутам карточек */
     filter: catalogFilter.optional(),
+    /** подборка из разных подкатегорий (раздел «Транзисторные печи для стали»): карточки — из каталога по адресам */
+    paths: z.array(z.string()).optional().describe('Товары по адресам страниц: подборка из разных подкатегорий (вместо товаров этой страницы)'),
     cards: z.array(productCard).describe('Карточки товаров (когда не из каталога)'),
     attrs: attrs(),
     gridAttrs: attrs(),
@@ -314,6 +316,8 @@ export const catalogCardItem = z.object({
   caption: inline('Краткое описание').optional(),
   label: inline('Надпись над названием').optional(),
   linkText: inline('Надпись ссылки (по умолчанию «Подробнее»)').optional(),
+  /** подзаголовок над карточками: у соседних карточек с одной группой — общий («Тиристорные плавильные печи») */
+  group: inline('Группа — подзаголовок над карточками (у соседних карточек одной группы общий)').optional(),
 });
 export type CatalogCardItem = z.infer<typeof catalogCardItem>;
 
@@ -327,7 +331,7 @@ export const catalogCardsBlock = z
   .object({
     type: z.literal('catalogCards'),
     source: z
-      .enum(['categories', 'spares', 'subcategories', 'products'])
+      .enum(['categories', 'spares', 'subcategories', 'products', 'none'])
       .describe('Что показываем')
       .meta({
         enumLabels: {
@@ -335,6 +339,7 @@ export const catalogCardsBlock = z
           spares: 'Категории запчастей',
           subcategories: 'Подкатегории этой категории',
           products: 'Товары этой страницы',
+          none: 'Только дополнительные карточки (ниже)',
         },
       }),
     design: z
@@ -350,6 +355,13 @@ export const catalogCardsBlock = z
     after: element('HTML под карточками').optional(),
     /** карточки после собранных из каталога: ссылки на другие разделы (запчасти, соседняя категория) */
     extra: z.array(catalogCardItem).optional().describe('Дополнительные карточки (ссылки на другие разделы)'),
+    /** группа для карточек из каталога (у дополнительных — своё поле «Группа») */
+    group: inline('Группа карточек из каталога — подзаголовок над ними').optional(),
+    /** ссылка под сеткой группы: «Все транзисторные модели и сравнение характеристик» */
+    groupLinks: z
+      .array(z.object({ group: inline('Группа (как в карточках)'), label: inline('Подпись'), href: href() }))
+      .optional()
+      .describe('Ссылки под группами'),
     /** заполняет контент-сервис при выводе страницы */
     items: z.array(catalogCardItem).optional().meta({ hidden: true }),
   })

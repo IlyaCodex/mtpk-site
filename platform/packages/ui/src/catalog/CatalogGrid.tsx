@@ -48,7 +48,8 @@ export function CatalogGrid({ filter, cards, gridAttrs }: { filter?: FilterData;
   const f = filter ?? auto;
   return (
     <>
-      {f && (
+      {/* фильтр без характеристик (dropdowns: []) — выключен: подборка из нескольких моделей */}
+      {f && f.dropdowns.length > 0 && (
         <form className="catalog-filter" aria-label={f.ariaLabel} data-cf-form="" data-cf-auto={auto ? '' : undefined}>
           {f.dropdowns.map((d) => (
             <div className="cf-dropdown" data-cf-dropdown="" data-cf-key={d.key} key={d.key}>

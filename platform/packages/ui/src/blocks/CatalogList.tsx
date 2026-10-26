@@ -13,8 +13,8 @@ function absolute(href: string, page: string): string {
 
 /** Каталог раздела: заголовок, фильтр по характеристикам, сетка карточек. */
 export function CatalogList({ block, ctx }: { block: CatalogListBlock; ctx: RenderContext }) {
-  // список из каталога, а опубликованных товаров ещё нет — секции нет
-  if (block.auto && !block.cards.length) return null;
+  // список из каталога (свой или по адресам), а опубликованных товаров нет — секции нет
+  if ((block.auto || block.paths?.length) && !block.cards.length) return null;
   const compare = ctx.compareSections.includes(ctx.path);
   const cards: GridCard[] = block.cards.map((card) => {
     const url = absolute(card.href, ctx.path);

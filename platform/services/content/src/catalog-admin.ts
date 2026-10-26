@@ -4,7 +4,7 @@ import { normalizePath } from '@mtpk/content-kit';
 import { action, block, type Block, type Crumb } from '@mtpk/content-model';
 import { ServiceRefusal, type ZodTypeProvider } from '@mtpk/shared';
 import { plainText } from './catalog.ts';
-import { catalogDependents, loadCatalog } from './catalog-data.ts';
+import { catalogDependents, hiddenSitePages, loadCatalog } from './catalog-data.ts';
 import { Prisma, type Db } from './db.ts';
 import { storeScripts } from './scripts.ts';
 import type { ContentStore } from './store.ts';
@@ -22,6 +22,8 @@ interface Deps {
   store: ContentStore;
   /** сброс кеша, события для поиска, сигнал сайту */
   changed: (paths: string[], kind?: 'page.upserted' | 'page.deleted') => Promise<void>;
+  /** сброс всего кеша и сигнал сайту «всё»: скрытие раздела меняет меню, сетки и списки на всех страницах */
+  purgeAll: () => Promise<void>;
 }
 
 const ADMIN = [{ adminToken: [] }];
@@ -224,7 +226,7 @@ export async function catalogPageGuard(db: Db, pageId: number, path: string): Pr
 
 // ── Маршруты ──────────────────────────────────────────────────────────────
 
-export async function catalogAdminRoutes(base: FastifyInstance, { db, store, changed }: Deps) {
+export async function catalogAdminRoutes(base: FastifyInstance, { db, store, changed, purgeAll }: Deps) {
   const app = base.withTypeProvider<ZodTypeProvider>();
 
   /** Страницы, на которых правка видна: до и после неё (товар мог переехать в другой список). */
@@ -237,7 +239,7 @@ export async function catalogAdminRoutes(base: FastifyInstance, { db, store, cha
       db.category.findMany({ include: { page }, orderBy: [{ sort: 'asc' }, { id: 'asc' }] }),
       db.subcategory.findMany({ include: { page }, orderBy: [{ sort: 'asc' }, { id: 'asc' }] }),
       db.product.findMany({
-        select: { id: true, pageId: true, categoryId: true, subcategoryId: true, name: true, nameNote: true, cover: true, sort: true, listed: true, page },
+        select: { id: true, pageId: true, categoryId: true, subcategoryId: true, name: true, nameNote: true, cover: true, sort: true, listed: true, hidden: true, page },
         orderBy: [{ sort: 'asc' }, { id: 'asc' }],
       }),
     ]);
@@ -594,6 +596,38 @@ export async function catalogAdminRoutes(base: FastifyInstance, { db, store, cha
     await changed(listing);
     return { ok: true };
   });
+
+  // ── Скрыть с сайта / показать (тумблер) ──────────────────────────────────
+  // Категория скрывается вместе с подкатегориями и товарами, подкатегория — с товарами: страницы отвечают 404,
+  // их нет в карте сайта, поиске, сетках, списках и меню. Данные и страницы не удаляются: включили — всё вернулось.
+  app.put(
+    '/admin/v1/catalog/:kind/:id/hidden',
+    {
+      schema: {
+        tags: [TAG],
+        summary: 'Скрыть с сайта или показать: категорию (с подкатегориями и товарами), подкатегорию (с товарами), товар',
+        params: z.object({ kind: z.enum(['categories', 'subcategories', 'products']), id: z.coerce.number().int().positive() }),
+        body: z.object({ hidden: z.boolean().describe('true — скрыть с сайта, false — показывать') }),
+        security: ADMIN,
+      },
+    },
+    async (req, reply) => {
+      const { kind, id } = req.params;
+      const model = { categories: db.category, subcategories: db.subcategory, products: db.product }[kind] as unknown as {
+        findUnique: (a: unknown) => Promise<{ id: number } | null>;
+        update: (a: unknown) => Promise<unknown>;
+      };
+      if (!(await model.findUnique({ where: { id }, select: { id: true } }))) return reply.code(404).send({ error: 'not_found' });
+      const was = (await hiddenSitePages(db, await loadCatalog(db))).paths;
+      await model.update({ where: { id }, data: { hidden: req.body.hidden } });
+      const now = (await hiddenSitePages(db, await loadCatalog(db))).paths;
+      // страницы, которые появились или пропали: поиск переиндексирует их, сайт перегенерирует (скрытые — в 404)
+      const affected = [...new Set([...was, ...now])].filter((p) => was.has(p) !== now.has(p));
+      await changed(affected);
+      await purgeAll();
+      return { ok: true, hidden: req.body.hidden, pages: affected.length };
+    },
+  );
 
   // ── Порядок ────────────────────────────────────────────────────────────
   app.post('/admin/v1/catalog/reorder', { schema: { tags: [TAG], summary: 'Порядок карточек: записи в новом порядке', body: reorderInput, security: ADMIN } }, async (req) => {

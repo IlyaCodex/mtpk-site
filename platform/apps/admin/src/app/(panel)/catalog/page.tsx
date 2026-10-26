@@ -5,6 +5,7 @@ import { Icon } from '@/components/icons';
 import { Badge, EmptyState, formatDate, LinkButton, PageHeader } from '@/components/ui';
 import { requireUser } from '@/lib/auth';
 import {
+  hiddenBy,
   lastSegment,
   plain,
   plural,
@@ -17,7 +18,7 @@ import {
 } from '@/lib/catalog';
 import { env } from '@/lib/env';
 import { serviceJson } from '@/lib/services';
-import { CatalogSearch, Reorder } from './CatalogParts';
+import { CatalogSearch, Reorder, SiteToggle } from './CatalogParts';
 import { SparesView } from './SparesView';
 
 export const metadata: Metadata = { title: 'Каталог продукции' };
@@ -92,11 +93,17 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
             }
             badges={
               <>
+                {c.hidden && <Badge tone="red">Скрыта на сайте</Badge>}
                 {c.status !== 'published' && <Badge tone="amber">Черновик</Badge>}
                 {!c.onHome && <Badge>Нет на главной</Badge>}
               </>
             }
-            actions={<Reorder kind="categories" ids={ids} index={i} label={plain(c.name)} />}
+            actions={
+              <span className="flex items-center gap-2">
+                {c.kind !== 'hub' && <SiteToggle kind="categories" id={c.id} hidden={c.hidden} label={plain(c.name)} />}
+                <Reorder kind="categories" ids={ids} index={i} label={plain(c.name)} />
+              </span>
+            }
           />
         ))}
       </div>
@@ -140,8 +147,8 @@ function Trail({ items }: { items: { href?: string; label: string }[] }) {
 /** Карточка категории или подкатегории: обложка, название, счётчики, порядок. */
 function Tile({ href, image, title, text, meta, badges, actions }: { href: string; image: string | null; title: string; text?: string; meta: string; badges?: ReactNode; actions?: ReactNode }) {
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs transition hover:border-brand-300 hover:shadow-md">
-      <Link href={href} className="block">
+    <div className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs transition hover:border-brand-300 hover:shadow-md">
+      <Link href={href} className="block flex-1">
         <div className="aspect-[16/9] overflow-hidden bg-slate-100">
           {image ? (
             <img src={thumbUrl(image, 640)!} alt="" loading="lazy" className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
@@ -149,33 +156,41 @@ function Tile({ href, image, title, text, meta, badges, actions }: { href: strin
             <div className="flex h-full items-center justify-center text-xs text-slate-400">нет обложки</div>
           )}
         </div>
-        <div className="px-4 pt-3 pb-12">
+        <div className="px-4 pt-3 pb-2">
           <div className="font-semibold text-slate-900 group-hover:text-brand-700">{title}</div>
           {text && <div className="mt-1 line-clamp-2 text-xs text-slate-500">{text}</div>}
           <div className="mt-1 text-xs text-slate-500">{meta}</div>
         </div>
       </Link>
-      <div className="absolute right-3 bottom-3 left-4 flex items-center justify-between gap-2">
+      {/* плашки и кнопки — строкой под текстом; не помещаются — переносятся (плашка, тумблер, стрелки) */}
+      <div className="flex flex-wrap items-center justify-between gap-2 pr-3 pb-3 pl-4">
         <span className="flex flex-wrap gap-1">{badges}</span>
-        {actions}
+        <span className="ml-auto">{actions}</span>
       </div>
     </div>
   );
 }
 
 /** Шапка уровня: обложка, название, адрес, кнопки правки. */
-function Summary({ image, title, path, status, editHref, editLabel, pageId, site }: { image: string | null; title: string; path: string; status: string; editHref: string; editLabel: string; pageId: number; site: string }) {
+function Summary({ image, title, path, status, editHref, editLabel, pageId, site, toggle }: { image: string | null; title: string; path: string; status: string; editHref: string; editLabel: string; pageId: number; site: string; toggle?: ReactNode }) {
   return (
     <section className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
       {image ? <img src={thumbUrl(image, 320)!} alt="" className="h-16 w-28 shrink-0 rounded-lg object-cover" /> : <div className="h-16 w-28 shrink-0 rounded-lg bg-slate-100" />}
       <div className="min-w-0 flex-1">
         <h1 className="truncate text-xl font-semibold text-slate-900">{title}</h1>
         <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-          {status === 'published' ? <Badge tone="green">На сайте</Badge> : <Badge tone="amber">Черновик — на сайте не виден</Badge>}
+          {status === 'hidden' ? (
+            <Badge tone="red">Скрыта на сайте тумблером</Badge>
+          ) : status === 'published' ? (
+            <Badge tone="green">На сайте</Badge>
+          ) : (
+            <Badge tone="amber">Черновик — на сайте не виден</Badge>
+          )}
           <span className="font-mono">{path}</span>
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2">
+        {toggle}
         <LinkButton size="sm" variant="primary" href={editHref}>
           {editLabel}
         </LinkButton>
@@ -218,11 +233,12 @@ function CategoryView({ category, tree, nodes, site }: { category: CatCategory; 
         image={category.cover}
         title={plain(category.name)}
         path={category.path}
-        status={category.status}
+        status={category.hidden ? 'hidden' : category.status}
         editHref={`/catalog/categories/${category.id}`}
         editLabel="Изменить категорию"
         pageId={category.pageId}
         site={site}
+        toggle={<SiteToggle kind="categories" id={category.id} hidden={category.hidden} label={plain(category.name)} />}
       />
 
       <SectionTitle
@@ -247,11 +263,17 @@ function CategoryView({ category, tree, nodes, site }: { category: CatCategory; 
               meta={`${s.products} ${plural(s.products, 'товар', 'товара', 'товаров')}`}
               badges={
                 <>
+                  {(s.hidden || category.hidden) && <Badge tone="red">Скрыта на сайте</Badge>}
                   {s.status !== 'published' && <Badge tone="amber">Черновик</Badge>}
                   {!s.listed && <Badge>Не в «Модельном ряду»</Badge>}
                 </>
               }
-              actions={<Reorder kind="subcategories" ids={subIds} index={i} label={plain(s.name)} />}
+              actions={
+                <span className="flex items-center gap-2">
+                  <SiteToggle kind="subcategories" id={s.id} hidden={s.hidden} parent={hiddenBy(tree, { categoryId: s.categoryId, hidden: s.hidden }).parent} label={plain(s.name)} />
+                  <Reorder kind="subcategories" ids={subIds} index={i} label={plain(s.name)} />
+                </span>
+              }
             />
           ))}
         </div>
@@ -308,11 +330,20 @@ function SubcategoryView({ category, subcategory, tree, site }: { category: CatC
         image={subcategory.cover}
         title={plain(subcategory.name)}
         path={subcategory.path}
-        status={subcategory.status}
+        status={subcategory.hidden || category.hidden ? 'hidden' : subcategory.status}
         editHref={`/catalog/subcategories/${subcategory.id}`}
         editLabel="Изменить подкатегорию"
         pageId={subcategory.pageId}
         site={site}
+        toggle={
+          <SiteToggle
+            kind="subcategories"
+            id={subcategory.id}
+            hidden={subcategory.hidden}
+            parent={hiddenBy(tree, { categoryId: subcategory.categoryId, hidden: subcategory.hidden }).parent}
+            label={plain(subcategory.name)}
+          />
+        }
       />
       <SectionTitle
         title={`Товары (${products.length})`}
@@ -367,8 +398,9 @@ function ProductRows({ products, tree, site, reorder, showWhere }: { products: C
               </td>
               {showWhere && <td className="px-4 py-2 text-xs text-slate-600">{where(p)}</td>}
               <td className="px-4 py-2">
-                <span className="flex flex-wrap gap-1">
-                  {p.status === 'published' ? <Badge tone="green">На сайте</Badge> : <Badge tone="amber">Черновик</Badge>}
+                <span className="flex flex-wrap items-center gap-1">
+                  <SiteToggle kind="products" id={p.id} hidden={p.hidden} parent={hiddenBy(tree, p).parent} label={plain(p.name)} />
+                  {p.status !== 'published' && <Badge tone="amber">Черновик</Badge>}
                   {!p.listed && <Badge>Не в списке</Badge>}
                 </span>
               </td>

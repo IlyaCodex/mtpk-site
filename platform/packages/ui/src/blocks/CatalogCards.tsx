@@ -50,8 +50,8 @@ function HomeCard({ item, eager }: { item: CatalogCardItem; eager: readonly stri
   );
 }
 
-/** Тизер: обложка, название, описание, «Подробнее →» (подкатегории, товары-узлы). */
-function TeaserCard({ item, eager }: { item: CatalogCardItem; eager: readonly string[] }) {
+/** Тизер: обложка, название, описание, «Подробнее →» (подкатегории, товары-узлы). В группе — название уровнем ниже. */
+function TeaserCard({ item, eager, nested }: { item: CatalogCardItem; eager: readonly string[]; nested?: boolean }) {
   return (
     <a href={item.href} className="teaser-card">
       <div className="teaser-card__cover">
@@ -59,7 +59,7 @@ function TeaserCard({ item, eager }: { item: CatalogCardItem; eager: readonly st
         {isMadeInRussia(item.href) && <MadeBadge />}
       </div>
       <div className="teaser-card__body">
-        <Inline as="h3" className="teaser-card__title" html={item.title} />
+        <Inline as={nested ? 'h4' : 'h3'} className="teaser-card__title" html={item.title} />
         {item.caption !== undefined && <Inline as="p" className="teaser-card__caption" html={item.caption} />}
         <Inline className="teaser-card__more" html={`${item.linkText ?? 'Подробнее'} <span class="btn__arrow" aria-hidden="true">→</span>`} />
       </div>
@@ -81,6 +81,17 @@ function LineCard({ item, prefix, eager }: { item: CatalogCardItem; prefix: stri
       </div>
     </a>
   );
+}
+
+/** Карточки по группам: соседние карточки с одной группой — под общим подзаголовком (без группы — группа без него). */
+function groupsOf(items: CatalogCardItem[]): { title?: string; items: CatalogCardItem[] }[] {
+  const out: { title?: string; items: CatalogCardItem[] }[] = [];
+  for (const it of items) {
+    const last = out[out.length - 1];
+    if (last && last.title === it.group) last.items.push(it);
+    else out.push({ title: it.group, items: [it] });
+  }
+  return out;
 }
 
 /** HTML под сеткой (вводный текст, ссылки): элементы как есть, картинки — как в блоках «HTML как есть». */
@@ -131,15 +142,39 @@ export function CatalogCards({ block, ctx }: { block: CatalogCardsBlock; ctx: Re
     );
   }
   if (block.design === 'teaser') {
+    const groups = groupsOf(items);
+    const grouped = groups.some((g) => g.title);
     return (
       <section className="catalog-list" {...extra(block.attrs, 'section')}>
         <div className="container">
           {block.head && <SectionHead head={block.head} />}
-          <div className="teaser-grid">
-            {items.map((item, i) => (
-              <TeaserCard key={i} item={item} eager={eager} />
-            ))}
-          </div>
+          {grouped ? (
+            groups.map((g, gi) => (
+              <div className="cards-group" key={gi}>
+                {g.title && <Inline as="h3" className="cards-group__title" html={g.title} />}
+                <div className="teaser-grid">
+                  {g.items.map((item, i) => (
+                    <TeaserCard key={i} item={item} eager={eager} nested />
+                  ))}
+                </div>
+                {(block.groupLinks ?? [])
+                  .filter((l) => g.title && l.group === g.title)
+                  .map((l, li) => (
+                    <p className="cards-group__more" key={li}>
+                      <a href={l.href}>
+                        <Inline html={l.label} />
+                      </a>
+                    </p>
+                  ))}
+              </div>
+            ))
+          ) : (
+            <div className="teaser-grid">
+              {items.map((item, i) => (
+                <TeaserCard key={i} item={item} eager={eager} />
+              ))}
+            </div>
+          )}
           {block.after && <After html={block.after} ctx={ctx} />}
         </div>
       </section>

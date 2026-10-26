@@ -60,7 +60,7 @@ export async function publicRoutes(base: FastifyInstance, { store, db }: Deps) {
     },
   );
   app.get('/v1/pages', { schema: { tags: ['Страницы'], summary: 'Опубликованные страницы (для карты сайта)' } }, async () => store.listPages());
-  app.get('/v1/settings', { schema: { tags: ['Сайт'], summary: 'Настройки сайта: контакты, меню, подвал' } }, async () => store.settings());
+  app.get('/v1/settings', { schema: { tags: ['Сайт'], summary: 'Настройки сайта: контакты, меню, подвал' } }, async () => store.siteSettings());
   app.get('/v1/holidays', { schema: { tags: ['Сайт'], summary: 'Праздничные баннеры главной: расписание, баннеры, поздравления' } }, async () => store.holidays());
   app.get('/v1/site-data', { schema: { tags: ['Сайт'], summary: 'Склад и разделы со сравнением (для рендера блоков)' } }, async () =>
     store.siteData(),
@@ -217,7 +217,15 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
   };
 
   // ── Каталог: категории, подкатегории, товары ───────────────────────────
-  await catalogAdminRoutes(app, { db, store, changed });
+  await catalogAdminRoutes(app, {
+    db,
+    store,
+    changed,
+    purgeAll: async () => {
+      await store.purge();
+      await notifyWeb('all');
+    },
+  });
 
   // ── Схемы блоков: по ним админка строит формы редактирования ──────────
   app.get(
