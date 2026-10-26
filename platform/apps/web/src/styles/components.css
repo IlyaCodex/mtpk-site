@@ -682,6 +682,8 @@ a.bo-item__value:focus-visible { outline: none; }
    ============================================================ */
 .cat-index { position: relative; z-index: 1; padding: 56px 0 48px; background: var(--surface-page); color: var(--text-primary); }
 .cat-index + .cat-index { padding-top: 0; }
+/* выбрана одна категория (фильтр /products/ прячет остальные разделы) — у показанного поле сверху, не впритык к панели */
+.cat-index[style*="display: none"] + .cat-index { padding-top: 56px; }
 .cat-index__head { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle); }
 .cat-index__title { margin: 0; font-family: var(--font-display); font-size: clamp(20px, 2.4vw, 26px); font-weight: var(--fw-bold); line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); }
 .cat-index__title em { font-style: normal; color: var(--text-brand); }
@@ -754,6 +756,7 @@ a.bo-item__value:focus-visible { outline: none; }
 }
 @media (max-width: 768px) {
   .cat-index { padding: 36px 0 28px; }
+  .cat-index[style*="display: none"] + .cat-index { padding-top: 36px; }
 }
 /* телефон: по две карточки в ряд, компактнее */
 @media (max-width: 600px) {

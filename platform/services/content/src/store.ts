@@ -12,8 +12,9 @@ import {
   type StockJsonItem,
   type StockView,
 } from '@mtpk/content-kit';
-import { resolveCatalogBlocks, type CatalogData } from '@mtpk/content-kit/catalog';
+import { hiddenPages, resolveCatalogBlocks, type CatalogData } from '@mtpk/content-kit/catalog';
 import { darkVars } from '@mtpk/content-kit/dark';
+import { hiddenTest, pruneHiddenHtml, pruneHiddenLinks, type HiddenTest } from '@mtpk/content-kit/hidden-links';
 import { styleFileCss } from '@mtpk/content-kit/styles';
 import { DEFAULT_HOLIDAYS, DEFAULT_SETTINGS, holidaySettings, siteSettings, type Block, type HolidaySettings, type SiteSettings } from '@mtpk/content-model';
 import { hiddenSitePages, loadCatalog } from './catalog-data.ts';
@@ -28,6 +29,11 @@ type Cached<T> = T | typeof MISSING;
 /** Блоки страницы для вывода: карточки — из каталога, у товара — общие блоки его категории. */
 function withCatalog<T extends { id: number; blocks: unknown }>(row: T, data: CatalogData): T {
   return { ...row, blocks: resolveCatalogBlocks(row, row.blocks as Block[], data) };
+}
+
+/** Ведёт ли ссылка в раздел каталога, скрытый тумблером (null — скрытых нет). */
+function hiddenHref(data: CatalogData): HiddenTest | null {
+  return hiddenTest(hiddenPages(data).paths);
 }
 
 /** То же плюс склад: блоки склада получают типы и позиции. */
@@ -139,8 +145,14 @@ export class ContentStore {
 
   /** Блоки страницы с данными каталога и (если на ней есть блоки склада) склада. */
   async pageData<T extends { id: number; blocks: unknown }>(row: T, catalog?: CatalogData): Promise<T> {
+    const data = catalog ?? (await this.catalog());
     const stock = hasStockBlocks(row.blocks as Block[]) ? await this.stockView() : null;
-    return withData(row, catalog ?? (await this.catalog()), stock);
+    const out = withData(row, data, stock);
+    // карточки, разделы и ссылки скрытых тумблером разделов каталога — не на сайте (в базе и в админке — как есть)
+    const hidden = hiddenHref(data);
+    if (!hidden) return out;
+    const body = (out as { body?: unknown }).body;
+    return { ...out, blocks: pruneHiddenLinks(out.blocks as Block[], hidden), ...(typeof body === 'string' ? { body: pruneHiddenHtml(body, hidden).html } : {}) };
   }
 
   /**
@@ -156,8 +168,11 @@ export class ContentStore {
       ]);
       // страницы не из таблиц каталога (запчасти): название и фото — с их разметки
       const { pages } = await this.stockSource();
-      // скрытые в админке позиции на сайт не выводятся; тип, где все позиции скрыты, тоже не показывается
-      return resolveStockView(groups, items.filter((it) => !it.hidden), await this.catalog(), (path) => pages[path]);
+      // скрытые в админке позиции на сайт не выводятся — и позиции скрытых тумблером разделов каталога;
+      // тип, где все позиции скрыты, тоже не показывается
+      const catalog = await this.catalog();
+      const off = hiddenHref(catalog);
+      return resolveStockView(groups, items.filter((it) => !it.hidden && !off?.(String(it.url || ''))), catalog, (path) => pages[path]);
     });
   }
 
@@ -189,9 +204,11 @@ export class ContentStore {
   private async stockSource(): Promise<{ json: Record<string, unknown>; pages: Record<string, { title: string; image: string | null }> }> {
     return this.cache.wrap('stock-source', this.ttl, async () => {
       const items = await this.db.stockItem.findMany({ orderBy: { position: 'asc' } });
-      // в stock.json (бейдж «В наличии», срок на странице товара) — только позиции, которые показываются на сайте;
-      // страницы нужны всем позициям — превью в админке
-      const config: StockConfigItem[] = items.filter((it) => !it.hidden).map((it) => {
+      const catalog = await this.catalog();
+      const off = hiddenHref(catalog);
+      // в stock.json (бейдж «В наличии», срок на странице товара) — только позиции, которые показываются на сайте
+      // (не скрытые в «Наличии» и не в скрытых разделах каталога); страницы нужны всем позициям — превью в админке
+      const config: StockConfigItem[] = items.filter((it) => !it.hidden && !off?.(String(it.url || ''))).map((it) => {
         const extra = (it.extra ?? {}) as Record<string, unknown>;
         return {
           ...extra,
@@ -212,7 +229,6 @@ export class ContentStore {
         ? await this.db.page.findMany({ select: { id: true, path: true, blocks: true, title: true }, where: { path: { in: [...wanted] } } })
         : [];
       // разметка страниц — серверный рендер тех же блоков, что видит посетитель
-      const catalog = await this.catalog();
       const byPath = new Map(rows.map((r) => [r.path, { body: seoHtml(withCatalog(r, catalog)), title: r.title }]));
       const { items: resolved, warnings } = resolveStock(config, (p) => byPath.get(p));
       for (const w of warnings) this.log.warn({ stock: w }, 'склад');
@@ -229,7 +245,10 @@ export class ContentStore {
     return this.cache.wrap('compare', this.ttl * 24, async () => {
       const rows = await this.db.page.findMany({ select: { id: true, path: true, blocks: true }, where: { path: { startsWith: '/products/' } } });
       const catalog = await this.catalog();
-      const { index, sections, report } = buildCompareIndex(rows.map((r) => ({ path: r.path, body: seoHtml(withCatalog(r, catalog)) })));
+      // товары скрытых тумблером разделов в сравнение не попадают
+      const { ids: hidden } = await this.hidden();
+      const shown = rows.filter((r) => !hidden.has(r.id));
+      const { index, sections, report } = buildCompareIndex(shown.map((r) => ({ path: r.path, body: seoHtml(withCatalog(r, catalog)) })));
       this.log.info({ sections: sections.length, scanned: report.scanned }, 'индекс сравнения пересобран');
       return { index, sections };
     });
