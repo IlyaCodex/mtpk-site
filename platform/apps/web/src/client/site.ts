@@ -28,4 +28,7 @@ ready(() => {
   // справочник режимов термообработки (Практикум): поиск, фильтр, пример расчёта — модуль только этой статьи
   const guide = document.querySelector<HTMLElement>('.ui-thermal-guide');
   if (guide) void import('./thermal-guide').then((m) => m.initThermalGuide(guide));
+  // статьи об индукторах (Практикум): проверка размерной цепи зазора, цели Метрики по ссылкам — модуль только им
+  const lesson = document.querySelector<HTMLElement>('.ui-education');
+  if (lesson?.querySelector('[data-gap-calculator], [data-inductor-event]')) void import('./inductor-guide').then((m) => m.initInductorGuide(lesson));
 });
