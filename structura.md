@@ -259,10 +259,11 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │   │       └── 15 разделов, 16 таблиц, карта набивки в /docs/. Стили пакета в классе .ui-futerovka.
 │   │   │          Пакет предлагал /products/futerovochnye-smesi/ — положено в запчасти по решению Евгения.
 │   │   │          ⚠ Два фото из каталогов сторонних поставщиков не публикуются до подтверждения прав.
-│   │   ├── …/tigli/                                        ✅ Тигли для плавильных печей (пакет «Тигли» V4.3 09.10.2026, на сайте 16.10.2026)
-│   │   │       └── 11 страниц: grafitovye · karbidokremnievye · magnezitovye · dlya-elektropechey · s-nosikom ·
+│   │   ├── …/tigli/                                        ✅ Тигли для плавильных печей (пакет «Тигли» V7 30.10.2026; V4.3 — на сайте с 16.10.2026)
+│   │   │       └── 13 страниц: grafitovye · karbidokremnievye · magnezitovye · dlya-elektropechey · s-nosikom ·
 │   │   │          ovalnye · dlya-alyuminiya · grafitoglinyanye · grafitovye-s-karbidom-kremniya · komplektuyushchie ·
-│   │   │          podbor-i-ekspluatatsiya. 198 строк номенклатуры — в таблицах, схема размеров рядом с таблицей.
+│   │   │          podbor-i-ekspluatatsiya · korundovye-alundovye (V7, корундовые 100–950 мл) · vybor-po-metallu (V7,
+│   │   │          выбор по металлу и сплаву). 204 позиции номенклатуры — в таблицах, схема размеров рядом с таблицей.
 │   │   │          HTML-блок пакета (обёртка .uc, шаблон tpl/tigli.css); заявка — окном запчастей (форма «Тигли»),
 │   │   │          фото и схемы — на весь экран; картинки — /img/crucibles/. По пакету 4 страницы из 12 (хаб,
 │   │   │          grafitovye, karbidokremnievye, magnezitovye) уже были на боевом сайте — адреса те же.

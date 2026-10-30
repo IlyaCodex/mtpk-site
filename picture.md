@@ -55,10 +55,16 @@ picture/
 │   └── 03_КОМПЛЕКТУЮЩИЕ/                        # сопла и клапаны (на сайте пока не используются)
 │
 ├── products/gruzopodemnye-elektromagnity/        # пакет «Грузоподъёмные электромагниты» v2 (09.10.2026)
-│   └── *-480.webp, *-900.webp                   # round, oval, pipes, billets, cabinet, reel — в медиатеке
-│                                                # /img/gruzopodemnye-elektromagnity/ (раздел и 6 страниц, корень каталога)
+│   ├── *-480.webp, *-900.webp                   # round, oval, pipes, billets, cabinet, reel — в медиатеке
+│   │                                            # /img/gruzopodemnye-elektromagnity/ (раздел и 6 страниц, корень каталога)
+│   └── round|pipes|billets|reel-foto.png        # фото на белом от Евгения (30.10.2026, 3200×2561): на сайте *-foto.jpg
+│                                                # 1600×1280 — карточки раздела и корня каталога, главное фото страниц
+│                                                # (прежние *-900.webp — вторым кадром)
 ├── products/dop-oborudovanie/                    # пакет «Доп оборудование» v2 (09.10.2026)
 │   ├── zagruzochnaya-telezhka.webp, relsovaya-elektroplatforma.webp, rukavnyy-filtr.webp
+│   ├── *-foto.png                               # фото на белом от Евгения (30.10.2026): тележка, платформа, газоочистка —
+│   │                                            # *-foto.jpg 1600×1280: обложки (главная), корень каталога, главное фото
+│   │                                            # страниц (прежние .webp — вторым кадром)
 │   ├── layout.svg, filter-flow.svg              # схемы: планировка загрузки, работа рукавного фильтра
 │   └── *-zapros.txt                             # задания для подбора — в медиатеке /files/dop-oborudovanie/
 │                                                # картинки — /img/dop-oborudovanie/ (3 страницы, корень каталога)
@@ -71,7 +77,9 @@ picture/
 │                                                # раздела — servomashiny-ui-tms-03, фон шапки — razlivka-slitkov-ui-ls9-01 (цех)
 ├── products/zapchasti/tigli/                     # пакет «Тигли» V4.3 (09.10.2026): 18 фото (photo-*.png,
 │                                                # graphite-quartz.png) и 13 схем размеров (dimensions-*.svg) —
-│                                                # в медиатеке /img/crucibles/ (12 страниц, хаб запчастей, корень каталога)
+│                                                # в медиатеке /img/crucibles/ (14 страниц, хаб запчастей, корень каталога);
+│                                                # V7 (30.10.2026): + корундовый ряд — 5 фото korundovyj-alundovyj-tigel-*.webp
+│                                                # и 6 схем *-razmery.svg, туда же (прежние 32 файла пакета совпали)
 │
 ├── otzyvy/                                      # благодарственные письма для /otzyvy/
 │   └── *.pdf                                    # 9 оригиналов писем (Desktop/Письма);
@@ -769,7 +777,10 @@ AVIF/WebP делает медиасервис. Композиция у всех 
     кадром, моноблок вторым. Превью `astro/public/img/nagrevateli/t-*.webp` (4 шт.,
     2–5 КБ, sharp из прод-PNG) сейчас нужны только страницам АВз.
   - **Среднечастотные (АВн):** `card-srednechastotnye` ← `UI-80AVn-1`; 5 моделей —
-    студия + 3 живых фото серии (`heater-avn-live-1..3`).
+    студия + 3 живых фото серии (`heater-avn-live-1..3`). С 30.10.2026 карточка «Среднечастотные»,
+    карточки и первый кадр УИ-60/80/100/120/160АВн — фото на белом от Евгения
+    `/img/induktsionnye-nagrevateli/avn-foto.jpg` 1600×1280 (исходник `picture/products/induktsionnye-nagrevateli/avn-foto.png`);
+    у 8 моделей «АВН 1–20 кГц» (`avn/1-20-khz/`) — пока `card-srednechastotnye`.
   - **Ручные (ЛН):** `card-ruchnye` ← `ui_ln`; обычные ЛН (6 моделей) — компактный блок.
     «Встр. охл.» (6 моделей, `ui-*-2`) — `card-ruchnye-vo` (зелёный напольный блок со
     встроенным охлаждением, фото на белом от Евгения, 2026-08-12).
