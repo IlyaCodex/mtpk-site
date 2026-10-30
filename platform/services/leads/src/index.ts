@@ -209,7 +209,7 @@ async function handle(req: FastifyRequest, reply: FastifyReply) {
   log.info({ leadId: row.id, source: row.source }, 'заявка сохранена');
 
   if (attachment) {
-    // Вложение — во временный приватный бакет только для отправки письма (удаляется воркером)
+    // Приватный оригинал хранится до доставки письма и файла в CRM (либо намеренного пропуска CRM).
     const key = `leads/${row.id}/${attachment.name}`;
     try {
       await putObject(s3, env.S3_BUCKET_PRIVATE, key, attachment.data, 'application/octet-stream');

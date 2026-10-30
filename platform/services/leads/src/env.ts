@@ -25,6 +25,8 @@ export const env = readEnv(
     MAIL_FROM: z.string().default(''),
     B24_WEBHOOK: z.string().default(''),
     B24_YM_UID_FIELD: z.string().default('UF_CRM_YA_CID'),
+    /** Множественное файловое поле CRM; проверяется через API только для заявок с файлом. */
+    B24_FILE_FIELD: z.string().default('UF_CRM_SITE_FILES'),
     /** локально (не production) проверить настоящую доставку: письмо и лид в Битрикс24 */
     LEADS_LOCAL_DELIVERY: envParts.bool,
   }),

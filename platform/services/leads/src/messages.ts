@@ -63,7 +63,7 @@ export function bitrixLeadFields(lead: Lead, ymUidField: string): Record<string,
   if (lead.task) comments += `\n\nЗадача: ${lead.task}`;
   const extra = extraLines((lead.fields ?? {}) as Record<string, string>);
   if (extra.length) comments += `\n${extra.join('\n')}`;
-  if (lead.attachmentName) comments += `\nКП клиента: во вложении письма на info@ (${lead.attachmentName})`;
+  if (lead.attachmentName) comments += `\nКП клиента: ${lead.attachmentName} (файл заявки)`;
   if (lead.attachmentNote) comments += `\n⚠ ${lead.attachmentNote} — запросите КП у клиента`;
   if (lead.pageUrl) comments += `\n\nСтраница: ${lead.pageUrl}`;
   if (lead.source) comments += `${lead.pageUrl ? '\n' : '\n\n'}Источник: ${lead.source}`;
