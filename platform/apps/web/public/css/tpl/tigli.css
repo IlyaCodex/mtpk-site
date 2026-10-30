@@ -1,6 +1,6 @@
 /* ============================================================
-   Тигли для плавильных печей — /products/zapchasti/tigli/ и 11 страниц серий.
-   Разметка — из пакета «Тигли» V4.3 (09.10.2026), обёртка .uc; оформление — сайта: шрифты,
+   Тигли для плавильных печей — /products/zapchasti/tigli/ и 13 страниц серий.
+   Разметка — из пакета «Тигли» V7 (30.10.2026; до него V4.3), обёртка .uc; оформление — сайта: шрифты,
    карточки, таблицы, кнопки (base-layout.css), светлая подложка фото и схем. Заявка — окном запчастей
    (client/spare.ts, форма <ui-form type="spare">), фото и схемы — на весь экран там же. Вопросы —
    разметкой общего блока (components.css). Статья — во всю ширину со светлым фоном (фон body
@@ -23,7 +23,7 @@
 .uc :is(a, button, [tabindex]):focus-visible { outline: 2px solid var(--green-500); outline-offset: 3px; }
 .uc img { display: block; max-width: 100%; height: auto; }
 
-.uc .uc-breadcrumbs { margin: 0 0 var(--sp-8); font-size: 13px; color: var(--border-default); }
+.uc .uc-breadcrumbs { margin: 0 0 var(--sp-8); font-size: 13px; color: var(--border-default); overflow-wrap: anywhere; }
 .uc .uc-breadcrumbs a { color: var(--text-secondary); text-decoration: none; transition: color var(--duration-fast) var(--ease-out); }
 .uc .uc-breadcrumbs a:hover { color: var(--text-brand); }
 .uc .uc-breadcrumbs [aria-current] { color: var(--text-tertiary); }
@@ -113,11 +113,13 @@
 .uc .uc-photo-gallery + p { margin-top: 24px; }
 
 /* таблицы — карточкой */
-.uc .uc-table { margin: 18px 0 24px; overflow-x: auto; overscroll-behavior-x: contain; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--surface-page); }
+.uc .uc-table { max-width: 100%; margin: 18px 0 24px; overflow-x: auto; overscroll-behavior-x: contain; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--surface-page); }
 .uc table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; }
 .uc caption { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); background: var(--surface-subtle); font-family: var(--font-display); font-size: 15px; font-weight: var(--fw-semibold); text-align: left; color: var(--text-primary); }
 .uc :is(th, td) { padding: 12px 16px; border-top: 1px solid var(--border-subtle); text-align: left; vertical-align: middle; }
-.uc thead th { border-top: 0; background: var(--surface-subtle); font-size: 12px; font-weight: var(--fw-bold); letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-tertiary); }
+.uc th { vertical-align: top; }
+/* заголовки столбцов — строчными (V7): длинные русские названия параметров в верхнем регистре читаются хуже */
+.uc thead th { border-top: 0; background: var(--surface-subtle); font-size: 12px; font-weight: var(--fw-bold); color: var(--text-tertiary); }
 .uc tbody th { background: transparent; font-weight: var(--fw-semibold); color: var(--text-primary); }
 .uc tbody td { color: var(--text-primary); }
 .uc td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
@@ -178,7 +180,7 @@
 }
 .uc .uc-cta::before { content: ""; position: absolute; top: -1px; right: 32px; width: 64px; height: 3px; border-radius: 0 0 3px 3px; background: var(--green-500); }
 .uc .uc-cta h2 { margin: 0 0 12px; }
-.uc .uc-cta p { max-width: 70ch; }
+.uc .uc-cta p { max-width: 80ch; }
 .uc .uc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; margin-top: 8px; }
 .uc .uc-actions .button {
   display: inline-flex;
@@ -218,6 +220,29 @@
 .uc .uc-model-map { columns: 2; column-gap: 32px; padding-left: 22px; }
 .uc .uc-model-map li { break-inside: avoid; margin-bottom: 10px; }
 
+/* V7: переход к выбору по металлу, исполнения фото + схема (корундовые тигли), таблицы «параметр — значение»
+   (на телефоне — в одну колонку), подсказка о прокрутке широкой таблицы */
+.uc section[id] { scroll-margin-top: calc(var(--site-header-h, 116px) + var(--sp-4)); }
+.uc section > p, .uc .uc-application > :is(p, ul), .uc .uc-note { max-width: 80ch; }
+.uc .uc-selection { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 28px 0; padding: 22px 26px; border: 1px solid var(--border-default); border-left: 4px solid var(--green-600); border-radius: 14px; background: var(--surface-subtle); }
+.uc .uc-selection p { max-width: 65ch; margin: 0; }
+.uc .uc-selection > a { min-width: 200px; font-weight: var(--fw-semibold); }
+.uc .uc-application { margin: 28px 0 40px; }
+.uc .uc-application h2 { margin-top: 32px; }
+.uc .uc-variant { padding: 22px 0; border-top: 1px solid var(--border-default); scroll-margin-top: calc(var(--site-header-h, 116px) + var(--sp-4)); }
+.uc .uc-variant:target { background: var(--green-50); }
+.uc .uc-variant h3 { margin: 8px 0 20px; font-size: 23px; }
+.uc .uc-variant-media { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; }
+.uc .uc-variant figure { min-width: 0; margin: 0; }
+.uc .uc-variant figure a { cursor: zoom-in; }
+.uc .uc-variant figure img { width: 100%; max-height: 380px; object-fit: contain; border-radius: 16px; }
+.uc .uc-variant-media figure:nth-child(2) img { max-height: 440px; }
+.uc .uc-variant-media figure:only-child { grid-column: 1 / -1; max-width: 620px; }
+.uc .uc-variant-media figure:only-child img { max-height: 500px; }
+.uc .uc-variant figcaption { margin: 12px 0; font-size: 14px; color: var(--text-secondary); }
+.uc .uc-cards .uc-card:first-child .uc-card-photo img { object-fit: contain; }
+.uc .uc-table-scroll-hint { display: none; }
+
 @media (max-width: 1050px) {
   .uc .uc-dimensions { display: flex; flex-direction: column; gap: 14px; }
   .uc .uc-dimension-figure { position: static; display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 8px 24px; width: 100%; order: 0; }
@@ -231,6 +256,21 @@
   .uc .uc-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .uc .uc-product-hero { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .uc .uc-product-hero .uc-product-photo { max-width: none; }
+}
+@media (max-width: 760px) {
+  .uc h1 { max-width: none; }
+  .uc .uc-selection { display: block; padding: 18px; }
+  .uc .uc-selection p { margin-bottom: 12px; }
+  .uc .uc-variant-media { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .uc .uc-variant h3 { font-size: 21px; }
+  .uc .uc-variant figure img { max-height: none; }
+  /* широкие таблицы прокручиваются внутри карточки; пары «параметр — значение» — по ширине экрана */
+  .uc .uc-table table { min-width: 620px; }
+  .uc .uc-table-pair table { min-width: 0; table-layout: fixed; }
+  .uc .uc-table-pair th:first-child { width: 44%; }
+  .uc .uc-table-pair :is(th, td) { padding: 10px; white-space: normal; overflow-wrap: break-word; hyphens: auto; }
+  .uc .uc-table-pair caption { padding: 12px; }
+  .uc .uc-table-scroll-hint { display: block; margin: -12px 0 24px; font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
 }
 @media (max-width: 640px) {
   .uc { padding-top: var(--sp-4); font-size: 15px; }
@@ -250,4 +290,21 @@
   .uc .uc-actions { flex-direction: column; align-items: stretch; }
   .uc .uc-actions .button { width: 100%; }
   .uc .uc-model-map { columns: 1; }
+}
+/* пары «параметр — значение» на узком телефоне: параметр над значением, без шапки таблицы */
+@media (max-width: 480px) {
+  .uc .uc-table-pair table { table-layout: auto; }
+  .uc .uc-table-pair thead { display: none; }
+  .uc .uc-table-pair tbody { display: block; }
+  .uc .uc-table-pair tbody tr { display: grid; grid-template-columns: minmax(0, 1fr); border-bottom: 1px solid var(--border-subtle); }
+  .uc .uc-table-pair tbody tr:last-child { border-bottom: 0; }
+  .uc .uc-table-pair tbody :is(th, td), .uc .uc-table-pair tbody th:first-child { display: block; width: auto; border: 0; overflow-wrap: normal; word-break: normal; }
+  .uc .uc-table-pair tbody th { padding: 12px 12px 3px; font-size: 14px; }
+  .uc .uc-table-pair tbody td { padding: 3px 12px 12px; }
+}
+@media print {
+  .uc :is(.uc-cta, .uc-related) { display: none; }
+  .uc .uc-table { overflow: visible; }
+  .uc table { min-width: 0; font-size: 11px; }
+  .uc .uc-variant { break-inside: avoid; }
 }
