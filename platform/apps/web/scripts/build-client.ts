@@ -46,7 +46,7 @@ const ENTRIES: Record<string, string> = {
   'doc-bar': 'src/client/doc-bar.ts',
   // эффект праздничной обложки главной (снег, искры…) — только в дни праздника
   'holiday-fx': 'src/client/holiday-fx.ts',
-  // карта без рекламы (Leaflet, контур суши): страницы с блоком data-free-map
+  // карта без рекламы (Leaflet, OpenStreetMap): страницы с блоком data-free-map
   'free-map': 'src/client/free-map.ts',
 };
 

@@ -110,10 +110,9 @@
   берёт иконку и подпись у пункта мегаменю с тем же адресом). Новый вид элемента — правка компонента; стили
   мобильного меню — `apps/web/public/css/mobile-fixes.css` (раздел 5). `design/prototypes/_partials` — прототипы
   эпохи Astro, сайтом не используются.
-- Карта без рекламы («О компании») — Leaflet и свой контур суши без плиток, чужих подписей и границ, модуль
-  `client/free-map.ts` (`free-map-land.json` делает `scripts/free-map-land.ts`, Natural Earth): HTML-блок с
-  `<div class="free-map" data-free-map='[{"name":"Миасс","ll":[55.13,60.14],"note":"адрес","main":true}]'>`. Плитки OpenStreetMap
-  не возвращать: Донбасс и Крым на них подписаны как Украина, а офисы МТПК там есть; плитки 2ГИС платные.
+- Карта без рекламы («О компании») — Leaflet и плитки OpenStreetMap, модуль `client/free-map.ts`: HTML-блок с
+  `<div class="free-map" data-free-map='[{"name":"Миасс","ll":[55.13,60.14],"note":"адрес","main":true}]'>`; плитки — в CSP шлюза.
+  Плитки выбрал Евгений ради городов на карте, подписи на них — как в OSM; меток Донецка и Луганска нет по его просьбе.
 - Иконки SVG в блоках — окно «Иконка и цвет» (`apps/admin/src/components/icon-picker.tsx`), набор Solar —
   `apps/admin/public/icons/solar-linear.json` (`scripts/icons-solar.ts`); цвет — `style="color:…"` у `<svg>`
   (в HTML-секциях при сохранении остаётся на месте, в класс не уходит).
