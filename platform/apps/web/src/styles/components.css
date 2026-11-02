@@ -1128,8 +1128,10 @@ a.bo-item__value:focus-visible { outline: none; }
   .faq__answer { padding: 0 var(--sp-5) var(--sp-5); font-size: 15px; }
 }
 
-/* Карта без рекламы (client/free-map.ts): метка — кружок и подпись на белой плашке */
-.free-map { position: absolute; inset: 0; z-index: 0; background: var(--surface-subtle); }
+/* Карта без рекламы (client/free-map.ts): контур суши; метка — кружок и подпись на белой плашке */
+.free-map.leaflet-container, .free-map { position: absolute; inset: 0; z-index: 0; background: var(--surface-brand-soft); }
+.free-map__land { fill: var(--border-default); }
+.free-map__lake { fill: var(--surface-brand-soft); }
 .free-map__marker { width: 0; height: 0; }
 .free-map__pin {
   position: absolute;
