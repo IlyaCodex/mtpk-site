@@ -10,6 +10,8 @@ const MADE_DENY = [
   'sistemy-ohlazhdeniya/chillery',
   'drobemetnoe-oborudovanie/turbina-s-pryamym-privodom',
   'drobemetnoe-oborudovanie/turbina-s-remennym-privodom',
+  // передвижные машины производит партнёр
+  'drobemetnoe-oborudovanie/peredvizhnye',
 ];
 
 /** Нужен ли бейдж «Сделано в России» товару/категории по адресу /products/… */

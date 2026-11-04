@@ -81,6 +81,9 @@ export interface CatalogData {
 
 const bySort = <T extends { sort: number; path: string }>(a: T, b: T) => a.sort - b.sort || a.path.localeCompare(b.path);
 
+/** Разделы, чьё оборудование производит партнёр: под их товарами нет «Преимуществ» (там «Собственное производство»). */
+const PARTNER_MADE = ['/products/drobemetnoe-oborudovanie/peredvizhnye/'];
+
 /** Статус страницы, скрытой с сайта тумблером каталога (её или раздела выше): не published — всюду не видна. */
 export const HIDDEN_STATUS = 'hidden';
 
@@ -203,10 +206,11 @@ export function resolveCatalogBlocks(page: { id: number }, blocks: Block[], data
   let out = blocks.map(resolve);
   // страница товара: общие блоки категории — перед просмотром фото (он в конце страницы)
   if (product) {
-    // «Преимущества» — с гарантией товара (у чиллеров, транзисторных печей — 12 месяцев)
-    const shared = (data.categories.find((c) => c.id === product.categoryId)?.productBlocks ?? []).map((b) =>
-      b.type === 'adv' && !b.warranty && product.warranty ? { ...b, warranty: product.warranty } : b,
-    );
+    // «Преимущества» — с гарантией товара (у чиллеров, транзисторных печей — 12 месяцев), у оборудования партнёра их нет
+    const partner = PARTNER_MADE.some((p) => product.path.startsWith(p));
+    const shared = (data.categories.find((c) => c.id === product.categoryId)?.productBlocks ?? [])
+      .filter((b) => !(partner && b.type === 'adv'))
+      .map((b) => (b.type === 'adv' && !b.warranty && product.warranty ? { ...b, warranty: product.warranty } : b));
     if (shared.length) {
       const at = out.length && out[out.length - 1].type === 'lightbox' ? out.length - 1 : out.length;
       out = [...out.slice(0, at), ...shared, ...out.slice(at)];

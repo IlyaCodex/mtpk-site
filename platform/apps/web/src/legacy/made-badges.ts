@@ -32,7 +32,9 @@
     // Турбины: российское происхождение не подтверждено, бейдж не ставим
     // ни на карточке товара, ни на плитках в каталоге.
     'drobemetnoe-oborudovanie/turbina-s-pryamym-privodom',
-    'drobemetnoe-oborudovanie/turbina-s-remennym-privodom'
+    'drobemetnoe-oborudovanie/turbina-s-remennym-privodom',
+    // Передвижные машины производит партнёр.
+    'drobemetnoe-oborudovanie/peredvizhnye'
   ];
 
   function eligible(slug: string) {

@@ -92,6 +92,15 @@ test('страница товара: общие секции категории 
   assert.equal((other[1] as Extract<Block, { type: 'adv' }>).warranty, undefined);
 });
 
+test('страница товара партнёра (передвижные дробемёты): без «Преимуществ» с «Собственным производством»', () => {
+  const mobile = product({ id: 5, pageId: 104, path: '/products/drobemetnoe-oborudovanie/peredvizhnye/uid-270/' });
+  const out = resolveCatalogBlocks({ id: 104 }, [{ type: 'productHero' } as Block], { ...data, products: [...data.products, mobile] });
+  assert.deepEqual(
+    out.map((b) => b.type),
+    ['productHero', 'leadgen'],
+  );
+});
+
 test('чья страница: категория, подкатегория или товар', () => {
   assert.equal(catalogOwner(1, data).category?.id, 1);
   assert.equal(catalogOwner(10, data).subcategory?.id, 10);
