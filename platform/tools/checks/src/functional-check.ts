@@ -1,7 +1,7 @@
 /**
  * Функциональная проверка клиентских модулей сайта в браузере: меню, поиск,
  * галерея товара, просмотр фото, фильтр каталога, сравнение, «Запросить цену»,
- * согласие на cookie, отправка заявки.
+ * плашка cookie и запуск Метрики без неё, отправка заявки.
  *
  *   npx tsx tools/checks/src/functional-check.ts [--base=http://127.0.0.1:3200] [--no-submit]
  */
@@ -139,9 +139,11 @@ await check('маска телефона', async () => {
   assert(v === '+7 (900) 123-45-67', `маска дала «${v}»`);
 });
 
-await check('согласие на cookie: плашка и «Принять»', async () => {
+await check('плашка cookie: Метрика без «Принять», плашка закрывается', async () => {
   const page = await open('/', { consent: false });
   await page.waitForSelector('#cookie-consent:not([hidden])', { timeout: 3000 });
+  const ym = await page.waitForSelector('script[src="https://mc.yandex.ru/metrika/tag.js"]', { state: 'attached', timeout: 6000 }).then(() => true, () => false);
+  assert(ym, 'Метрика не запустилась без «Принять»');
   await page.click('#cookie-accept');
   assert(await page.locator('#cookie-consent[hidden]').count(), 'плашка не скрылась');
 });

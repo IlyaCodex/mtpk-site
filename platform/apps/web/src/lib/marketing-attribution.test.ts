@@ -156,21 +156,17 @@ test('ClientID callback is awaited and takes precedence over cookie fallback', a
   assert.equal(fd.get('_ym_uid'), 'fresh-client-id');
 });
 
-test('a silent counter has a bounded fallback and no consent never calls it', async () => {
+test('a silent counter has a bounded fallback', async () => {
   const b = browser(); b.cookies.set('_ym_uid', 'fallback'); const m = b.load(marketingCode); const fd = b.data();
   const pending = Promise.resolve(m.appendAnalytics(fd)); await b.advance(1000); await pending;
   assert.equal(fd.get('_ym_uid'), 'fallback');
-  const denied = browser(paid(), false); denied.cookies.set('_ym_uid', 'must-not-collect'); const data = denied.data();
-  await denied.load(marketingCode).appendAnalytics(data);
-  assert.equal(denied.ymCalls.length, 0); assert.equal(data.get('_ym_uid'), null);
 });
 
-test('consent withdrawn before callback prevents collecting ClientID', async () => {
-  const b = browser(); const m = b.load(marketingCode); const fd = b.data();
+test('ClientID does not wait for the cookie banner click', async () => {
+  const b = browser(paid(), false); const m = b.load(marketingCode); const fd = b.data();
   const pending = m.appendAnalytics(fd);
-  b.store.delete('ui_cookie_consent'); b.callbacks.at(-1)!('do-not-collect');
-  await pending;
-  assert.equal(fd.get('_ym_uid'), null);
+  b.callbacks.at(-1)!('no-click-client-id'); await pending;
+  assert.equal(fd.get('_ym_uid'), 'no-click-client-id');
 });
 
 test('late callback affects future forms without changing an already completed form', async () => {
@@ -192,6 +188,14 @@ for (const mode of ['modern', 'legacy'] as const) {
     assert.equal(b.requests[0].body.get('_ym_uid'), 'client-before-submit');
     assert.equal(b.requests[0].body.get('utm_source'), 'yandex');
     assert.equal(b.ymCalls.find((c) => c[1] === 'reachGoal')?.[0], 112991420);
+  });
+  test(`${mode} form sends ClientID without the cookie banner click`, async () => {
+    const b = browser(paid(), false); const api = b.load(mode === 'modern' ? formsCode : legacyCode);
+    if (mode === 'modern') api.initForms();
+    b.setNow(4000); b.submit(); await b.advance(20);
+    b.callbacks.at(-1)!('no-click-client-id'); await b.advance(0);
+    assert.equal(b.requests.length, 1);
+    assert.equal(b.requests[0].body.get('_ym_uid'), 'no-click-client-id');
   });
   test(`${mode} form still submits when the counter never responds`, async () => {
     const b = browser(); const api = b.load(mode === 'modern' ? formsCode : legacyCode);

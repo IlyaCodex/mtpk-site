@@ -1,7 +1,7 @@
 /**
- * Согласие на cookie и аналитика. До «Принять» счётчики не запускаются;
- * после — стартуют при простое браузера или первом действии пользователя
- * (T-PERF-12). Во фрейме инструментов Метрики (Вебвизор, карты) — сразу.
+ * Плашка о cookie и аналитика. Счётчики стартуют у всех посетителей, не дожидаясь «Принять», —
+ * при простое браузера или первом действии пользователя (T-PERF-12); во фрейме инструментов
+ * Метрики (Вебвизор, карты) — сразу. «Принять» прячет плашку и запоминает это на год.
  */
 const KEY = 'ui_cookie_consent';
 const CONSENT_VERSION = 'v2026.1';
@@ -83,13 +83,12 @@ function accept(banner: HTMLElement): void {
   }
   banner.hidden = true;
   window.dispatchEvent(new Event('cookie-consent-accepted'));
-  startAnalytics();
 }
 
 /**
  * Цели Метрики со статей Практикума: статья сообщает о действии событием ui-praktikum-event
  * (detail: { name, …параметры }) — цель с этим именем уходит во все счётчики. Засчитывается там, где в
- * Метрике заведена цель «JavaScript-событие» с таким идентификатором; без согласия на cookie счётчиков нет.
+ * Метрике заведена цель «JavaScript-событие» с таким идентификатором.
  */
 function listenArticleGoals(): void {
   document.addEventListener('ui-praktikum-event', (e) => {
@@ -103,9 +102,9 @@ function listenArticleGoals(): void {
 export function initConsent(): void {
   listenArticleGoals();
   if (inFrame()) return startAnalytics();
+  scheduleAnalytics();
   const banner = document.getElementById('cookie-consent');
-  if (hasConsent()) return scheduleAnalytics();
-  if (!banner) return;
+  if (hasConsent() || !banner) return;
   banner.hidden = false;
   document.getElementById('cookie-accept')?.addEventListener('click', () => accept(banner), { once: true });
 }

@@ -96,22 +96,12 @@ let ymClientId = '';
 let ymClientIdRequest: Promise<string> | undefined;
 const CLIENT_ID_TIMEOUT_MS = 600;
 
-function hasAnalyticsConsent(): boolean {
-  try {
-    return (localStorage.getItem('ui_cookie_consent') || getCookie('ui_cookie_consent')).startsWith('1|');
-  } catch {
-    try { return getCookie('ui_cookie_consent').startsWith('1|'); } catch { return false; }
-  }
-}
-
 function cachedClientId(): string {
-  if (!hasAnalyticsConsent()) return '';
   try { return ymClientId || getCookie('_ym_uid'); } catch { return ymClientId; }
 }
 
-/** Ожидаем разрешённый callback; недоступная Метрика не задержит заявку дольше 600 мс. */
+/** Ожидаем callback Метрики; недоступная Метрика не задержит заявку дольше 600 мс. */
 export function refreshYmClientId(): Promise<string> {
-  if (!hasAnalyticsConsent()) return Promise.resolve('');
   if (ymClientId) return Promise.resolve(ymClientId);
   if (ymClientIdRequest) return ymClientIdRequest;
   const w = window as W;
@@ -127,7 +117,7 @@ export function refreshYmClientId(): Promise<string> {
     const timeout = setTimeout(finish, CLIENT_ID_TIMEOUT_MS);
     try {
       w.ym!(YM_UIBUSINESS_COUNTER, 'getClientID', (id: unknown) => {
-        if (hasAnalyticsConsent() && id) ymClientId = String(id).slice(0, 100);
+        if (id) ymClientId = String(id).slice(0, 100);
         finish();
       });
     } catch { finish(); }

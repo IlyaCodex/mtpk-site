@@ -1,6 +1,6 @@
 /**
  * Пиксели счётчиков для браузеров без JavaScript. Сами счётчики (Метрика,
- * Top.Mail.Ru) запускает клиентский модуль consent.ts — после согласия на cookie.
+ * Top.Mail.Ru) запускает клиентский модуль consent.ts, не дожидаясь «Принять» на плашке cookie.
  */
 export function AnalyticsNoscript() {
   return (

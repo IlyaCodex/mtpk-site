@@ -201,6 +201,5 @@ export function initForms(): void {
   if (!forms.length) return;
   getMarketing(); // зафиксировать первое касание сразу при загрузке страницы
   window.setTimeout(refreshYmClientId, 3000);
-  window.addEventListener('cookie-consent-accepted', refreshYmClientId);
   forms.forEach(initForm);
 }

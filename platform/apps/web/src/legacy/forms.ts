@@ -100,19 +100,10 @@ type StatusType = 'pending' | 'success' | 'error';
   // fallback, если API Метрики ещё не успел ответить.
   var primaryYmClientId = '';
   var primaryYmClientIdRequest: Promise<string> | null = null;
-  function hasAnalyticsConsent() {
-    try {
-      return (localStorage.getItem('ui_cookie_consent') || getCookie('ui_cookie_consent')).startsWith('1|');
-    } catch (e) {
-      try { return getCookie('ui_cookie_consent').startsWith('1|'); } catch (e) { return false; }
-    }
-  }
   function cachedClientId() {
-    if (!hasAnalyticsConsent()) return '';
     try { return primaryYmClientId || getCookie('_ym_uid'); } catch (e) { return primaryYmClientId; }
   }
   function refreshYmClientId(): Promise<string> {
-    if (!hasAnalyticsConsent()) return Promise.resolve('');
     if (primaryYmClientId) return Promise.resolve(primaryYmClientId);
     if (primaryYmClientIdRequest) return primaryYmClientIdRequest;
     if (typeof window.ym !== 'function') return Promise.resolve(cachedClientId());
@@ -127,7 +118,7 @@ type StatusType = 'pending' | 'success' | 'error';
       var timeout = setTimeout(finish, 600);
       try {
         window.ym!(PRIMARY_YM_COUNTER, 'getClientID', function (clientId: unknown) {
-          if (hasAnalyticsConsent() && clientId) primaryYmClientId = String(clientId).slice(0, 100);
+          if (clientId) primaryYmClientId = String(clientId).slice(0, 100);
           finish();
         });
       } catch (e) { finish(); }
@@ -137,7 +128,6 @@ type StatusType = 'pending' | 'success' | 'error';
     return pending;
   }
   setTimeout(refreshYmClientId, 3000);
-  window.addEventListener('cookie-consent-accepted', refreshYmClientId);
 
   async function appendAnalyticsCookies(fd: FormData): Promise<void> {
     var b24Trace = '';
