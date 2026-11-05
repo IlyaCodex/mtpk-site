@@ -139,7 +139,7 @@ function initForm(form: HTMLFormElement, index: number): void {
     }
     fd.set('request_id', requestId);
     for (const [k, v] of Object.entries(getMarketing())) if (v) fd.append(k, v);
-    appendAnalytics(fd);
+    const analytics = appendAnalytics(fd).catch(() => { /* аналитика не должна блокировать заявку */ });
 
     const button = $<HTMLButtonElement>('[type="submit"]', form);
     const buttonHtml = button?.innerHTML ?? '';
@@ -155,7 +155,7 @@ function initForm(form: HTMLFormElement, index: number): void {
     // автозаполнение может опередить антиспам-порог (3 с) — дожидаемся его
     const wait = Math.min(3100, Math.max(0, 3100 - (Date.now() - loadedAt)));
 
-    void new Promise((r) => setTimeout(r, wait))
+    void Promise.all([analytics, new Promise((r) => setTimeout(r, wait))])
       .then(() => fetch(ENDPOINT, { method: 'POST', body: fd, signal: controller.signal, headers: { Accept: 'application/json' } }))
       .then(async (res) => {
         if (!(res.headers.get('Content-Type') ?? '').toLowerCase().includes('application/json')) throw new Error('bad response');

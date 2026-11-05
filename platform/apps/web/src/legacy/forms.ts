@@ -71,6 +71,14 @@ type StatusType = 'pending' | 'success' | 'error';
       }
     }
 
+    var paidSource = String(data.utm_source || '').trim().toLowerCase();
+    var paidMedium = String(data.utm_medium || '').trim().toLowerCase();
+    if (paidMedium === 'cpc' && (paidSource === 'ya' || paidSource === 'yandex') &&
+        (data.utm_source !== 'yandex' || data.utm_medium !== 'cpc')) {
+      data.utm_source = 'yandex';
+      data.utm_medium = 'cpc';
+      changed = true;
+    }
     if (changed || !Object.keys(saved).length) {
       try {
         var s = JSON.stringify(data);
@@ -91,19 +99,47 @@ type StatusType = 'pending' | 'success' | 'error';
   // Client ID берём у рекламного счётчика uibusiness; _ym_uid остаётся
   // fallback, если API Метрики ещё не успел ответить.
   var primaryYmClientId = '';
-  function refreshYmClientId() {
+  var primaryYmClientIdRequest: Promise<string> | null = null;
+  function hasAnalyticsConsent() {
     try {
-      if (typeof window.ym === 'function') {
-        window.ym(PRIMARY_YM_COUNTER, 'getClientID', function (clientId: unknown) {
-          if (clientId) primaryYmClientId = String(clientId).slice(0, 100);
-        });
+      return (localStorage.getItem('ui_cookie_consent') || getCookie('ui_cookie_consent')).startsWith('1|');
+    } catch (e) {
+      try { return getCookie('ui_cookie_consent').startsWith('1|'); } catch (e) { return false; }
+    }
+  }
+  function cachedClientId() {
+    if (!hasAnalyticsConsent()) return '';
+    try { return primaryYmClientId || getCookie('_ym_uid'); } catch (e) { return primaryYmClientId; }
+  }
+  function refreshYmClientId(): Promise<string> {
+    if (!hasAnalyticsConsent()) return Promise.resolve('');
+    if (primaryYmClientId) return Promise.resolve(primaryYmClientId);
+    if (primaryYmClientIdRequest) return primaryYmClientIdRequest;
+    if (typeof window.ym !== 'function') return Promise.resolve(cachedClientId());
+    var pending = new Promise<string>(function (resolve) {
+      var settled = false;
+      function finish() {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeout);
+        resolve(cachedClientId());
       }
-    } catch (e) {}
+      var timeout = setTimeout(finish, 600);
+      try {
+        window.ym!(PRIMARY_YM_COUNTER, 'getClientID', function (clientId: unknown) {
+          if (hasAnalyticsConsent() && clientId) primaryYmClientId = String(clientId).slice(0, 100);
+          finish();
+        });
+      } catch (e) { finish(); }
+    });
+    primaryYmClientIdRequest = pending;
+    void pending.then(function () { if (primaryYmClientIdRequest === pending) primaryYmClientIdRequest = null; });
+    return pending;
   }
   setTimeout(refreshYmClientId, 3000);
   window.addEventListener('cookie-consent-accepted', refreshYmClientId);
 
-  function appendAnalyticsCookies(fd: FormData) {
+  async function appendAnalyticsCookies(fd: FormData): Promise<void> {
     var b24Trace = '';
     try {
       if (window.b24Tracker && window.b24Tracker.guest &&
@@ -114,39 +150,23 @@ type StatusType = 'pending' | 'success' | 'error';
     if (!b24Trace) b24Trace = getCookie('b24_trace');
     if (b24Trace) fd.append('b24_trace', b24Trace);
 
-    refreshYmClientId();
-    var ymUid = primaryYmClientId || getCookie('_ym_uid');
+    var ymUid = await refreshYmClientId();
     if (ymUid) fd.append('_ym_uid', ymUid);
   }
 
   // ── Цели аналитики ───────────────────────────────────────────
-  // Целей не было вообще: конверсии форм в Метрике не считались.
-  // Шлём одну общую цель lead_form_submit и вторую — по имени формы
-  // (data-form), чтобы разделить экспресс-звонок и полную заявку.
-  function isUiBusinessPaidClick(marketing: Marketing) {
-    var campaign = String(marketing.utm_campaign || '').toLowerCase();
-    var source = String(marketing.utm_source || '').toLowerCase();
-    var medium = String(marketing.utm_medium || '').toLowerCase();
-    var yclid = String(marketing.yclid || '');
-    return campaign.indexOf('aimarketing_') === 0 &&
-      source === 'yandex' && medium === 'cpc' && /^\d{10,40}$/.test(yclid);
-  }
-
   function reachGoal(form: HTMLFormElement) {
     var label = (form.getAttribute('data-form') || 'lead').toLowerCase()
       .replace(/[^a-zа-я0-9]+/gi, '_').replace(/^_+|_+$/g, '').slice(0, 40);
     var marketing = getMarketing();
-    var campaign = String(marketing.utm_campaign || '').toLowerCase();
-    var source = String(marketing.utm_source || '').toLowerCase();
-    // Кампании, созданные этим рекламным кабинетом, имеют стабильный префикс
-    // AImarketing_. Остальные размеченные кампании Яндекс Директа относятся
-    // к УралИндуктор3. Органику и прямые заходы не приписываем рекламе.
+    var campaign = String(marketing.utm_campaign || '').trim().toLowerCase();
+    var source = String(marketing.utm_source || '').trim().toLowerCase();
+    var paid = (source === 'yandex' || source === 'ya') && String(marketing.utm_medium || '').trim().toLowerCase() === 'cpc';
     var goalCounter = 0;
-    // Счётчик uibusiness получает конверсию только после настоящего клика
-    // из Директа: тестовые UTM без yclid больше не загрязняют эту цель.
-    if (isUiBusinessPaidClick(marketing)) {
+    // Кампания определяет кабинет; yclid не является условием выбора счётчика.
+    if (paid && campaign.indexOf('aimarketing_') === 0) {
       goalCounter = YM_UIBUSINESS_COUNTER;
-    } else if (campaign && source === 'yandex') {
+    } else if (paid && campaign) {
       goalCounter = YM_LEGACY_COUNTER;
     }
     try {
@@ -272,7 +292,7 @@ type StatusType = 'pending' | 'success' | 'error';
       // маркетинговые метки (utm_*, yclid, gclid, fbclid, referrer, landing_url)
       var mk = getMarketing();
       Object.keys(mk).forEach(function (k) { if (mk[k]) fd.append(k, mk[k]); });
-      appendAnalyticsCookies(fd); // b24_trace + _ym_uid для сквозной аналитики
+      var analytics = appendAnalyticsCookies(fd).catch(function () { /* аналитика не блокирует заявку */ });
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.dataset.label = submitBtn.innerHTML;
@@ -286,7 +306,7 @@ type StatusType = 'pending' | 'success' | 'error';
       // Автозаполнение может завершиться раньше антиспам-порога. Данные не
       // выбрасываем: дожидаемся трёх секунд вместо ложного «успеха».
       var waitMs = Math.min(3100, Math.max(0, 3100 - (Date.now() - loadedAt)));
-      new Promise(function (resolve) { setTimeout(resolve, waitMs); })
+      Promise.all([analytics, new Promise(function (resolve) { setTimeout(resolve, waitMs); })])
         .then(function () {
           return fetch(ENDPOINT, { method: 'POST', body: fd, signal: controller.signal,
             headers: { 'Accept': 'application/json' } });

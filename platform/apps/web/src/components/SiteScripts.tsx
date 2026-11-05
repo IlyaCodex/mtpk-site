@@ -1,5 +1,6 @@
 import { AnalyticsNoscript } from './Analytics';
 import { MANGO_SCRIPT } from '@/lib/site';
+import { versioned } from '@/lib/versions';
 
 /**
  * Битрикс24 — сквозная аналитика / call tracker (портал b1785973). Строго перед
@@ -12,15 +13,15 @@ const BITRIX_JS = `(function(w,d,u){
 
 /**
  * Коллтрекинг Mango (загрузчик ~460 КБ) работает только на https://uralinduktor.ru и только для
- * посетителей из Директа: метки yandex/cpc в адресе или сохранённые раньше (cookie
+ * посетителей из Директа: метки yandex/ya + cpc в адресе или сохранённые раньше (cookie
  * ui_marketing_trace, packages/ui/src/browser/marketing.ts). Остальным его не грузим — условие
  * шире проверки внутри загрузчика, точную проверку он делает сам.
  */
 const MANGO_GATE = `(function(){
       var h=location.hostname,q=location.search;
       if(location.protocol!=='https:'||!/^(www\\.)?uralinduktor\\.ru$/i.test(h))return;
-      if(!/[?&]utm_source=yandex(&|$)/i.test(q)&&document.cookie.indexOf('ui_marketing_trace=')<0)return;
-      var s=document.createElement('script');s.src=${JSON.stringify(MANGO_SCRIPT)};s.async=true;document.body.appendChild(s);
+      if(!/[?&]utm_source=(?:yandex|ya)(&|$)/i.test(q)&&document.cookie.indexOf('ui_marketing_trace=')<0)return;
+      var s=document.createElement('script');s.src=${JSON.stringify(versioned(MANGO_SCRIPT))};s.async=true;document.body.appendChild(s);
     })();`;
 
 /**

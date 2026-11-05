@@ -1,5 +1,5 @@
 /**
- * Маркетинговая атрибуция заявок — перенос из forms.js без изменения логики:
+ * Маркетинговая атрибуция заявок — общая логика с прежними forms.js:
  * последнее размеченное касание (utm_*, yclid, gclid, fbclid, referrer,
  * landing_url) живёт 30 дней в localStorage + cookie; трейс Битрикс24 и
  * Client ID Метрики добавляются к заявке; цели Метрики и Top.Mail.Ru.
@@ -71,6 +71,15 @@ export function getMarketing(): Record<string, string> {
       changed = true;
     }
   }
+  // Один источник Директа в заявках и целях, включая старые сохранённые метки ya.
+  const source = String(data.utm_source || '').trim().toLowerCase();
+  const medium = String(data.utm_medium || '').trim().toLowerCase();
+  if (medium === 'cpc' && (source === 'ya' || source === 'yandex') &&
+      (data.utm_source !== 'yandex' || data.utm_medium !== 'cpc')) {
+    data.utm_source = 'yandex';
+    data.utm_medium = 'cpc';
+    changed = true;
+  }
   if (changed || !Object.keys(saved).length) {
     try {
       const s = JSON.stringify(data);
@@ -84,22 +93,52 @@ export function getMarketing(): Record<string, string> {
 }
 
 let ymClientId = '';
-/** Client ID у рекламного счётчика uibusiness (_ym_uid — запасной вариант). */
-export function refreshYmClientId() {
+let ymClientIdRequest: Promise<string> | undefined;
+const CLIENT_ID_TIMEOUT_MS = 600;
+
+function hasAnalyticsConsent(): boolean {
   try {
-    const w = window as W;
-    if (typeof w.ym === 'function') {
-      w.ym(YM_UIBUSINESS_COUNTER, 'getClientID', (id: unknown) => {
-        if (id) ymClientId = String(id).slice(0, 100);
-      });
-    }
+    return (localStorage.getItem('ui_cookie_consent') || getCookie('ui_cookie_consent')).startsWith('1|');
   } catch {
-    /* Метрика ещё не загружена */
+    try { return getCookie('ui_cookie_consent').startsWith('1|'); } catch { return false; }
   }
 }
 
+function cachedClientId(): string {
+  if (!hasAnalyticsConsent()) return '';
+  try { return ymClientId || getCookie('_ym_uid'); } catch { return ymClientId; }
+}
+
+/** Ожидаем разрешённый callback; недоступная Метрика не задержит заявку дольше 600 мс. */
+export function refreshYmClientId(): Promise<string> {
+  if (!hasAnalyticsConsent()) return Promise.resolve('');
+  if (ymClientId) return Promise.resolve(ymClientId);
+  if (ymClientIdRequest) return ymClientIdRequest;
+  const w = window as W;
+  if (typeof w.ym !== 'function') return Promise.resolve(cachedClientId());
+  const pending = new Promise<string>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(cachedClientId());
+    };
+    const timeout = setTimeout(finish, CLIENT_ID_TIMEOUT_MS);
+    try {
+      w.ym!(YM_UIBUSINESS_COUNTER, 'getClientID', (id: unknown) => {
+        if (hasAnalyticsConsent() && id) ymClientId = String(id).slice(0, 100);
+        finish();
+      });
+    } catch { finish(); }
+  });
+  ymClientIdRequest = pending;
+  void pending.then(() => { if (ymClientIdRequest === pending) ymClientIdRequest = undefined; });
+  return pending;
+}
+
 /** Трейс сквозной аналитики Битрикс24 и Client ID Метрики — в данные формы. */
-export function appendAnalytics(fd: FormData) {
+export async function appendAnalytics(fd: FormData): Promise<void> {
   let trace = '';
   try {
     trace = (window as W).b24Tracker?.guest?.getTrace?.() || '';
@@ -108,34 +147,24 @@ export function appendAnalytics(fd: FormData) {
   }
   if (!trace) trace = getCookie('b24_trace');
   if (trace) fd.append('b24_trace', trace);
-  refreshYmClientId();
-  const ym = ymClientId || getCookie('_ym_uid');
+  const ym = await refreshYmClientId();
   if (ym) fd.append('_ym_uid', ym);
 }
 
-function isUiBusinessPaidClick(m: Record<string, string>): boolean {
-  const campaign = String(m.utm_campaign || '').toLowerCase();
-  return (
-    campaign.indexOf('aimarketing_') === 0 &&
-    String(m.utm_source || '').toLowerCase() === 'yandex' &&
-    String(m.utm_medium || '').toLowerCase() === 'cpc' &&
-    /^\d{10,40}$/.test(String(m.yclid || ''))
-  );
-}
-
 /**
- * Цель «lead_form_submit»: в кабинет uibusiness — только настоящий клик из
- * Директа (AImarketing_ + yclid), остальные размеченные кампании Директа —
- * в «УралИндуктор3»; органику рекламе не приписываем.
+ * Кабинет определяет кампания, а yclid остаётся идентификатором клика.
+ * Другие размеченные кампании платного Директа сохраняют прежнюю ветку legacy.
+ * Органику и остальные источники кабинетам не приписываем.
  */
 export function reachGoal(formName: string) {
   const label = (formName || 'lead').toLowerCase().replace(/[^a-zа-я0-9]+/gi, '_').replace(/^_+|_+$/g, '').slice(0, 40);
   const m = getMarketing();
-  const campaign = String(m.utm_campaign || '').toLowerCase();
-  const source = String(m.utm_source || '').toLowerCase();
+  const campaign = String(m.utm_campaign || '').trim().toLowerCase();
+  const source = String(m.utm_source || '').trim().toLowerCase();
+  const paid = (source === 'yandex' || source === 'ya') && String(m.utm_medium || '').trim().toLowerCase() === 'cpc';
   let counter = 0;
-  if (isUiBusinessPaidClick(m)) counter = YM_UIBUSINESS_COUNTER;
-  else if (campaign && source === 'yandex') counter = YM_LEGACY_COUNTER;
+  if (paid && campaign.startsWith('aimarketing_')) counter = YM_UIBUSINESS_COUNTER;
+  else if (paid && campaign) counter = YM_LEGACY_COUNTER;
   const w = window as W;
   try {
     if (counter && typeof w.ym === 'function') {
