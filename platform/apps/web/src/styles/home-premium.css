@@ -1,0 +1,612 @@
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════════
+   Главная: премиальное оформление блоков после первого экрана (первый экран — как есть, тексты — те же).
+   Область — main с обложкой главной (.hero--home). Тёмные вставки: цифры, панель «Под ключ», полоса
+   сервиса, проекты. Появление при прокрутке — client/reveal.ts (класс .rv, затем .is-in).
+   ═══════════════════════════════════════════════════════════════════════════════════════════════════ */
+:root {
+  --pm-deep: #0b1a20;
+  --pm-grad: linear-gradient(115deg, #1f5e78 0%, #2b8a72 52%, #4fab3a 100%);
+  --pm-grad-soft: linear-gradient(115deg, #7cc6dc 0%, #8fd6a4 55%, #b6e59e 100%);
+  --pm-glow: radial-gradient(60% 90% at 0% 0%, rgba(31, 94, 120, 0.5), transparent 62%),
+    radial-gradient(55% 90% at 100% 100%, rgba(79, 171, 58, 0.22), transparent 62%);
+  --pm-radius: 22px;
+  --pm-ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --pm-line: rgba(16, 31, 38, 0.08);
+  --pm-shadow: 0 1px 1px rgba(16, 31, 38, 0.03), 0 12px 32px -18px rgba(16, 31, 38, 0.18);
+  --pm-shadow-hover: 0 2px 4px rgba(16, 31, 38, 0.04), 0 34px 64px -30px rgba(16, 31, 38, 0.36);
+  /* цвета, которые в тёмной теме остаются как есть (подложка фото, блик, белая кнопка), — переменными:
+     тёмная тема (content-kit dark.ts) перекрашивает только цвета, записанные в свойствах напрямую */
+  --pm-paper: #fff;
+  --pm-ink: #0f2128;
+  --pm-stage: linear-gradient(180deg, transparent 66%, rgba(15, 33, 40, 0.07) 100%),
+    radial-gradient(85% 75% at 50% 26%, #ffffff 0%, #f1f5f6 52%, #dde5e8 100%);
+  --pm-glint: linear-gradient(105deg, transparent 32%, rgba(255, 255, 255, 0.6) 48%, rgba(255, 255, 255, 0.12) 56%, transparent 68%);
+  --pm-badge: rgba(255, 255, 255, 0.92);
+}
+
+/* ── Общее: ритм разделов, заголовки, надзаголовки ── */
+main:has(> .hero--home) > :is(.equip, .leadgen, .solve, .foundry, .stock-show, .care, .upgrade, .works, .lease, .geomap, .best-offer) {
+  padding-block: clamp(84px, 9vw, 132px);
+}
+main:has(> .hero--home) :is(.equip__title, .leadgen__title, .solve__title, .foundry__title, .stock-show__title, .care__title, .upgrade__title, .works__title, .lease__title, .geomap__title, .bo-info__title) {
+  font-size: clamp(32px, 3.6vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.038em;
+}
+main:has(> .hero--home) :is(.leadgen__title, .solve__title, .foundry__title, .stock-show__title, .care__title, .upgrade__title, .works__title, .lease__title, .geomap__title, .bo-panel__title) em {
+  background: var(--pm-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+main:has(> .hero--home) :is(.equip__lead, .leadgen__lead, .solve__lead, .foundry__lead, .stock-show__lead, .care__lead, .upgrade__lead, .works__lead, .lease__lead, .geomap__lead) {
+  font-size: clamp(16px, 1.2vw, 18px);
+  line-height: 1.6;
+}
+main:has(> .hero--home) :is(.leadgen__eyebrow, .solve__eyebrow, .foundry__eyebrow, .stock-show__eyebrow, .care__eyebrow, .upgrade__eyebrow, .works__eyebrow, .lease__eyebrow, .geomap__eyebrow, .bo-info__eyebrow, .bo-panel__eyebrow) {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: 0.16em;
+  color: var(--teal-600);
+}
+main:has(> .hero--home) :is(.leadgen__eyebrow, .solve__eyebrow, .foundry__eyebrow, .stock-show__eyebrow, .care__eyebrow, .upgrade__eyebrow, .works__eyebrow, .lease__eyebrow, .geomap__eyebrow, .bo-info__eyebrow, .bo-panel__eyebrow)::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--pm-grad);
+}
+/* кнопки главной — с объёмом и мягким свечением */
+main:has(> .hero--home) > :not(.hero) :is(.btn--primary, .btn--green) {
+  background: linear-gradient(180deg, #5cbc45 0%, #45a032 100%);
+  box-shadow: 0 12px 28px -12px rgba(79, 171, 58, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.45s var(--pm-ease), box-shadow 0.45s var(--pm-ease), filter 0.3s;
+}
+main:has(> .hero--home) > :not(.hero) :is(.btn--primary, .btn--green):hover {
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 18px 36px -14px rgba(79, 171, 58, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ── Каталог «Оборудование»: раздел светлый, карточки — в мягких фирменных оттенках. Вид карточки —
+   переменные --eq-*: их цвета тёмная тема не перекрашивает, для неё — свои значения ── */
+main:has(> .hero--home) .equip {
+  background: radial-gradient(70% 40% at 50% 0%, rgba(31, 94, 120, 0.07), transparent 70%), #f4f6f7;
+}
+main:has(> .hero--home) .equip__head { margin-bottom: clamp(32px, 4vw, 52px); }
+main:has(> .hero--home) .equip__more {
+  padding: 12px 20px;
+  border: 1px solid var(--pm-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text-primary);
+  box-shadow: var(--pm-shadow);
+}
+main:has(> .hero--home) .equip__more:hover { color: var(--green-700); border-color: rgba(79, 171, 58, 0.4); }
+main:has(> .hero--home) .equip__grid { gap: 22px; counter-reset: pm-equip; }
+/* оттенки по очереди — мята, лёд, сталь; карточка — сама подложка фото: белый фон снимка растворяется в оттенке */
+main:has(> .hero--home) .equip-card {
+  --eq-t1: #e9f5ed;
+  --eq-t2: #c9e5d2;
+  --eq-bg: radial-gradient(100% 75% at 50% 32%, #ffffff 0%, var(--eq-t1) 46%, var(--eq-t2) 100%);
+  --eq-line: rgba(255, 255, 255, 0.7);
+  --eq-shadow: 0 1px 2px rgba(16, 31, 38, 0.05), 0 24px 44px -30px rgba(16, 31, 38, 0.4);
+  --eq-shadow-hover: 0 2px 4px rgba(16, 31, 38, 0.06), 0 50px 80px -38px rgba(16, 31, 38, 0.5);
+  --eq-pad: 0px;
+  --eq-stage: none;
+  --eq-stage-edge: none;
+  --eq-stage-r: 25px 25px 0 0;
+  --eq-corner: 20px;
+  --eq-body: 4px 20px 20px 24px;
+  --eq-title: #0f2128;
+  --eq-num: rgba(15, 33, 40, 0.42);
+  --eq-go-bg: #fff;
+  --eq-go-line: transparent;
+  --eq-go-ink: #0f2128;
+  --eq-spot: rgba(255, 255, 255, 0.6);
+  --eq-ring: #fff;
+}
+main:has(> .hero--home) .equip-card:nth-child(3n + 2) { --eq-t1: #e6f0f5; --eq-t2: #c4dbe6; }
+main:has(> .hero--home) .equip-card:nth-child(3n) { --eq-t1: #eef1f4; --eq-t2: #d2dae0; }
+/* тёмная тема: тёмная карточка, фото — на светлой подложке внутри (снимки — на белом фоне) */
+html[data-theme='dark'] main:has(> .hero--home) .equip .equip-card {
+  --eq-bg: linear-gradient(165deg, #1c363f 0%, #10222a 50%, #0b1a20 100%);
+  --eq-line: rgba(255, 255, 255, 0.07);
+  --eq-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 28px 50px -30px rgba(0, 0, 0, 0.7);
+  --eq-shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.22), 0 52px 84px -40px rgba(0, 0, 0, 0.8);
+  --eq-pad: 8px;
+  --eq-stage: var(--pm-stage);
+  --eq-stage-edge: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --eq-stage-r: 19px;
+  --eq-corner: 15px;
+  --eq-body: 18px 10px 10px 14px;
+  --eq-title: #fff;
+  --eq-go-bg: rgba(255, 255, 255, 0.06);
+  --eq-go-line: rgba(255, 255, 255, 0.16);
+  --eq-go-ink: #fff;
+  --eq-spot: rgba(143, 214, 164, 0.18);
+  --eq-ring: rgba(169, 227, 182, 0.95);
+}
+main:has(> .hero--home) .equip-card {
+  isolation: isolate;
+  overflow: visible;
+  padding: var(--eq-pad);
+  border: 1px solid var(--eq-line);
+  border-radius: 26px;
+  background: var(--eq-bg);
+  box-shadow: var(--eq-shadow);
+  counter-increment: pm-equip;
+}
+/* свет за курсором (--mx/--my — client/showcase.ts) и рамка, которая загорается рядом с ним */
+main:has(> .hero--home) .equip-card::before,
+main:has(> .hero--home) .equip-card::after {
+  content: '';
+  position: absolute;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.5s var(--pm-ease);
+  pointer-events: none;
+}
+main:has(> .hero--home) .equip-card::before {
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), var(--eq-spot), transparent 62%);
+}
+main:has(> .hero--home) .equip-card::after {
+  inset: -1px;
+  padding: 1px;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 0%), var(--eq-ring), transparent 75%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+main:has(> .hero--home) .equip-card:hover {
+  border-color: var(--eq-line);
+  transform: perspective(1100px) translateY(-6px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  box-shadow: var(--eq-shadow-hover);
+}
+main:has(> .hero--home) .equip-card:hover::before,
+main:has(> .hero--home) .equip-card:hover::after { opacity: 1; }
+/* подложка фото (в светлой теме — сама карточка): белый фон снимка растворяется в ней (multiply) */
+main:has(> .hero--home) .equip .equip-card__cover {
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--eq-stage-r);
+  background: var(--eq-stage);
+  box-shadow: var(--eq-stage-edge);
+}
+main:has(> .hero--home) .equip .equip-card__cover img {
+  inset: 30px 24px 10px;
+  width: calc(100% - 48px);
+  height: calc(100% - 40px);
+  mix-blend-mode: multiply;
+  transition: transform 0.9s var(--pm-ease);
+}
+main:has(> .hero--home) .equip-card:hover .equip-card__cover img { transform: translateY(-6px) scale(1.06); }
+/* номер на подложке — сверху слева, как в каталоге выставки (скринридеру не читается) */
+main:has(> .hero--home) .equip .equip-card__cover::before {
+  content: counter(pm-equip, decimal-leading-zero);
+  content: counter(pm-equip, decimal-leading-zero) / '';
+  position: absolute;
+  top: var(--eq-corner);
+  left: calc(var(--eq-corner) + 2px);
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--eq-num);
+}
+/* блик по карточке, когда она проявилась при прокрутке */
+main:has(> .hero--home) .equip .equip-card__cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--pm-glint);
+  translate: -110% 0;
+  pointer-events: none;
+}
+main:has(> .hero--home) .equip-card.is-in .equip-card__cover::after { animation: pm-glint 1.7s var(--pm-ease) calc(var(--rv-d, 0ms) + 0.35s) both; }
+@keyframes pm-glint {
+  to { translate: 110% 0; }
+}
+main:has(> .hero--home) .equip-card__body { padding: var(--eq-body); }
+/* перенос по слогам — только на узких плитках телефона (там он нужен), на широких — слово целиком */
+main:has(> .hero--home) .equip-card__title { hyphens: manual; font-size: 17px; letter-spacing: -0.012em; color: var(--eq-title); }
+main:has(> .hero--home) .equip-card__go {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--eq-go-line);
+  border-radius: 50%;
+  background: var(--eq-go-bg);
+  color: var(--eq-go-ink);
+  transition: background 0.4s, border-color 0.4s, box-shadow 0.5s, transform 0.5s var(--pm-ease);
+}
+main:has(> .hero--home) .equip-card__go::before { inset: 12px; }
+main:has(> .hero--home) .equip-card:hover .equip-card__go {
+  border-color: transparent;
+  background: var(--pm-grad);
+  box-shadow: 0 10px 26px -8px rgba(79, 171, 58, 0.75);
+  transform: rotate(45deg);
+}
+main:has(> .hero--home) .equip .equip-card .made-badge {
+  top: calc(var(--eq-corner) - 3px);
+  right: calc(var(--eq-corner) - 3px);
+  border-radius: 999px;
+  background: var(--pm-badge);
+  color: var(--pm-ink);
+  box-shadow: 0 6px 16px -8px rgba(15, 33, 40, 0.35);
+}
+
+/* ── Цифры: тёмная полоса ── */
+main:has(> .hero--home) .stats {
+  position: relative;
+  background: var(--pm-glow), var(--pm-deep);
+  padding-block: clamp(56px, 6vw, 92px);
+}
+main:has(> .hero--home) .stats .stats__grid { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+main:has(> .hero--home) .stats .stat { background: transparent; padding-block: 8px; }
+main:has(> .hero--home) .stats .stat + .stat { border-left: 1px solid rgba(255, 255, 255, 0.09); }
+main:has(> .hero--home) .stats .stat__icon {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #8fd6a4;
+}
+main:has(> .hero--home) .stats .stat__label { color: #8fd6a4; letter-spacing: 0.14em; }
+main:has(> .hero--home) .stats .stat__num {
+  font-size: clamp(42px, 4.2vw, 62px);
+  color: #fff;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+main:has(> .hero--home) .stats .stat__num small { color: rgba(255, 255, 255, 0.72); letter-spacing: -0.01em; }
+main:has(> .hero--home) .stats .stat__plus {
+  background: var(--pm-grad-soft);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+main:has(> .hero--home) .stats .stat__text { color: rgba(255, 255, 255, 0.62); }
+
+/* ── Заявка ── */
+main:has(> .hero--home) .leadgen {
+  background: radial-gradient(45% 60% at 100% 30%, rgba(79, 171, 58, 0.08), transparent 70%), radial-gradient(40% 50% at 0% 100%, rgba(31, 94, 120, 0.07), transparent 70%), #fff;
+}
+main:has(> .hero--home) .leadgen__checklist-item {
+  border: 1px solid var(--pm-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--pm-shadow);
+}
+main:has(> .hero--home) .leadgen__checklist-item svg {
+  border-radius: 50%;
+  background: var(--pm-grad);
+  color: #fff;
+}
+main:has(> .hero--home) .leadgen .form {
+  border: 1px solid var(--pm-line);
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(16, 31, 38, 0.03), 0 50px 100px -50px rgba(16, 31, 38, 0.38);
+  overflow: hidden;
+}
+main:has(> .hero--home) .leadgen .form::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--pm-grad);
+}
+main:has(> .hero--home) .leadgen :is(.form__input, .form__textarea) { border-radius: 14px; background: #f7f9fa; }
+main:has(> .hero--home) .leadgen :is(.form__input, .form__textarea):focus { background: #fff; }
+
+/* ── «Решения для задач»: карточка темнеет при наведении ── */
+main:has(> .hero--home) .solve { background: #f4f6f7; }
+main:has(> .hero--home) .solve-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius);
+  background: #fff;
+  box-shadow: var(--pm-shadow);
+}
+main:has(> .hero--home) .solve-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--pm-glow), var(--pm-deep);
+  opacity: 0;
+  transition: opacity 0.55s var(--pm-ease);
+}
+main:has(> .hero--home) .solve-card:hover { transform: translateY(-6px); border-color: transparent; box-shadow: var(--pm-shadow-hover); }
+main:has(> .hero--home) .solve-card:hover::before { opacity: 1; }
+main:has(> .hero--home) .solve-card :is(.solve-card__title, .solve-card__text, .solve-card__num, .solve-card__icon, .solve-card__go) { transition: color 0.45s ease; }
+main:has(> .hero--home) .solve-card:hover .solve-card__title { color: #fff; }
+main:has(> .hero--home) .solve-card:hover :is(.solve-card__text, .solve-card__num) { color: rgba(255, 255, 255, 0.66); }
+main:has(> .hero--home) .solve-card:hover :is(.solve-card__icon, .solve-card__go) { color: #8fd6a4; }
+main:has(> .hero--home) .solve__foot {
+  padding: 26px 32px;
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius);
+  background: #fff;
+  box-shadow: var(--pm-shadow);
+}
+
+/* ── «Литейное производство под ключ» ── */
+main:has(> .hero--home) .foundry { background: #fff; }
+main:has(> .hero--home) .foundry__art { filter: drop-shadow(0 30px 40px rgba(16, 31, 38, 0.14)); }
+main:has(> .hero--home) .foundry-step {
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius);
+  background: linear-gradient(180deg, #fff 0%, #f8faf9 100%);
+  box-shadow: var(--pm-shadow);
+}
+main:has(> .hero--home) .foundry-step:hover { transform: translateY(-6px); box-shadow: var(--pm-shadow-hover); }
+main:has(> .hero--home) .foundry-step__num {
+  font-size: 44px;
+  letter-spacing: -0.05em;
+  background: var(--pm-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+main:has(> .hero--home) .foundry-step__icon { border-radius: 14px; background: var(--pm-grad); color: #fff; }
+main:has(> .hero--home) .foundry-step + .foundry-step::before { background: var(--pm-grad); }
+main:has(> .hero--home) .foundry__panel {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  border-radius: 28px;
+  background: var(--pm-glow), var(--pm-deep);
+  box-shadow: 0 50px 100px -55px rgba(11, 26, 32, 0.8);
+}
+main:has(> .hero--home) .foundry__panel-main { border-right-color: rgba(255, 255, 255, 0.1); }
+main:has(> .hero--home) :is(.foundry__panel-title, .foundry__list-title) { color: #fff; }
+main:has(> .hero--home) :is(.foundry__panel-text, .foundry__list li) { color: rgba(255, 255, 255, 0.7); }
+main:has(> .hero--home) .foundry__list li::before { background-color: #8fd6a4; }
+
+/* ── Склад ── */
+main:has(> .hero--home) .stock-show { background: #f4f6f7; }
+main:has(> .hero--home) .stock-type {
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius);
+  box-shadow: var(--pm-shadow);
+}
+main:has(> .hero--home) .stock-type:hover { transform: translateY(-6px); border-color: rgba(79, 171, 58, 0.35); box-shadow: var(--pm-shadow-hover); }
+main:has(> .hero--home) .stock-type__cover img { transition: transform 1s var(--pm-ease); }
+main:has(> .hero--home) .stock-type:hover .stock-type__cover img { transform: scale(1.05); }
+main:has(> .hero--home) .stock-show__tab { border-radius: 999px; }
+main:has(> .hero--home) .stock-show__arrow { border-radius: 50%; }
+main:has(> .hero--home) .stock-show__foot {
+  padding: 22px 28px;
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius);
+  background: #fff;
+  box-shadow: var(--pm-shadow);
+}
+
+/* ── Сервис ── */
+main:has(> .hero--home) .care { background: #fff; }
+main:has(> .hero--home) .care__photo { overflow: hidden; border-radius: 26px; box-shadow: 0 40px 80px -46px rgba(16, 31, 38, 0.55); }
+main:has(> .hero--home) .care__photo::before { display: none; }
+main:has(> .hero--home) .care__photo img { border-radius: 0; scale: 1.06; translate: 0 var(--py, 0px); }
+main:has(> .hero--home) .care__photo-tag {
+  left: 18px;
+  bottom: 18px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+main:has(> .hero--home) .care-card {
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius);
+  background: linear-gradient(180deg, #fff 0%, #f8faf9 100%);
+  box-shadow: var(--pm-shadow);
+}
+main:has(> .hero--home) .care-card:hover { transform: translateY(-5px); box-shadow: var(--pm-shadow-hover); }
+main:has(> .hero--home) .care-card__icon { border-radius: 14px; background: var(--pm-grad); color: #fff; }
+main:has(> .hero--home) .care__cta {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  border-radius: 26px;
+  background: var(--pm-glow), var(--pm-deep);
+  box-shadow: 0 40px 90px -55px rgba(11, 26, 32, 0.8);
+}
+main:has(> .hero--home) .care__cta-icon { color: #8fd6a4; border-right-color: rgba(255, 255, 255, 0.1); }
+main:has(> .hero--home) .care__cta-title { color: #fff; }
+main:has(> .hero--home) :is(.care__cta-lead, .care__phones-label) { color: rgba(255, 255, 255, 0.64); }
+main:has(> .hero--home) .care__phones { border-left-color: rgba(255, 255, 255, 0.1); }
+main:has(> .hero--home) .care__phones a { color: #fff; }
+main:has(> .hero--home) .care__phones a:hover { color: #8fd6a4; }
+
+/* ── Модернизация ── */
+main:has(> .hero--home) .upgrade { background: #f4f6f7; }
+main:has(> .hero--home) .upgrade__points { border-top-color: var(--pm-line); }
+main:has(> .hero--home) .upgrade-point { position: relative; border-bottom-color: transparent; }
+main:has(> .hero--home) .upgrade-point::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(31, 94, 120, 0.45), rgba(79, 171, 58, 0.35) 40%, var(--pm-line) 70%);
+  transform-origin: left;
+  transition: transform 1.2s var(--pm-ease) calc(var(--rv-d, 0ms) + 200ms);
+}
+main:has(> .hero--home) .upgrade-point.rv:not(.is-in)::after { transform: scaleX(0); }
+main:has(> .hero--home) .upgrade-point__num { border-radius: 14px; background: var(--pm-grad); color: #fff; }
+main:has(> .hero--home) .upgrade__photo { overflow: hidden; border-radius: 26px; box-shadow: 0 40px 80px -46px rgba(16, 31, 38, 0.55); }
+main:has(> .hero--home) .upgrade__photo img { border-radius: 0; scale: 1.06; translate: 0 var(--py, 0px); }
+main:has(> .hero--home) .upgrade__photo-tag {
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ── Проекты: тёмный раздел ── */
+main:has(> .hero--home) .works {
+  background: radial-gradient(50% 45% at 0% 0%, rgba(31, 94, 120, 0.42), transparent 65%), radial-gradient(45% 40% at 100% 60%, rgba(79, 171, 58, 0.16), transparent 65%), var(--pm-deep);
+  color: #fff;
+}
+main:has(> .hero--home) :is(.works__title, .works__subtitle) { color: #fff; }
+main:has(> .hero--home) .works__title em { background: var(--pm-grad-soft); -webkit-background-clip: text; background-clip: text; }
+main:has(> .hero--home) .works__eyebrow { color: #8fd6a4; }
+main:has(> .hero--home) .works__lead { color: rgba(255, 255, 255, 0.66); }
+main:has(> .hero--home) .works__all { border-color: rgba(255, 255, 255, 0.3); color: #fff; border-radius: 999px; }
+main:has(> .hero--home) .works__all:hover { background: var(--pm-paper); border-color: transparent; color: var(--pm-deep); }
+main:has(> .hero--home) .works-main {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 60px 120px -60px rgba(0, 0, 0, 0.7);
+}
+main:has(> .hero--home) .works-main__photo img { transition: transform 1.4s var(--pm-ease); }
+main:has(> .hero--home) .works-main:hover .works-main__photo img { transform: scale(1.04); }
+main:has(> .hero--home) .works-main__tag { background: rgba(143, 214, 164, 0.14); color: #a9e3b6; }
+main:has(> .hero--home) .works-main__meta { color: rgba(255, 255, 255, 0.55); }
+main:has(> .hero--home) .works-main__title { font-size: clamp(22px, 2.2vw, 30px); letter-spacing: -0.02em; }
+main:has(> .hero--home) .works-main__title a { color: #fff; }
+main:has(> .hero--home) .works-main__title a:hover { color: #a9e3b6; }
+main:has(> .hero--home) .works__arrow { border-color: rgba(255, 255, 255, 0.18); border-radius: 50%; background: rgba(255, 255, 255, 0.04); color: #fff; }
+main:has(> .hero--home) .works__arrow:hover:not(:disabled) { border-color: #8fd6a4; color: #8fd6a4; }
+main:has(> .hero--home) .work-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--pm-radius);
+  background: rgba(255, 255, 255, 0.04);
+}
+main:has(> .hero--home) .work-card:hover { transform: translateY(-6px); border-color: rgba(143, 214, 164, 0.4); box-shadow: 0 40px 70px -40px rgba(0, 0, 0, 0.8); }
+main:has(> .hero--home) .work-card__photo { background: rgba(255, 255, 255, 0.04); }
+main:has(> .hero--home) .work-card:hover .work-card__photo img { transform: scale(1.05); }
+main:has(> .hero--home) .work-card__meta { color: rgba(255, 255, 255, 0.5); }
+main:has(> .hero--home) .work-card__title { color: #fff; }
+main:has(> .hero--home) .work-card__link { color: #8fd6a4; }
+
+/* ── Лизинг ── */
+main:has(> .hero--home) .lease { background: #fff; }
+main:has(> .hero--home) .lease__title { font-size: clamp(30px, 3vw, 44px); }
+main:has(> .hero--home) .lease__panel {
+  border: 1px solid var(--pm-line);
+  border-radius: 30px;
+  background: radial-gradient(60% 80% at 100% 0%, rgba(79, 171, 58, 0.1), transparent 70%), radial-gradient(50% 70% at 0% 100%, rgba(31, 94, 120, 0.09), transparent 70%), linear-gradient(180deg, #fbfcfc, #f3f7f5);
+  box-shadow: 0 50px 100px -60px rgba(16, 31, 38, 0.4);
+}
+main:has(> .hero--home) .lease-partner {
+  border: 1px solid var(--pm-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--pm-shadow);
+}
+main:has(> .hero--home) .lease-partner:hover { transform: translateY(-4px); box-shadow: var(--pm-shadow-hover); }
+
+/* ── География ── */
+main:has(> .hero--home) .geomap { background: #f4f6f7; }
+main:has(> .hero--home) .geomap__num {
+  font-size: clamp(56px, 6vw, 88px);
+  letter-spacing: -0.05em;
+  background: var(--pm-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+main:has(> .hero--home) .geomap__filter { border-radius: 999px; }
+main:has(> .hero--home) .geomap__filter.is-active { background: var(--pm-grad); border-color: transparent; }
+main:has(> .hero--home) .geomap__frame { border: 0; border-radius: 28px; box-shadow: 0 50px 100px -60px rgba(16, 31, 38, 0.5); }
+main:has(> .hero--home) .geomap__ctrl { border-radius: 14px; }
+main:has(> .hero--home) .geomap__note { border-left: 0; padding: 18px 24px; border-radius: 18px; background: #fff; box-shadow: var(--pm-shadow); }
+
+/* ── Контакты и сравнение КП ── */
+main:has(> .hero--home) .best-offer { background: #fff; }
+main:has(> .hero--home) .bo-item__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-top: 0;
+  border-radius: 14px;
+  background: var(--pm-grad);
+  color: #fff;
+}
+main:has(> .hero--home) .bo-item__icon svg { width: 24px; height: 24px; }
+main:has(> .hero--home) .bo-panel::before { opacity: 0.6; }
+main:has(> .hero--home) .bo-panel__card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--pm-line);
+  border-radius: 30px;
+  box-shadow: 0 2px 4px rgba(16, 31, 38, 0.03), 0 50px 100px -50px rgba(16, 31, 38, 0.38);
+}
+main:has(> .hero--home) .bo-panel__card::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--pm-grad);
+}
+main:has(> .hero--home) .best-offer__drop { border-radius: 18px; }
+main:has(> .hero--home) .best-offer__phone-input { border-radius: 14px; }
+
+/* ── Переходы карточек и появление при прокрутке (client/reveal.ts) ── */
+main:has(> .hero--home) :is(.rv, .equip-card, .solve-card, .foundry-step, .stock-type, .care-card, .work-card, .lease-partner) {
+  transition:
+    opacity 0.95s var(--pm-ease) var(--rv-d, 0ms),
+    translate 0.95s var(--pm-ease) var(--rv-d, 0ms),
+    scale 0.95s var(--pm-ease) var(--rv-d, 0ms),
+    filter 0.95s var(--pm-ease) var(--rv-d, 0ms),
+    clip-path 1.25s var(--pm-ease) var(--rv-d, 0ms),
+    transform 0.6s var(--pm-ease),
+    box-shadow 0.6s var(--pm-ease),
+    border-color 0.4s ease,
+    background-color 0.4s ease;
+}
+main:has(> .hero--home) .rv:not(.is-in) { opacity: 0; translate: 0 40px; filter: blur(6px); }
+main:has(> .hero--home) .rv--zoom:not(.is-in) { translate: none; scale: 0.94; }
+main:has(> .hero--home) .rv--side:not(.is-in) { translate: -40px 0; }
+main:has(> .hero--home) .rv--soft:not(.is-in) { filter: none; }
+main:has(> .hero--home) .rv--unveil:not(.is-in) { opacity: 1; translate: none; filter: none; clip-path: inset(18% 0 0 0 round 26px); }
+main:has(> .hero--home) .rv--unveil.is-in { clip-path: inset(0 0 0 0 round 26px); }
+
+@media (max-width: 1024px) {
+  main:has(> .hero--home) .stats .stat + .stat { border-left: 0; }
+  main:has(> .hero--home) .stats .stat:nth-child(even) { border-left: 1px solid rgba(255, 255, 255, 0.09); }
+  main:has(> .hero--home) .stats .stat:nth-child(-n + 2) { border-bottom: 1px solid rgba(255, 255, 255, 0.09); }
+}
+@media (max-width: 640px) {
+  main:has(> .hero--home) > :is(.equip, .leadgen, .solve, .foundry, .stock-show, .care, .upgrade, .works, .lease, .geomap, .best-offer) { padding-block: 72px; }
+  main:has(> .hero--home) .equip__grid { gap: 10px; }
+  main:has(> .hero--home) .equip-card { padding: min(var(--eq-pad), 5px); border-radius: 18px; }
+  main:has(> .hero--home) .equip .equip-card__cover { border-radius: 14px; }
+  main:has(> .hero--home) .equip .equip-card__cover::before { top: 10px; left: 11px; font-size: 10px; }
+  main:has(> .hero--home) .equip .equip-card__cover img { inset: 24px 12px 6px; width: calc(100% - 24px); height: calc(100% - 30px); }
+  main:has(> .hero--home) .equip .equip-card .made-badge { top: 7px; right: 7px; }
+  /* узкая плитка: название — во всю ширину (связка «на оборудование» не рвётся), кнопка-стрелка не нужна — ссылка вся карточка */
+  main:has(> .hero--home) .equip-card__body { padding: 6px 12px 12px 13px; }
+  html[data-theme='dark'] main:has(> .hero--home) .equip-card__body { padding: 12px 8px 8px 9px; }
+  main:has(> .hero--home) .equip-card__title { hyphens: auto; font-size: 13px; }
+  main:has(> .hero--home) .equip-card__go { display: none; }
+  main:has(> .hero--home) .stats .stat:nth-child(even) { border-left: 0; }
+  main:has(> .hero--home) .stats .stat { border-bottom: 1px solid rgba(255, 255, 255, 0.09); }
+  main:has(> .hero--home) .stats .stat:last-child { border-bottom: 0; }
+  main:has(> .hero--home) .foundry__panel-main { border-bottom-color: rgba(255, 255, 255, 0.1); }
+  main:has(> .hero--home) .care__phones { border-top-color: rgba(255, 255, 255, 0.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  main:has(> .hero--home) .rv { opacity: 1 !important; translate: none !important; scale: none !important; filter: none !important; clip-path: none !important; }
+  main:has(> .hero--home) .equip .equip-card__cover::after { display: none; }
+}
+@media print {
+  main:has(> .hero--home) .rv { opacity: 1 !important; translate: none !important; scale: none !important; filter: none !important; clip-path: none !important; }
+}

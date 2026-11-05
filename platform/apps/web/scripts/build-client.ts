@@ -70,6 +70,8 @@ const CSS_BUNDLES: Record<string, string[]> = {
     'src/styles/components.css',
     // разделы страниц — один вид на всех страницах (после шаблонов и стилей страниц)
     'src/styles/sections.css',
+    // главная: премиальное оформление блоков после первого экрана, появление при прокрутке (client/reveal.ts)
+    'src/styles/home-premium.css',
     // праздничная обложка главной (раздел «Праздники»)
     'src/styles/holiday.css',
     'src/styles/widgets.css',

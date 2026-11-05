@@ -23,6 +23,11 @@ ready(() => {
   initConsent();
   initToTop();
   initTheme();
+  // главная: появление блоков при прокрутке, витрина «Оборудования» (модули грузятся только ей)
+  if (document.querySelector('main > .hero--home')) {
+    void import('./reveal').then((m) => m.initReveal());
+    void import('./showcase').then((m) => m.initShowcase());
+  }
   // вошли в админку — панель администратора (модуль грузится только им)
   if (/(?:^|;\s*)mtpk_bar=1/.test(document.cookie)) void import('./admin-bar').then((m) => m.mountAdminBar());
   // справочник режимов термообработки (Практикум): поиск, фильтр, пример расчёта — модуль только этой статьи
