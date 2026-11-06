@@ -140,6 +140,12 @@
 - Праздничные баннеры главной (расписание, баннеры, поздравления, эффекты) — админка «Праздники»; модель и даты —
   `packages/content-model/src/holidays.ts`, шапка — `packages/ui/src/blocks/HomeHero.tsx`, эффекты —
   `apps/web/src/client/holiday-fx.ts`, стили — `apps/web/src/styles/holiday.css`.
+- Фотоотчёты с объектов (отгрузки, запуски, сервис: дата, регион, описание, фото, видео) — админка «Фотоотчёты»;
+  данные — настройка `photo-reports` (content.settings), модель — `packages/content-model/src/photo-reports.ts`.
+  На сайте — блок `photoReports` (`packages/ui/src/blocks/PhotoReports.tsx`; на /proekty/ — между избранными
+  проектами и реестром: HTML пакета поделён на две обёртки `.pr-root`), окно с каруселью и свой видеоплеер —
+  `client/photo-reports.ts`, стили — `styles/photo-reports.css`. Файлы — медиатека `img/otchety/<год>/<отчёт>/`;
+  видео — MP4 (H.264) до 50 МБ, обложка — кадр из видео (делает админка).
 
 ## Где живёт состояние проекта
 

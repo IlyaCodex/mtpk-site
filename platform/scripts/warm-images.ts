@@ -37,6 +37,19 @@ function variantUrls(html: string): string[] {
       if (hints) for (const part of hints.srcSet.split(',')) out.push(part.trim().split(/\s+/)[0]);
     }
   }
+  // фотоотчёты: кадры окна и миниатюры под ним (их подставляет модуль photo-reports)
+  for (const m of html.matchAll(/<script type="application\/json" class="photo-reports__data">([^<]*)<\/script>/g)) {
+    const reports = JSON.parse(m[1]) as { photos: { src: string }[]; videos: { poster: string }[] }[];
+    for (const r of reports) {
+      const shots = [...r.photos.map((p) => p.src), ...r.videos.map((v) => v.poster).filter(Boolean)];
+      for (const src of shots) {
+        for (const place of ['report-modal__img', 'report-modal__thumb']) {
+          const hints = responsive(src, place);
+          if (hints) for (const part of hints.srcSet.split(',')) out.push(part.trim().split(/\s+/)[0]);
+        }
+      }
+    }
+  }
   return out.filter((u) => u.startsWith('/img/') && /[?&]w=\d+/.test(u));
 }
 
