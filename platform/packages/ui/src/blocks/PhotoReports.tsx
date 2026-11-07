@@ -135,9 +135,6 @@ export function PhotoReports({ block, ctx }: { block: PhotoReportsBlock; ctx: Re
                     </button>
                   </h3>
                   {r.text.trim() && <p className="report-card__text">{excerpt(r.text)}</p>}
-                  <span className="report-card__more" aria-hidden="true">
-                    {r.videos.length ? 'Смотреть фото и видео' : 'Смотреть фото'} <span className="report-card__arrow">→</span>
-                  </span>
                 </div>
               </article>
             );
@@ -157,40 +154,50 @@ export function PhotoReports({ block, ctx }: { block: PhotoReportsBlock; ctx: Re
 
       <dialog className="report-modal" aria-labelledby={`${id}-modal-title`}>
         <div className="report-modal__box">
-          <div className="report-modal__media">
-            <div className="report-modal__stage" data-stage=""></div>
-            <button type="button" className="report-modal__nav report-modal__nav--prev" data-step="-1" aria-label="Предыдущий кадр">
-              <Chevron dir={-1} />
+          {/* на телефоне — шапка «шторки»: ручка и кнопка закрытия; на ПК — только кнопка в углу */}
+          <div className="report-modal__head">
+            <span className="report-modal__grip" aria-hidden="true"></span>
+            <button type="button" className="report-modal__close" data-report-close="" aria-label="Закрыть">
+              <Close />
             </button>
-            <button type="button" className="report-modal__nav report-modal__nav--next" data-step="1" aria-label="Следующий кадр">
-              <Chevron dir={1} />
-            </button>
-            <span className="report-modal__counter" data-counter=""></span>
-            <div className="report-modal__thumbs" data-thumbs=""></div>
           </div>
-          <div className="report-modal__info">
-            <span className="report-modal__kind" data-kind=""></span>
-            <h2 className="report-modal__title" id={`${id}-modal-title`} data-title=""></h2>
-            <ul className="report-modal__meta">
-              <li>
-                <Calendar />
-                <span data-date=""></span>
-              </li>
-              <li data-place-row="">
-                <Pin />
-                <span data-place=""></span>
-              </li>
-            </ul>
-            <div className="report-modal__text" data-text=""></div>
-            {ctx.hasLeadgenBlock && (
-              <a className="btn btn--primary report-modal__cta" href="#leadgen" data-report-cta="">
-                Обсудить похожий проект
-              </a>
-            )}
+          <div className="report-modal__body">
+            <div className="report-modal__media">
+              <div className="report-modal__stage" data-stage="">
+                <div className="report-modal__frame" data-frame=""></div>
+                <button type="button" className="report-modal__nav report-modal__nav--prev" data-step="-1" aria-label="Предыдущий кадр">
+                  <Chevron dir={-1} />
+                </button>
+                <button type="button" className="report-modal__nav report-modal__nav--next" data-step="1" aria-label="Следующий кадр">
+                  <Chevron dir={1} />
+                </button>
+                <span className="report-modal__counter" data-counter=""></span>
+              </div>
+              <div className="report-modal__thumbs" data-thumbs=""></div>
+            </div>
+            <div className="report-modal__info">
+              <span className="report-modal__kind" data-kind=""></span>
+              <h2 className="report-modal__title" id={`${id}-modal-title`} data-title=""></h2>
+              <ul className="report-modal__meta">
+                <li>
+                  <Calendar />
+                  <span data-date=""></span>
+                </li>
+                <li data-place-row="">
+                  <Pin />
+                  <span data-place=""></span>
+                </li>
+              </ul>
+              <div className="report-modal__text" data-text=""></div>
+              {ctx.hasLeadgenBlock && (
+                <div className="report-modal__cta-bar">
+                  <a className="btn btn--primary report-modal__cta" href="#leadgen" data-report-cta="">
+                    Обсудить похожий проект
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
-          <button type="button" className="report-modal__close" data-report-close="" aria-label="Закрыть">
-            <Close />
-          </button>
         </div>
       </dialog>
     </section>

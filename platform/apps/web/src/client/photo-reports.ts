@@ -4,7 +4,7 @@ import { setImage } from './images';
 /**
  * Фотоотчёты с объектов (блок photoReports, разметка — packages/ui/src/blocks/PhotoReports.tsx):
  * кнопки годов, «Показать ещё» (по pageSize карточек), окно <dialog> с каруселью фото и видео —
- * стрелки, миниатюры, клавиши ←/→, свайп; кадр вписан в окно целиком. Видео — свой плеер: запуск,
+ * стрелки, квадратные миниатюры, клавиши ←/→, свайп; кадр вписан в окно целиком. Видео — свой плеер: запуск,
  * перемотка, звук, весь экран.
  * Ссылка …#otchet-<id> открывает отчёт сразу. Оформление — styles/photo-reports.css.
  */
@@ -54,8 +54,16 @@ function videoPlayer(slide: Extract<Slide, { kind: 'video' }>, title: string): {
 </div>`;
   const video = $<HTMLVideoElement>('video', el)!;
   video.src = slide.src;
-  if (slide.poster) video.poster = slide.poster;
   video.setAttribute('aria-label', title);
+  // плеер — по пропорциям ролика (стили: --ar, по умолчанию вертикальный 9:16): сначала по обложке, потом по самому видео
+  const fitTo = (w: number, h: number) => w && h && el.style.setProperty('--ar', (w / h).toFixed(4));
+  if (slide.poster) {
+    video.poster = slide.poster;
+    const shot = new Image();
+    shot.addEventListener('load', () => fitTo(shot.naturalWidth, shot.naturalHeight), { once: true });
+    shot.src = slide.poster;
+  }
+  video.addEventListener('loadedmetadata', () => fitTo(video.videoWidth, video.videoHeight), { once: true });
   const play = $<HTMLButtonElement>('[data-v="play"]', el)!;
   const mute = $<HTMLButtonElement>('[data-v="mute"]', el)!;
   const seek = $<HTMLInputElement>('.report-video__seek', el)!;
@@ -160,6 +168,7 @@ function initSection(section: HTMLElement): void {
 
   // ── окно отчёта ──
   const stage = $('[data-stage]', dialog)!;
+  const frame = $('[data-frame]', dialog)!;
   const thumbs = $('[data-thumbs]', dialog)!;
   const counter = $('[data-counter]', dialog)!;
   const navs = $$<HTMLButtonElement>('[data-step]', dialog);
@@ -182,12 +191,12 @@ function initSection(section: HTMLElement): void {
       img.addEventListener('load', () => stage.classList.remove('is-loading'), { once: true });
       img.addEventListener('error', () => stage.classList.remove('is-loading'), { once: true });
       setImage(img, s.src, 'report-modal__img');
-      stage.replaceChildren(img);
+      frame.replaceChildren(img);
     } else {
       stage.classList.remove('is-loading');
       const player = videoPlayer(s, current?.title ?? '');
       stopVideo = player.stop;
-      stage.replaceChildren(player.el);
+      frame.replaceChildren(player.el);
     }
     counter.textContent = `${index + 1} / ${slides.length}`;
     $$<HTMLButtonElement>('button', thumbs).forEach((b, j) => {
@@ -232,7 +241,7 @@ function initSection(section: HTMLElement): void {
           setImage(img, src, 'report-modal__thumb');
           b.append(img);
         }
-        if (s.kind === 'video') b.insertAdjacentHTML('beforeend', ICONS.play);
+        if (s.kind === 'video') b.insertAdjacentHTML('beforeend', `<span class="report-modal__thumb-play">${ICONS.play}</span>`);
         b.addEventListener('click', () => show(j));
         return b;
       }),

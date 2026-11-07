@@ -3,7 +3,8 @@
  * client/photo-reports.ts): карточки с плашкой «месяц · регион» на фото, кнопки годов, «Показать ещё»,
  * окно с каруселью фото и видео (свой плеер). Вид — в тон странице «Проекты» (скругление 20 px,
  * зелёный надзаголовок, плашка на фото как у избранных проектов).
- * Цвета на фото и в тёмной области окна — переменными: тёмная тема их не перекрашивает (content-kit/dark).
+ * Цвета поверх фото и видео — переменными: тёмная тема их не перекрашивает (content-kit/dark);
+ * остальное — токены сайта, в тёмной теме у них свои значения.
  */
 
 .photo-reports {
@@ -104,7 +105,7 @@
 .report-card__count svg { width: 15px; height: 15px; }
 .report-card__count svg:not(:first-child) { margin-left: 4px; }
 
-.report-card__body { display: flex; flex: 1; flex-direction: column; gap: var(--sp-2); padding: 18px 20px 20px; }
+.report-card__body { display: flex; flex: 1; flex-direction: column; gap: var(--sp-2); padding: 18px 20px 22px; }
 .report-card__kind { font-size: 12px; font-weight: var(--fw-semibold); letter-spacing: 0.04em; text-transform: uppercase; color: var(--teal-600); }
 .report-card__title { margin: 0; font-family: var(--font-display); font-size: 17px; font-weight: var(--fw-semibold); line-height: 1.32; letter-spacing: -0.01em; }
 .report-card__open {
@@ -133,9 +134,6 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
-.report-card__more { margin-top: auto; padding-top: var(--sp-2); font-size: 14px; font-weight: var(--fw-semibold); color: var(--green-700); }
-.report-card__arrow { display: inline-block; transition: transform var(--duration-fast) var(--ease-out); }
-.report-card:hover .report-card__arrow { transform: translateX(4px); }
 
 .photo-reports__more { display: flex; justify-content: center; margin-top: var(--sp-10); }
 .photo-reports__more[hidden] { display: none; }
@@ -166,40 +164,62 @@
 }
 
 /* ── окно отчёта ─────────────────────────────────────────────────────────── */
+/*
+ * Светлое окно: слева — подложка с кадром (фото со скруглением и тенью, вписано целиком) и квадратными
+ * миниатюрами, справа — описание. На телефоне — «шторка» снизу: ручка, кнопка закрытия, кнопка заявки
+ * прилипает к низу экрана.
+ */
 html:has(.report-modal[open]) { overflow: hidden; }
 
 .report-modal {
-  --rm-stage: #0b1519;
-  --rm-stage-ink: #fff;
-  --rm-ctrl: rgba(255, 255, 255, 0.14);
-  --rm-ctrl-hover: rgba(255, 255, 255, 0.26);
-  --rm-shade: rgba(8, 18, 22, 0.72);
-  width: min(1180px, calc(100vw - 48px));
+  --rm-shade: rgba(14, 28, 34, 0.46);
+  --rm-chip: rgba(255, 255, 255, 0.95);
+  --rm-chip-ink: #0f2128;
+  --rm-video: #0b1519;
+  --rm-on-video: #fff;
+  --rm-video-ctrl: rgba(255, 255, 255, 0.2);
+  --rm-video-shade: rgba(8, 18, 22, 0.66);
+  width: min(1200px, calc(100vw - 48px));
   max-width: none;
-  height: min(740px, calc(100dvh - 48px));
+  height: min(760px, calc(100dvh - 48px));
   max-height: none;
   margin: auto;
   padding: 0;
   overflow: hidden;
   border: 0;
-  border-radius: 20px;
+  border-radius: 24px;
   background: var(--surface-page);
   color: var(--text-primary);
-  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 40px 100px -30px rgba(8, 18, 22, 0.45);
   opacity: 0;
-  transform: translateY(12px) scale(0.985);
+  transform: translateY(14px) scale(0.985);
   transition: opacity var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
 }
 .report-modal.is-open { opacity: 1; transform: none; }
-.report-modal::backdrop { background: var(--rm-shade); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); opacity: 0; transition: opacity var(--duration-base) var(--ease-out); }
+.report-modal::backdrop { background: var(--rm-shade); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); opacity: 0; transition: opacity var(--duration-base) var(--ease-out); }
 .report-modal.is-open::backdrop { opacity: 1; }
 
-.report-modal__box { position: relative; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr); height: 100%; }
+.report-modal__box { position: relative; height: 100%; }
+.report-modal__head { position: absolute; top: 28px; right: 28px; z-index: 3; }
+.report-modal__grip { display: none; }
+.report-modal__body { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(340px, 1fr); height: 100%; padding: 16px; }
 
-.report-modal__media { position: relative; display: flex; flex-direction: column; min-height: 0; background: var(--rm-stage); color: var(--rm-stage-ink); }
-/* кадр — во всю площадь сцены и вписан целиком (object-fit: contain): высоту задаёт сцена, а не сам снимок */
-.report-modal__stage { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: pan-y; }
-.report-modal__img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; }
+/* подложка с кадром и миниатюрами */
+.report-modal__media { display: flex; flex-direction: column; gap: 14px; min-height: 0; padding: 18px; border-radius: 18px; background: var(--surface-muted); }
+.report-modal__stage { position: relative; flex: 1; min-height: 0; touch-action: pan-y; }
+/* кадр вписан целиком: размер рамки задаёт подложка, а не снимок (иначе высокий кадр уходил бы за край) */
+.report-modal__frame { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; container-type: size; }
+.report-modal__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 14px;
+  box-shadow: 0 22px 44px -26px rgba(8, 18, 22, 0.55);
+  user-select: none;
+  -webkit-user-drag: none;
+}
 .report-modal__stage.is-loading::before {
   content: '';
   position: absolute;
@@ -207,8 +227,8 @@ html:has(.report-modal[open]) { overflow: hidden; }
   left: calc(50% - 18px);
   width: 36px;
   height: 36px;
-  border: 3px solid var(--rm-ctrl);
-  border-top-color: var(--rm-stage-ink);
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--teal-600);
   border-radius: 50%;
   animation: rm-spin 0.8s linear infinite;
 }
@@ -216,113 +236,133 @@ html:has(.report-modal[open]) { overflow: hidden; }
 
 .report-modal__nav {
   position: absolute;
-  top: calc(50% - 60px);
+  top: calc(50% - 22px);
   z-index: 2;
   display: grid;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border: 0;
   border-radius: 50%;
-  background: var(--rm-ctrl);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  color: var(--rm-stage-ink);
+  background: var(--rm-chip);
+  color: var(--rm-chip-ink);
+  box-shadow: 0 10px 24px -12px rgba(8, 18, 22, 0.5);
   cursor: pointer;
-  transition: background-color var(--duration-fast) var(--ease-out);
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
 }
-.report-modal__nav:hover { background: var(--rm-ctrl-hover); }
-.report-modal__nav svg { width: 22px; height: 22px; }
-.report-modal__nav--prev { left: 16px; }
-.report-modal__nav--next { right: 16px; }
+.report-modal__nav:hover { transform: scale(1.07); box-shadow: 0 14px 28px -12px rgba(8, 18, 22, 0.55); }
+.report-modal__nav svg { width: 20px; height: 20px; }
+.report-modal__nav--prev { left: 4px; }
+.report-modal__nav--next { right: 4px; }
 .report-modal__nav[hidden],
 .report-modal__counter[hidden],
 .report-modal__thumbs[hidden] { display: none; }
 .report-modal__counter {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 8px;
+  left: 8px;
   z-index: 2;
-  padding: 4px 12px;
+  padding: 5px 12px;
   border-radius: 999px;
-  background: var(--rm-shade);
+  background: var(--rm-chip);
+  box-shadow: 0 6px 16px -10px rgba(8, 18, 22, 0.45);
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--rm-stage-ink);
+  color: var(--rm-chip-ink);
 }
 
-.report-modal__thumbs { display: flex; gap: 8px; flex-shrink: 0; overflow-x: auto; padding: 12px 16px 16px; scrollbar-width: thin; }
+/* миниатюры — квадратные плитки; у выбранной — рамка фирменного цвета */
+.report-modal__thumbs { display: flex; gap: 10px; flex-shrink: 0; overflow-x: auto; margin: -4px; padding: 4px; scrollbar-width: none; }
+.report-modal__thumbs::-webkit-scrollbar { display: none; }
 .report-modal__thumb {
   position: relative;
   flex-shrink: 0;
-  width: 80px;
-  height: 60px;
+  width: 72px;
+  height: 72px;
   overflow: hidden;
   padding: 0;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  background: var(--rm-ctrl);
+  border: 0;
+  border-radius: 14px;
+  background: var(--surface-page);
   opacity: 0.6;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
   cursor: pointer;
-  transition: opacity var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+  transition: opacity var(--duration-fast) var(--ease-out), outline-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 .report-modal__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.report-modal__thumb:hover { opacity: 0.9; }
-.report-modal__thumb.is-active { border-color: var(--rm-stage-ink); opacity: 1; }
-.report-modal__thumb--video svg { position: absolute; top: calc(50% - 12px); left: calc(50% - 12px); width: 24px; height: 24px; color: var(--rm-stage-ink); filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6)); }
+.report-modal__thumb:hover { opacity: 1; transform: translateY(-2px); }
+.report-modal__thumb.is-active { opacity: 1; outline-color: var(--teal-600); }
+.report-modal__thumb-play {
+  position: absolute;
+  top: calc(50% - 14px);
+  left: calc(50% - 14px);
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--rm-chip);
+  color: var(--rm-chip-ink);
+  box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.45);
+}
+.report-modal__thumb-play svg { width: 13px; height: 13px; margin-left: 2px; }
 
-.report-modal__info { display: flex; flex-direction: column; gap: var(--sp-4); min-height: 0; overflow-y: auto; padding: 40px 36px 32px; }
+.report-modal__info { display: flex; flex-direction: column; gap: 16px; min-height: 0; overflow-y: auto; padding: 34px 28px 18px 36px; }
 .report-modal__kind { font-size: 12px; font-weight: var(--fw-semibold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--teal-600); }
-.report-modal__title { margin: -8px 0 0; padding-right: 32px; font-family: var(--font-display); font-size: 24px; font-weight: var(--fw-bold); line-height: 1.25; letter-spacing: -0.015em; color: var(--text-primary); }
-.report-modal__meta { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font-size: 14px; color: var(--text-secondary); }
+.report-modal__title { margin: -6px 0 0; padding-right: 52px; font-family: var(--font-display); font-size: 26px; font-weight: var(--fw-bold); line-height: 1.22; letter-spacing: -0.015em; color: var(--text-primary); }
+.report-modal__meta { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; font-size: 14px; color: var(--text-secondary); }
 .report-modal__meta li { display: flex; align-items: flex-start; gap: 10px; }
 .report-modal__meta li[hidden] { display: none; }
 .report-modal__meta svg { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; color: var(--green-600); }
 .report-modal__text { padding-top: var(--sp-4); border-top: 1px solid var(--border-subtle); font-size: 15px; line-height: 1.65; color: var(--text-secondary); }
 .report-modal__text p { margin: 0 0 12px; }
 .report-modal__text p:last-child { margin-bottom: 0; }
-.report-modal__cta { align-self: flex-start; margin-top: auto; }
+.report-modal__cta-bar { margin-top: auto; padding-top: var(--sp-2); }
 
 .report-modal__close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 3;
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   place-items: center;
   border: 0;
   border-radius: 50%;
   background: var(--surface-muted);
   color: var(--text-primary);
   cursor: pointer;
-  transition: background-color var(--duration-fast) var(--ease-out);
+  transition: background-color var(--duration-fast) var(--ease-out), transform var(--duration-base) var(--ease-out);
 }
-.report-modal__close:hover { background: var(--border-subtle); }
+.report-modal__close:hover { background: var(--border-subtle); transform: rotate(90deg); }
 .report-modal__close svg { width: 20px; height: 20px; }
 
-/* ── свой плеер видео ── */
-.report-video { position: absolute; inset: 0; background: var(--rm-stage); }
+/* ── свой плеер видео: по пропорциям ролика (--ar — ширина / высота, ставит скрипт), вписан в рамку ── */
+.report-video {
+  position: relative;
+  width: min(100cqw, 100cqh * var(--ar, 0.5625));
+  aspect-ratio: var(--ar, 0.5625);
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--rm-video);
+  box-shadow: 0 22px 44px -26px rgba(8, 18, 22, 0.55);
+}
 .report-video__media { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
 .report-video__big {
   position: absolute;
-  top: calc(50% - 38px);
-  left: calc(50% - 38px);
+  top: calc(50% - 36px);
+  left: calc(50% - 36px);
   display: grid;
-  width: 76px;
-  height: 76px;
+  width: 72px;
+  height: 72px;
   place-items: center;
   border: 0;
   border-radius: 50%;
-  background: var(--rm-ctrl-hover);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  color: var(--rm-stage-ink);
+  background: var(--rm-chip);
+  color: var(--rm-chip-ink);
+  box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.55);
   cursor: pointer;
   transition: opacity var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
 }
-.report-video__big svg { width: 32px; height: 32px; margin-left: 4px; }
+.report-video__big svg { width: 28px; height: 28px; margin-left: 4px; }
 .report-video__big:hover { transform: scale(1.06); }
 .report-video:not(.is-paused) .report-video__big { opacity: 0; pointer-events: none; }
 .report-video__bar {
@@ -332,40 +372,64 @@ html:has(.report-modal[open]) { overflow: hidden; }
   left: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 28px 14px 12px;
-  background: linear-gradient(180deg, transparent, var(--rm-shade));
-  color: var(--rm-stage-ink);
+  gap: 8px;
+  padding: 28px 12px 10px;
+  background: linear-gradient(180deg, transparent, var(--rm-video-shade));
+  color: var(--rm-on-video);
   transition: opacity var(--duration-base) var(--ease-out);
 }
 .report-video.is-idle .report-video__bar { opacity: 0; }
 .report-video.is-idle { cursor: none; }
-.report-video__btn { display: grid; flex-shrink: 0; width: 36px; height: 36px; place-items: center; border: 0; border-radius: 50%; background: none; color: inherit; cursor: pointer; }
-.report-video__btn:hover { background: var(--rm-ctrl); }
-.report-video__btn svg { width: 20px; height: 20px; }
+.report-video__btn { display: grid; flex-shrink: 0; width: 34px; height: 34px; place-items: center; border: 0; border-radius: 50%; background: none; color: inherit; cursor: pointer; }
+.report-video__btn:hover { background: var(--rm-video-ctrl); }
+.report-video__btn svg { width: 19px; height: 19px; }
 .report-video__time { flex-shrink: 0; font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
-.report-video__seek { flex: 1; min-width: 60px; height: 4px; accent-color: var(--green-500); cursor: pointer; }
+.report-video__seek { flex: 1; min-width: 40px; height: 4px; accent-color: var(--green-500); cursor: pointer; }
 
 @media (max-width: 1100px) {
   .photo-reports__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .photo-reports__head { flex-direction: column; align-items: flex-start; }
 }
+/* телефон и планшет: окно — «шторка» снизу */
 @media (max-width: 900px) {
-  .report-modal { width: 100vw; height: 100dvh; max-height: none; border-radius: 0; }
-  .report-modal__box { display: flex; flex-direction: column; overflow-y: auto; }
+  .report-modal {
+    width: 100vw;
+    max-width: 100vw;
+    height: auto;
+    max-height: 94dvh;
+    margin: auto 0 0;
+    border-radius: 24px 24px 0 0;
+    transform: translateY(100%);
+    transition-duration: 320ms;
+  }
+  .report-modal.is-open { transform: none; }
+  .report-modal__box { display: flex; flex-direction: column; height: auto; max-height: 94dvh; }
+  .report-modal__head { position: relative; top: auto; right: auto; display: flex; flex-shrink: 0; align-items: center; justify-content: flex-end; height: 54px; padding: 0 12px; }
+  .report-modal__grip { position: absolute; top: 8px; left: calc(50% - 20px); display: block; width: 40px; height: 5px; border-radius: 999px; background: var(--border-default); }
+  .report-modal__close { width: 38px; height: 38px; }
+  .report-modal__close:hover { transform: none; }
+  .report-modal__body { display: block; flex: 1; min-height: 0; height: auto; padding: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .report-modal__media { margin: 0 14px; padding: 12px; gap: 12px; border-radius: 18px; }
   /* кадр квадратный: и горизонтальные, и вертикальные снимки — без больших пустых полос */
-  .report-modal__media { flex: 0 0 auto; }
-  .report-modal__stage { flex: none; aspect-ratio: 1; max-height: 62dvh; }
-  .report-modal__info { overflow: visible; padding: 24px 20px 32px; }
-  .report-modal__title { padding-right: 0; font-size: 21px; }
-  .report-modal__nav { top: calc(50% - 56px); width: 40px; height: 40px; }
-  .report-modal__nav--prev { left: 10px; }
-  .report-modal__nav--next { right: 10px; }
-  .report-modal__close { background: var(--rm-shade); color: var(--rm-stage-ink); }
-  .report-modal__close:hover { background: var(--rm-shade); }
-  .report-modal__counter { top: 18px; }
-  .report-modal__thumb { width: 64px; height: 48px; }
-  .report-modal__cta { align-self: stretch; text-align: center; }
+  .report-modal__stage { flex: none; aspect-ratio: 1; }
+  .report-modal__nav { top: calc(50% - 18px); width: 36px; height: 36px; }
+  .report-modal__nav svg { width: 18px; height: 18px; }
+  .report-modal__nav--prev { left: 2px; }
+  .report-modal__nav--next { right: 2px; }
+  .report-modal__thumb { width: 58px; height: 58px; border-radius: 12px; }
+  .report-modal__info { overflow: visible; gap: 14px; padding: 22px 20px 0; }
+  .report-modal__info:not(:has(.report-modal__cta-bar)) { padding-bottom: 28px; }
+  .report-modal__title { padding-right: 0; font-size: 22px; }
+  /* «Обсудить похожий проект» — всегда под рукой внизу шторки */
+  .report-modal__cta-bar {
+    position: sticky;
+    bottom: 0;
+    margin: 4px -20px 0;
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    background: var(--surface-page);
+    box-shadow: 0 -14px 24px -20px rgba(8, 18, 22, 0.5);
+  }
+  .report-modal__cta { display: flex; width: 100%; justify-content: center; }
 }
 @media (max-width: 760px) {
   .photo-reports { padding: var(--sp-6) 0 var(--sp-16); }
@@ -388,7 +452,9 @@ html:has(.report-modal[open]) { overflow: hidden; }
   .report-card,
   .report-card__img,
   .report-modal,
-  .report-modal::backdrop { transition: none; }
+  .report-modal::backdrop,
+  .report-modal__close { transition: none; }
   .report-card:hover,
-  .report-card:hover .report-card__img { transform: none; }
+  .report-card:hover .report-card__img,
+  .report-modal__close:hover { transform: none; }
 }
