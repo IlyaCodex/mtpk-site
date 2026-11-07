@@ -78,13 +78,28 @@ const jobs = [...urls].flatMap((u) => FORMATS.map((accept) => ({ u, accept })));
 let done = 0;
 let failed = 0;
 const t0 = Date.now();
+/** Запрос копии; сбой сети (прогрев боевого сайта через интернет) — ещё одна попытка через 2 с. */
+async function warm(u: string, accept: string, retry = true): Promise<number> {
+  try {
+    const res = await fetch(`${SITE}${u}`, { headers: { accept } });
+    await res.arrayBuffer();
+    return res.status;
+  } catch (err) {
+    if (!retry) throw err;
+    await new Promise((r) => setTimeout(r, 2000));
+    return warm(u, accept, false);
+  }
+}
+
 // медиасервис перекодирует не больше двух картинок одновременно — больше запросов не нужно
 await pool(jobs, 2, async ({ u, accept }) => {
-  const res = await fetch(`${SITE}${u}`, { headers: { accept } });
-  await res.arrayBuffer();
-  if (!res.ok) {
+  const status = await warm(u, accept).catch((err: Error) => {
+    console.warn(`сеть: ${err.message} ${u}`);
+    return 0;
+  });
+  if (status < 200 || status >= 400) {
     failed++;
-    console.warn(`${res.status} ${u}`);
+    if (status) console.warn(`${status} ${u}`);
   }
   if (++done % 200 === 0) console.log(`  ${done}/${jobs.length}`);
 });
