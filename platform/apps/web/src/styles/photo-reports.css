@@ -65,6 +65,13 @@
 .photo-reports__year.is-active { border-color: var(--teal-600); background: var(--teal-600); color: var(--rp-on-accent); }
 .photo-reports__year.is-active span { color: var(--rp-on-accent-soft); }
 
+/* продолжение раздела выше (joined): тонкая черта, «По годам» слева, годы справа */
+.photo-reports.photo-reports--joined { padding-top: 0; }
+.photo-reports--joined .photo-reports__inner::before { content: ""; display: block; height: 1px; margin-bottom: var(--sp-8); background: var(--border-subtle); }
+.photo-reports--joined .photo-reports__head { align-items: center; }
+.photo-reports__label { font-family: var(--font-display); font-size: 22px; font-weight: var(--fw-semibold); line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); white-space: nowrap; }
+.photo-reports--joined .photo-reports__years { flex-shrink: 1; justify-content: flex-end; }
+
 /* сетка карточек: 4 в ряд, 3 до 1100px, 2 до 760px, одна до 480px */
 .photo-reports__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-6); }
 
@@ -389,6 +396,19 @@ html:has(.report-modal[open]) { overflow: hidden; }
 @media (max-width: 1100px) {
   .photo-reports__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .photo-reports__head { flex-direction: column; align-items: flex-start; }
+  /* годы — одной строкой вбок до краёв экрана (без переносов в несколько рядов) */
+  .photo-reports--joined .photo-reports__head { align-items: stretch; gap: var(--sp-4); }
+  .photo-reports--joined .photo-reports__years {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    margin: 0 calc(-1 * var(--sp-8));
+    padding: 2px var(--sp-8);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .photo-reports--joined .photo-reports__years::-webkit-scrollbar { display: none; }
+  .photo-reports--joined .photo-reports__year { flex-shrink: 0; }
 }
 /* телефон и планшет: окно — «шторка» снизу */
 @media (max-width: 900px) {
@@ -434,6 +454,9 @@ html:has(.report-modal[open]) { overflow: hidden; }
 @media (max-width: 760px) {
   .photo-reports { padding: var(--sp-6) 0 var(--sp-16); }
   .photo-reports__inner { padding: 0 var(--sp-5); }
+  .photo-reports--joined .photo-reports__inner::before { margin-bottom: var(--sp-6); }
+  .photo-reports--joined .photo-reports__years { margin: 0 calc(-1 * var(--sp-5)); padding: 2px var(--sp-5); }
+  .photo-reports__label { font-size: 19px; }
   .photo-reports__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); }
   .report-card__body { padding: 14px 14px 16px; }
   .report-card__title { font-size: 15px; }

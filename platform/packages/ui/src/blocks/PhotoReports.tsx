@@ -66,7 +66,8 @@ function modalData(items: PhotoReport[]): string {
  * заголовок, начало описания), сначала pageSize штук и «Показать ещё», кнопки
  * годов. Щелчок по карточке — окно <dialog> с каруселью фото и видео,
  * описанием, датой и местом. Окно, фильтр и кнопку оживляет клиентский модуль
- * photo-reports; без скрипта видны первые карточки.
+ * photo-reports; без скрипта видны первые карточки. joined — без своего
+ * заголовка: черта и «По годам» с кнопками годов справа.
  */
 export function PhotoReports({ block, ctx }: { block: PhotoReportsBlock; ctx: RenderContext }) {
   const items = block.items ?? [];
@@ -75,28 +76,40 @@ export function PhotoReports({ block, ctx }: { block: PhotoReportsBlock; ctx: Re
   const years = [...new Set(items.map((r) => r.date.slice(0, 4)))].sort().reverse();
   const count = (y: string) => items.filter((r) => r.date.startsWith(y)).length;
   const rest = items.length - block.pageSize;
+  const props = extra(block.attrs, 'section');
+  const className = ['photo-reports', block.joined && 'photo-reports--joined', props.className].filter(Boolean).join(' ');
+  const yearButtons = years.length > 1 && (
+    <div className="photo-reports__years" role="group" aria-label="Год">
+      <button type="button" className="photo-reports__year is-active" data-year="" aria-pressed="true">
+        Все годы <span>{items.length}</span>
+      </button>
+      {years.map((y) => (
+        <button key={y} type="button" className="photo-reports__year" data-year={y} aria-pressed="false">
+          {y} <span>{count(y)}</span>
+        </button>
+      ))}
+    </div>
+  );
   return (
-    <section className="photo-reports" id={id} data-photo-reports="" data-page-size={block.pageSize} {...extra(block.attrs, 'section')}>
+    <section id={id} data-photo-reports="" data-page-size={block.pageSize} {...props} className={className}>
       <div className="photo-reports__inner">
-        <div className="photo-reports__head">
-          <div className="photo-reports__heading">
-            {block.head.eyebrow && <Inline as="span" className="photo-reports__eyebrow" html={block.head.eyebrow} />}
-            <Inline as="h2" className="photo-reports__title" html={block.head.title} />
-            {block.head.lead && <Inline as="p" className="photo-reports__lead" html={block.head.lead} />}
-          </div>
-          {years.length > 1 && (
-            <div className="photo-reports__years" role="group" aria-label="Год">
-              <button type="button" className="photo-reports__year is-active" data-year="" aria-pressed="true">
-                Все годы <span>{items.length}</span>
-              </button>
-              {years.map((y) => (
-                <button key={y} type="button" className="photo-reports__year" data-year={y} aria-pressed="false">
-                  {y} <span>{count(y)}</span>
-                </button>
-              ))}
+        {block.joined ? (
+          yearButtons && (
+            <div className="photo-reports__head">
+              <Inline as="span" className="photo-reports__label" html={block.yearsLabel} />
+              {yearButtons}
             </div>
-          )}
-        </div>
+          )
+        ) : (
+          <div className="photo-reports__head">
+            <div className="photo-reports__heading">
+              {block.head.eyebrow && <Inline as="span" className="photo-reports__eyebrow" html={block.head.eyebrow} />}
+              <Inline as="h2" className="photo-reports__title" html={block.head.title} />
+              {block.head.lead && <Inline as="p" className="photo-reports__lead" html={block.head.lead} />}
+            </div>
+            {yearButtons}
+          </div>
+        )}
 
         <div className="photo-reports__grid">
           {items.map((r, i) => {
