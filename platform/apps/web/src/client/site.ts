@@ -36,4 +36,7 @@ ready(() => {
   // статьи об индукторах (Практикум): проверка размерной цепи зазора, цели Метрики по ссылкам — модуль только им
   const lesson = document.querySelector<HTMLElement>('.ui-education');
   if (lesson?.querySelector('[data-gap-calculator], [data-inductor-event]')) void import('./inductor-guide').then((m) => m.initInductorGuide(lesson));
+  // «История электромагнитной индукции» (Практикум): опыт Фарадея по кнопкам, цели Метрики — модуль только этой статьи
+  const history = document.querySelector<HTMLElement>('.ui-history');
+  if (history) void import('./history-article').then((m) => m.initHistoryArticle(history));
 });

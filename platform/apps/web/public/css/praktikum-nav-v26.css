@@ -101,6 +101,15 @@
 .praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide h3 { font-size: 26px; }
 /* ссылка — сразу под текстом: блок текста стоит по центру высоты картинки */
 .praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide .hub-link { margin-top: 0; }
+/* Карточка на две колонки (.hub-card--duo) — при трёх колонках закрывает пустые места последнего ряда группы:
+   картинка слева во всю высоту (вписана, как у схем), текст справа; при двух колонках и на телефоне — обычная.
+   «История электромагнитной индукции» (09.11.2026): в «Индукционном оборудовании» ряд после неё полный. */
+@media (min-width: 1100px) {
+  .praktikum-content .ui-praktikum-hub .hub-card.hub-card--duo { grid-column: span 2; flex-direction: row; }
+  .praktikum-content .ui-praktikum-hub .hub-card.hub-card--duo .hub-card__media { flex: 0 0 54%; aspect-ratio: auto; }
+  .praktikum-content .ui-praktikum-hub .hub-card.hub-card--duo .hub-card-body { justify-content: center; padding: 32px 36px; }
+  .praktikum-content .ui-praktikum-hub .hub-card.hub-card--duo .hub-link { margin-top: 0; }
+}
 @media (max-width: 760px) {
   .praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide { flex-direction: column; }
   .praktikum-content .ui-praktikum-hub .hub-card.hub-card--wide .hub-card__media { flex: none; }
