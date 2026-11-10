@@ -62,7 +62,8 @@ function Field({ id, field, currency, values }: { id: CalcId; field: CalcField; 
         <Unit field={field} currency={currency} values={values} />
       </span>
       <small className="calc__error" hidden>
-        Допустимо: <span>{formatNumber(field.min)}</span> – <span>{formatNumber(field.max)}</span>
+        {/* пределы — до 4 знаков после запятой: у массы шихты минимум 0,0001 т, с тремя знаками он выглядел бы нулём */}
+        Допустимо: <span>{formatNumber(field.min, 4)}</span> – <span>{formatNumber(field.max, 4)}</span>
         {field.integer && <span className="calc__error-int"> · целое число</span>}
       </small>
     </div>
