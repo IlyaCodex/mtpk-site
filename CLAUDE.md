@@ -140,6 +140,11 @@
 - Праздничные баннеры главной (расписание, баннеры, поздравления, эффекты) — админка «Праздники»; модель и даты —
   `packages/content-model/src/holidays.ts`, шапка — `packages/ui/src/blocks/HomeHero.tsx`, эффекты —
   `apps/web/src/client/holiday-fx.ts`, стили — `apps/web/src/styles/holiday.css`.
+- Калькуляторы расчёта (`/kalkulyatory/`, вкладки `#plavka`, `#drob`, `#hts`) — блок `calculators`: поля и формулы —
+  `content-kit/calculators.ts` (по пакету подрядчика `Desktop/Калькуляторы`), модели с паспортными значениями — из
+  каталога, `content-kit/calculator-equipment.ts` (печи и дробемёты — индекс сравнения, смесители ХТС — таблицы моделей
+  на их страницах; подставляет контент-сервис), вид — `packages/ui/src/blocks/Calculators.tsx`, `styles/calculators.css`,
+  поведение — `client/calculators.ts`. Валюта и цены примера — поля блока (на .kz — тенге). Тип страницы — T18.
 - Фотоотчёты с объектов (отгрузки, запуски, сервис: дата, регион, описание, фото, видео) — админка «Фотоотчёты»;
   данные — настройка `photo-reports` (content.settings), модель — `packages/content-model/src/photo-reports.ts`.
   На сайте — блок `photoReports` (`packages/ui/src/blocks/PhotoReports.tsx`; на /proekty/ — между избранными
