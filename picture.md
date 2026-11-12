@@ -75,6 +75,11 @@ picture/
 │                                                # раздел МНЛЗ (25), газоочистка УИ-ФРИ/ЦП/СМ (3), запчасти МНЛЗ (6); в медиатеке
 │                                                # /img/mnlz/<страница>/ (WebP и уменьшенные копии делает медиатека). Обложка
 │                                                # раздела — servomashiny-ui-tms-03, фон шапки — razlivka-slitkov-ui-ls9-01 (цех)
+├── products/oborudovanie-lgm/modelnaya-osnastka/ # пакет «ЛГМ — модельная оснастка» (11.11.2026): 49 WebP в photos/ (оснастка,
+│                                                # пеномодели, кадры цеха; *-small — миниатюры), обложка и ролик MP4 25 с (H.264,
+│                                                # 4 МБ) — в медиатеке /img/modelnaya-osnastka-lgm/ и /files/modelnaya-osnastka-lgm/;
+│                                                # card-modelnaya-osnastka.jpg 680×510 (кадр tool-radial) — карточка в разделе ЛГМ;
+│                                                # og-osnastka-lgm.jpg на сайте не используется
 ├── products/zapchasti/tigli/                     # пакет «Тигли» V4.3 (09.10.2026): 18 фото (photo-*.png,
 │                                                # graphite-quartz.png) и 13 схем размеров (dimensions-*.svg) —
 │                                                # в медиатеке /img/crucibles/ (14 страниц, хаб запчастей, корень каталога);
