@@ -79,7 +79,8 @@ picture/
 │                                                # пеномодели, кадры цеха; *-small — миниатюры), обложка и ролик MP4 25 с (H.264,
 │                                                # 4 МБ) — в медиатеке /img/modelnaya-osnastka-lgm/ и /files/modelnaya-osnastka-lgm/;
 │                                                # card-modelnaya-osnastka.jpg 680×510 (кадр tool-radial) — карточка в разделе ЛГМ;
-│                                                # og-osnastka-lgm.jpg на сайте не используется
+│                                                # og-osnastka-lgm.jpg 1200×630 — фон обложки страницы (и превью ссылки);
+│                                                # tool-radial.webp в медиатеке, на странице не используется
 ├── products/zapchasti/tigli/                     # пакет «Тигли» V4.3 (09.10.2026): 18 фото (photo-*.png,
 │                                                # graphite-quartz.png) и 13 схем размеров (dimensions-*.svg) —
 │                                                # в медиатеке /img/crucibles/ (14 страниц, хаб запчастей, корень каталога);
