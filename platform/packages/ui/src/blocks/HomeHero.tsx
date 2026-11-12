@@ -27,8 +27,38 @@ function QuickLinks({ links }: { links: HomeHeroBlock['links'] }) {
   );
 }
 
-/** Ссылка-подсказка внизу обложки: к каталогу. */
-function ScrollHint() {
+/** Этапы работы — строкой внизу обложки: номер, этап и пояснение в несколько слов. */
+function Steps({ steps }: { steps: HomeHeroBlock['steps'] }) {
+  if (!steps?.length) return null;
+  return (
+    <ol className="hero__steps" aria-label="Как мы работаем">
+      {steps.map((s, i) => {
+        const body = (
+          <>
+            <span className="hero__step-num">{String(i + 1).padStart(2, '0')}</span>
+            <Inline className="hero__step-title" html={s.title} />
+            {s.text && <Inline className="hero__step-text" html={s.text} />}
+          </>
+        );
+        return (
+          <li key={i} className="hero__step">
+            {s.href ? (
+              <a className="hero__step-link" href={s.href}>
+                {body}
+              </a>
+            ) : (
+              <div className="hero__step-link">{body}</div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+/** Ссылка-подсказка внизу обложки: к каталогу. С этапами работы её нет — каталог виден сразу под обложкой. */
+function ScrollHint({ block }: { block: HomeHeroBlock }) {
+  if (block.steps?.length) return null;
   return (
     <a href="#catalog" className="hero__scroll" title={'Перейти к каталогу оборудования'}>
       <span>Каталог оборудования</span>
@@ -80,16 +110,17 @@ function HolidayHero({ block, holiday }: { block: HomeHeroBlock; holiday: Active
             <QuickLinks links={block.links} />
           </div>
         </div>
+        <Steps steps={block.steps} />
       </div>
-      <ScrollHint />
+      <ScrollHint block={block} />
     </section>
   );
 }
 
 /**
  * Обложка главной: фото (стили .hero__image), заголовок, кнопки и карточка
- * «Экспресс-заявка». Разметка — как у прежней HTML-секции, классы те же.
- * В дни праздника (ctx.holiday) — праздничный вид.
+ * «Экспресс-заявка», внизу — этапы работы. Разметка — как у прежней
+ * HTML-секции, классы те же. В дни праздника (ctx.holiday) — праздничный вид.
  */
 export function HomeHero({ block, holiday }: { block: HomeHeroBlock; holiday?: ActiveHoliday | null }) {
   if (holiday) return <HolidayHero block={block} holiday={holiday} />;
@@ -124,8 +155,9 @@ export function HomeHero({ block, holiday }: { block: HomeHeroBlock; holiday?: A
             </div>
           )}
         </div>
+        <Steps steps={block.steps} />
       </div>
-      <ScrollHint />
+      <ScrollHint block={block} />
     </section>
   );
 }

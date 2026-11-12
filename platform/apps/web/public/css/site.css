@@ -497,9 +497,12 @@ body { margin: 0; }
   background: var(--neutral-950); /* fallback пока нет видео */
   color: var(--neutral-0);
 }
-/* Главная: hero ниже, чтобы под ним проглядывал блок «Оборудование» (не трогает .hero О компании) */
-section.hero--home { min-height: 44vh; }
-@media (max-width: 768px) { section.hero--home { min-height: 52vh; } }
+/* Главная: hero по высоте содержимого — 5 px сверху до надзаголовка, внизу этапы работы; под ним сразу виден блок
+   «Оборудование» (12.11.2026). Праздничная обложка — своей высоты (holiday.css), .hero О компании не трогает */
+section.hero--home { min-height: 0; }
+.hero--home:not(.hero--holiday) .hero__content { padding-top: 5px; }
+/* надзаголовок — блоком: строчный блок сидел бы на линии текста на 6 px ниже края */
+.hero--home:not(.hero--holiday) .hero__eyebrow { display: flex; width: fit-content; }
 /* Заголовок hero на главной — компактнее (блок ниже за счёт меньшего h1) */
 .hero--home .hero__title { font-size: clamp(24px, 3.2vw, 42px); }
 @media (max-width: 768px) { .hero--home .hero__title { font-size: clamp(24px, 6.4vw, 34px); } }
@@ -670,6 +673,61 @@ section.hero--home { min-height: 44vh; }
 @media (max-width: 480px) {
   .hero__links { gap: var(--sp-2); margin-top: var(--sp-5); }
   .hero__link { padding: 8px 14px; font-size: 14px; }
+}
+/* этапы работы (поле «Этапы работы» обложки главной) — строка на всю ширину внизу обложки: номер, этап, пояснение
+   в несколько слов; на планшете и телефоне — по два в ряд. Подсказки «Каталог оборудования ↓» при них нет */
+.hero__content:has(.hero__steps) { padding-bottom: var(--sp-6); }
+.hero__steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: var(--sp-6) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+.hero__step { min-width: 0; }
+.hero__step + .hero__step { border-left: 1px solid rgba(255, 255, 255, 0.12); }
+.hero__step-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 10px;
+  height: 100%;
+  padding: var(--sp-4) var(--sp-5) 0;
+  color: var(--neutral-0);
+  text-decoration: none;
+}
+.hero__step:first-child .hero__step-link { padding-left: 0; }
+.hero__step-num {
+  grid-row: span 2;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: var(--fw-bold);
+  line-height: 22px;
+  letter-spacing: 0.04em;
+  color: var(--green-400);
+}
+.hero__step-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: var(--fw-semibold);
+  line-height: 22px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.hero__step-text { margin-top: 2px; font-size: 13.5px; line-height: 1.4; color: rgba(255, 255, 255, 0.68); }
+a.hero__step-link:hover .hero__step-title { color: var(--green-400); }
+a.hero__step-link:focus-visible { outline: 2px solid var(--green-400); outline-offset: 2px; }
+@media (max-width: 960px) {
+  .hero__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero__step:nth-child(odd) { border-left: 0; }
+  .hero__step:nth-child(odd) .hero__step-link { padding-left: 0; }
+  .hero__step:nth-child(n + 3) .hero__step-link { padding-top: var(--sp-3); }
+}
+@media (max-width: 480px) {
+  .hero__step-link { padding-right: var(--sp-3); column-gap: 8px; }
+  .hero__step:nth-child(even) .hero__step-link { padding-left: var(--sp-3); }
+  .hero__step-title { font-size: 15px; line-height: 20px; }
+  .hero__step-num { line-height: 20px; }
+  .hero__step-text { font-size: 13px; }
 }
 /* Scroll indicator */
 .hero__scroll {

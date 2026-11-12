@@ -28,6 +28,9 @@
 main:has(> .hero--home) > :is(.equip, .leadgen, .solve, .foundry, .stock-show, .care, .upgrade, .works, .lease, .geomap, .best-offer) {
   padding-block: clamp(84px, 9vw, 132px);
 }
+/* «Оборудование» сразу под обложкой — меньше воздуха сверху и под шапкой раздела: его начало видно на первом экране */
+main:has(> .hero--home) > .hero--home + .equip { padding-top: clamp(32px, 3vw, 48px); }
+main:has(> .hero--home) > .hero--home + .equip .equip__head { margin-bottom: clamp(24px, 2.4vw, 36px); }
 main:has(> .hero--home) :is(.equip__title, .leadgen__title, .solve__title, .foundry__title, .stock-show__title, .care__title, .upgrade__title, .works__title, .lease__title, .geomap__title, .bo-info__title) {
   font-size: clamp(32px, 3.6vw, 52px);
   line-height: 1.05;

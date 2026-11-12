@@ -588,6 +588,11 @@ export const homeHeroBlock = z
       .array(z.object({ href: href(), label: inline('Подпись') }))
       .optional()
       .describe('Быстрые переходы (под кнопками)'),
+    /** этапы работы — строкой внизу обложки (с ними нет подсказки «Каталог оборудования ↓») */
+    steps: z
+      .array(z.object({ title: inline('Этап'), text: inline('Пояснение в несколько слов').optional(), href: href('Ссылка').optional() }))
+      .optional()
+      .describe('Этапы работы (строкой внизу обложки)'),
     quickCard: z
       .object({
         badge: inline('Плашка'),
