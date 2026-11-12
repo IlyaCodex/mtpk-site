@@ -57,6 +57,7 @@ export function activeNavFor(path: string): string | undefined {
   if (slug.startsWith('kontakty')) return 'kontakty';
   if (slug.startsWith('otzyvy')) return 'otzyvy';
   if (slug.startsWith('praktikum')) return 'praktikum';
+  if (slug.startsWith('kalkulyatory')) return 'kalkulyatory';
   return undefined;
 }
 

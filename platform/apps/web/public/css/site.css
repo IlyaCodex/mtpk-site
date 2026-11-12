@@ -497,10 +497,10 @@ body { margin: 0; }
   background: var(--neutral-950); /* fallback пока нет видео */
   color: var(--neutral-0);
 }
-/* Главная: hero по высоте содержимого — 5 px сверху до надзаголовка, внизу этапы работы; под ним сразу виден блок
-   «Оборудование» (12.11.2026). Праздничная обложка — своей высоты (holiday.css), .hero О компании не трогает */
+/* Главная: hero по высоте содержимого — небольшой отступ сверху до надзаголовка, внизу этапы работы; под ним сразу
+   виден блок «Оборудование» (12.11.2026). Праздничная обложка — своей высоты (holiday.css), .hero О компании не трогает */
 section.hero--home { min-height: 0; }
-.hero--home:not(.hero--holiday) .hero__content { padding-top: 5px; }
+.hero--home:not(.hero--holiday) .hero__content { padding-top: var(--sp-5); }
 /* надзаголовок — блоком: строчный блок сидел бы на линии текста на 6 px ниже края */
 .hero--home:not(.hero--holiday) .hero__eyebrow { display: flex; width: fit-content; }
 /* Заголовок hero на главной — компактнее (блок ниже за счёт меньшего h1) */

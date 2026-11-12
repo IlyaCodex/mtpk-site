@@ -762,32 +762,39 @@ a.pcard__stock-badge:hover { background: var(--green-700, #2E6B27); }
  * 16. Шапка с полным меню (от 1025px) — по ширине контента: поля
  *     те же, что у .container (32px), логотип — над левым краем
  *     контента, микроформа звонка — над правым. Строка «логотип +
- *     7 пунктов + поиск + тема + форма» умещается в эту ширину:
+ *     9 пунктов + поиск + тема + форма» умещается в эту ширину:
  *     меню плотнее по мере сужения экрана, логотип меньше, а ниже
- *     1201px форма уходит (телефоны остаются в верхней строке).
+ *     1301px форма уходит (телефоны остаются в верхней строке).
  *     Раньше поля шапки на 1025-1560px были 16px (шапка шире контента),
  *     шире 1560px полное меню выпирало вправо на 32px, а на 1100-1200px
- *     форма вылезала за экран (прокрутка вбок).
+ *     форма вылезала за экран (прокрутка вбок). 12.11.2026 в меню стало
+ *     9 пунктов («Калькуляторы»): отступы пунктов меньше, на 1301-1440px
+ *     они растут вместе с шириной, форма уходит уже ниже 1301px — иначе
+ *     кнопки шапки заходили в поле контейнера или давали прокрутку вбок.
  * ============================================================ */
 @media (min-width: 1025px) {
   .nav { gap: 0; }
   .header__inner { gap: var(--sp-3); }
 }
-/* контейнер максимальной ширины (1440px): меню — 692px */
+/* контейнер максимальной ширины (1440px): меню — около 760px */
 @media (min-width: 1441px) {
-  .nav__link { padding-left: 10px; padding-right: 10px; }
+  .nav__link { padding-left: 7px; padding-right: 7px; }
 }
 @media (min-width: 1025px) and (max-width: 1440px) {
-  .nav__link { padding-left: var(--sp-2); padding-right: var(--sp-2); font-size: 13px; }
+  .nav__link {
+    padding-left: clamp(4px, calc((100vw - 1232px) / 18), var(--sp-2));
+    padding-right: clamp(4px, calc((100vw - 1232px) / 18), var(--sp-2));
+    font-size: 13px;
+  }
 }
 @media (min-width: 1025px) and (max-width: 1300px) {
   .nav__link { padding-left: 6px; padding-right: 6px; font-size: 12px; }
 }
-@media (min-width: 1025px) and (max-width: 1260px) {
+@media (min-width: 1025px) and (max-width: 1440px) {
   .header__brand img { max-height: 40px; }
 }
 /* форме звонка не хватает места (и на планшетах и телефонах с гамбургером) */
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   body .header-quick-form { display: none; }
 }
 @media (min-width: 1025px) and (max-width: 1120px) {
