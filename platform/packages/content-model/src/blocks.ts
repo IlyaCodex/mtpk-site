@@ -201,6 +201,8 @@ export const productHeroBlock = z
     title: inline('Название (H1)'),
     status: inline('Статус / срок').optional(),
     price: inline('Цена').optional(),
+    /** к цене-сумме: «базовая комплектация», «с НДС» */
+    priceNote: inline('Пояснение к цене').optional(),
     keyspecs: z.array(z.object({ num: inline('Значение'), label: inline('Параметр') })).describe('Ключевые характеристики'),
     actions: z.array(action).describe('Кнопки'),
     facts: z.array(z.object({ icon: svgIcon(), text: inline('Текст') })).describe('Факты (доставка, гарантия…)'),

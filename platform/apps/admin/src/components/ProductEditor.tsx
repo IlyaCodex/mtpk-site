@@ -27,6 +27,7 @@ type Hero = {
   title: string;
   status?: string;
   price?: string;
+  priceNote?: string;
   keyspecs: { num: string; label: string }[];
   actions: unknown[];
   facts: unknown[];
@@ -199,10 +200,14 @@ export function ProductEditor({
                           <TextInput value={short} onChange={setShort} placeholder="Например: УИД-376" />
                         </label>
                         <label className="block">
-                          <Label>Цена</Label>
-                          <TextInput value={hero.price} onChange={(price) => setHero({ price: price || undefined })} placeholder="Например: Цена — по запросу" />
+                          <Label hint="(сумма — крупно)">Цена</Label>
+                          <TextInput value={hero.price} onChange={(price) => setHero({ price: price || undefined })} placeholder="Например: 4 200 000 ₽ или Цена — по запросу" />
                         </label>
                       </div>
+                      <label className="block">
+                        <Label hint="(рядом с суммой, необязательно)">Пояснение к цене</Label>
+                        <TextInput value={hero.priceNote} onChange={(priceNote) => setHero({ priceNote: priceNote || undefined })} placeholder="Например: базовая комплектация" />
+                      </label>
                       <label className="block">
                         <Label>Наличие и срок</Label>
                         <TextInput value={hero.status} onChange={(status) => setHero({ status: status || undefined })} placeholder="Например: В наличии · отгрузка от 1 дня" />
@@ -221,12 +226,13 @@ export function ProductEditor({
                     </div>
                   </Section>
 
-                  <Section title="Фото товара" hint="Первое фото — главное. Порядок меняется перетаскиванием. Под каждым фото — его описание (alt).">
+                  <Section title="Фото товара" hint="Первое фото — главное. Порядок меняется перетаскиванием, «Удалить» убирает фото со страницы товара. Под каждым фото — его описание (alt).">
                     {/* у части товаров (со старого сайта) у главного фото отдельное описание mainAlt — сайт выводит его вместо
                         alt первого фото; в галерее показываем действующее и при правке оставляем одно поле — alt фото */}
                     <GalleryField
                       value={typeof hero.media.mainAlt === 'string' ? hero.media.photos.map((p, i) => (i === 0 ? { ...p, alt: hero.media.mainAlt as string } : p)) : hero.media.photos}
                       onChange={(photos) => setMedia({ photos, mainAlt: undefined })}
+                      min={1}
                     />
                     <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <label className="block">

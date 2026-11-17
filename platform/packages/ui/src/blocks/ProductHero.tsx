@@ -7,11 +7,15 @@ import { isMadeInRussia, productSlug } from '../catalog/rules.ts';
 import { sectionOf, type RenderContext } from '../context.ts';
 import { ProductMedia } from './ProductMedia.tsx';
 
+/** В цене есть сумма («4 200 000 ₽»), а не текст «Цена — по запросу». */
+const hasAmount = (html: string) => /\d/.test(html.replace(/&#?\w+;/g, ' ').replace(/<[^>]*>/g, ''));
+
 /**
  * Карточка товара (первый экран страницы модели): крошки, фото с галереей,
  * название, статус и цена, ключевые характеристики, кнопки, факты.
  * Позиция на складе — статус «В наличии · отгрузка…» и бейдж на фото; у позиции с ценой
  * (админка «Наличие на складе») — её цена вместо цены из карточки («Цена — по запросу»).
+ * Сумма в цене карточки показывается так же крупно, с пояснением рядом («базовая комплектация»).
  */
 export function ProductHero({ block, ctx }: { block: ProductHeroBlock; ctx: RenderContext }) {
   const slug = productSlug(ctx.path);
@@ -20,6 +24,7 @@ export function ProductHero({ block, ctx }: { block: ProductHeroBlock; ctx: Rend
   const status = stock && block.status !== undefined ? `В наличии · отгрузка ${stock.shipping || 'от 1 рабочего дня'}` : block.status;
   const offer = stock?.offer;
   const amount = offer ? priceHtml(offer.price, offer.priceFrom) : undefined;
+  const ownAmount = !amount && block.price !== undefined && hasAmount(block.price);
   const compare = ctx.compareSections.includes(sectionOf(ctx.path));
   return (
     <section className="phero" data-stock={stock ? 'true' : undefined}>
@@ -36,6 +41,11 @@ export function ProductHero({ block, ctx }: { block: ProductHeroBlock; ctx: Rend
                 <span className="phero__price phero__price--value">
                   <Inline className="phero__price-amount" html={amount} />
                   {offer?.priceNote && <span className="phero__price-note">{offer.priceNote}</span>}
+                </span>
+              ) : ownAmount ? (
+                <span className="phero__price phero__price--value">
+                  <Inline className="phero__price-amount" html={block.price!} />
+                  {block.priceNote && <Inline className="phero__price-note" html={block.priceNote} />}
                 </span>
               ) : (
                 block.price !== undefined && <Inline className="phero__price" html={block.price} />

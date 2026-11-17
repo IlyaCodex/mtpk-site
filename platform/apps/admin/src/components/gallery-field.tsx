@@ -22,7 +22,8 @@ const move = <T,>(list: T[], from: number, to: number): T[] => {
 /**
  * Галерея фото товара: сетка карточек. Первое фото — главное. Порядок —
  * перетаскиванием или стрелками; фото добавляются загрузкой с компьютера
- * (кнопкой или перетаскиванием файлов на галерею) и выбором из медиатеки.
+ * (кнопкой или перетаскиванием файлов на галерею) и выбором из медиатеки,
+ * убираются кнопкой «Удалить» на фото (файл остаётся в медиатеке).
  * Новые файлы кладутся в папку товара: img/products/<адрес>/ (или в folder).
  * Фото виджетов (сетка, карусель): primary=false — без «главного» и
  * миниатюры, fields — подпись и ссылка под каждым фото.
@@ -34,6 +35,7 @@ export function GalleryField({
   primary = true,
   fields = [],
   folder: ownFolder,
+  min = 0,
 }: {
   value: Photo[];
   onChange: (v: Photo[]) => void;
@@ -42,6 +44,8 @@ export function GalleryField({
   fields?: PhotoField[];
   /** папка медиатеки для загрузок (по умолчанию — папка страницы) */
   folder?: string;
+  /** сколько фото должно остаться (у товара — главное фото обязательно) */
+  min?: number;
 }) {
   const { pagePath } = useEditorContext();
   const folder = ownFolder ?? uploadFolderFor(pagePath);
@@ -55,6 +59,10 @@ export function GalleryField({
 
   const set = (i: number, patch: Partial<Photo>) => onChange(value.map((p, j) => (j === i ? { ...p, ...patch } : p)));
   const add = (urls: string[]) => onChange([...value, ...urls.filter((u) => !value.some((p) => p.src === u)).map((src) => ({ src, alt: '' }))]);
+  const remove = (i: number) => {
+    if (value.length <= min) return toast.error('Это единственное фото — сначала добавьте другое, потом удалите это');
+    if (window.confirm('Удалить фото? Файл останется в медиатеке — его можно добавить снова.')) onChange(value.filter((_, j) => j !== i));
+  };
 
   async function upload(files: FileList | File[]) {
     const images = [...files].filter((f) => f.type.startsWith('image/'));
@@ -151,12 +159,12 @@ export function GalleryField({
                 </span>
                 <button
                   type="button"
-                  title="Убрать из галереи"
-                  className="absolute top-1.5 right-1.5 hidden h-6 w-6 items-center justify-center rounded-full bg-white/95 text-slate-500 shadow hover:text-red-600 group-hover:flex"
-                  aria-label="Убрать из галереи"
-                  onClick={() => window.confirm('Убрать фото из галереи? Файл останется в медиатеке.') && onChange(value.filter((_, j) => j !== i))}
+                  title="Удалить фото (файл останется в медиатеке)"
+                  className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-white/95 py-0.5 pr-2 pl-1.5 text-[11px] font-medium text-slate-600 shadow hover:bg-red-50 hover:text-red-600"
+                  onClick={() => remove(i)}
                 >
-                  <Icon name="close" className="h-3.5 w-3.5" />
+                  <Icon name="trash" className="h-3.5 w-3.5" />
+                  Удалить
                 </button>
               </div>
               <div className="space-y-1.5 p-2">
