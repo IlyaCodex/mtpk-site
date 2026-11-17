@@ -537,6 +537,11 @@ AVIF/WebP делает медиасервис. Композиция у всех 
 - **TODO:** в будущем — 4 уникальных fal.ai-рендера моделей
   (`model-uid-3512.png` … `model-uid-3525.png`) и реальные фото с боевого WP
   /из цеха для phero-галерей (`uid-3512-photo-1..N.jpg` и т.д.).
+- **УИД-3500** (17.11.2026, просьба Евгения — фото из файла `Desktop\UR\Пять_типов_дробемётного_оборудования…docx`,
+  не через /product-image: генератора на этом компьютере нет): медиатека `img/drobemet/uid-3500/01.jpg` (1271×953) —
+  обложка карточки и единственное фото страницы. Кадр по установке без погрузчика, баннер с надписью на заднем плане
+  закрашен фоном. Исходник и кадр — `picture/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/uid-3500/`.
+  Перерисовать в цех-канон — /product-image, когда будет генератор.
 
 ### Каталог «Дробемёты проходные подвесного типа» — `/products/drobemetnoe-oborudovanie/prokhodnye-podvesnogo-tipa/`
 **Источники:** `picture/products/drobemetnoe-oborudovanie/`

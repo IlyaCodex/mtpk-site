@@ -138,16 +138,16 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │       └── /products/drobemetnoe-oborudovanie/kranovogo-tipa/uid-376e/  ✅ T05 · Карточка позиции УИД-376Е
 │   │   └── /products/drobemetnoe-oborudovanie/barabannogo-tipa/           ✅ T04 · Каталог «Дробемёты барабанного типа» (10 моделей УИД)
 │   │       └── 10 карточек T05 uid-320, uid-322, uid-324, uid-326, uid-3110, uid-3113, uid-3210, uid-3220, uid-15, uid-28
-│   │   └── /products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/  ✅ T04 · Каталог «С вращающимся столом» (4 модели УИД)
-│   │       └── 4 карточки T05 uid-3512, uid-3515, uid-3518, uid-3525
-│   │   └── /products/drobemetnoe-oborudovanie/dlya-shvellera-i-sorta/         ✅ T04 · Каталог «Для швеллера, двутавра и сорта» (12 моделей УИД для проката)
-│   │       └── 12 карточек T05 uid-1500-1000, uid-1500-1200, uid-1700-1200, uid-1900-1000, uid-1900-1200, uid-2300-1200, uid-2300-1400, uid-2500-1000, uid-2500-1200, uid-2500-1400, uid-2800-1200, uid-3800-1700
+│   │   └── /products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/  ✅ T04 · Каталог «С вращающимся столом» (5 моделей УИД)
+│   │       └── 5 карточек T05 uid-3500 (с 17.11.2026, цена базовой комплектации), uid-3512, uid-3515, uid-3518, uid-3525
+│   │   └── /products/drobemetnoe-oborudovanie/dlya-shvellera-i-sorta/         ✅ T04 · Каталог «Для швеллера, двутавра и сорта» (13 моделей УИД для проката)
+│   │       └── 13 карточек T05 uid-800-400 (с 17.11.2026, цена базовой комплектации), uid-1500-1000, uid-1500-1200, uid-1700-1200, uid-1900-1000, uid-1900-1200, uid-2300-1200, uid-2300-1400, uid-2500-1000, uid-2500-1200, uid-2500-1400, uid-2800-1200, uid-3800-1700
 │   │   └── /products/drobemetnoe-oborudovanie/prokhodnye-podvesnogo-tipa/     ✅ T04 · Каталог «Проходные подвесного типа» (4 модели УИД)
 │   │       └── 4 карточки T05 uid-383, uid-384, uid-485, uid-4810
-│   │   └── /products/drobemetnoe-oborudovanie/dlya-ochistki-trub/             ✅ T04 · Каталог «Для очистки труб» (5 моделей УИДТ)
-│   │       └── 5 карточек T05 uidt-20, uidt-30, uidt-50, uidt-100, uidt-150
+│   │   └── /products/drobemetnoe-oborudovanie/dlya-ochistki-trub/             ✅ T04 · Каталог «Для очистки труб» (6 моделей УИДТ)
+│   │       └── 6 карточек T05 uidt-10 (с 17.11.2026, цена базовой комплектации), uidt-20, uidt-30, uidt-50, uidt-100, uidt-150
 │   │   └── /products/drobemetnoe-oborudovanie/s-lentochnym-konveyerom/        ✅ T04 · Каталог «С ленточным сетчатым конвейером» (4 модели УИД)
-│   │       └── 4 карточки T05 uid-60, uid-80, uid-100, uid-120
+│   │       └── 4 карточки T05 uid-60 (по файлу 17.11.2026, цена базовой комплектации), uid-80, uid-100, uid-120
 │   │   └── /products/drobemetnoe-oborudovanie/s-vykatnym-stolom/              ✅ T04 · Каталог «С выкатным столом» (4 модели УИД-76)
 │   │       └── 4 карточки T05 uid-765, uid-7610, uid-7620, uid-7630
 │   │   └── /products/drobemetnoe-oborudovanie/peredvizhnye/                   ✅ T04 · Каталог «Передвижные дробемёты» (3 модели BH)
