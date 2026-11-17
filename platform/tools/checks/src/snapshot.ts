@@ -27,7 +27,8 @@ function stable(html: string): string {
   return html
     .replace(/<script id="__NEXT_DATA__"[\s\S]*?<\/script>/, '')
     .replace(/\/_next\/static\/[^"' )]+/g, '/_next/static/*')
-    .replace(/(\/assets\/[a-z0-9-]+?)-[0-9a-f]{8,}\.(js|css)/g, '$1-*.$2')
+    // хеш esbuild — 8 заглавных букв и цифр (site-TMEHS6AX.js), прежний — шестнадцатеричный
+    .replace(/(\/assets\/[a-z0-9-]+?)-(?:[0-9a-f]{8,}|[0-9A-Z]{8})\.(js|css)/g, '$1-*.$2')
     .replace(/<meta name="next-head-count"[^>]*>/, '');
 }
 
@@ -68,7 +69,8 @@ export function compareSnapshots(base: Snapshot, now: Snapshot): { same: number;
   let same = 0;
   for (const p of Object.keys(now.pages).sort()) {
     if (!(p in base.pages)) continue;
-    const d = firstDifference(canonHtml(base.pages[p]), canonHtml(now.pages[p]), 90);
+    // эталон мог сохраниться прежней версией stable — приводим и его
+    const d = firstDifference(canonHtml(stable(base.pages[p])), canonHtml(now.pages[p]), 90);
     if (d) diffs.push({ path: p, was: d.a, now: d.b });
     else same++;
   }

@@ -163,12 +163,25 @@ export function extractProperties(html: string): Record<string, unknown>[] {
   });
 }
 
+/** Цена из карточки товара (поле «Цена, ₽» блока productHero). */
+export interface OwnPrice {
+  price: number;
+  priceFrom?: boolean;
+}
+
 /**
  * Product — на товарных страницах (.phero, .product-overview, .tr-product-overview). Цена (offers) — только
- * когда товар есть в «Наличии на складе» с ценой и страница её показывает (карточка .phero): остальная цена
- * проектная, её в разметке нет.
+ * та, что страница показывает (карточка .phero): позиции «Наличия на складе» с ценой, иначе цена товара из его
+ * карточки (own); «Цена — по запросу» в разметку не идёт.
  */
-export function buildProductSchema(html: string, description: string | null, canonicalAbs: string, site = DEFAULT_SITE, offer?: StockOffer): string | null {
+export function buildProductSchema(
+  html: string,
+  description: string | null,
+  canonicalAbs: string,
+  site = DEFAULT_SITE,
+  offer?: StockOffer,
+  own?: OwnPrice,
+): string | null {
   const isHero = /<section\s+class="phero"/.test(html);
   const isSpare = /<div\s+class="product-overview"/.test(html);
   const isTr = /<div\s+class="tr-product-overview"/.test(html);
@@ -223,6 +236,11 @@ export function buildProductSchema(html: string, description: string | null, can
       offerCount: String(offer.offers),
       availability: 'https://schema.org/InStock',
     };
+  } else if (own && isHero) {
+    // цена из карточки товара: «от» — нижняя граница; наличие не указываем — товар под заказ
+    schema.offers = own.priceFrom
+      ? { '@type': 'AggregateOffer', lowPrice: String(own.price), priceCurrency: 'RUB', offerCount: '1' }
+      : { '@type': 'Offer', price: String(own.price), priceCurrency: 'RUB', url: canonicalAbs };
   }
   return JSON.stringify(schema);
 }
@@ -323,12 +341,13 @@ export function buildFaqSchema(html: string): string | null {
   });
 }
 
-/** Все JSON-LD страницы в порядке вывода: Breadcrumb, FAQ, Product, Article. offer — цена товара со склада. */
+/** Все JSON-LD страницы в порядке вывода: Breadcrumb, FAQ, Product, Article. offer — цена товара со склада, own — из его карточки. */
 export function buildPageJsonLd(
   body: string,
   page: { path: string; title: string; description: string | null; publishedAt?: string | null; modifiedAt?: string | null },
   site = DEFAULT_SITE,
   offer?: StockOffer,
+  own?: OwnPrice,
 ): string[] {
   const slug = page.path.replace(/^\/|\/$/g, '');
   const pageUrlAbs = `${site}/${slug}${slug ? '/' : ''}`;
@@ -338,7 +357,7 @@ export function buildPageJsonLd(
   if (breadcrumb) out.push(breadcrumb);
   const faq = buildFaqSchema(body);
   if (faq) out.push(faq);
-  const product = buildProductSchema(body, page.description, canonicalAbs, site, offer);
+  const product = buildProductSchema(body, page.description, canonicalAbs, site, offer, own);
   if (product) out.push(product);
   const article = buildArticleSchema(body, page.description, canonicalAbs, {
     published: page.publishedAt ?? undefined,

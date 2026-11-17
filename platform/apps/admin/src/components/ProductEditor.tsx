@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRef, useState, type ReactNode } from 'react';
 import { api } from '@/lib/client-api';
-import type { ProductEntity } from '@/lib/catalog';
+import { plain, type ProductEntity, type StockPrice } from '@/lib/catalog';
 import { BlockList, type BlockData, type BlockSchemas } from './BlockList';
 import { ProductCardFields, productCardBody, type Option, type ProductCardDraft, type SubOption } from './catalog-forms';
 import { EditorContext } from './editor-context';
@@ -26,7 +26,11 @@ type Hero = {
   origin?: string;
   title: string;
   status?: string;
+  /** надпись без цены: «Цена — по запросу» */
   price?: string;
+  /** цена, ₽ */
+  amount?: number;
+  amountFrom?: boolean;
   priceNote?: string;
   keyspecs: { num: string; label: string }[];
   actions: unknown[];
@@ -69,12 +73,15 @@ export function ProductEditor({
   siteUrl,
   crumbs,
   catalog,
+  stockPrice,
 }: {
   initial: EditablePage;
   schemas: BlockSchemas;
   siteUrl: string;
   crumbs: Crumb[];
   catalog?: CatalogProductProps;
+  /** цена товара в «Наличии на складе» — страница показывает её */
+  stockPrice?: StockPrice;
 }) {
   const extra = useRef<ExtraDraft | null>(null);
   const { page, update, dirty: pageDirty, saving: pageSaving, save, rebase } = usePageDraft(initial, extra);
@@ -133,7 +140,7 @@ export function ProductEditor({
   const short = hero.breadcrumbs.at(-1)?.label ?? '';
   const setShort = (label: string) => setHero({ breadcrumbs: hero.breadcrumbs.map((c, i, all) => (i === all.length - 1 ? { ...c, label } : c)) });
   const heroSchema = schemas.productHero?.schema;
-  const plain = (s: string) => s.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
+  const priceFields = <PriceFields hero={hero} setHero={setHero} stockPrice={stockPrice} />;
 
   const tabs: [Tab, string][] = [
     ...(catalog ? [['card', 'В каталоге'] as [Tab, string]] : []),
@@ -178,12 +185,17 @@ export function ProductEditor({
 
             <EditorContext.Provider value={{ pagePath: page.path }}>
               {tab === 'card' && card && catalog && (
-                <ProductCardFields
-                  draft={card}
-                  set={(patch) => setCard((c) => (c ? { ...c, ...patch } : c))}
-                  categories={catalog.categories}
-                  subcategories={catalog.subcategories}
-                />
+                <div className="space-y-5">
+                  <Section title="Цена" hint="На странице товара — крупно, рядом с наличием. То же поле — во вкладке «Страница товара».">
+                    {priceFields}
+                  </Section>
+                  <ProductCardFields
+                    draft={card}
+                    set={(patch) => setCard((c) => (c ? { ...c, ...patch } : c))}
+                    categories={catalog.categories}
+                    subcategories={catalog.subcategories}
+                  />
+                </div>
               )}
 
               {tab === 'main' && (
@@ -200,21 +212,14 @@ export function ProductEditor({
                           <TextInput value={short} onChange={setShort} placeholder="Например: УИД-376" />
                         </label>
                         <label className="block">
-                          <Label hint="(сумма — крупно)">Цена</Label>
-                          <TextInput value={hero.price} onChange={(price) => setHero({ price: price || undefined })} placeholder="Например: 4 200 000 ₽ или Цена — по запросу" />
+                          <Label hint="(строка над названием)">Происхождение</Label>
+                          <TextInput value={hero.origin} onChange={(origin) => setHero({ origin: origin || undefined })} placeholder="Например: Производство Россия" />
                         </label>
                       </div>
-                      <label className="block">
-                        <Label hint="(рядом с суммой, необязательно)">Пояснение к цене</Label>
-                        <TextInput value={hero.priceNote} onChange={(priceNote) => setHero({ priceNote: priceNote || undefined })} placeholder="Например: базовая комплектация" />
-                      </label>
+                      {priceFields}
                       <label className="block">
                         <Label>Наличие и срок</Label>
                         <TextInput value={hero.status} onChange={(status) => setHero({ status: status || undefined })} placeholder="Например: В наличии · отгрузка от 1 дня" />
-                      </label>
-                      <label className="block">
-                        <Label hint="(строка над названием)">Происхождение</Label>
-                        <TextInput value={hero.origin} onChange={(origin) => setHero({ origin: origin || undefined })} placeholder="Например: Производство Россия" />
                       </label>
                       <label className="block sm:w-1/2 sm:pr-2">
                         <Label>Публикация</Label>
@@ -332,6 +337,59 @@ export function ProductEditor({
         </div>
       </div>
     </BuilderProvider>
+  );
+}
+
+/** Цена как на сайте: «от 4 200 000 ₽». */
+const priceText = (price: number, from?: boolean) => `${from ? 'от ' : ''}${price.toLocaleString('ru-RU')} ₽`;
+
+/**
+ * Цена товара: сумма в рублях (на странице — крупно, с «от» и пояснением, и в разметке для поисковиков);
+ * пусто — надпись «Цена — по запросу». У позиции «Наличия на складе» с ценой страница показывает её.
+ */
+function PriceFields({ hero, setHero, stockPrice }: { hero: Hero; setHero: (patch: Partial<Hero>) => void; stockPrice?: StockPrice }) {
+  // вставленное «4 200 000 ₽» — тоже цена: берём цифры до копеек
+  const setAmount = (text: string) => {
+    const amount = Number(text.split(/[.,]/)[0].replace(/\D/g, ''));
+    setHero(amount > 0 ? { amount } : { amount: undefined, amountFrom: undefined });
+  };
+  const note = hero.priceNote ? plain(hero.priceNote) : '';
+  return (
+    <div className="space-y-2">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <Label>Цена, ₽</Label>
+          <div className="flex items-center gap-3">
+            <input className="field" inputMode="numeric" aria-label="Цена, ₽" value={hero.amount ?? ''} placeholder="Например: 4200000" onChange={(e) => setAmount(e.target.value)} />
+            <label className={cx('inline-flex shrink-0 items-center gap-2 text-sm', hero.amount ? 'text-slate-700' : 'text-slate-400')}>
+              <input type="checkbox" checked={Boolean(hero.amountFrom)} disabled={!hero.amount} onChange={(e) => setHero({ amountFrom: e.target.checked || undefined })} />
+              «от»
+            </label>
+          </div>
+        </div>
+        <label className="block">
+          <Label hint="(рядом с ценой, необязательно)">Пояснение к цене</Label>
+          <TextInput value={hero.priceNote} onChange={(priceNote) => setHero({ priceNote: priceNote || undefined })} placeholder="Например: базовая комплектация" />
+        </label>
+      </div>
+      <p className="text-xs text-slate-500">
+        {hero.amount
+          ? `На сайте: ${priceText(hero.amount, hero.amountFrom)}${note ? ` ${note}` : ''} — на странице товара и в разметке цены для поисковиков; кнопка «Запросить цену» становится «Оставить заявку».`
+          : hero.price
+            ? `Пусто — на сайте «${plain(hero.price)}».`
+            : 'Пусто — цены на странице нет.'}
+      </p>
+      {stockPrice && (
+        <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          Товар есть в «Наличии на складе» с ценой {priceText(stockPrice.price, stockPrice.priceFrom)}
+          {stockPrice.priceNote ? ` ${stockPrice.priceNote}` : ''} — пока позиция на складе, страница показывает её. Цена склада меняется в разделе{' '}
+          <Link className="underline" href="/stock">
+            «Наличие на складе»
+          </Link>
+          .
+        </p>
+      )}
+    </div>
   );
 }
 

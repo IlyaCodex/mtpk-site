@@ -248,6 +248,25 @@ export interface ProductEntity extends Omit<CatProduct, 'path' | 'status' | 'upd
   page: { id: number; path: string; status: string; updatedAt: string };
 }
 
+/** Цена товара со склада — её страница товара показывает вместо своей, пока позиция в «Наличии». */
+export type StockPrice = { price: number; priceFrom: boolean; priceNote?: string };
+
+/**
+ * Цена со склада для страницы товара (как на сайте, content-kit `stockBySlug`): наименьшая из видимых
+ * позиций «Наличия» с ценой, ведущих на эту страницу; «от» — если так у неё или цены у позиций разные.
+ */
+export function stockPriceFor(
+  items: { url: string; price?: number | null; priceFrom?: boolean; priceNote?: string | null; hidden?: boolean }[],
+  path: string,
+): StockPrice | undefined {
+  const pathOf = (url: string) => url.trim().replace(/[?#].*$/, '').replace(/\/?$/, '/');
+  const priced = items.flatMap((i) => (!i.hidden && i.price && i.price > 0 && pathOf(i.url) === path ? [{ ...i, price: i.price }] : []));
+  if (!priced.length) return undefined;
+  const low = priced.reduce((a, b) => (b.price < a.price ? b : a));
+  const high = Math.max(...priced.map((i) => i.price));
+  return { price: low.price, priceFrom: Boolean(low.priceFrom) || high > low.price, ...(low.priceNote?.trim() ? { priceNote: low.priceNote.trim() } : {}) };
+}
+
 /** Последний сегмент адреса: '/products/a/b/' → 'b' (так раздел выбирается в адресе каталога). */
 export const lastSegment = (path: string) => path.split('/').filter(Boolean).pop() ?? '';
 

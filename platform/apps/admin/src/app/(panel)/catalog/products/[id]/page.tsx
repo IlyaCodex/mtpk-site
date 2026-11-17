@@ -5,7 +5,7 @@ import { catalogTrail } from '@/components/catalog-trail';
 import { ProductEditor } from '@/components/ProductEditor';
 import type { EditablePage } from '@/components/use-page-draft';
 import { requireUser } from '@/lib/auth';
-import type { CatalogTree, ProductEntity } from '@/lib/catalog';
+import { stockPriceFor, type CatalogTree, type ProductEntity } from '@/lib/catalog';
 import { env } from '@/lib/env';
 import { ServiceError, serviceJson } from '@/lib/services';
 
@@ -25,10 +25,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     if (err instanceof ServiceError && err.status === 404) notFound();
     throw err;
   });
-  const [page, schemas, tree] = await Promise.all([
+  const [page, schemas, tree, stock] = await Promise.all([
     serviceJson<Raw>('content', `pages/${product.page.id}`, { user }),
     serviceJson<{ blocks: BlockSchemas }>('content', 'block-schemas', { user }),
     serviceJson<CatalogTree>('content', 'catalog/tree', { user }),
+    serviceJson<{ items: Parameters<typeof stockPriceFor>[0] }>('content', 'stock', { user }),
   ]);
   const { extraMeta, kind: _kind, ...rest } = page;
   return (
@@ -38,6 +39,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       siteUrl={env().PUBLIC_SITE_URL}
       crumbs={catalogTrail(tree, product.categoryId, product.subcategoryId)}
       catalog={{ product, categories: tree.categories.filter((c) => c.kind === 'equipment'), subcategories: tree.subcategories }}
+      stockPrice={stockPriceFor(stock.items, page.path)}
     />
   );
 }

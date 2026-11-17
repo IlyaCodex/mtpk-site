@@ -79,3 +79,17 @@ test('товар со склада с ценой: offers — AggregateOffer (н�
   const spare = '<div class="product-overview"><h1>Конденсатор ЭЭВП</h1></div>';
   assert.equal(JSON.parse(buildProductSchema(spare, null, url, undefined, { price: 50000, priceFrom: false, offers: 1 })!).offers, undefined);
 });
+
+test('цена из карточки товара: Offer (с «от» — AggregateOffer) без отметки наличия; цена склада — главнее', () => {
+  const html = '<section class="phero"><div class="phero__main"><img src="/img/p.webp"></div><h1 class="phero__title">Дробемётная установка УИД-3500</h1></section>';
+  const url = 'https://uralinduktor.ru/products/drobemetnoe-oborudovanie/s-vrashchayushchimsya-stolom/uid-3500/';
+  const own = JSON.parse(buildProductSchema(html, null, url, undefined, undefined, { price: 2099000 })!);
+  assert.deepEqual(own.offers, { '@type': 'Offer', price: '2099000', priceCurrency: 'RUB', url });
+  const from = JSON.parse(buildProductSchema(html, null, url, undefined, undefined, { price: 2099000, priceFrom: true })!);
+  assert.deepEqual(from.offers, { '@type': 'AggregateOffer', lowPrice: '2099000', priceCurrency: 'RUB', offerCount: '1' });
+  const both = JSON.parse(buildProductSchema(html, null, url, undefined, { price: 1990000, priceFrom: false, offers: 1 }, { price: 2099000 })!);
+  assert.equal(both.offers.lowPrice, '1990000');
+  assert.equal(both.offers.availability, 'https://schema.org/InStock');
+  const spare = '<div class="product-overview"><h1>Конденсатор ЭЭВП</h1></div>';
+  assert.equal(JSON.parse(buildProductSchema(spare, null, url, undefined, undefined, { price: 50000 })!).offers, undefined);
+});

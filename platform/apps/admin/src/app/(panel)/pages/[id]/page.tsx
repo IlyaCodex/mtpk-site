@@ -5,7 +5,7 @@ import { DocumentEditor } from '@/components/DocumentEditor';
 import { PageEditor, type EditablePage } from '@/components/PageEditor';
 import { ProductEditor } from '@/components/ProductEditor';
 import { requireUser } from '@/lib/auth';
-import { editorCrumbs } from '@/lib/catalog';
+import { editorCrumbs, stockPriceFor } from '@/lib/catalog';
 import { env } from '@/lib/env';
 import { ServiceError, serviceJson } from '@/lib/services';
 
@@ -43,9 +43,12 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
   const initial = { ...rest, source: String(extraMeta?.source ?? '') };
   const crumbs = editorCrumbs(page.path, page.blocks as never);
   const props = { initial, schemas: schemas.blocks, siteUrl: env().PUBLIC_SITE_URL, crumbs };
-  return page.blocks.some((b) => b.type === 'productHero') ? (
-    <ProductEditor {...props} />
-  ) : (
+  if (page.blocks.some((b) => b.type === 'productHero')) {
+    // карточка товара вне записей каталога: цена со склада — та же подсказка, что у товаров каталога
+    const stock = await serviceJson<{ items: Parameters<typeof stockPriceFor>[0] }>('content', 'stock', { user });
+    return <ProductEditor {...props} stockPrice={stockPriceFor(stock.items, page.path)} />;
+  }
+  return (
     // в клиентский редактор — только данные: разметку подсказки он строит сам
     <PageEditor {...props} catalogOwner={catalog && catalog.kind !== 'product' ? { kind: catalog.kind, id: catalog.id } : undefined} />
   );

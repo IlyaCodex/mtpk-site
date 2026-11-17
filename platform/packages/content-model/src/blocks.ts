@@ -200,8 +200,13 @@ export const productHeroBlock = z
     origin: inline('Происхождение (над заголовком)').optional(),
     title: inline('Название (H1)'),
     status: inline('Статус / срок').optional(),
-    price: inline('Цена').optional(),
-    /** к цене-сумме: «базовая комплектация», «с НДС» */
+    /** надпись, когда цены нет: «Цена — по запросу» */
+    price: inline('Надпись без цены').optional(),
+    /** цена, ₽ (админка «Цена, ₽»): крупно вместо надписи и в разметке Product; у позиции склада с ценой — её цена */
+    amount: z.number().int().positive().describe('Цена, ₽').optional(),
+    /** «от» перед ценой */
+    amountFrom: z.boolean().describe('«от» перед ценой').optional(),
+    /** к цене: «базовая комплектация», «с НДС» */
     priceNote: inline('Пояснение к цене').optional(),
     keyspecs: z.array(z.object({ num: inline('Значение'), label: inline('Параметр') })).describe('Ключевые характеристики'),
     actions: z.array(action).describe('Кнопки'),

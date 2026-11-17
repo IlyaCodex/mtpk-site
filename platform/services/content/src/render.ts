@@ -45,7 +45,7 @@ export function legacyFeatures(blocks: Block[]): string[] {
   return html ? detectPageFeatures(html).filter((f) => !REPLACED_BY_MODULES.has(f)) : [];
 }
 
-/** Запись БД → страница для вывода. offer — цена товара со склада (в разметку Product). */
+/** Запись БД → страница для вывода. offer — цена товара со склада (в разметку Product; без неё — цена из карточки товара). */
 export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: string, offer?: StockOffer): PageDto {
   const base = {
     path: page.path,
@@ -87,6 +87,9 @@ export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: st
 
   const blocks = page.blocks as Block[];
   const html = seoHtml(page);
+  // цена из карточки товара (поле «Цена, ₽») — в разметку Product, если со склада цены нет
+  const hero = blocks.find((b): b is Extract<Block, { type: 'productHero' }> => b.type === 'productHero');
+  const own = hero?.amount ? { price: hero.amount, priceFrom: hero.amountFrom } : undefined;
   return {
     ...base,
     blocks,
@@ -104,6 +107,7 @@ export function renderPage(page: Page, styles: Map<string, StyleBlock>, site: st
       },
       site,
       offer,
+      own,
     ),
     features: legacyFeatures(blocks),
     searchable: isSearchable(page.path),
