@@ -6,10 +6,12 @@ const $=<T extends HTMLElement = HTMLInputElement>(id: string)=>document.getElem
 const listing=$<HTMLElement>('products'),cards=listing?[...listing.querySelectorAll<HTMLElement>('.product-card')]:[];
 let pageNumber=1, pageSize=24, filteredCards=cards;
 const normalize=(t: string)=>t.toLowerCase().replace(/ё/g,'е');
+// «Порядок каталога»: сначала детали турбин нового образца, за ними — старого, остальное — как в каталоге
+const generation=(c: HTMLElement)=>/нового\s+образца/i.test(c.dataset.name!)?0:/старого\s+образца/i.test(c.dataset.name!)?1:2;
 function filterCatalog(){
  const category=$('category-select').value,model=$('model-select').value,query=normalize($('search').value).trim().split(/\s+/).filter(Boolean);
  filteredCards=cards.filter(c=>(!category||c.dataset.category===category)&&(!model||c.dataset.scope==='turbine'||JSON.parse(c.dataset.models!).includes(model))&&query.every(q=>normalize(c.dataset.search!).includes(q)));
- if($('sort-select').value==='name')filteredCards.sort((a,b)=>a.dataset.name!.localeCompare(b.dataset.name!,'ru'));else filteredCards.sort((a,b)=>Number(a.dataset.order)-Number(b.dataset.order));
+ if($('sort-select').value==='name')filteredCards.sort((a,b)=>a.dataset.name!.localeCompare(b.dataset.name!,'ru'));else filteredCards.sort((a,b)=>generation(a)-generation(b)||Number(a.dataset.order)-Number(b.dataset.order));
  pageNumber=1;drawPage();
 }
 function drawPage(){
