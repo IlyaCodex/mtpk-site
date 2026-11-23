@@ -345,9 +345,9 @@ export function MediaBrowser({
 }
 
 /** Поле «картинка/файл»: адрес, превью и выбор из медиатеки. */
-export function MediaInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+export function MediaInput({ value, onChange, folder: emptyFolder = 'img/' }: { value: string; onChange: (v: string) => void; /** папка медиатеки, пока картинки нет */ folder?: string }) {
   const [open, setOpen] = useState(false);
-  const folder = value.startsWith('/') ? value.slice(1).replace(/[^/]+$/, '') : 'img/';
+  const folder = value.startsWith('/') ? value.slice(1).replace(/[^/]+$/, '') : emptyFolder;
   return (
     <div className="flex items-start gap-3">
       {value && isImage(value) ? (

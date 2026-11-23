@@ -20,6 +20,7 @@ import { buildCalculatorEquipment, HTS_MIXERS } from '@mtpk/content-kit/calculat
 import { hiddenPages, resolveCatalogBlocks, type CatalogData } from '@mtpk/content-kit/catalog';
 import { darkVars } from '@mtpk/content-kit/dark';
 import { hiddenTest, pruneHiddenHtml, pruneHiddenLinks, type HiddenTest } from '@mtpk/content-kit/hidden-links';
+import { hasSpareCards, sparePhotoOfBlocks, syncSpareCardBlocks, type SparePhoto } from '@mtpk/content-kit/spare-photos';
 import { styleFileCss } from '@mtpk/content-kit/styles';
 import {
   DEFAULT_HOLIDAYS,
@@ -168,9 +169,12 @@ export class ContentStore {
     const reports = hasPhotoReportBlocks(resolved.blocks as Block[])
       ? { ...resolved, blocks: resolvePhotoReportBlocks(resolved.blocks as Block[], (await this.photoReports()).items) }
       : resolved;
-    const out = hasCalculatorBlocks(reports.blocks as Block[])
+    const calc = hasCalculatorBlocks(reports.blocks as Block[])
       ? { ...reports, blocks: resolveCalculatorBlocks(reports.blocks as Block[], await this.calculatorEquipment()) }
       : reports;
+    // карточки запчастей (списки, «похожие») — с фото со страницы детали
+    const photos = hasSpareCards(calc.blocks) ? await this.sparePhotos() : null;
+    const out = photos ? { ...calc, blocks: syncSpareCardBlocks(calc.blocks as Block[], (path) => photos[path]) } : calc;
     // карточки, разделы и ссылки скрытых тумблером разделов каталога — не на сайте (в базе и в админке — как есть)
     const hidden = hiddenHref(data);
     if (!hidden) return out;
@@ -359,6 +363,26 @@ export class ContentStore {
     });
   }
 
+  /** Фото страниц запчастей (адрес → фото; null — заглушка): их показывают и карточки детали на других страницах. */
+  async sparePhotos(): Promise<Record<string, SparePhoto | null>> {
+    return this.cache.wrap('spare-photos', this.ttl, async () => {
+      const rows = await this.db.$queryRaw<{ path: string; blocks: unknown }[]>`SELECT path, blocks FROM content.pages WHERE blocks::text LIKE '%product-photo%'`;
+      const out: Record<string, SparePhoto | null> = {};
+      for (const r of rows) {
+        const photo = sparePhotoOfBlocks(r.blocks);
+        if (photo !== undefined) out[r.path] = photo;
+      }
+      return out;
+    });
+  }
+
+  /** Страницы с карточкой детали (списки раздела, «похожие») — при смене её фото обновляются и они. */
+  async spareCardPages(path: string): Promise<string[]> {
+    const needle = `class=\\"card-image\\" href=\\"${path}\\"`;
+    const rows = await this.db.$queryRaw<{ path: string }[]>`SELECT path FROM content.pages WHERE position(${needle} in blocks::text) > 0`;
+    return rows.map((r) => r.path);
+  }
+
   /** Страницы с блоком фотоотчётов — их кеш сбрасывается при сохранении отчётов. */
   async photoReportPages(): Promise<string[]> {
     const rows = await this.db.$queryRaw<{ path: string }[]>`SELECT path FROM content.pages WHERE blocks::text LIKE '%"photoReports"%'`;
@@ -405,7 +429,7 @@ export class ContentStore {
     this.styles = null;
     if (!paths || !paths.length) return this.cache.clear();
     await this.cache.del(...paths.map((p) => `page:${p}`), 'pages:list', 'redirects', 'stock-source', 'stock-view', 'stock-pages', 'site-data', 'catalog', 'hidden-pages');
-    if (paths.some((p) => p.startsWith('/products/'))) await this.cache.del('compare', 'calc-equipment');
+    if (paths.some((p) => p.startsWith('/products/'))) await this.cache.del('compare', 'calc-equipment', 'spare-photos');
     return paths.length;
   }
 }

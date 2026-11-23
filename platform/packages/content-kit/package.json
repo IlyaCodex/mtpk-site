@@ -23,7 +23,8 @@
     "./hidden-links": "./src/hidden-links.ts",
     "./hero-css": "./src/hero-css.ts",
     "./calculators": "./src/calculators.ts",
-    "./calculator-equipment": "./src/calculator-equipment.ts"
+    "./calculator-equipment": "./src/calculator-equipment.ts",
+    "./spare-photos": "./src/spare-photos.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

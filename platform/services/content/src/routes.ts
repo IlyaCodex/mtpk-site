@@ -20,6 +20,7 @@ import { extractBlocksInlineStyles, rulesToCss } from '@mtpk/content-kit/inline-
 import { resolveCatalogBlocks } from '@mtpk/content-kit/catalog';
 import { annotateDocument, setDocMeta } from '@mtpk/content-kit/doc-edit';
 import { responsiveHeroCss } from '@mtpk/content-kit/hero-css';
+import { sparePhotoOfBlocks } from '@mtpk/content-kit/spare-photos';
 import {
   block as blockSchema,
   BLOCK_LABELS,
@@ -480,10 +481,15 @@ export async function adminRoutes(base: FastifyInstance, deps: Deps) {
       await catalogPageGuard(db, req.params.id, normalizePath(req.body.path));
       // её карточка видна в списках — их кеш тоже сбрасывается (статус и адрес входят в карточку)
       const before = catalogDependents(await loadCatalog(db), req.params.id);
+      const prev = await db.page.findUnique({ where: { id: req.params.id }, select: { blocks: true } });
       const res = await savePage(req.body, req.params.id);
       if (!res) return reply.code(404).send({ error: 'not_found' });
       const after = catalogDependents(await loadCatalog(db), req.params.id);
-      await changed([...new Set([...res.paths, ...before, ...after])]);
+      // фото запчасти — и в её карточках на других страницах (списки раздела, «похожие»)
+      const saved = await db.page.findUnique({ where: { id: req.params.id }, select: { path: true, blocks: true } });
+      const photoChanged = saved && JSON.stringify(sparePhotoOfBlocks(prev?.blocks) ?? null) !== JSON.stringify(sparePhotoOfBlocks(saved.blocks) ?? null);
+      const cards = photoChanged ? await store.spareCardPages(saved.path) : [];
+      await changed([...new Set([...res.paths, ...before, ...after, ...cards])]);
       return { ok: true, id: req.params.id };
     },
   );

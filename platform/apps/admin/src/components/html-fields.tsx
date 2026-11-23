@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useEditorContext } from './editor-context';
 import { IconField } from './icon-picker';
 import { Icon } from './icons';
-import { MediaInput } from './media';
+import { fileSrc, MediaInput } from './media';
 import { ItemActions } from './schema-form';
 import { fromHtml, TextInput } from './text-fields';
 import { cx } from './ui';
@@ -170,6 +171,8 @@ type Field =
   | { kind: 'textNode'; path: Path; label: string; value: string; item: Path | null }
   | { kind: 'href'; path: Path; label: string; value: string; item: Path | null }
   | { kind: 'image'; path: Path; label: string; src: string; alt: string; item: Path | null }
+  | { kind: 'sparePhoto'; path: Path; label: string; src: string; alt: string; item: Path | null }
+  | { kind: 'note'; path: Path; label: string; value: string; item: Path | null }
   | { kind: 'icon'; path: Path; label: string; value: string; item: Path | null };
 
 type ItemGroup = { list: Path; items: Path[]; role: string };
@@ -220,6 +223,18 @@ function collect(html: string): { fields: Field[]; groups: Map<string, ItemGroup
         const value = el.getAttribute(attr);
         if (value !== null && value !== '') fields.push({ kind: 'formAttr', path: pathOf(el, root), label, attr, value, multiline: Boolean(multiline), item: itemPath(el) });
       }
+      return;
+    }
+    // фото запчасти (кнопка «увеличить» с картинкой или заглушка «Фотография уточняется») — одно поле
+    if (tag === 'button' && classesOf(el).includes('product-photo')) {
+      const img = el.querySelector('img');
+      fields.push({ kind: 'sparePhoto', path: pathOf(el, root), label: 'Фото детали', src: img?.getAttribute('src') ?? '', alt: img?.getAttribute('alt') ?? '', item: itemPath(el) });
+      return;
+    }
+    // карточка запчасти в списке: фото — со страницы детали (сайт подставляет его сам), правится там
+    if (tag === 'a' && classesOf(el).includes('card-image')) {
+      fields.push({ kind: 'href', path: pathOf(el, root), label: 'Ссылка — адрес', value: el.getAttribute('href') ?? '', item: itemPath(el) });
+      fields.push({ kind: 'note', path: pathOf(el, root), label: 'Фото карточки', value: 'берётся со страницы детали — поле «Фото детали» на её странице', item: itemPath(el) });
       return;
     }
     if (tag === 'img') {
@@ -297,7 +312,10 @@ export function HtmlFieldsEditor({ html, onChange }: { html: string; onChange: (
               onChange={(v) =>
                 onChange(
                   patch(html, f.path, (n) => {
-                    (n as Element).innerHTML = v;
+                    const el = n as Element;
+                    el.innerHTML = v;
+                    // подпись под фото запчасти — она же подпись в окне увеличения
+                    if (el.classList.contains('photo-caption')) el.parentElement?.querySelector('.product-photo[data-zoom]')?.setAttribute('data-caption', el.textContent?.trim() ?? '');
                   }),
                 )
               }
@@ -343,6 +361,14 @@ export function HtmlFieldsEditor({ html, onChange }: { html: string; onChange: (
             <IconField value={f.value} removable onChange={(svg) => onChange(patch(html, f.path, (n) => replaceElement(n as Element, svg)))} />
           </div>
         );
+      case 'note':
+        return (
+          <p key={key} className="text-xs text-slate-500">
+            <span className="font-medium text-slate-600">{f.label}</span> — {f.value}
+          </p>
+        );
+      case 'sparePhoto':
+        return <SparePhotoField key={key} field={f} html={html} onChange={onChange} />;
       case 'image':
         return (
           <div key={key} className="space-y-2 rounded-lg border border-slate-200 p-3">
@@ -435,6 +461,83 @@ export function HtmlFieldsEditor({ html, onChange }: { html: string; onChange: (
     );
   });
   return <div className="space-y-3">{out}</div>;
+}
+
+const escAttr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/** Заглушка вместо фото запчасти — как у деталей со старого сайта. */
+const SPARE_PLACEHOLDER = '<button class="product-photo" disabled=""><div class="empty-image">Фотография<br>уточняется при подборе</div></button>';
+
+/** Размер картинки медиатеки (для width/height — без сдвига вёрстки); не загрузилась — без размера. */
+function imageSize(src: string): Promise<{ w: number; h: number } | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img.naturalWidth ? { w: img.naturalWidth, h: img.naturalHeight } : null);
+    img.onerror = () => resolve(null);
+    img.src = fileSrc(src);
+  });
+}
+
+/**
+ * Фото запчасти: одно, на её странице — с увеличением по щелчку; карточки детали в списках раздела
+ * и «похожих» сайт показывает с ним же (content-kit spare-photos). Нет фото — заглушка.
+ */
+function SparePhotoField({ field: f, html, onChange }: { field: Extract<Field, { kind: 'sparePhoto' }>; html: string; onChange: (html: string) => void }) {
+  const { pagePath } = useEditorContext();
+  const section = pagePath.match(/^\/products\/zapchasti\/([^/]+)\//)?.[1];
+  const setPhoto = async (src: string) => {
+    if (!src.trim()) return onChange(patch(html, f.path, (n) => replaceElement(n as Element, SPARE_PLACEHOLDER)));
+    const size = await imageSize(src);
+    onChange(
+      patch(html, f.path, (n) => {
+        const button = n as Element;
+        const root = button.getRootNode() as DocumentFragment;
+        // описание: прежнее, у новой — название детали (заголовок страницы)
+        const alt = f.alt || root.querySelector('h1')?.textContent?.replace(/\s+/g, ' ').trim() || '';
+        const caption = button.parentElement?.querySelector('.photo-caption')?.textContent?.trim() ?? '';
+        replaceElement(
+          button,
+          `<button class="product-photo" data-zoom="${escAttr(src)}" data-alt="${escAttr(alt)}" data-caption="${escAttr(caption)}" aria-label="Увеличить изображение">` +
+            `<img src="${escAttr(src)}" alt="${escAttr(alt)}"${size ? ` width="${size.w}" height="${size.h}"` : ''} loading="eager" decoding="async"></button>`,
+        );
+      }),
+    );
+  };
+  return (
+    <div className="space-y-2 rounded-lg border border-slate-200 p-3">
+      <div>
+        <span className="mb-1 block text-xs font-medium text-slate-600">{f.label}</span>
+        <MediaInput value={f.src} folder={section ? `img/zapchasti/${section}/` : undefined} onChange={(v) => void setPhoto(v)} />
+        <span className="mt-1 block text-[11px] text-slate-400">
+          {f.src
+            ? 'На странице — с увеличением по щелчку; в карточках детали в списках раздела — тоже это фото.'
+            : 'Сейчас на сайте заглушка «Фотография уточняется при подборе». Выберите фото или загрузите новое в окне медиатеки — оно появится и в карточках детали в списках раздела.'}
+        </span>
+      </div>
+      {f.src && (
+        <>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-slate-600">Что на фото (для поиска и незрячих)</span>
+            <input
+              className="field"
+              value={f.alt}
+              onChange={(e) =>
+                onChange(
+                  patch(html, f.path, (n) => {
+                    const button = n as Element;
+                    button.setAttribute('data-alt', e.target.value);
+                    button.querySelector('img')?.setAttribute('alt', e.target.value);
+                  }),
+                )
+              }
+            />
+          </label>
+          <button type="button" className="text-xs text-slate-500 underline hover:text-red-600" onClick={() => void setPhoto('')}>
+            Убрать фото — вернуть заглушку
+          </button>
+        </>
+      )}
+    </div>
+  );
 }
 
 /** Название секции для списка блоков: aria-label, первый заголовок или класс. */
