@@ -4,7 +4,7 @@
  */
 
 /** Разделы с бейджем «Сделано в России» и исключения из них. */
-const MADE_ALLOW = ['induktsionnye-plavilnye-pechi', 'drobemetnoe-oborudovanie', 'sistemy-ohlazhdeniya'];
+const MADE_ALLOW = ['induktsionnye-plavilnye-pechi', 'drobemetnoe-oborudovanie', 'sistemy-ohlazhdeniya', 'tiristornye-preobrazovateli-chastoty'];
 const MADE_DENY = [
   'induktsionnye-plavilnye-pechi/tranzistornye',
   'sistemy-ohlazhdeniya/chillery',

@@ -81,6 +81,10 @@ picture/
 │                                                # card-modelnaya-osnastka.jpg 680×510 (кадр tool-radial) — карточка в разделе ЛГМ;
 │                                                # og-osnastka-lgm.jpg 1200×630 — фон обложки страницы (и превью ссылки);
 │                                                # tool-radial.webp в медиатеке, на странице не используется
+├── products/tiristornye-preobrazovateli-chastoty/ # пакет «ТПЧ» V7 (24.11.2026): 14 фото узлов (обзорная *-obzor.webp и крупная),
+│                                                # 4 кадра шкафа, схема tpch-funkcionalnaya-shema.svg, чертёж шкафа 400 кВт — в медиатеке
+│                                                # /img/tpch/; shkaf-tpch-400-kartochka.webp — вид спереди с чертежа (обложка карточки
+│                                                # раздела на главной); опросный лист TXT и PDF (печать, 3 листа A4) — /files/tpch/
 ├── products/zapchasti/tigli/                     # пакет «Тигли» V4.3 (09.10.2026): 18 фото (photo-*.png,
 │                                                # graphite-quartz.png) и 13 схем размеров (dimensions-*.svg) —
 │                                                # в медиатеке /img/crucibles/ (14 страниц, хаб запчастей, корень каталога);
