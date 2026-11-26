@@ -177,29 +177,27 @@ L4  ТОВАР (296 шт.)            /products/<раздел>/<категори
 │   │   │   └── 10 карточек T05 uig-10t … uig-200t
 │   │   └── /products/sistemy-ohlazhdeniya/chillery/    ✅ T04 · Каталог «Чиллеры УИЧ» (25 моделей)
 │   │       └── 25 карточек T05 uich-005 … uich-30v
-│   ├── /products/stalerozlivochnye-kovshi/             ✅ T03a · Хаб «Сталеразливочные ковши» (5 категорий + 42 товара T05)
-│   │   ├── …/stalerazlivochnye-kovshi-dlya-rasplavlennoj-stali/      ✅ T04 · Для расплавленной стали
-│   │   ├── …/stalerazlivochnye-kovshi-dlya-rasplavlennogo-chuguna/   ✅ T04 · Для расплавленного чугуна
-│   │   ├── …/stalerazlivochnye-kovshi-stopornogo-tipa/               ✅ T04 · Стопорного типа
-│   │   ├── …/stalerazlivochnye-kovshi-chajnikovogo-tipa/             ✅ T04 · Чайникового типа
-│   │   ├── …/kovshi-dlya-modificirovaniya-chuguna/                  ✅ T04 · Для модифицирования чугуна (пакет V8)
-│   │   ├── …/kak-vybrat-litejnyj-kovsh/                          ✅ T02 · Как выбрать ковш (пакет V8)
-│   │   ├── …/kovshi-s-kryshkoj-i-specialnye-ispolneniya/         ✅ T02 · С крышкой и специсполнения
-│   │   ├── …/komplektuyushchie-litejnyh-kovshej/                 ✅ T02 · Комплектующие и запчасти
-│   │   ├── …/oprosnyj-list/                                      ✅ T02 · Опросный лист на ковш
-│   │   └── 62 карточки T05 УИК-… вложены под своими 5 категориями
-│   ├── /products/stendy-sushki-i-nagreva-kovshej/    ✅ T03a · Хаб «Стенды сушки и нагрева ковшей» (пакет V8, 25.09.2026)
-│   │   ├── …/gazovye/                                ✅ T04 · Газовые стенды (8 исполнений)
+│   ├── /products/stalerozlivochnye-kovshi/             ✅ T03a · Хаб «Сталеразливочные и чугунолитейные ковши» (пакет V12, 26.11.2026)
+│   │   ├── …/stalerazlivochnye-kovshi-dlya-rasplavlennoj-stali/      ✅ T04 · Сталеразливочные поворотные ковши (12 моделей 0,3–10 т)
+│   │   ├── …/stalerazlivochnye-kovshi-dlya-rasplavlennogo-chuguna/   ✅ T04 · Чугунолитейные разливочные ковши (15 моделей 0,3–15 т)
+│   │   ├── …/stalerazlivochnye-kovshi-stopornogo-tipa/               ✅ T04 · Стопорные ковши с донным сливом (11 моделей 0,5–10 т)
+│   │   ├── …/stalerazlivochnye-kovshi-chajnikovogo-tipa/             ✅ T04 · Чайниковые литейные ковши (10 моделей 0,5–8 т)
+│   │   ├── …/kovshi-dlya-modificirovaniya-chuguna/                  ✅ T04 · Ковши для модифицирования чугуна (11 моделей 0,3–10 т)
+│   │   ├── …/kak-vybrat-litejnyj-kovsh/                          ✅ T02 · Как выбрать литейный ковш
+│   │   ├── …/kovshi-s-kryshkoj-i-specialnye-ispolneniya/         ✅ T02 · Ковши с крышкой и специальные исполнения
+│   │   ├── …/komplektuyushchie-litejnyh-kovshej/                 ✅ T02 · Комплектующие литейных ковшей
+│   │   ├── …/oprosnyj-list/                                      ✅ T02 · Опросный лист на ковш (TXT — /files/kovshi/)
+│   │   └── 59 моделей T05: названия и SEO пакета V12 («Сталеразливочный поворотный ковш 0,5 т»), адреса прежние (/uik-s-0-5/…);
+│   │       УИК-С-12а, УИК-С-12б, УИК-Ч-16 (в пакете их нет) скрыты тумблером, 301 на свою серию (26.11.2026)
+│   ├── /products/stendy-sushki-i-nagreva-kovshej/    ✅ T03a · Хаб «Стенды сушки и нагрева ковшей» (пакет V8 → V12, 26.11.2026)
+│   │   ├── …/gazovye/                                ✅ T04 · Газовые стенды (8 исполнений; …/3-4-t/ — «для ковшей 3-5 т», правка Евгения)
 │   │   └── …/elektricheskie/                         ✅ T04 · Электрические стенды (3 исполнения)
 │   │       — дизельный стенд 15 т не публикуется: исполнение по запросу (решение Евгения 25.09)
-│   │   └── …/oprosnyj-list/                             ✅ T02 · Опросный лист на стенд
+│   │   └── …/oprosnyj-list/                             ✅ T02 · Опросный лист на стенд (TXT — /files/stendy/)
 │   │       — прежняя страница …/stalerozlivochnye-kovshi/stend-dlya-sushki-i-nagreva-litejnogo-kovsha/ → 301 на хаб
-│   │   📷 Картинки: `astro/public/img/card-kovsh-{slug-короткий}.jpg` × 5
-│   │       — перерисованы через **fal-ai/gpt-image-1/edit-image** (GPT Image 2, quality=high)
-│   │       с реальных фото клиента из `ФОТО/Сталеразливочные ковши/Галлерея с фото/` как референсов:
-│   │       конструкция (рёбра жёсткости, траверсы, стопорные/тилт-механизмы, красный маховик) 1-в-1,
-│   │       стиль — антрацит/teal-green на чистом белом студийном фоне, без логотипов.
-│   │       Hero: `kovshi-hero.jpg` — цех с тремя ковшами через nano-banana 16:9.
+│   │   📷 Картинки (пакет V12, 26.11.2026): обложки ковшей — рендеры пакета на белом с полями до 4:3
+│   │       `img/kovshi/<серия>-ladle-4x3.jpg`; у стендов обложки прежние (просьба Евгения); схемы размеров и фото
+│   │       узлов — в разделах страниц (см. picture.md). Фон первых экранов — прежний `kovshi-hero.jpg`.
 │   │   🍰 В мегаменю: пункт «Лабораторное оборудование» заменён на «Сталеразливочные ковши»
 │   │       (Header.astro, иконка — стилизованный ковш с боковым носком).
 │   │   📌 Slug'и 1-в-1 с боевого (stalerOzlivochnye в названии раздела, stalerAzlivochnye в подкатегориях
